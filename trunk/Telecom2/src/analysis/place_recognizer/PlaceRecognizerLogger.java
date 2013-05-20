@@ -1,0 +1,286 @@
+package analysis.place_recognizer;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import network.NetworkCell;
+
+import org.gps.utils.LatLonPoint;
+
+import analysis.PlsEvent;
+
+import visual.Kml;
+
+
+
+public class PlaceRecognizerLogger {
+	
+	public static void log(String username, String kind_of_place, Map<Integer, Cluster> clusters) {
+		try {
+		new File("output/place_recognition/"+username).mkdir();
+		new File("output/place_recognition/"+username+"/"+kind_of_place).mkdir();
+		
+		
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("output/place_recognition/"+username+"/"+kind_of_place+"/eventsXcluster.txt")));	
+		for(int k : clusters.keySet()) {
+			out.println("Cluster "+k+":");
+			List<PlsEvent> events = clusters.get(k).getEvents();
+			for(PlsEvent e: events) {
+				out.println("\t"+e);
+			}
+		}
+		out.close();
+		
+		DecimalFormat df = new DecimalFormat("###.####",new DecimalFormatSymbols(Locale.US));
+		out = new PrintWriter(new BufferedWriter(new FileWriter("output/place_recognition/"+username+"/"+kind_of_place+"/weight_evolution.txt")));	
+		for(int k : clusters.keySet()) {
+			Cluster c = clusters.get(k);
+			double w_time = c.getWeight("WeightOnTime");
+			double w_day = c.getWeight("WeightOnDay");
+			double w_diversity = c.getWeight("WeightOnDiversity");		
+			
+			out.println("Cluster "+k+":\tsize = "+c.size()+
+					                  "\tw_time = "+df.format(w_time) + 
+									  "\tw_day = "+df.format(w_time+w_day) +
+								      "\tw_diversity = "+df.format(w_time+w_day+w_diversity));
+	
+		}
+		out.close();
+		
+		
+		
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	private static final String[] COLORS = new String[]{
+		"0000ff", "ff0000", "00ff00", "ff00ff", "ffff00", "00ffff",
+		"000077", "770000", "007700", "770077", "777700", "007777",
+		"bb0000", "330000", "bb0077", "77bb33", "33bb77", "bb3377",
+		"ddaaee", "ee9900", "55f63e", "c3c433", "ffff00", "00ffff"
+	};
+	
+	private static PrintWriter outKml;
+	private static Kml kml;
+	public static void openKMLFile(String file) {
+		try {
+			outKml = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+			kml = new Kml();
+			kml.printHeaderFolder(outKml, "Results");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void closeKMLFile() {
+		try {
+			kml.printFooterFolder(outKml);
+			outKml.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public static void openUserFolder(String username) {
+		kml.printFolder(outKml, username.substring(0,5));
+	}
+	
+	public static void closeUserFolder() {
+		kml.closeFolder(outKml);
+	}
+	
+	
+	public static void logkml(String kind_of_place, Map<Integer, Cluster> clusters, List<LatLonPoint> placemarks) {
+		try {
+			
+			kml.printFolder(outKml, kind_of_place);
+			int colorIndex=0;
+			
+			
+			
+			kml.printFolder(outKml, "resutls");
+			
+			outKml.println("<Style id=\""+getColor(kind_of_place)+"\">" +
+						   "<IconStyle>" +
+						   "<color>ff"+getColor(kind_of_place)+"</color>" +
+						   "<scale>1.2</scale>" +
+						   "<Icon>" +
+						   "<href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href>" +
+						   "</Icon>" +
+						   "</IconStyle>" +
+							"</Style>");
+				
+			
+			for(LatLonPoint p: placemarks)
+				outKml.println("<Placemark>" +
+						    "<name>"+kind_of_place+"</name>" +
+						    "<styleUrl>#"+getColor(kind_of_place)+"</styleUrl>" +
+						    "<Point>" +
+						    "<coordinates>"+p.getLongitude()+","+p.getLatitude()+",0</coordinates>" +
+						    "</Point>" +
+						    "</Placemark>");
+			
+			
+			kml.closeFolder(outKml);
+			
+			
+			
+			for(int k: clusters.keySet()){
+				
+				if(k == -1) continue;
+				
+				List<PlsEvent> clusterEvents = clusters.get(k).getEvents();
+				
+				kml.printFolder(outKml, "cluster "+k);
+				
+				Map<Long, List<PlsEvent>> clusterByCells = new HashMap<Long, List<PlsEvent>>();
+				for(PlsEvent e: clusterEvents){
+					List<PlsEvent> l = clusterByCells.get(e.getCellac());
+					if(l == null) {
+						l = new ArrayList<PlsEvent>();
+						clusterByCells.put(e.getCellac(), l);
+					}
+					l.add(e);
+				} 
+				
+				
+				for(long celllac: clusterByCells.keySet()){
+					String desc = getDescription(clusterEvents, clusterByCells.get(celllac));
+					int cellsize = clusterByCells.get(celllac).size();
+					NetworkCell cell = network.NetworkMap.getInstance().get(celllac);
+					String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
+					outKml.println(cell.toKml(COLORS[colorIndex % (COLORS.length)],name,desc));
+				}
+				colorIndex++;
+				kml.closeFolder(outKml);
+			}
+			kml.closeFolder(outKml);
+			
+					
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public static String getColor(String kind_of_place) {
+		if(kind_of_place.startsWith("HOME")) 
+			return COLORS[0];
+		else if(kind_of_place.startsWith("WORK")) 
+			return COLORS[1];
+		else if(kind_of_place.startsWith("FRIDAY_NIGHT")) 
+			return COLORS[2];
+		else if(kind_of_place.startsWith("SATURDAY_NIGHT")) 
+			return COLORS[3];
+		else if(kind_of_place.startsWith("SUNDAY")) 
+			return COLORS[4];
+		else if(kind_of_place.startsWith("NIGHT")) 
+			return COLORS[5];
+		else if(kind_of_place.startsWith("GENERIC")) 
+			return COLORS[6];
+		return COLORS[7];
+	}
+	
+	
+	
+	public static final String[] DAYS = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+	public static final int WIDTH = 200;
+	public static final int HEIGHT = 100;
+	
+	public static String getDescription(List<PlsEvent> cluster, List<PlsEvent> cell) {
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("<table>");
+		sb.append("<tr>");
+		
+		sb.append("<td>");
+		sb.append("<b>Hour Counter Cluster</b><br>");
+		sb.append(getHourDist(cluster));
+		sb.append("</td>");
+		
+		sb.append("<td>");
+		sb.append("<b>Hour Counter Cell</b><br>");
+		sb.append(getHourDist(cell));
+		sb.append("</td>");
+		
+		sb.append("</tr><tr>");
+		
+		sb.append("<td>");
+		sb.append("<b>Day Counter Cluster</b><br>");
+		sb.append(getDayDist(cluster));
+		sb.append("</td>");
+		
+		sb.append("<td>");
+		sb.append("<b>Day Counter Cell</b><br>");
+		sb.append(getDayDist(cell));
+		sb.append("</td>");
+		
+		sb.append("</tr>");
+		sb.append("</table>");
+		return sb.toString();
+		
+	}
+	
+	public static String getHourDist(List<PlsEvent> x) {
+		int[] counter = new int[24];
+		Calendar c = new GregorianCalendar();
+		for(PlsEvent e: x){
+			c.setTimeInMillis(e.getTimeStamp());
+			//int day_of_week = c.get(Calendar.DAY_OF_WEEK)-1;
+			//int day = c.get(Calendar.DAY_OF_MONTH);
+			//int month = c.get(Calendar.MONTH);
+			int hour = c.get(Calendar.HOUR_OF_DAY);
+			
+			counter[hour]++;
+		}
+		int max = 0;
+		StringBuffer sb2 = new StringBuffer();
+		for(int i=0; i<counter.length;i++) {
+			max = counter[i] > max ? counter[i] : max;
+			sb2.append(","+counter[i]);
+		}
+		String data = sb2.toString().substring(1);
+		
+		return "<img src=\"http://chart.googleapis.com/chart?chxl=0:|0|6|12|18|23&chxp=0,0,6,12,18,23&chxr=0,0,23|1,0,"+max+"&chxt=x,y&chbh=a&chs="+WIDTH+"x"+HEIGHT+"&cht=bvs&chco=76A4FB&chds=0,"+max+"&chd=t:"+data+"\" width=\""+WIDTH+"\" height=\""+HEIGHT+"\" alt=\"\" />";
+	}
+	
+	public static String getDayDist(List<PlsEvent> x) {
+		int[] counter = new int[7];
+		Calendar c = new GregorianCalendar();
+		for(PlsEvent e: x){
+			c.setTimeInMillis(e.getTimeStamp());
+			int day_of_week = c.get(Calendar.DAY_OF_WEEK)-1;
+			//int day = c.get(Calendar.DAY_OF_MONTH);
+			//int month = c.get(Calendar.MONTH);
+			//int hour = c.get(Calendar.HOUR_OF_DAY);
+			
+			counter[day_of_week]++;
+		}
+		int max = 0;
+		StringBuffer sb2 = new StringBuffer();
+		for(int i=0; i<counter.length;i++) {
+			max = counter[i] > max ? counter[i] : max;
+			sb2.append(","+counter[i]);
+		}
+		String data = sb2.toString().substring(1);
+		
+		return "<img src=\"http://chart.googleapis.com/chart?chxl=0:|Sun|Mon|Tue|Wed|Thu|Fri|Sat&chxp=0,0.5,1.5,2.5,3.5,4.5,5.5,6.5&chxr=0,0,7|1,0,"+max+"&chxt=x,y&chbh=a,3&chs="+WIDTH+"x"+HEIGHT+"&cht=bvs&chco=008000&chds=0,"+max+"&chd=t:"+data+"\" width=\""+WIDTH+"\" height=\""+HEIGHT+"\" alt=\"\" />";
+	}	
+	
+	
+}
