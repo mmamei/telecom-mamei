@@ -10,7 +10,7 @@
 network_map_file = C:/DATASET/PLS/file_rete/dfl_network_20120406.txt
 
 // File di rete serializzato
-network_map_bin = cache/network.bin
+network_map_bin = C:/BASE/cache/network.bin
 
 // Cartella con i PLS
 pls_folder = C:/DATASET/PLS/file_pls_piem/file_pls_piem_2

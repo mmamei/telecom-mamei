@@ -56,6 +56,9 @@ public class Config {
 		}
 		else if(name.equals("network_map_bin")) {
 			network_map_bin = value;
+			// get dir
+			File f = new File(network_map_bin.substring(0,network_map_bin.lastIndexOf("/")));
+			f.mkdirs();
 		}
 		else if(name.equals("pls_folder")) {
 			pls_folder = value;
