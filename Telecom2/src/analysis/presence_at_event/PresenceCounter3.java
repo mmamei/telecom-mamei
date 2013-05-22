@@ -29,7 +29,7 @@ public class PresenceCounter3 {
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			double c = count(ce,200,2000,5);
+			double c = count(ce,2000,2000,5);
 			Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
@@ -38,7 +38,7 @@ public class PresenceCounter3 {
 		
 		new GraphScatterPlotter("Result","Estimated","GroundTruth",result);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounter2";
+		String dir = Config.getInstance().base_dir +"/PresenceCounter3";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result.csv"));
@@ -59,6 +59,7 @@ public class PresenceCounter3 {
 		String file_other = getFile(event.spot,o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
+		System.out.println(userPresentDuringEvent.size());
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
@@ -67,7 +68,7 @@ public class PresenceCounter3 {
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
 		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
-		
+		System.out.println(userPresentAtTheEventTimeOnOtherDays.size());
 			
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
 		return userPresentDuringEvent.size();
@@ -95,9 +96,12 @@ public class PresenceCounter3 {
 			String[] splitted = line.split(",");
 			if(splitted.length == 5) {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
-				if(start.before(cal) && end.after(cal))
-				if(start_exclude != null && end_exclude !=null && cal.before(start_exclude) && cal.after(end_exclude))
+				if(start.before(cal) && end.after(cal)) {
+					if(start_exclude == null || end_exclude ==null)
 						users.add(splitted[0]);
+					else if(cal.before(start_exclude) || cal.after(end_exclude))
+						users.add(splitted[0]);
+				}
 			}
 			else System.out.println("Problems: "+line);
 		}
