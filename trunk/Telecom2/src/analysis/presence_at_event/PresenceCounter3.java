@@ -29,7 +29,7 @@ public class PresenceCounter3 {
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			double c = count(ce,100);
+			double c = count(ce,200,2000,5);
 			Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
@@ -53,18 +53,18 @@ public class PresenceCounter3 {
 		Logger.logln("Done!");
 	}
 		
-	public static double count(CityEvent event, double e_radius) throws Exception {	
+	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
 		
-		String file_event = getFile(event.spot,500);
-		String file_other = getFile(event.spot,2000);
+		String file_event = getFile(event.spot,e_radius);
+		String file_other = getFile(event.spot,o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
 		
 		Calendar start = (Calendar)event.st.clone();
-		start.add(Calendar.DAY_OF_MONTH, -5);
+		start.add(Calendar.DAY_OF_MONTH, -days);
 		
 		Calendar end = (Calendar)event.et.clone();
-		end.add(Calendar.DAY_OF_MONTH, 5);
+		end.add(Calendar.DAY_OF_MONTH, days);
 		
 		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
 		
