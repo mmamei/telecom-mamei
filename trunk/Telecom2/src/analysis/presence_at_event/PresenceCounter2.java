@@ -1,10 +1,13 @@
 package analysis.presence_at_event;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +26,6 @@ public class PresenceCounter2 {
 		
 		Collection<CityEvent> events = CityEvent.getEventsInData();
 		
-
 		double[][] result = new double[events.size()][2];
 		
 		int i = 0;
@@ -62,25 +64,37 @@ public class PresenceCounter2 {
 		}
 		else Logger.logln(file+" already exists!");
 		
-		List<PlsEvent> events = PlsEvent.readEvents(new File(file));
 		
-		int nd = PlsEvent.countDays(events) - 1;
+		Calendar start = (Calendar)event.st.clone();
+		start.add(Calendar.DAY_OF_MONTH, -5);
+		
+		Calendar end = (Calendar)event.et.clone();
+		start.add(Calendar.DAY_OF_MONTH, 5);
 		
 		Set<String> userPresentDuringEvent = new HashSet<String>();
 		Set<String> userPresentAtTheEventTimeOnOtherDays = new HashSet<String>();
 		
-		for(PlsEvent e : events) {
-			int h = e.getCalendar().get(Calendar.HOUR_OF_DAY);
-			if(event.st.before(e.getCalendar()) && event.et.after(e.getCalendar()))
-				userPresentDuringEvent.add(e.getUsername());
-			else if(event.st.get(Calendar.HOUR_OF_DAY) <= h && event.et.get(Calendar.HOUR_OF_DAY) >= h)
-				userPresentAtTheEventTimeOnOtherDays.add(e.getUsername());
+		String line;
+		Calendar cal = new GregorianCalendar();
+		BufferedReader in = new BufferedReader(new FileReader(file));
+		while((line = in.readLine()) != null){
+			String[] splitted = line.split(",");
+			if(splitted.length == 5) {
+				if(splitted[3].equals("null")) continue;
+				cal.setTimeInMillis(Long.parseLong(splitted[1]));
+				if(start.before(cal) && end.after(cal)) {
+					if(event.st.before(cal) && event.et.after(cal))
+						userPresentDuringEvent.add(splitted[0]);
+					else
+						userPresentAtTheEventTimeOnOtherDays.add(splitted[0]);
+				}
+			}
+			else System.out.println("Problems: "+line);
 		}
-		
+		in.close();
 		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
 		return userPresentDuringEvent.size();
-		
-		//return (int)(1.0 * userPresentDuringEvent.size() - (1.0 *  userPresentAtTheEventTimeOnOtherDays.size()/nd));
 	}
+	
 }
