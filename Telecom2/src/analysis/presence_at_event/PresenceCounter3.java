@@ -58,7 +58,7 @@ public class PresenceCounter3 {
 		String file_event = getFile(event.spot,500);
 		String file_other = getFile(event.spot,2000);
 		
-		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et);
+		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -5);
@@ -66,7 +66,7 @@ public class PresenceCounter3 {
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, 5);
 		
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end);
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
 		
 			
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
@@ -86,7 +86,7 @@ public class PresenceCounter3 {
 		return file;
 	}
 	
-	public static Set<String> getUsers(String file, Calendar start, Calendar end) throws Exception {
+	public static Set<String> getUsers(String file, Calendar start, Calendar end, Calendar start_exclude, Calendar end_exclude) throws Exception {
 		Set<String> users = new HashSet<String>();
 		String line;
 		Calendar cal = new GregorianCalendar();
@@ -95,7 +95,8 @@ public class PresenceCounter3 {
 			String[] splitted = line.split(",");
 			if(splitted.length == 5) {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
-				if(start.before(cal) && end.after(cal)) 
+				if(start.before(cal) && end.after(cal))
+				if(start_exclude != null && end_exclude !=null && cal.before(start_exclude) && cal.after(end_exclude))
 						users.add(splitted[0]);
 			}
 			else System.out.println("Problems: "+line);
