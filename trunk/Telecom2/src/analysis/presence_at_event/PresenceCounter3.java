@@ -23,13 +23,18 @@ public class PresenceCounter3 {
 
 	public static void main(String[] args) throws Exception {
 		
+		
+		double e_radius = 1000;
+		double o_radius = 2000;
+		int days = 4;
+		
 		Collection<CityEvent> events = CityEvent.getEventsInData();
 		
 		double[][] result = new double[events.size()][2];
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			double c = count(ce,2000,2000,5);
+			double c = count(ce,e_radius,o_radius,days);
 			Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
@@ -41,7 +46,7 @@ public class PresenceCounter3 {
 		String dir = Config.getInstance().base_dir +"/PresenceCounter3";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result.csv"));
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+e_radius+"_"+o_radius+"_"+days+".csv"));
 		out.println("event,estimated,groundtruth");
 		i=0;
 		for(CityEvent ce: events) {
