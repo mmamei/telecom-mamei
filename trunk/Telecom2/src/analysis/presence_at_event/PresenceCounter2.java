@@ -30,7 +30,7 @@ public class PresenceCounter2 {
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			double c = count(ce);
+			double c = count(ce,100);
 			Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
@@ -54,8 +54,9 @@ public class PresenceCounter2 {
 		Logger.logln("Done!");
 	}
 		
-	public static double count(CityEvent event) throws Exception {	
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+event.spot.name+".txt";
+	public static double count(CityEvent event, double e_radius) throws Exception {	
+		event.spot.changeRadius(e_radius);
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+event.spot.name+"_"+event.spot.radius+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -69,7 +70,7 @@ public class PresenceCounter2 {
 		start.add(Calendar.DAY_OF_MONTH, -5);
 		
 		Calendar end = (Calendar)event.et.clone();
-		start.add(Calendar.DAY_OF_MONTH, 5);
+		end.add(Calendar.DAY_OF_MONTH, 5);
 		
 		Set<String> userPresentDuringEvent = new HashSet<String>();
 		Set<String> userPresentAtTheEventTimeOnOtherDays = new HashSet<String>();
