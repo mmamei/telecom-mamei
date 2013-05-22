@@ -31,7 +31,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		String dir = Config.getInstance().base_dir+"/"+this.getClass().getSimpleName();
 		File fd = new File(dir);
 		if(!fd.exists()) fd.mkdirs();
-		this.outputfile = dir+"/"+p.name+".txt";
+		this.outputfile = dir+"/"+p.name+"_"+p.radius+".txt";
 		placemark = p;
 		plsAround = new ArrayList<PlsEvent>();
 		Logger.logln("Extracting pls events  generated close to: "+p.name);
