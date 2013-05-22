@@ -43,10 +43,15 @@ public class Placemark {
 	}
 	
 	
+	public void changeRadius(double r) {
+		this.radius = r;
+		this.cellsAround = getCellsAround();
+	}
+	
+	
 	public static Placemark getPlacemark(String placemark) {
 		if(PLACEMARKS == null) initPlacemaks();
 		return PLACEMARKS.get(placemark);
-		
 	}
 	
 	public static void initPlacemaks() {
