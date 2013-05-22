@@ -30,7 +30,7 @@ public class PresenceCounter2 {
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			double c = count(ce,100);
+			double c = count(ce,2000);
 			Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
