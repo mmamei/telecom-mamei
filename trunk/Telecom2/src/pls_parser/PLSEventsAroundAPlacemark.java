@@ -3,6 +3,7 @@ package pls_parser;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,9 +22,7 @@ import area.Placemark;
 
 public class PLSEventsAroundAPlacemark extends BufferAnalyzer {	
 
-	private List<PlsEvent> plsAround;
-	
-	private String outputfile;
+	private PrintWriter out = null;
 	private Placemark placemark;
 	
 	
@@ -31,10 +30,15 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		String dir = Config.getInstance().base_dir+"/"+this.getClass().getSimpleName();
 		File fd = new File(dir);
 		if(!fd.exists()) fd.mkdirs();
-		this.outputfile = dir+"/"+p.name+"_"+p.radius+".txt";
 		placemark = p;
-		plsAround = new ArrayList<PlsEvent>();
 		Logger.logln("Extracting pls events  generated close to: "+p.name);
+		
+		try {
+			out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.name+"_"+p.radius+".txt"))));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/*
@@ -50,7 +54,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	String celllac;
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
-	
+	NetworkMap nm = NetworkMap.getInstance();
 	public void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
@@ -60,19 +64,14 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		
 		if(!placemark.contains(celllac)) return;
 		
-		plsAround.add(new PlsEvent(username,imsi,Long.parseLong(celllac),timestamp));
+		long cellac = Long.parseLong(celllac);
+		NetworkCell nc = nm.get(cellac);
+		if(nc == null) out.println(username+","+timestamp+","+imsi+",null");
+		else out.println(username+","+timestamp+","+imsi+","+cellac+","+nc.getCellName());
 	}
 	
 	public void finish() {
-		try {
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(outputfile))));
-		for(PlsEvent e: plsAround)
-			out.println(e.toCSV());
-		out.flush();
 		out.close();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public static void process(Placemark p) throws Exception {
