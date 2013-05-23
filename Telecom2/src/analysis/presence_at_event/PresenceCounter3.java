@@ -20,13 +20,19 @@ import area.Placemark;
 
 public class PresenceCounter3 {
 	
-
+	
 	public static void main(String[] args) throws Exception {
 		
+		int days = 5;
+		for(double e_radius=1000; e_radius<=2000;e_radius=e_radius+500)
+		for(double o_radius=e_radius; e_radius<=3000;e_radius=e_radius+500)
+		process(e_radius,o_radius,days);
 		
-		double e_radius = 1000;
-		double o_radius = 2000;
-		int days = 4;
+	}
+		
+	public static void process(double e_radius, double o_radius, int days) throws Exception {
+		
+		Logger.logln("Processing: e_radius = "+e_radius+" o_radius = "+o_radius+" days = "+days);
 		
 		Collection<CityEvent> events = CityEvent.getEventsInData();
 		
