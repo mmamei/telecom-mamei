@@ -20,14 +20,14 @@ import visual.GraphScatterPlotter;
 import area.CityEvent;
 import area.Placemark;
 
-public class PresenceCounter3 {
+public class PresenceCounterSimple {
 	
 	
 	public static void main(String[] args) throws Exception {
 		
 		double e_radius = 200;
-		double o_radius = 3000;
-		int days = 10;
+		double o_radius = 200;
+		int days = 100;
 		
 		/*
 		for(e_radius=1000;e_radius<=3000;e_radius+=1000)
@@ -62,7 +62,7 @@ public class PresenceCounter3 {
 		
 		
 		new GraphScatterPlotter("Result: e_radius = "+e_radius+", o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
-		/*
+		
 		String dir = Config.getInstance().base_dir +"/PresenceCounter3";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
@@ -76,7 +76,7 @@ public class PresenceCounter3 {
 		}
 		out.close();
 		//Logger.logln("Done!");
-		*/
+		
 	}
 		
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
