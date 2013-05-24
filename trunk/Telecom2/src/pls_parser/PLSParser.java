@@ -46,15 +46,18 @@ public class PLSParser {
 		for(int i=0; i<items.length;i++){
 			File item = items[i];
 			if(item.isFile()) {
-				Calendar cal = new GregorianCalendar();
+				Calendar end_cal = new GregorianCalendar();
 				String n = item.getName();
-				cal.setTimeInMillis(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))));
+				end_cal.setTimeInMillis(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))));
 				
-				if(cal.before(startTime) || cal.after(endTime)) continue;
+				Calendar begin_cal = (Calendar)end_cal.clone();
+				begin_cal.add(Calendar.MINUTE, -30); // a pls file with time T contains events from T-30 min, to T
 				
-				String key = cal.get(Calendar.DAY_OF_MONTH)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+cal.get(Calendar.YEAR);
+				if(end_cal.before(startTime) || begin_cal.after(endTime)) continue;
+				
+				String key = end_cal.get(Calendar.DAY_OF_MONTH)+"/"+MONTHS[end_cal.get(Calendar.MONTH)]+"/"+end_cal.get(Calendar.YEAR);
 				String h = allDays.get(key);
-				allDays.put(key, h==null? cal.get(Calendar.HOUR_OF_DAY)+"-" : h+cal.get(Calendar.HOUR_OF_DAY)+"-");
+				allDays.put(key, h==null? end_cal.get(Calendar.HOUR_OF_DAY)+"-" : h+end_cal.get(Calendar.HOUR_OF_DAY)+"-");
 				
 				analyzeFile(item, analyzer);
 				if((i+1) % 10 == 0) Logger.logln(i+"/"+items.length+" done!");
