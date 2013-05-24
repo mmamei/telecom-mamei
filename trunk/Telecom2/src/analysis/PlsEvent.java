@@ -95,12 +95,14 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
 	public String toString(){
 		NetworkCell nc = NetworkMap.getInstance().get(cellac);
-		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+ nc == null ? "null" : nc.getCellName();
+		String cn = nc == null ? "null" : nc.getCellName();
+		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+cn;
 	}
 	
 	public String toCSV(){
 		NetworkCell nc = NetworkMap.getInstance().get(cellac);
-		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+ nc == null ? "null" : nc.getCellName();
+		String cn = nc == null ? "null" : nc.getCellName();
+		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+cn;
 	}
 	
 	public static List<PlsEvent> readEvents(File f) throws Exception {
@@ -131,7 +133,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 							events.add(e);
 						}
 					}
-					else System.out.println("Problems: "+line+" in "+fx.getAbsolutePath());
+					//else System.out.println("Problems: "+line+" in "+fx.getAbsolutePath());
 				}
 				in.close();
 			} catch(Exception e) {

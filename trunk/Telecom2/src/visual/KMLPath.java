@@ -1,5 +1,6 @@
 package visual;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -9,9 +10,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import utils.FilterAndCounterUtils;
-
 import network.NetworkMap;
+import utils.Config;
+import utils.FilterAndCounterUtils;
+import utils.Logger;
 import analysis.PlsEvent;
 
 public class KMLPath {
@@ -159,6 +161,15 @@ public class KMLPath {
 		Random r = new Random();
 		r.setSeed(pe.getTimeStamp());
 		return 0.01 * r.nextDouble() - 0.005;
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		openFile(Config.getInstance().base_dir+"/test.kml");
+		List<PlsEvent> data = PlsEvent.readEvents(new File(Config.getInstance().base_dir+"/UsersCSVCreator/test/164e6218294db749859bfffc798c5a51ba31262f6cfd7ab1e4e27d134789ba.csv"));
+		print("164e6218294db749859bfffc798c5a51ba31262f6cfd7ab1e4e27d134789ba",data);
+		closeFile();
+		Logger.logln("Done!");
 	}
 	
 }

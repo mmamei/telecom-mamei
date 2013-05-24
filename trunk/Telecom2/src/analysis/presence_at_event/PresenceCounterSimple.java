@@ -95,6 +95,7 @@ public class PresenceCounterSimple {
 		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
 		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
+		
 		return userPresentDuringEvent.size();
 	}
 	
