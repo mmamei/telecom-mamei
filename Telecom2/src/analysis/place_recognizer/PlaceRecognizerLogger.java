@@ -18,9 +18,9 @@ import network.NetworkCell;
 
 import org.gps.utils.LatLonPoint;
 
-import analysis.PlsEvent;
-
+import utils.Config;
 import visual.Kml;
+import analysis.PlsEvent;
 
 
 
@@ -28,11 +28,11 @@ public class PlaceRecognizerLogger {
 	
 	public static void log(String username, String kind_of_place, Map<Integer, Cluster> clusters) {
 		try {
-		new File("output/place_recognition/"+username).mkdir();
-		new File("output/place_recognition/"+username+"/"+kind_of_place).mkdir();
+		new File(Config.getInstance().base_dir+"/PlaceRecognizerLogger/"+username).mkdirs();
+		new File(Config.getInstance().base_dir+"/PlaceRecognizerLogger/"+username+"/"+kind_of_place).mkdirs();
 		
 		
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("output/place_recognition/"+username+"/"+kind_of_place+"/eventsXcluster.txt")));	
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(Config.getInstance().base_dir+"/PlaceRecognizerLogger/"+username+"/"+kind_of_place+"/eventsXcluster.txt")));	
 		for(int k : clusters.keySet()) {
 			out.println("Cluster "+k+":");
 			List<PlsEvent> events = clusters.get(k).getEvents();
@@ -43,7 +43,7 @@ public class PlaceRecognizerLogger {
 		out.close();
 		
 		DecimalFormat df = new DecimalFormat("###.####",new DecimalFormatSymbols(Locale.US));
-		out = new PrintWriter(new BufferedWriter(new FileWriter("output/place_recognition/"+username+"/"+kind_of_place+"/weight_evolution.txt")));	
+		out = new PrintWriter(new BufferedWriter(new FileWriter(Config.getInstance().base_dir+"/PlaceRecognizerLogger/"+username+"/"+kind_of_place+"/weight_evolution.txt")));	
 		for(int k : clusters.keySet()) {
 			Cluster c = clusters.get(k);
 			double w_time = c.getWeight("WeightOnTime");
@@ -73,6 +73,29 @@ public class PlaceRecognizerLogger {
 		"ddaaee", "ee9900", "55f63e", "c3c433", "ffff00", "00ffff"
 	};
 	
+	
+	
+	private static PrintWriter totalCSV;
+	public static void openTotalCSVFile(String file) {
+		try{
+			totalCSV = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void closeTotalCSVFile() {
+		totalCSV.close();
+	}
+	public static void logcsv(String username, String kind_of_place, List<LatLonPoint> placemarks) {
+		StringBuffer sb = new StringBuffer();
+		for(LatLonPoint p: placemarks)
+			sb.append(","+p.getLongitude()+" "+p.getLatitude());
+		totalCSV.println(username+","+kind_of_place+""+sb.toString());
+	}
+	
+	
+	
 	private static PrintWriter outKml;
 	private static Kml kml;
 	public static void openKMLFile(String file) {
@@ -84,6 +107,7 @@ public class PlaceRecognizerLogger {
 			e.printStackTrace();
 		}
 	}
+
 	
 	public static void closeKMLFile() {
 		try {

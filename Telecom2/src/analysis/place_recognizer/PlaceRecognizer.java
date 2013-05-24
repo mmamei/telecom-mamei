@@ -46,7 +46,7 @@ public class PlaceRecognizer {
 		String tperiod = events.get(0).getTimeStamp()+"-"+events.get(events.size()-1).getTimeStamp();
 		
 		Map<Integer, Cluster> clusters = null;
-		File f = new File("cache/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
+		File f = new File(Config.getInstance().base_dir+"/cache/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
 		if(f.exists()) 
 			clusters = (Map<Integer, Cluster>)CopyAndSerializationUtils.restore(f);
 		else {
@@ -93,24 +93,27 @@ public class PlaceRecognizer {
 			}
 		}
 		 
-		PlaceRecognizerLogger.log(username, kind_of_place, clusters);
+		if(VERBOSE) PlaceRecognizerLogger.log(username, kind_of_place, clusters);
 		PlaceRecognizerLogger.logkml(kind_of_place, clusters, placemarks);
+		PlaceRecognizerLogger.logcsv(username,kind_of_place,placemarks);
 		
 		return placemarks;
 	}
 	
 	
 	
-	
-	
+	public static boolean VERBOSE = false;
 	
 	public static void main(String[] args) throws Exception {
-		//String dir = "D:/CODE/TELECOM/Telecom2/output/usercsv";
-		//String dir = "D:/CODE/TELECOM/Telecom1/data/volunteer_data/all";
-		String dir = "D:/CODE/TELECOM/Telecom2/output/Stadio_Silvio_Piola_(NO)-11_03_2012_19_00-11_03_2012_23_00";
+		String dir = "test";
+		String in_dir = Config.getInstance().base_dir+"/UsersCSVCreator/"+dir;
+		String out_dir = Config.getInstance().base_dir+"/PlaceRecognizer/"+dir;
+		File d = new File(out_dir);
+		if(!d.exists()) d.mkdirs();
 		
-		PlaceRecognizerLogger.openKMLFile("output/place_recognition/results.kml");
-		File[] files = new File(dir).listFiles();
+		PlaceRecognizerLogger.openTotalCSVFile(out_dir+"/results.csv");
+		PlaceRecognizerLogger.openKMLFile(out_dir+"/results.kml");
+		File[] files = new File(in_dir).listFiles();
 		
 		Map<String, List<LatLonPoint>> allResults = new HashMap<String, List<LatLonPoint>>();
 		
@@ -121,17 +124,18 @@ public class PlaceRecognizer {
 			String filename = f.getName();
 			String username = filename.substring(0, filename.indexOf(".csv"));
 			List<PlsEvent> events = PlsEvent.readEvents(f);
-			PlaceRecognizerLogger.openUserFolder(username);
+			if(VERBOSE) PlaceRecognizerLogger.openUserFolder(username);
 			
 			for(String kind_of_place:kind_of_places)
 				allResults.put(username+"_"+kind_of_place, analyze(username,kind_of_place,events,0.25,0.25,2000,0.6));
 				
-			PlaceRecognizerLogger.closeUserFolder();
+			if(VERBOSE) PlaceRecognizerLogger.closeUserFolder();
 		}
 		PlaceRecognizerLogger.closeKMLFile();
+		PlaceRecognizerLogger.closeTotalCSVFile();
 		
-		PlaceRecognizerEvaluator rs = new PlaceRecognizerEvaluator(2000);
-		rs.evaluate(allResults);
+		//PlaceRecognizerEvaluator rs = new PlaceRecognizerEvaluator(2000);
+		//rs.evaluate(allResults);
 		
 		
 		Logger.logln("Done!");
