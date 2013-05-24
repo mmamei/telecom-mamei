@@ -70,7 +70,7 @@ public class PresenceCounter {
 			String filename = f.getName();
 			String username = filename.substring(0, filename.indexOf(".csv"));
 			List<PlsEvent> plsEvents = PlsEvent.readEvents(f);
-			double p = PresenceProbability.presenceProbabilityTest(username,plsEvents,event);
+			double p = PresenceProbability.presenceProbabilityTest(username,plsEvents,event);	
 			count += p;	
 		}
 		return count;

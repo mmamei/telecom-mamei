@@ -135,11 +135,14 @@ public class Placemark {
 	
 	
 	public static void main(String[] args) throws Exception {
-		Placemark x = Placemark.getPlacemark("Stadio Silvio Piola (NO)");
-		String dir = Config.getInstance().base_dir+"/Placemark";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
-		x.printKML(dir+"/"+x.name+".kml");
+		initPlacemaks();
+		for(String name: PLACEMARKS.keySet()) {
+			Placemark x = Placemark.getPlacemark(name);
+			String dir = Config.getInstance().base_dir+"/Placemark";
+			File d = new File(dir);
+			if(!d.exists()) d.mkdirs();
+			x.printKML(dir+"/"+x.name+"_"+x.radius+".kml");	
+		}
 		Logger.logln("Done!");
 	}
 	

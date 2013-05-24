@@ -67,7 +67,7 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 		cal.setTimeInMillis(Long.parseLong(fields[3]));
 		
 		if(cal.before(startTime) || cal.after(endTime) || !event.spot.contains(celllac)) return;
-		
+				
 		usersAround.add(username);
 	}
 	
@@ -93,7 +93,7 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		process(CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012"));
+		process(CityEvent.getEvent("Stadio Olimpico (TO),12/03/2012"));
 	}
 	
 }
