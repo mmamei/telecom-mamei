@@ -11,6 +11,8 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.math.stat.regression.SimpleRegression;
+
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
 import utils.Logger;
@@ -23,16 +25,17 @@ public class PresenceCounter3 {
 	
 	public static void main(String[] args) throws Exception {
 		
-		int days = 5;
-		for(double e_radius=1000; e_radius<=2000;e_radius=e_radius+500)
-		for(double o_radius=e_radius; e_radius<=3000;e_radius=e_radius+500)
-		process(e_radius,o_radius,days);
+		double[] vals = new double[]{1000,2000,3000};
+		for(double e_radius:vals)
+		for(double o_radius=e_radius; o_radius<=3000;o_radius=o_radius+10000)
+		for(int days=0;days<=0; days+=2)
+			process(e_radius,o_radius,days);
 		
 	}
 		
 	public static void process(double e_radius, double o_radius, int days) throws Exception {
 		
-		Logger.logln("Processing: e_radius = "+e_radius+" o_radius = "+o_radius+" days = "+days);
+		Logger.log("Processing: e_radius = "+e_radius+" o_radius = "+o_radius+" days = "+days+" ");
 		
 		Collection<CityEvent> events = CityEvent.getEventsInData();
 		
@@ -41,14 +44,19 @@ public class PresenceCounter3 {
 		int i = 0;
 		for(CityEvent ce: events) {
 			double c = count(ce,e_radius,o_radius,days);
-			Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
+			//Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
 			i++;
 		}
 		
-		new GraphScatterPlotter("Result","Estimated","GroundTruth",result);
+		SimpleRegression sr = new SimpleRegression();
+		sr.addData(result);
+		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
+		
+		new GraphScatterPlotter("Result: e_radius = "+e_radius+", o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
+		/*
 		String dir = Config.getInstance().base_dir +"/PresenceCounter3";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
@@ -61,7 +69,8 @@ public class PresenceCounter3 {
 			i++;
 		}
 		out.close();
-		Logger.logln("Done!");
+		//Logger.logln("Done!");
+		*/
 	}
 		
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
@@ -70,7 +79,6 @@ public class PresenceCounter3 {
 		String file_other = getFile(event.spot,o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
-		System.out.println(userPresentDuringEvent.size());
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
@@ -79,8 +87,7 @@ public class PresenceCounter3 {
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
 		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
-		System.out.println(userPresentAtTheEventTimeOnOtherDays.size());
-			
+		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
 		return userPresentDuringEvent.size();
 	}
@@ -94,7 +101,7 @@ public class PresenceCounter3 {
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
 			PLSEventsAroundAPlacemark.process(p);
 		}
-		else Logger.logln(file+" already exists!");
+		//else Logger.logln(file+" already exists!");
 		return file;
 	}
 	
