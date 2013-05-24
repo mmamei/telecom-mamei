@@ -95,14 +95,12 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
 	public String toString(){
 		NetworkCell nc = NetworkMap.getInstance().get(cellac);
-		if(nc == null) return username+","+getCalendar().getTime()+","+imsi+","+cellac+",null";
-		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+nc.getCellName();
+		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+ nc == null ? "null" : nc.getCellName();
 	}
 	
 	public String toCSV(){
 		NetworkCell nc = NetworkMap.getInstance().get(cellac);
-		if(nc == null) return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+",null";
-		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+nc.getCellName();
+		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+ nc == null ? "null" : nc.getCellName();
 	}
 	
 	public static List<PlsEvent> readEvents(File f) throws Exception {
