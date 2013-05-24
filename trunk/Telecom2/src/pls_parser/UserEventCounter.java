@@ -1,21 +1,20 @@
 package pls_parser;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import utils.Config;
 import utils.Logger;
-import area.CityEvent;
 
 public class UserEventCounter extends BufferAnalyzer {
 	
-	private String outputfile;
+	private String hashmap_outputfile;
 	private Map<String,Integer> users_events;
 	
 	public UserEventCounter() {
@@ -25,7 +24,7 @@ public class UserEventCounter extends BufferAnalyzer {
 		if(!fd.exists()) fd.mkdirs();
 		String f = Config.getInstance().pls_folder;
 		f = f.substring(f.lastIndexOf("/")+1);
-		outputfile = dir+"/"+f+".csv";
+		hashmap_outputfile = dir+"/"+f+".csv";
 	}
 
 	
@@ -48,7 +47,7 @@ public class UserEventCounter extends BufferAnalyzer {
 	
 	public void finish() {
 		try {
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(outputfile))));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(hashmap_outputfile))));
 		for(String user: users_events.keySet())
 			out.println(user+","+users_events.get(user));
 		out.close();
@@ -57,14 +56,42 @@ public class UserEventCounter extends BufferAnalyzer {
 		}
 	}
 	
+	public void extractUsersAboveThreshol(int n) throws Exception {
+		File f = new File(hashmap_outputfile); 
+		if(!f.exists()) {
+			PLSParser.parse(this);
+			finish();
+		}
+		
+		String fn = hashmap_outputfile.substring(0,hashmap_outputfile.lastIndexOf("."));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(fn+"_users_above_"+n+".txt"))));
+		
+		BufferedReader br = new BufferedReader(new FileReader(f));
+		String line;
+		while((line=br.readLine())!=null){
+			String[] x = line.split(",");
+			String username = x[0];
+			int n_events = Integer.parseInt(x[1]);
+			if(n_events > n)
+				out.println(username);
+				
+		}
+		br.close();
+		out.close();
+		Logger.logln("Done!");
+	}
+	
 	
 	
 	
 	public static void main(String[] args) throws Exception {
 		UserEventCounter ba = new UserEventCounter();
-		PLSParser.parse(ba);
-		ba.finish();
-		Logger.logln("Done");
+		if(!new File(ba.hashmap_outputfile).exists()) {
+			PLSParser.parse(ba);
+			ba.finish();
+			Logger.logln("Done");
+		}
+		ba.extractUsersAboveThreshol(2000);
 	}
 	
 }
