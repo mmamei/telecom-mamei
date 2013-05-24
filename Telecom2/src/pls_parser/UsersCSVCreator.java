@@ -23,24 +23,16 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	private String outputdir;
 	
 	
-	public UsersCSVCreator(CityEvent ce) {
+	public UsersCSVCreator(String usersListFile) {
 		
-		String file = Config.getInstance().base_dir+"/UsersAroundAnEvent/"+ce.toFileName();
-		if(!new File(file).exists()) {
-			Logger.logln(file+" Does not exist!");
-			Logger.logln("Running UsersAroundAnEvent.process()");
-			try {
-				UsersAroundAnEvent.process(ce);
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(0);
-			}
-		}
-		else {
-			Logger.logln(file+" already exists!");
+		if(!new File(usersListFile).exists()) {
+			Logger.logln(usersListFile+" Does not exist!");
+			Logger.logln("You must get the list of usesr by running one of the pls_parser.User* classes!");
+			System.exit(0);
 		}
 		
-		outputdir = Config.getInstance().base_dir +"/"+ this.getClass().getSimpleName() +"/"+ ce.toString();
+		String odir_name = usersListFile.substring(usersListFile.lastIndexOf("/")+1,usersListFile.lastIndexOf("."));
+		outputdir = Config.getInstance().base_dir +"/"+ this.getClass().getSimpleName() +"/"+ odir_name;
 		try {
 			FileUtils.deleteDirectory(new File(outputdir));
 		} catch (IOException e) {
@@ -58,7 +50,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 		traces = new HashMap<String,UserTrace>();
 		// file contains the username of the users to be processed
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(file));
+			BufferedReader in = new BufferedReader(new FileReader(usersListFile));
 			String line;
 			while((line=in.readLine())!=null) {
 				String username = line.trim();
@@ -89,7 +81,21 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	public static void create(CityEvent ce) throws Exception {
-		UsersCSVCreator ba = new UsersCSVCreator(ce);
+		String file = Config.getInstance().base_dir+"/UsersAroundAnEvent/"+ce.toFileName();
+		if(!new File(file).exists()) {
+			Logger.logln(file+" Does not exist!");
+			Logger.logln("Running UsersAroundAnEvent.process()");
+			try {
+				UsersAroundAnEvent.process(ce);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+		}
+		else {
+			Logger.logln(file+" already exists!");
+		}
+		UsersCSVCreator ba = new UsersCSVCreator(file);
 		if(ba.traces.size() > 0) {
 			PLSParser.parse(ba);
 			ba.finish();
@@ -99,8 +105,13 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	public static void main(String[] args) throws Exception {
-		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
-		create(ce);
+		String file = "C:/BASE/UserEventCounter/file_pls_piem_users_above_2000.txt";
+		UsersCSVCreator ba = new UsersCSVCreator(file);
+		if(ba.traces.size() > 0) {
+			PLSParser.parse(ba);
+			ba.finish();
+		}
+		Logger.logln("Done");
 	}
 	
 }
