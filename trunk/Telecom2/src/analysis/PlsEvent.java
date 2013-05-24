@@ -95,13 +95,13 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
 	public String toString(){
 		NetworkCell nc = NetworkMap.getInstance().get(cellac);
-		if(nc == null) return username+","+getCalendar().getTime()+","+imsi+",null";
+		if(nc == null) return username+","+getCalendar().getTime()+","+imsi+","+cellac+",null";
 		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+nc.getCellName();
 	}
 	
 	public String toCSV(){
 		NetworkCell nc = NetworkMap.getInstance().get(cellac);
-		if(nc == null) return username+","+getCalendar().getTime()+","+imsi+",null";
+		if(nc == null) return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+",null";
 		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+nc.getCellName();
 	}
 	
@@ -118,12 +118,12 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 		List<PlsEvent> events = new ArrayList<PlsEvent>();
 		Calendar cal = new GregorianCalendar();
 		for(File fx: files) {
-			System.out.println(fx.length());
 			String line = null;
 			try{
-				fx.setReadOnly();
 				BufferedReader in = new BufferedReader(new FileReader(fx));
 				while((line = in.readLine()) != null){
+					line = line.trim();
+					if(line.length() < 1) continue; // extra line at the end of file
 					String[] splitted = line.split(",");
 					if(splitted.length == 5) {
 						if(splitted[3].equals("null")) continue;
@@ -133,7 +133,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 							events.add(e);
 						}
 					}
-					else System.out.println("Problems: "+line);
+					else System.out.println("Problems: "+line+" in "+fx.getAbsolutePath());
 				}
 				in.close();
 			} catch(Exception e) {

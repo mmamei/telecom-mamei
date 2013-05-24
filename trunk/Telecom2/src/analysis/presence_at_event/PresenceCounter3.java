@@ -25,11 +25,17 @@ public class PresenceCounter3 {
 	
 	public static void main(String[] args) throws Exception {
 		
-		double[] vals = new double[]{1000,2000,3000};
-		for(double e_radius:vals)
-		for(double o_radius=e_radius; o_radius<=3000;o_radius=o_radius+10000)
-		for(int days=0;days<=0; days+=2)
-			process(e_radius,o_radius,days);
+		double e_radius = 200;
+		double o_radius = 3000;
+		int days = 10;
+		
+		/*
+		for(e_radius=1000;e_radius<=3000;e_radius+=1000)
+		for(o_radius=e_radius; o_radius<=3000;o_radius=o_radius+10000)
+		for(days=0;days<=0; days+=2)
+		*/	
+			
+		process(e_radius,o_radius,days);
 		
 	}
 		

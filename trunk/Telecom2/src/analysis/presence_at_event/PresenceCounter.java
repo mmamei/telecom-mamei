@@ -18,7 +18,7 @@ public class PresenceCounter {
 
 	public static void main(String[] args) throws Exception {
 		
-		Collection<CityEvent> events = CityEvent.getAllEvents();
+		Collection<CityEvent> events = CityEvent.getEventsInData();
 		
 
 		double[][] result = new double[events.size()][2];
@@ -57,9 +57,8 @@ public class PresenceCounter {
 			Logger.logln("Running UsersCSVCreator.create()");
 			UsersCSVCreator.create(event);
 		}
-		else {
+		else 
 			Logger.logln(inputdir+" already exists!");
-		}
 		
 		File[] files = new File(inputdir).listFiles();
 		
@@ -71,7 +70,7 @@ public class PresenceCounter {
 			String filename = f.getName();
 			String username = filename.substring(0, filename.indexOf(".csv"));
 			List<PlsEvent> plsEvents = PlsEvent.readEvents(f);
-			double p = PresenceProbability.presenceProbability(username,plsEvents,event);
+			double p = PresenceProbability.presenceProbabilityTest(username,plsEvents,event);
 			count += p;	
 		}
 		return count;

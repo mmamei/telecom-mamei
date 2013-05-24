@@ -131,6 +131,22 @@ public class PresenceProbability {
 	}
 	
 	
+	/*
+	 * This just returns 1 if the user was present during the event, but he was never present otherwise.
+	 * It returns 0 if the user was also present at other times
+	 */
+	public static double presenceProbabilityTest(String username, List<PlsEvent> plsEvents, CityEvent event) {
+		
+		for(PlsEvent pe: plsEvents) {
+			if((pe.getCalendar().before(event.st) || pe.getCalendar().after(event.et)) && event.spot.contains(pe.getCellac()))
+				return 0;
+		}
+		
+		return 1;
+		
+	}
+	
+	
 	public static double fractionOfTimeInWhichTheUserWasAtTheEvent(List<PlsEvent> plsEvents, CityEvent event) {
 		Calendar first = null;
 		Calendar last = null;
