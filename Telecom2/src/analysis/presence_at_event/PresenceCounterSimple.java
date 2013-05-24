@@ -63,7 +63,7 @@ public class PresenceCounterSimple {
 		
 		new GraphScatterPlotter("Result: e_radius = "+e_radius+", o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounter3";
+		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+e_radius+"_"+o_radius+"_"+days+".csv"));
