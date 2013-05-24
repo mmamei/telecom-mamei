@@ -119,11 +119,11 @@ public class PlaceRecognizerLogger {
 	}
 	
 	
-	public static void openUserFolder(String username) {
+	public static void openUserFolderKML(String username) {
 		kml.printFolder(outKml, username.substring(0,5));
 	}
 	
-	public static void closeUserFolder() {
+	public static void closeUserFolderKML() {
 		kml.closeFolder(outKml);
 	}
 	
@@ -136,7 +136,7 @@ public class PlaceRecognizerLogger {
 			
 			
 			
-			kml.printFolder(outKml, "resutls");
+			kml.printFolder(outKml, "results");
 			
 			outKml.println("<Style id=\""+getColor(kind_of_place)+"\">" +
 						   "<IconStyle>" +

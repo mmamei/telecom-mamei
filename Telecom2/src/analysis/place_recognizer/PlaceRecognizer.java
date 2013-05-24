@@ -117,19 +117,19 @@ public class PlaceRecognizer {
 		
 		Map<String, List<LatLonPoint>> allResults = new HashMap<String, List<LatLonPoint>>();
 		
-		String[] kind_of_places = new String[]{"HOME","WORK"};
+		String[] kind_of_places = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
 		for(int i=0; i<files.length; i++){
 			File f = files[i];	
 			if(!f.isFile()) continue;
 			String filename = f.getName();
 			String username = filename.substring(0, filename.indexOf(".csv"));
 			List<PlsEvent> events = PlsEvent.readEvents(f);
-			if(VERBOSE) PlaceRecognizerLogger.openUserFolder(username);
+			PlaceRecognizerLogger.openUserFolderKML(username);
 			
 			for(String kind_of_place:kind_of_places)
 				allResults.put(username+"_"+kind_of_place, analyze(username,kind_of_place,events,0.25,0.25,2000,0.6));
 				
-			if(VERBOSE) PlaceRecognizerLogger.closeUserFolder();
+			PlaceRecognizerLogger.closeUserFolderKML();
 		}
 		PlaceRecognizerLogger.closeKMLFile();
 		PlaceRecognizerLogger.closeTotalCSVFile();
