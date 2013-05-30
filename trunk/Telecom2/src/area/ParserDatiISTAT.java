@@ -2,6 +2,7 @@ package area;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -22,9 +23,24 @@ public class ParserDatiISTAT {
 		PrintWriter out = new PrintWriter(new FileWriter(out_dir+"/Piemonte.csv"));
 		
 		for(String comune: data.keySet()) 
-			out.println(comune+","+data.get(comune));
-
+			out.println(comune.toUpperCase()+","+data.get(comune));
 		out.close();
+	}
+	
+	
+	public static Map<String,Integer> load(String region) throws Exception {
+		File f = new File(Config.getInstance().base_dir+"/ParserDatiISTAT/"+region+".csv");
+		BufferedReader br = new BufferedReader(new FileReader(f));
+		
+		Map<String,Integer> istat = new HashMap<String,Integer>();
+		
+		String line;
+		while((line=br.readLine())!=null) {
+			String[] e = line.split(",");
+			istat.put(e[0], Integer.parseInt(e[1]));
+		}
+		br.close();
+		return istat;
 	}
 	
 	public static Map<String,Integer> parse(String d) throws Exception {
