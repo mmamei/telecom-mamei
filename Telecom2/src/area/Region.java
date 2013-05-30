@@ -13,7 +13,7 @@ public class Region implements Serializable {
 	private Geometry g;
 	
 	public Region(String name, String kmlcoordinates) {
-		this.name = name;
+		this.name = name.replaceAll("\\\\", "");
 		this.kmlcoordinates = kmlcoordinates;
 		process();
 	}

@@ -9,11 +9,16 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.math.stat.regression.SimpleRegression;
+
 import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
+import visual.GraphScatterPlotter;
 import visual.Kml;
+import area.CityEvent;
+import area.ParserDatiISTAT;
 import area.Region;
 import area.RegionMap;
 
@@ -29,8 +34,48 @@ public class PopulationDensity {
 		}
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
 		Map<String,Double> density = process(rm,kind_of_place);
+		
 		printKML(density,rm,kind_of_place,true);
+		
+		compareWithISTAT(density,region);
+	
 		Logger.logln("Done!");
+	}
+	
+	
+	public static void compareWithISTAT(Map<String,Double> density, String region) throws Exception {
+		Map<String,Integer> istat = ParserDatiISTAT.load(region);
+		int size = 0;
+		for(String r: density.keySet()) {
+			int estimated = density.get(r).intValue();
+			Integer groundtruth = istat.get(r);
+			if(groundtruth != null) {
+				size++;
+				//System.out.println(r+","+estimated+","+groundtruth);
+			}
+		}
+		
+		
+		double[][] result = new double[size][2];
+		int i = 0;
+		for(String r: density.keySet()) {
+			int estimated = density.get(r).intValue();
+			Integer groundtruth = istat.get(r);
+			if(groundtruth != null) {
+				result[i][0] = Math.log10(1+estimated);
+				result[i][1] = Math.log10(1+groundtruth);
+				i++;
+			}
+		}
+		
+		
+		SimpleRegression sr = new SimpleRegression();
+		sr.addData(result);
+		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
+		
+		new GraphScatterPlotter("Result:"+region,"Estimated (log10)","GroundTruth (log10)",result);
+		
+		
 	}
 	
 	public static Map<String,Double> process(RegionMap rm, String kind_of_place) throws Exception {
@@ -63,8 +108,13 @@ public class PopulationDensity {
 		return density;
 	}
 	
-	public static void printKML(Map<String,Double> density, RegionMap rm , String kop, boolean logscale) throws Exception {
-	
+	public static void printKML(Map<String,Double> den, RegionMap rm , String kop, boolean logscale) throws Exception {
+		
+		
+		Map<String,Double> density = new HashMap<String,Double>();
+		for(String r: den.keySet())
+			density.put(r, den.get(r).doubleValue());
+		
 		// convert to the log scale,
 		if(logscale) 
 			for(String name: density.keySet()) 
@@ -85,8 +135,7 @@ public class PopulationDensity {
 		kml.printHeaderFolder(out, rm.getName());
 		
 		for(Region r: rm.getRegions()) {
-			Double val = density.get(r.getName());
-			if(val == null) val = 0.0;
+			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
 			int index = Colors.HEAT_COLORS.length - 1 - (int)(val/max * (Colors.HEAT_COLORS.length-1));
 			String desc = kop+" DENSITY = "+(logscale ? Math.pow(10, val) : val);
 			out.println(r.toKml("ff"+Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]),desc));
