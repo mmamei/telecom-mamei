@@ -42,6 +42,11 @@ public class Placemark {
 		//Logger.logln(name+" has "+cellsAround.size()+" cells around");
 	}
 	
+	public Placemark clone() {
+		return new Placemark(name,center,radius);
+	}
+	
+	
 	
 	public void changeRadius(double r) {
 		this.radius = r;
@@ -138,6 +143,7 @@ public class Placemark {
 		initPlacemaks();
 		for(String name: PLACEMARKS.keySet()) {
 			Placemark x = Placemark.getPlacemark(name);
+			x.changeRadius(-300);
 			String dir = Config.getInstance().base_dir+"/Placemark";
 			File d = new File(dir);
 			if(!d.exists()) d.mkdirs();

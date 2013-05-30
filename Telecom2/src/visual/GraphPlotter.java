@@ -47,6 +47,11 @@ public class GraphPlotter {
 			ss.add(i, data[i]);
 			dataset.addSeries(ss);
 	}
+	
+	
+	public void addAnnotation() {
+		
+	}
 
 	public ChartPanel getChart() {
 		return chartpanel;
