@@ -66,8 +66,11 @@ public class Region implements Serializable {
 		return openGIScoordinates;
 	}
 
-	
 	public String toKml(String color) {
+		return toKml(color,"");
+	}
+	
+	public String toKml(String color, String description) {
 		return "<Style id=\""+color+"\">" +
 				"<LineStyle>" +
 				"<color>"+color+"</color>" +
@@ -78,6 +81,7 @@ public class Region implements Serializable {
 				"</Style>" +
 				"<Placemark>" +
 				"<name>"+name+"</name>" +
+				"<description>"+description+"</description>" +
 				"<styleUrl>#"+color+"</styleUrl>" +
 				"<Polygon>" +
 				"<outerBoundaryIs>" +
