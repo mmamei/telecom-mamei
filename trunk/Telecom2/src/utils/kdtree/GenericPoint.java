@@ -19,12 +19,14 @@
 
 package utils.kdtree;
 
+import java.io.Serializable;
+
 /**
  * A Point implementation supporting k dimensions.
  * @author <a href="http://www.savarese.com/">Daniel F. Savarese</a>
  */
 public class GenericPoint<Coord extends Comparable<? super Coord>>
-  implements Point<Coord>
+  implements Point<Coord>,Serializable
 {
   private Comparable<? super Coord>[] __coordinates;
 

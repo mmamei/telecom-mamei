@@ -57,7 +57,6 @@ public class ParserComuniItalia {
 		}
 		
 		CopyAndSerializationUtils.save(new File(output_obj_file), rm);
-		rm.printKML();
 		Logger.logln("Done!");
 	}
 	

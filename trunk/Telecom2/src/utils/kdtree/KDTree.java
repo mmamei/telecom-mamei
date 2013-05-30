@@ -19,6 +19,7 @@
 
 package utils.kdtree;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,9 +44,9 @@ import java.util.Set;
  */
 public class KDTree<Coord extends Comparable<? super Coord>,
                         P extends Point<Coord>, V>
-  implements RangeSearchTree<Coord, P, V>
+  implements RangeSearchTree<Coord, P, V>, Serializable
 {
-  final class KDNode implements Map.Entry<P,V>{
+  final class KDNode implements Map.Entry<P,V>,Serializable{
     int _discriminator;
     P _point;
     V _value;
@@ -95,7 +96,7 @@ public class KDTree<Coord extends Comparable<? super Coord>,
     }
   }
 
-  final class MapEntryIterator implements Iterator<Map.Entry<P,V>> {
+  final class MapEntryIterator implements Iterator<Map.Entry<P,V>>, Serializable {
     LinkedList<KDNode> _stack;
     KDNode _next;
     P _lower, _upper;
@@ -157,7 +158,7 @@ public class KDTree<Coord extends Comparable<? super Coord>,
     }
   }
 
-  final class KeyIterator implements Iterator<P> {
+  final class KeyIterator implements Iterator<P>, Serializable {
     MapEntryIterator iterator;
 
     KeyIterator(MapEntryIterator it) {
@@ -180,7 +181,7 @@ public class KDTree<Coord extends Comparable<? super Coord>,
     }
   }
 
-  final class ValueIterator implements Iterator<V> {
+  final class ValueIterator implements Iterator<V>, Serializable {
     MapEntryIterator iterator;
 
     ValueIterator(MapEntryIterator it) {
@@ -203,7 +204,7 @@ public class KDTree<Coord extends Comparable<? super Coord>,
     }
   }
 
-  abstract class CollectionView<E> implements Collection<E> {
+  abstract class CollectionView<E> implements Collection<E>, Serializable {
 
     public boolean add(E o)
       throws UnsupportedOperationException
@@ -273,7 +274,7 @@ public class KDTree<Coord extends Comparable<? super Coord>,
     }
   }
 
-  abstract class SetView<E> extends CollectionView<E> implements Set<E> {
+  abstract class SetView<E> extends CollectionView<E> implements Set<E>, Serializable {
     public boolean equals(Object o) {
       if(!(o instanceof Set))
         return false;
@@ -294,7 +295,7 @@ public class KDTree<Coord extends Comparable<? super Coord>,
     }
   }
 
-  final class MapEntrySet extends SetView<Map.Entry<P,V>>
+  final class MapEntrySet extends SetView<Map.Entry<P,V>> implements Serializable
   {
     public boolean contains(Object o)
       throws ClassCastException, NullPointerException
@@ -352,7 +353,7 @@ public class KDTree<Coord extends Comparable<? super Coord>,
     }
   }
 
-  final class KeySet extends SetView<P> {
+  final class KeySet extends SetView<P> implements Serializable {
 
     public boolean contains(Object o)
       throws ClassCastException, NullPointerException
@@ -403,7 +404,7 @@ public class KDTree<Coord extends Comparable<? super Coord>,
     }
   }
 
-  final class ValueCollection extends CollectionView<V> {
+  final class ValueCollection extends CollectionView<V> implements Serializable {
 
     public boolean contains(Object o)
       throws ClassCastException, NullPointerException
