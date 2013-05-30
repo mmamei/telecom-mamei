@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import network.NetworkMap;
+import utils.Colors;
 import utils.Config;
 import utils.FilterAndCounterUtils;
 import utils.Logger;
@@ -31,19 +32,6 @@ public class KMLPath {
 		
 		kml.printHeaderDocument(out, "trace");
 	}
-	
-	
-	static final String[] colors = new String[]{
-		"ff0000ff", "ffff0000", "ff00ff00", "ffff00ff", "ffffff00", "ff00ffff",
-		"ff000077", "ff770000", "ff007700", "ff770077", "ff777700", "ff007777",
-		"ffbb0000", "ff330000", "ffbb0077", "ff77bb33", "ff33bb77", "ffbb3377",
-		"ffddaaee", "ffee9900", "ff55f63e", "ffc3c433", "ffffff00", "ff00ffff",
-		
-		"ff0000aa", "ffaa0000", "ff00aa00", "ffaa00aa", "faaaaf00", "ff00faaf",
-		"ff0aa077", "ff770aa0", "ff0077a0", "ff770a77", "ff7777a0", "ff00a777",
-		"ffbb0a00", "ff330a00", "ffbb0a77", "ff77abaa", "ffaabb77", "ffbbaa77",
-		"ffdaaaea", "ffee990a", "ff55fa3e", "ffc3ca33", "f1ff1100", "ff00f11f"
-	};
 	
 	public static void print(String username, List<PlsEvent> plsEvents) {
 		kml.printFolder(out, username);
@@ -77,15 +65,15 @@ public class KMLPath {
 					double lat1 = nm.get(pe.getCellac()).getBarycentreLatitude() + jitter(pe);
 					double lon2 = nm.get(pe1.getCellac()).getBarycentreLongitude() + jitter(pe1);
 					double lat2 = nm.get(pe1.getCellac()).getBarycentreLatitude() + jitter(pe1);
-					out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, colors[color_index]));
+					out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index]));
 				}
 				else {
 					color_index ++;
-					if(color_index >= colors.length) color_index = 0;
+					if(color_index >= Colors.RANDOM_COLORS.length) color_index = 0;
 				}
 			}
 			color_index ++;
-			if(color_index >= colors.length) color_index = 0;
+			if(color_index >= Colors.RANDOM_COLORS.length) color_index = 0;
 			kml.closeFolder(out);
 		}
 		
