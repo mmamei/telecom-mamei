@@ -45,6 +45,14 @@ public class RegionMap implements Serializable {
 		kdtree.put(cellPoint, r);
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
+	public List<Region> getRegions(){
+		return rm;
+	}
+	
 	public static final double earth_radius = 6372.795477598; // km
 	public static final double search_radius = 10; // km
 	public static final double deg_radius = Math.toDegrees(search_radius/earth_radius);
