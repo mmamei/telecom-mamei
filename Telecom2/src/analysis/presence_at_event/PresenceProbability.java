@@ -1,6 +1,5 @@
 package analysis.presence_at_event;
 
-import java.awt.Event;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -19,14 +18,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import pls_parser.UsersCSVCreator;
-
 import utils.Config;
 import utils.Logger;
 import visual.GraphPlotter;
-import visual.GraphScatterPlotter;
 import visual.KMLPath;
 import analysis.PlsEvent;
 import area.CityEvent;
+import area.Placemark;
 
 public class PresenceProbability {
 	
@@ -123,11 +121,18 @@ public class PresenceProbability {
 	
 	private static final DecimalFormat DF = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
 	
-	public static double presenceProbability(String username, List<PlsEvent> plsEvents, CityEvent event) {
+	public static double presenceProbability(String username, List<PlsEvent> plsEvents, CityEvent event, double o_radius) {
 		double f1 = fractionOfTimeInWhichTheUserWasAtTheEvent(plsEvents,event);
+		Placemark p = event.spot.clone();
+		p.changeRadius(o_radius);
+		event.spot = p;
 		double f2 = fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(plsEvents,event);
 		//Logger.logln(username+" = "+f1+", "+f2);
 		return f1 * (1-f2);
+	}
+	
+	public static double presenceProbability(String username, List<PlsEvent> plsEvents, CityEvent event) {
+		return presenceProbability(username,plsEvents,event,event.spot.radius);
 	}
 	
 	
