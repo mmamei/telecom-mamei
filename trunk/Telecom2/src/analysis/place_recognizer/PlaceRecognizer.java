@@ -105,7 +105,7 @@ public class PlaceRecognizer {
 	public static boolean VERBOSE = false;
 	
 	public static void main(String[] args) throws Exception {
-		String dir = "test";
+		String dir = "file_pls_piem_users_above_2000";
 		String in_dir = Config.getInstance().base_dir+"/UsersCSVCreator/"+dir;
 		String out_dir = Config.getInstance().base_dir+"/PlaceRecognizer/"+dir;
 		File d = new File(out_dir);
