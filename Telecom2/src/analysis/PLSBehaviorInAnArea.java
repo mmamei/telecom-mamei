@@ -21,7 +21,7 @@ import utils.Logger;
 import visual.GraphPlotter;
 import area.Placemark;
 
-public class PLSBehaviorInAnAreaByCell {
+public class PLSBehaviorInAnArea {
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	static final String[] DAYS = new String[]{"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
@@ -44,7 +44,7 @@ public class PLSBehaviorInAnAreaByCell {
 			PLSEventsAroundAPlacemark.process(p);
 		}
 		
-		Map<String,PLSMap> cell_plsmap = getPLSMap(file);
+		Map<String,PLSMap> cell_plsmap = getPLSMap(file,false);
 		
 		for(String cell: cell_plsmap.keySet()) {
 			
@@ -137,10 +137,9 @@ public class PLSBehaviorInAnAreaByCell {
 
 	
 	
-	public static Map<String,PLSMap> getPLSMap(String file) throws Exception {
+	public static Map<String,PLSMap> getPLSMap(String file, boolean bycells) throws Exception {
 		
 		Map<String,PLSMap> cell_plsmap = new TreeMap<String,PLSMap>();
-		PLSMap plsmap = new PLSMap();
 		String[] splitted;
 		String line;
 		
@@ -151,25 +150,32 @@ public class PLSBehaviorInAnAreaByCell {
 			if(line.length() < 1) continue; // extra line at the end of file
 			splitted = line.split(",");
 			if(splitted.length == 5 && !splitted[3].equals("null")) {
+				
+				
+				String username = splitted[0];
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
+				String key = getKey(cal);
+				String celllac = splitted[3]; 
+				
+				if(!bycells) celllac = "all"; // if we do not want to extract pls by cells we just overwrite the key to use always the 'all' key
+				
+				PLSMap plsmap = cell_plsmap.get(celllac);
+				if(plsmap==null) {
+					plsmap = new PLSMap();
+					cell_plsmap.put(celllac,plsmap);
+				}
 				
 				if(plsmap.startTime == null || plsmap.startTime.after(cal)) plsmap.startTime = (Calendar)cal.clone();
 				if(plsmap.endTime == null || plsmap.endTime.before(cal)) plsmap.endTime = (Calendar)cal.clone();
-				
-				String key = getKey(cal);
-				String username = splitted[0];
 				Set<String> users = plsmap.usr_counter.get(key);
 				if(users == null) users = new TreeSet<String>();
 				users.add(username);
 				plsmap.usr_counter.put(key, users);
-				
 				Integer count = plsmap.pls_counter.get(key);
 				plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
 			}
 		}
 		in.close();
-		cell_plsmap.put("all", plsmap);
-		
 		return cell_plsmap;
 	}
 	
