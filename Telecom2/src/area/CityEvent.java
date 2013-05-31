@@ -6,8 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import pls_parser.AnalyzePLSCoverage;
@@ -53,12 +56,12 @@ public class CityEvent {
 		return CITY_EVENTS.get(event);
 	}
 	
-	public static Collection<CityEvent> getEventsInData() {
+	public static List<CityEvent> getEventsInData() {
 		
 		Map<String,String> ad = AnalyzePLSCoverage.compute();
 
 		if(CITY_EVENTS == null) init();
-		Collection<CityEvent> result = new ArrayList<CityEvent>();
+		List<CityEvent> result = new ArrayList<CityEvent>();
 		
 		for(CityEvent ce: CITY_EVENTS.values()) {
 			String[] s = get(ce.st);
@@ -68,6 +71,16 @@ public class CityEvent {
 			   ad.get(e[0])!=null && ad.get(e[0]).contains(e[1]))
 				result.add(ce);
 		}
+		
+		
+		Collections.sort(result,new Comparator<CityEvent>(){
+			public int compare(CityEvent e1, CityEvent e2) {
+				return e1.st.compareTo(e2.st);
+			}
+			
+		});
+		
+		
 		return result;
 	}
 	
