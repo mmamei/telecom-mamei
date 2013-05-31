@@ -61,9 +61,9 @@ public class PopulationDensity {
 		for(String r: density.keySet()) {
 			int estimated = density.get(r).intValue();
 			Integer groundtruth = istat.get(r);
-			if(groundtruth != null) {
-				result[i][0] = Math.log10(1+estimated);
-				result[i][1] = Math.log10(1+groundtruth);
+			if(groundtruth != null && estimated>0 && groundtruth>0) {
+				result[i][0] = Math.log10(estimated);
+				result[i][1] = Math.log10(groundtruth);
 				i++;
 			}
 		}
@@ -72,8 +72,7 @@ public class PopulationDensity {
 		SimpleRegression sr = new SimpleRegression();
 		sr.addData(result);
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
-		
-		new GraphScatterPlotter("Result:"+region,"Estimated (log10)","GroundTruth (log10)",result);
+		new GraphScatterPlotter("Result: "+region,"Estimated (log10)","GroundTruth (log10)",result);
 		
 		
 	}
