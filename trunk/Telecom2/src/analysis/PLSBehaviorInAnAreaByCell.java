@@ -21,7 +21,7 @@ import utils.Logger;
 import visual.GraphPlotter;
 import area.Placemark;
 
-public class PLSBehaviorInAnArea {
+public class PLSBehaviorInAnAreaByCell {
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	static final String[] DAYS = new String[]{"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
