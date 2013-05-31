@@ -24,13 +24,13 @@ import area.Placemark;
 public class PLSBehaviorInAnArea {
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	static final String[] DAYS = new String[]{"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+	
 	
 	public static void main(String[] args) throws Exception { 
 		//Placemark p = Placemark.getPlacemark("Juventus Stadium (TO)");
 		//Placemark p = Placemark.getPlacemark("Stadio Olimpico (TO)");
 		Placemark p = Placemark.getPlacemark("Stadio Silvio Piola (NO)");
-		p.changeRadius(-300);
+		p.changeRadius(1000);
 		process(p);
 		
 	}
@@ -44,43 +44,45 @@ public class PLSBehaviorInAnArea {
 			PLSEventsAroundAPlacemark.process(p);
 		}
 		
-		Map<String,PLSMap> cell_plsmap = getPLSMap(file,false);
+		Map<String,PLSMap> cell_plsmap = getPLSMap(file,true);
 		
 		for(String cell: cell_plsmap.keySet()) {
 			
 			PLSMap plsmap = cell_plsmap.get(cell);
 			
-			int size = plsmap.getHours();
-			String[] domain = new String[size];
-			double[] pls_data = new double[size];
-			double[] usr_data = new double[size];
-			DescriptiveStatistics pls_stats = new DescriptiveStatistics();
-			DescriptiveStatistics usr_stats = new DescriptiveStatistics();
-			
-			Calendar cal = (Calendar)plsmap.startTime.clone();
-			int i = 0;
-			while(!cal.after(plsmap.endTime)) {
-				String key = getKey(cal);
-				Integer pls_count = plsmap.pls_counter.get(key);
-				pls_data[i] = pls_count == null ? 0 : (double)pls_count;
-				usr_data[i] = plsmap.usr_counter.get(key) == null ? 0 : plsmap.usr_counter.get(key).size();
-				domain[i] = getLabel(cal);
-				pls_stats.addValue(pls_data[i]);
-				usr_stats.addValue(usr_data[i]);
+			DescriptiveStatistics[] stats = getStats(plsmap);
 				
-				cal.add(Calendar.HOUR, 1);
-				i++;
-			}
-				
-			// compute z-score
-			double[] z_pls_data = getZ(pls_stats);
-			double[] z_usr_data =  getZ(usr_stats);
+			// compute data
+			//double[] pls_data = stats[0].getValues();
+			//double[] usr_data = stats[1].getValues();
+			double[] z_pls_data = getZ(stats[0]);
+			double[] z_usr_data =  getZ(stats[1]);
 			
-			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,domain,null,null,z_pls_data,z_usr_data);
+			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,null,z_pls_data,z_usr_data);
 		
 		}
 		Logger.logln("Done!");
 	}
+	
+	
+	public static DescriptiveStatistics[] getStats(PLSMap plsmap) {
+		DescriptiveStatistics pls_stats = new DescriptiveStatistics();
+		DescriptiveStatistics usr_stats = new DescriptiveStatistics();
+		
+		Calendar cal = (Calendar)plsmap.startTime.clone();
+		while(!cal.after(plsmap.endTime)) {
+			String key = getKey(cal);
+			Integer pls_count = plsmap.pls_counter.get(key);
+			double pls = pls_count == null ? 0 : (double)pls_count;
+			double usr = plsmap.usr_counter.get(key) == null ? 0 : plsmap.usr_counter.get(key).size();	
+			pls_stats.addValue(pls);
+			usr_stats.addValue(usr);
+			cal.add(Calendar.HOUR, 1);
+		}
+		
+		return new DescriptiveStatistics[]{pls_stats,usr_stats};
+	}
+	
 	
 	public static void drawGraph(String title, String[] domain, double[] pls_data,double[] usr_data,double[] z_pls_data,double[] z_usr_data) {
 		List<String> labels = new ArrayList<String>();
@@ -184,10 +186,5 @@ public class PLSBehaviorInAnArea {
 			 	MONTHS[cal.get(Calendar.MONTH)]+"-"+
 			 	cal.get(Calendar.YEAR)+":"+
 			 	cal.get(Calendar.HOUR_OF_DAY);
-	}
-	
-	public static String getLabel(Calendar cal) {
-		//return "-"+cal.get(Calendar.DAY_OF_MONTH)+":"+DAYS[cal.get(Calendar.DAY_OF_WEEK)-1]+"-";
-		return "["+cal.get(Calendar.DAY_OF_MONTH)+"-"+DAYS[cal.get(Calendar.DAY_OF_WEEK)-1]+":"+cal.get(Calendar.HOUR_OF_DAY)+"]";
 	}
 }
