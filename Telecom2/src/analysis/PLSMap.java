@@ -3,18 +3,22 @@ package analysis;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+
+
+/*
+ * USED in combination with PLSBehaviorInAnArea...
+ */
 
 class PLSMap {
 	Map<String,Set<String>> usr_counter;
 	Map<String,Integer> pls_counter;
-	Calendar startTime;
-	Calendar endTime;
+	Calendar startTime = null;
+	Calendar endTime = null;
 	
-	public PLSMap(Map<String,Set<String>> usr_counter, Map<String,Integer> pls_counter, Calendar startTime, Calendar endTime) {
-		this.usr_counter = usr_counter;
-		this.pls_counter = pls_counter;
-		this.startTime = startTime;
-		this.endTime = endTime;
+	public PLSMap() {
+		this.usr_counter = new TreeMap<String,Set<String>>();
+		this.pls_counter  = new TreeMap<String,Integer>();
 	}
 	
 	public int getHours() {

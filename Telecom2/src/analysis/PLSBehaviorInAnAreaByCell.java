@@ -139,18 +139,11 @@ public class PLSBehaviorInAnAreaByCell {
 	
 	public static Map<String,PLSMap> getPLSMap(String file) throws Exception {
 		
-		
 		Map<String,PLSMap> cell_plsmap = new TreeMap<String,PLSMap>();
-		
-		
-		Map<String,Set<String>> usr_counter = new TreeMap<String,Set<String>>();
-		Map<String,Integer> pls_counter = new TreeMap<String,Integer>();
-		
+		PLSMap plsmap = new PLSMap();
 		String[] splitted;
 		String line;
-		//PlsEvent e;
-		Calendar startTime = null;
-		Calendar endTime = null;
+		
 		Calendar cal = new GregorianCalendar();
 		BufferedReader in = new BufferedReader(new FileReader(file));
 		while((line = in.readLine()) != null){
@@ -160,22 +153,21 @@ public class PLSBehaviorInAnAreaByCell {
 			if(splitted.length == 5 && !splitted[3].equals("null")) {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
 				
-				if(startTime == null || startTime.after(cal)) startTime = (Calendar)cal.clone();
-				if(endTime == null || endTime.before(cal)) endTime = (Calendar)cal.clone();
+				if(plsmap.startTime == null || plsmap.startTime.after(cal)) plsmap.startTime = (Calendar)cal.clone();
+				if(plsmap.endTime == null || plsmap.endTime.before(cal)) plsmap.endTime = (Calendar)cal.clone();
 				
 				String key = getKey(cal);
 				String username = splitted[0];
-				Set<String> users = usr_counter.get(key);
+				Set<String> users = plsmap.usr_counter.get(key);
 				if(users == null) users = new TreeSet<String>();
 				users.add(username);
-				usr_counter.put(key, users);
+				plsmap.usr_counter.put(key, users);
 				
-				Integer count = pls_counter.get(key);
-				pls_counter.put(key, count == null ? 0 : count+1);	
+				Integer count = plsmap.pls_counter.get(key);
+				plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
 			}
 		}
 		in.close();
-		PLSMap plsmap = new PLSMap(usr_counter,pls_counter,startTime,endTime);
 		cell_plsmap.put("all", plsmap);
 		
 		return cell_plsmap;
