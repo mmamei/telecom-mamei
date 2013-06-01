@@ -1,4 +1,4 @@
-package analysis.presence_at_event;
+package pre_delete;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
@@ -20,31 +21,30 @@ import visual.GraphScatterPlotter;
 import area.CityEvent;
 import area.Placemark;
 
-public class PresenceCounterSimple2 {
+public class PresenceCounterSimpleRelCells {
 	
 	
 	public static void main(String[] args) throws Exception {
 		
+		double e_radius = 200;
 		double o_radius = 1000;
 		int days = 5;
-		
-		//for(o_radius=500; o_radius<=2000; o_radius=o_radius+500)
-		process(o_radius,days);
+	
+		process(e_radius,o_radius,days);
 		
 	}
 		
-	public static void process(double o_radius, int days) throws Exception {
+	public static void process(double e_radius, double o_radius, int days) throws Exception {
 		
-		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
+		Logger.log("Processing: e_radius = "+e_radius+" o_radius = "+o_radius+" days = "+days+" ");
 		
-		List<CityEvent> events = CityEvent.getEventsInData();
+		Collection<CityEvent> events = CityEvent.getEventsInData();
 		
 		double[][] result = new double[events.size()][2];
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			o_radius = ce.spot.radius;
-			double c = count(ce,ce.spot.radius,o_radius,days);
+			double c = count(ce,e_radius,o_radius,days);
 			//Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
@@ -56,12 +56,12 @@ public class PresenceCounterSimple2 {
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
 		
-		new GraphScatterPlotter("Result: o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
+		new GraphScatterPlotter("Result: e_radius = "+e_radius+", o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple2";
+		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+o_radius+"_"+days+".csv"));
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+e_radius+"_"+o_radius+"_"+days+".csv"));
 		out.println("event,estimated,groundtruth");
 		i=0;
 		for(CityEvent ce: events) {
@@ -75,12 +75,13 @@ public class PresenceCounterSimple2 {
 		
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
 		
-		Logger.logln("\n"+event.spot.name+", e_r = "+e_radius+", o_r = "+o_radius);
-		
-		String file_event = getFile(event.spot.clone(),e_radius);
-		String file_other = getFile(event.spot.clone(),o_radius);
-		
-		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
+		String file_event = getFile(event.spot,event.spot.radius);
+		String file_other = getFile(event.spot,o_radius);
+		/*
+		List<String> relevant_cells = ReleventCellsExtractor.process(event.spot);
+		System.out.println(event+" rel cells = "+relevant_cells.size());
+		*/
+		Set<String> userPresentDuringEvent = getUsers(null,file_event,event.st,event.et,null,null);
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
@@ -88,7 +89,7 @@ public class PresenceCounterSimple2 {
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(null,file_other,start,end,event.st,event.et);
 		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
 		
@@ -108,7 +109,7 @@ public class PresenceCounterSimple2 {
 		return file;
 	}
 	
-	public static Set<String> getUsers(String file, Calendar start, Calendar end, Calendar start_exclude, Calendar end_exclude) throws Exception {
+	public static Set<String> getUsers(List<String> relevant_cells, String file, Calendar start, Calendar end, Calendar start_exclude, Calendar end_exclude) throws Exception {
 		Set<String> users = new HashSet<String>();
 		String line;
 		Calendar cal = new GregorianCalendar();
@@ -117,7 +118,7 @@ public class PresenceCounterSimple2 {
 			String[] splitted = line.split(",");
 			if(splitted.length == 5) {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
-				if(start.before(cal) && end.after(cal)) {
+				if(start.before(cal) && end.after(cal) &&  (relevant_cells==null || relevant_cells.contains(splitted[3]))) {
 					if(start_exclude == null || end_exclude ==null)
 						users.add(splitted[0]);
 					else if(cal.before(start_exclude) || cal.after(end_exclude))
