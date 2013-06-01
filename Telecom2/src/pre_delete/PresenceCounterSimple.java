@@ -1,4 +1,4 @@
-package analysis.presence_at_event;
+package pre_delete;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.math.stat.regression.SimpleRegression;
@@ -21,15 +20,20 @@ import visual.GraphScatterPlotter;
 import area.CityEvent;
 import area.Placemark;
 
-public class PresenceCounterSimpleRelCells {
+public class PresenceCounterSimple {
 	
 	
 	public static void main(String[] args) throws Exception {
 		
 		double e_radius = 200;
-		double o_radius = 1000;
+		double o_radius = 200;
 		int days = 5;
-	
+		
+		
+		for(e_radius=1000;e_radius<=3000;e_radius+=1000)
+		for(o_radius=e_radius; o_radius<=3000; o_radius=o_radius+1000)
+			
+			
 		process(e_radius,o_radius,days);
 		
 	}
@@ -75,13 +79,10 @@ public class PresenceCounterSimpleRelCells {
 		
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
 		
-		String file_event = getFile(event.spot,event.spot.radius);
+		String file_event = getFile(event.spot,e_radius);
 		String file_other = getFile(event.spot,o_radius);
-		/*
-		List<String> relevant_cells = ReleventCellsExtractor.process(event.spot);
-		System.out.println(event+" rel cells = "+relevant_cells.size());
-		*/
-		Set<String> userPresentDuringEvent = getUsers(null,file_event,event.st,event.et,null,null);
+		
+		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
@@ -89,7 +90,7 @@ public class PresenceCounterSimpleRelCells {
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(null,file_other,start,end,event.st,event.et);
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
 		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
 		
@@ -109,7 +110,7 @@ public class PresenceCounterSimpleRelCells {
 		return file;
 	}
 	
-	public static Set<String> getUsers(List<String> relevant_cells, String file, Calendar start, Calendar end, Calendar start_exclude, Calendar end_exclude) throws Exception {
+	public static Set<String> getUsers(String file, Calendar start, Calendar end, Calendar start_exclude, Calendar end_exclude) throws Exception {
 		Set<String> users = new HashSet<String>();
 		String line;
 		Calendar cal = new GregorianCalendar();
@@ -118,7 +119,7 @@ public class PresenceCounterSimpleRelCells {
 			String[] splitted = line.split(",");
 			if(splitted.length == 5) {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
-				if(start.before(cal) && end.after(cal) &&  (relevant_cells==null || relevant_cells.contains(splitted[3]))) {
+				if(start.before(cal) && end.after(cal)) {
 					if(start_exclude == null || end_exclude ==null)
 						users.add(splitted[0]);
 					else if(cal.before(start_exclude) || cal.after(end_exclude))

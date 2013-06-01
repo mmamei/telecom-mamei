@@ -6,9 +6,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.math.stat.regression.SimpleRegression;
@@ -25,30 +25,26 @@ public class PresenceCounterSimple {
 	
 	public static void main(String[] args) throws Exception {
 		
-		double e_radius = 200;
-		double o_radius = 200;
+		double o_radius = 1000;
 		int days = 5;
 		
-		
-		for(e_radius=1000;e_radius<=3000;e_radius+=1000)
-		for(o_radius=e_radius; o_radius<=3000; o_radius=o_radius+1000)
-			
-			
-		process(e_radius,o_radius,days);
+		//for(o_radius=500; o_radius<=2000; o_radius=o_radius+500)
+		process(o_radius,days);
 		
 	}
 		
-	public static void process(double e_radius, double o_radius, int days) throws Exception {
+	public static void process(double o_radius, int days) throws Exception {
 		
-		Logger.log("Processing: e_radius = "+e_radius+" o_radius = "+o_radius+" days = "+days+" ");
+		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
-		Collection<CityEvent> events = CityEvent.getEventsInData();
+		List<CityEvent> events = CityEvent.getEventsInData();
 		
 		double[][] result = new double[events.size()][2];
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			double c = count(ce,e_radius,o_radius,days);
+			o_radius = ce.spot.radius;
+			double c = count(ce,ce.spot.radius,o_radius,days);
 			//Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
@@ -60,12 +56,12 @@ public class PresenceCounterSimple {
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
 		
-		new GraphScatterPlotter("Result: e_radius = "+e_radius+", o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
+		new GraphScatterPlotter("Result: o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple";
+		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple2";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+e_radius+"_"+o_radius+"_"+days+".csv"));
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+o_radius+"_"+days+".csv"));
 		out.println("event,estimated,groundtruth");
 		i=0;
 		for(CityEvent ce: events) {
@@ -79,8 +75,10 @@ public class PresenceCounterSimple {
 		
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
 		
-		String file_event = getFile(event.spot,e_radius);
-		String file_other = getFile(event.spot,o_radius);
+		Logger.logln("\n"+event.spot.name+", e_r = "+e_radius+", o_r = "+o_radius);
+		
+		String file_event = getFile(event.spot.clone(),e_radius);
+		String file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
 		
