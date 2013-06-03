@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +17,8 @@ import network.NetworkMap;
 
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
+
+import analysis.presence_at_event.ReleventCellsExtractor;
 
 import utils.Config;
 import utils.Logger;
@@ -31,7 +34,7 @@ public class Placemark {
 	public double[] center;
 	public LatLonPoint center_point;
 	public double radius;
-	private Set<String> cellsAround;
+	public Set<String> cellsAround;
 	
 	public Placemark(String name, double[] point, double radius) {
 		this.name = name;
@@ -39,11 +42,15 @@ public class Placemark {
 		center_point = new LatLonPoint(center[0],center[1]);
 		this.radius = radius;
 		this.cellsAround = getCellsAround();
-		//Logger.logln(name+" has "+cellsAround.size()+" cells around");
 	}
 	
 	public Placemark clone() {
 		return new Placemark(name,center,radius);
+	}
+	
+	public boolean equals(Object o) {
+		Placemark op = (Placemark)o;
+		return name.equals(op.name) && radius == op.radius;
 	}
 	
 	
@@ -77,7 +84,6 @@ public class Placemark {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	private Set<String> getCellsAround() { 
 		Set<String> cellsAround = new HashSet<String>();

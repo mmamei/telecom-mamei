@@ -139,7 +139,7 @@ public class PLSBehaviorInAnArea {
 
 	
 	
-	public static Map<String,PLSMap> getPLSMap(String file, boolean bycells) throws Exception {
+	public static Map<String,PLSMap> getPLSMap(String file, boolean group_by_cells) throws Exception {
 		
 		Map<String,PLSMap> cell_plsmap = new TreeMap<String,PLSMap>();
 		String[] splitted;
@@ -159,7 +159,7 @@ public class PLSBehaviorInAnArea {
 				String key = getKey(cal);
 				String celllac = splitted[3]; 
 				
-				if(!bycells) celllac = "all"; // if we do not want to extract pls by cells we just overwrite the key to use always the 'all' key
+				if(!group_by_cells) celllac = "all"; // if we do not want to extract pls by cells we just overwrite the key to use always the 'all' key
 				
 				PLSMap plsmap = cell_plsmap.get(celllac);
 				if(plsmap==null) {
