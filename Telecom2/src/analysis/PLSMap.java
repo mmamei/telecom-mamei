@@ -21,6 +21,8 @@ public class PLSMap {
 		this.pls_counter  = new TreeMap<String,Integer>();
 	}
 	
+	 
+	
 	public int getHours() {
 		return (int)Math.ceil((1.0*(endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 3600000));
 	}
