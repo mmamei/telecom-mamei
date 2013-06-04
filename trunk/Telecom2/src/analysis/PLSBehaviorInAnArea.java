@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
 import utils.Logger;
 import visual.GraphPlotter;
+import area.CityEvent;
 import area.Placemark;
 
 public class PLSBehaviorInAnArea {
@@ -28,9 +30,9 @@ public class PLSBehaviorInAnArea {
 	
 	public static void main(String[] args) throws Exception { 
 		//Placemark p = Placemark.getPlacemark("Juventus Stadium (TO)");
-		//Placemark p = Placemark.getPlacemark("Stadio Olimpico (TO)");
-		Placemark p = Placemark.getPlacemark("Stadio Silvio Piola (NO)");
-		p.changeRadius(1000);
+		Placemark p = Placemark.getPlacemark("Stadio Olimpico (TO)");
+		//Placemark p = Placemark.getPlacemark("Stadio Silvio Piola (NO)");
+		p.changeRadius(500);
 		process(p);
 		
 	}
@@ -44,7 +46,9 @@ public class PLSBehaviorInAnArea {
 			PLSEventsAroundAPlacemark.process(p);
 		}
 		
-		Map<String,PLSMap> cell_plsmap = getPLSMap(file,true);
+		
+		
+		Map<String,PLSMap> cell_plsmap = getPLSMap(file,false);
 		
 		for(String cell: cell_plsmap.keySet()) {
 			
@@ -55,8 +59,8 @@ public class PLSBehaviorInAnArea {
 			// compute data
 			//double[] pls_data = stats[0].getValues();
 			//double[] usr_data = stats[1].getValues();
-			double[] z_pls_data = getZ(stats[0]);
-			double[] z_usr_data =  getZ(stats[1]);
+			double[] z_pls_data = getZ(stats[0],plsmap.startTime);
+			double[] z_usr_data =  getZ(stats[1],plsmap.startTime);
 			
 			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,null,z_pls_data,z_usr_data);
 		
@@ -84,7 +88,7 @@ public class PLSBehaviorInAnArea {
 	}
 	
 	
-	public static void drawGraph(String title, String[] domain, double[] pls_data,double[] usr_data,double[] z_pls_data,double[] z_usr_data) {
+	public static GraphPlotter[] drawGraph(String title, String[] domain, double[] pls_data,double[] usr_data,double[] z_pls_data,double[] z_usr_data) {
 		List<String> labels = new ArrayList<String>();
 		List<String> titles = new ArrayList<String>();
 		List<String[]> domains = new ArrayList<String[]>();
@@ -125,19 +129,79 @@ public class PLSBehaviorInAnArea {
 			ncols = 2;
 		}
 	
-		GraphPlotter.drawMultiGraph(nrows, ncols, "events around "+title, titles, "hour", "n.", labels, domains, data);
+		return GraphPlotter.drawMultiGraph(nrows, ncols, "events around "+title, titles, "hour", "n.", labels, domains, data);
 	}
 	
-	public static double[] getZ(DescriptiveStatistics stat) {
-		double mean = stat.getMean();
-		double sigma = stat.getStandardDeviation();
+	
+	
+	public static double[] getZ(DescriptiveStatistics stat, Calendar startTime) {
 		double[] z = stat.getValues();
-		for(int i=0; i<z.length;i++)
-			z[i] = (z[i] - mean)/sigma;
+		DescriptiveStatistics[] hourly_stats = new DescriptiveStatistics[24];
+		for(int i=0; i<hourly_stats.length;i++) 
+			hourly_stats[i] = new DescriptiveStatistics();
+		
+		for(int i=0; i<z.length;i++) 
+			if(z[i]>0)
+				hourly_stats[i%24].addValue(z[i]);
+		
+		
+		
+		
+	
+		double[] m = new double[24];
+		double[] s = new double[24];
+		for(int i=0; i<hourly_stats.length;i++) {
+			m[i] = hourly_stats[i].getMean();
+			s[i] = hourly_stats[i].getStandardDeviation();
+		}
+		
+		for(int i=0; i<z.length;i++) {
+			z[i] = (z[i] - m[i%24]) / s[i%24];
+			if(z[i] < 0) z[i] = 0;
+		}
+		return z;
+	}
+	
+	public static double[] getZ2(DescriptiveStatistics stat, Calendar startTime) {
+		
+		DescriptiveStatistics stat2 = new DescriptiveStatistics();
+		Calendar cal = (Calendar)startTime.clone();
+		double[] vals = stat.getValues();
+		for(int i=0; i<vals.length;i++) {
+			if(cal.get(Calendar.HOUR_OF_DAY) > 10)
+				stat2.addValue(vals[i]);
+			cal.add(Calendar.HOUR_OF_DAY, 1);
+		}
+		
+		double mean = stat2.getMean();
+		double sigma = stat2.getStandardDeviation();
+		double[] z = stat.getValues();
+		for(int i=0; i<z.length;i++) {
+			z[i] = (z[i] - mean) / sigma;
+			if(z[i] < 0) z[i] = 0;
+		}
+		return z;
+	}
+	
+public static double[] getZ3(DescriptiveStatistics stat, Calendar startTime) {
+		
+		DescriptiveStatistics stat2 = new DescriptiveStatistics();
+		double[] vals = stat.getValues();
+		for(int i=0; i<vals.length;i++) {
+			if(vals[i] > 0)
+				stat2.addValue(vals[i]);
+		}
+		
+		double mean = stat2.getMean();
+		double sigma = stat2.getStandardDeviation();
+		double[] z = stat.getValues();
+		for(int i=0; i<z.length;i++) {
+			z[i] = (z[i] - mean) / sigma;
+			if(z[i] < 0) z[i] = 0;
+		}
 		return z;
 	}
 
-	
 	
 	public static Map<String,PLSMap> getPLSMap(String file, boolean group_by_cells) throws Exception {
 		

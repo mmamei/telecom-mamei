@@ -9,12 +9,14 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
+import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.GraphScatterPlotter;
 import area.CityEvent;
@@ -27,8 +29,6 @@ public class PresenceCounterSimple {
 		
 		double o_radius = 1000;
 		int days = 5;
-		
-		//for(o_radius=500; o_radius<=2000; o_radius=o_radius+500)
 		process(o_radius,days);
 		
 	}
@@ -37,14 +37,17 @@ public class PresenceCounterSimple {
 		
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
+		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
+		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
 		double[][] result = new double[events.size()][2];
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			o_radius = ce.spot.radius;
-			double c = count(ce,ce.spot.radius,o_radius,days);
+			double bestr = bestRadius.get(ce.spot.name);
+			o_radius = bestr;
+			double c = count(ce,bestr,o_radius,days);
 			//Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
 			result[i][1] = ce.head_count;
@@ -58,7 +61,7 @@ public class PresenceCounterSimple {
 		
 		new GraphScatterPlotter("Result: o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple2";
+		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+o_radius+"_"+days+".csv"));

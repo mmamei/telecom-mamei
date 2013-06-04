@@ -27,9 +27,11 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		
 		double o_radius = 1000;
 		int days = 5;
-		
+
 		//for(o_radius=500; o_radius<=2000; o_radius=o_radius+500)
 		process(o_radius,days);
+		
+		Logger.logln("Done!");
 		
 	}
 		
@@ -43,7 +45,8 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		
 		int i = 0;
 		for(CityEvent ce: events) {
-			o_radius = 1000;//ce.spot.radius;
+			ce.spot.changeRadius(1000);
+			o_radius = ce.spot.radius;
 			double c = count(ce,ce.spot.radius,o_radius,days);
 			//Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 			result[i][0] = c;
@@ -58,14 +61,14 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		
 		new GraphScatterPlotter("Result: o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",result);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple2";
+		String dir = Config.getInstance().base_dir +"/PresenceCounterSimpleWRelevantCellsOnly";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+o_radius+"_"+days+".csv"));
 		out.println("event,estimated,groundtruth");
 		i=0;
 		for(CityEvent ce: events) {
-			if(result[i][0] > 0)
+			//if(result[i][0] > 0)
 				out.println(ce.toString()+","+(int)result[i][0]+","+(int)result[i][1]);
 			i++;
 		}
@@ -81,9 +84,14 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		String file_event = getFile(event.spot,e_radius);
 		String file_other = getFile(event.spot,o_radius);
 		
+	
 		Set<String> relevantCells = (Set<String>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/ReleventCellsExtractor/"+event.spot.name+".ser"));
 		Logger.logln(event.toString()+" N. REL CELLS = "+relevantCells.size());
-		
+		Set<String> intersection = getRelCellsThatAreInthePLS(file_event,relevantCells);
+		Logger.logln(intersection.size()+"/"+relevantCells.size()+" are in the pls");
+		for(String i : intersection)
+			Logger.log(i+", ");
+		Logger.logln("");
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null,relevantCells);
 		
@@ -93,7 +101,7 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et,null);
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et,relevantCells);
 		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
 		
@@ -135,5 +143,24 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		}
 		in.close();
 		return users;
+	}
+	
+	
+	public static Set<String> getRelCellsThatAreInthePLS(String file, Set<String> relevant) throws Exception {
+		
+		Set<String> intersection = new HashSet<String>();
+		
+		String line;
+		BufferedReader in = new BufferedReader(new FileReader(file));
+		while((line = in.readLine()) != null){
+			String[] splitted = line.split(",");
+			if(splitted.length == 5) {
+				String cellac = splitted[3];
+				if(relevant.contains(cellac))
+				 intersection.add(cellac);
+			}
+		}
+		in.close();
+		return intersection;
 	}
 }
