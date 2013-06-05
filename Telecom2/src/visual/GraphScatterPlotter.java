@@ -21,7 +21,7 @@ public class GraphScatterPlotter extends ApplicationFrame {
 
     public GraphScatterPlotter(String title, String x, String y, List<double[][]> ldata, List<String> labels) {
         super(title);
-        JPanel jpanel = createDemoPanel(title,x,y,ldata,labels);
+        JPanel jpanel = createScatterPlot(title,x,y,ldata,labels);
         jpanel.setPreferredSize(new Dimension(500, 270));
         setContentPane(jpanel);
         pack();
@@ -29,7 +29,7 @@ public class GraphScatterPlotter extends ApplicationFrame {
         setVisible(true);
     }
 
-    public static JPanel createDemoPanel(String title,String x, String y, List<double[][]> ldata, List<String> labels) {
+    public static JPanel createScatterPlot(String title,String x, String y, List<double[][]> ldata, List<String> labels) {
     	
     	XYDataset ds = getDataset(ldata,labels);
     	

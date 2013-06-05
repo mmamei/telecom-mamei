@@ -1,6 +1,7 @@
 package visual;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +13,12 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYLineAnnotation;
+import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.HighLowRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RefineryUtilities;
@@ -37,7 +41,6 @@ public class GraphPlotter {
 		plot.setRangeGridlinePaint(Color.white);
 		chartpanel = new ChartPanel(jfreechart);
 		chartpanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		
 	}
 
 	public void addData(String title, double[] data) {
@@ -46,6 +49,19 @@ public class GraphPlotter {
 		for (int i = 0; i < data.length; i++)
 			ss.add(i, data[i]);
 			dataset.addSeries(ss);
+	}
+	
+	public void addAnnotation(String label, double x, double y) {
+		XYPlot plot = (XYPlot)chartpanel.getChart().getPlot();
+		XYTextAnnotation annotation = new XYTextAnnotation(label, x,y);
+		annotation.setPaint(new Color(200,0,0));
+		annotation.setFont(new Font("SansSerif",Font.BOLD,12));
+		plot.addAnnotation(annotation);
+		
+		//HighLowRenderer hlr=(HighLowRenderer)plot.getRenderer();
+
+		XYLineAnnotation a1=new XYLineAnnotation(x, 0, x, chartpanel.getHeight());
+		plot.addAnnotation(a1);
 	}
 	
 	
@@ -61,6 +77,7 @@ public class GraphPlotter {
 	public static void main(String args[]) throws Exception {
 		GraphPlotter gp = drawGraph("Main Frame","Title", "s1", "xlabel", "ylabel",new String[]{"a","b","c","d"},new double[]{1,4,9,16});
 		gp.addData("s2",new double[]{1,2,3,4});
+		gp.addAnnotation("marco", 2.3, 2);
 		
 		
 		List<String[]> domains = new ArrayList<String[]>();
