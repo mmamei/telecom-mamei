@@ -106,8 +106,8 @@ public class ReleventCellsExtractor {
 			for(String cell: cell_plsmap.keySet()) {
 				PLSMap plsmap = cell_plsmap.get(cell);
 				DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
-				double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0],plsmap.startTime);
-				double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1],plsmap.startTime);
+				double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0]);
+				double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1]);
 				
 				// has this cell outliers when event take place?
 				
@@ -167,8 +167,8 @@ public class ReleventCellsExtractor {
 		}
 		
 		DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(totplsmap);
-		double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0],totplsmap.startTime);
-		double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1],totplsmap.startTime);
+		double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0]);
+		double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1]);
 		
 		GraphPlotter[] g = PLSBehaviorInAnArea.drawGraph(title,totplsmap.getDomain(),null,null,z_pls_data,z_usr_data);
 		if(individual) {
@@ -177,8 +177,8 @@ public class ReleventCellsExtractor {
 				plsmap.startTime = totplsmap.startTime;
 				plsmap.endTime = totplsmap.endTime;
 				stats = PLSBehaviorInAnArea.getStats(plsmap);
-				z_pls_data = PLSBehaviorInAnArea.getZ(stats[0],plsmap.startTime);
-				z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1],plsmap.startTime);
+				z_pls_data = PLSBehaviorInAnArea.getZ(stats[0]);
+				z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1]);
 				g[0].addData(cell, z_pls_data);
 				g[1].addData(cell, z_usr_data);
 			}

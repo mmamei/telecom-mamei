@@ -84,8 +84,8 @@ public class PlacemarkRadiusExtractor {
 			
 			if(plsmap.startTime != null) {
 				DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
-				double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0],plsmap.startTime);
-				double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1],plsmap.startTime);
+				double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0]);
+				double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1]);
 					
 			    Calendar cal = (Calendar)plsmap.startTime.clone();
 				int i = 0;
