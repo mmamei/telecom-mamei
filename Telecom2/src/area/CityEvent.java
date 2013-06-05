@@ -46,6 +46,10 @@ public class CityEvent {
 	}
 	
 	
+	public int durationH() {
+		return (int)((et.getTimeInMillis() - st.getTimeInMillis()) / 3600000);
+	}
+	
 	public static Collection<CityEvent> getAllEvents() {
 		if(CITY_EVENTS == null) init();
 		return CITY_EVENTS.values();

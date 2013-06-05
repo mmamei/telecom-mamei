@@ -28,11 +28,11 @@ import area.Placemark;
 public class ReleventCellsExtractor {
 	
 	public static final boolean DRAW = true;
-	
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	public static final double z_threshold = 2;
 
 	//public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
-		public static final String[] pnames = new String[]{"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"};
+	public static final String[] pnames = new String[]{"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"};
 		
 	public static void main(String[] args) throws Exception {
 		
@@ -142,7 +142,7 @@ public class ReleventCellsExtractor {
 					cells.add(cell);
 			}
 			
-			if(DRAW) draw(p.name,cell_plsmap,cells,true);
+			if(DRAW) draw(p.name,cell_plsmap,cells,releventEvents,true);
 			
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -152,7 +152,7 @@ public class ReleventCellsExtractor {
 	}
 	
 	
-	public static void draw(String title, Map<String,PLSMap> cell_plsmap,Set<String> relevant,boolean individual) {
+	public static void draw(String title, Map<String,PLSMap> cell_plsmap,Set<String> relevant,List<CityEvent> releventEvents, boolean individual) {
 		
 		if(relevant.size()==0) return;
 		
@@ -183,6 +183,29 @@ public class ReleventCellsExtractor {
 				g[0].addData(cell, z_pls_data);
 				g[1].addData(cell, z_usr_data);
 			}
-		}	
+		}
+		
+		
+		// draw events' annotations 
+		Calendar cal = (Calendar)totplsmap.startTime.clone();
+		int i = 0;
+		next_event:
+		for(CityEvent e: releventEvents) {
+			for(;i<totplsmap.getHours();i++) {
+				boolean after_event = cal.after(e.et);
+				boolean in_event = e.st.before(cal) && e.et.after(cal);
+				if(in_event) {
+					for(GraphPlotter gp: g){
+						String label = e.st.get(Calendar.DAY_OF_MONTH)+" "+MONTHS[e.st.get(Calendar.MONTH)];
+						gp.addAnnotation(label,i+0.5*e.durationH(),2);
+					}
+				}
+				cal.add(Calendar.HOUR_OF_DAY, 1);
+				if(after_event || in_event) {
+					i++;
+					continue next_event;
+				}
+			}
+		}
 	}	
 }
