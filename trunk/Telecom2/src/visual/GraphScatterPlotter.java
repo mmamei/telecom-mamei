@@ -19,9 +19,9 @@ import org.jfree.util.ShapeUtilities;
 
 public class GraphScatterPlotter extends ApplicationFrame {
 
-    public GraphScatterPlotter(String title, String x, String y, double[][] data) {
+    public GraphScatterPlotter(String title, String x, String y, List<double[][]> ldata, List<String> labels) {
         super(title);
-        JPanel jpanel = createDemoPanel(title,x,y,data);
+        JPanel jpanel = createDemoPanel(title,x,y,ldata,labels);
         jpanel.setPreferredSize(new Dimension(500, 270));
         setContentPane(jpanel);
         pack();
@@ -29,11 +29,11 @@ public class GraphScatterPlotter extends ApplicationFrame {
         setVisible(true);
     }
 
-    public static JPanel createDemoPanel(String title,String x, String y, double[][] data) {
+    public static JPanel createDemoPanel(String title,String x, String y, List<double[][]> ldata, List<String> labels) {
     	
-    	XYDataset ds = getDataset(data);
+    	XYDataset ds = getDataset(ldata,labels);
     	
-        JFreeChart jfreechart = ChartFactory.createScatterPlot(title, x, y, ds, PlotOrientation.VERTICAL, false, true, false);
+        JFreeChart jfreechart = ChartFactory.createScatterPlot(title, x, y, ds, PlotOrientation.VERTICAL, true, true, false);
         Shape shape = ShapeUtilities.createDiamond(100);
 
         XYPlot xyPlot = (XYPlot) jfreechart.getPlot();
@@ -46,21 +46,31 @@ public class GraphScatterPlotter extends ApplicationFrame {
         return new ChartPanel(jfreechart);
     }
 
-    private static XYDataset getDataset(double[][] data) {
+    private static XYDataset getDataset(List<double[][]> ldata, List<String> labels) {
         XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
-        XYSeries series = new XYSeries("");
-        for(double[] d: data)
-         series.add(d[0], d[1]);
-        xySeriesCollection.addSeries(series);
+        
+        for(int i=0; i<ldata.size();i++) {
+	        XYSeries series = new XYSeries(labels.get(i));
+	        for(double[] d: ldata.get(i))
+	         series.add(d[0], d[1]);
+	        xySeriesCollection.addSeries(series);
+        }
+        
         return xySeriesCollection;
     }
 
     public static void main(String args[]) {
-    	double[][] data = new double[][]{
-    			{1,2},{4,5}
-    	};
+    	List<double[][]> ldata = new ArrayList<double[][]>();
+    	ldata.add(new double[][]{{1,2},{4,5}});
+    	ldata.add(new double[][]{{4,2},{3,5}});
+    	ldata.add(new double[][]{{3,2},{3.5,5}});
     	
-        GraphScatterPlotter x = new GraphScatterPlotter("Result","X","Y",data);
+    	List<String> labels = new ArrayList<String>();
+    	labels.add("data1");
+    	labels.add("data2");
+    	labels.add("data3");
+    	
+        new GraphScatterPlotter("Result","X","Y",ldata,labels);
         
     }
 }
