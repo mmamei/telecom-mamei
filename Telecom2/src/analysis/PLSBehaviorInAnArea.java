@@ -65,12 +65,11 @@ public class PLSBehaviorInAnArea {
 			// compute data
 			//double[] pls_data = stats[0].getValues();
 			//double[] usr_data = stats[1].getValues();
-			double[] z_pls_data = getZ(stats[0],plsmap.startTime);
-			double[] z_usr_data =  getZ(stats[1],plsmap.startTime);
+			double[] z_pls_data = getZ(stats[0]);
+			double[] z_usr_data =  getZ(stats[1]);
 			
-			StatsUtils.checkNormalDistrib(z_pls_data,true);
-			StatsUtils.checkNormalDistrib(getZ2(stats[0],plsmap.startTime),true);
-			StatsUtils.checkNormalDistrib(getZ3(stats[0],plsmap.startTime),true);
+			StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
+			StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
 			
 			
 			//drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,null,z_pls_data,z_usr_data);
@@ -144,7 +143,7 @@ public class PLSBehaviorInAnArea {
 	
 	
 	
-	public static double[] getZ(DescriptiveStatistics stat, Calendar startTime) {
+	public static double[] getZ(DescriptiveStatistics stat) {
 		double[] z = stat.getValues();
 		DescriptiveStatistics[] hourly_stats = new DescriptiveStatistics[24];
 		for(int i=0; i<hourly_stats.length;i++) 
@@ -164,38 +163,19 @@ public class PLSBehaviorInAnArea {
 		
 		for(int i=0; i<z.length;i++) {
 			z[i] = (z[i] - m[i%24]) / s[i%24];
-			//if(z[i] < 0) z[i] = 0;
+			if(z[i] < 0) z[i] = 0;
 		}
 		return z;
 	}
 	
-	public static double[] getZ2(DescriptiveStatistics stat, Calendar startTime) {
-		
-		DescriptiveStatistics stat2 = new DescriptiveStatistics();
-		Calendar cal = (Calendar)startTime.clone();
-		double[] vals = stat.getValues();
-		for(int i=0; i<vals.length;i++) {
-			//if(cal.get(Calendar.HOUR_OF_DAY) > 10)
-				stat2.addValue(vals[i]);
-			cal.add(Calendar.HOUR_OF_DAY, 1);
-		}
-		
-		double mean = stat2.getMean();
-		double sigma = stat2.getStandardDeviation();
-		double[] z = stat.getValues();
-		for(int i=0; i<z.length;i++) {
-			z[i] = (z[i] - mean) / sigma;
-			//if(z[i] < 0) z[i] = 0;
-		}
-		return z;
-	}
 	
-public static double[] getZ3(DescriptiveStatistics stat, Calendar startTime) {
+	
+	public static double[] getZ3(DescriptiveStatistics stat) {
 		
 		DescriptiveStatistics stat2 = new DescriptiveStatistics();
 		double[] vals = stat.getValues();
 		for(int i=0; i<vals.length;i++) {
-			//if(vals[i] > 0)
+			if(vals[i] > 0)
 				stat2.addValue(vals[i]);
 		}
 		
@@ -204,7 +184,7 @@ public static double[] getZ3(DescriptiveStatistics stat, Calendar startTime) {
 		double[] z = stat.getValues();
 		for(int i=0; i<z.length;i++) {
 			z[i] = (z[i] - mean) / sigma;
-			//if(z[i] < 0) z[i] = 0;
+			if(z[i] < 0) z[i] = 0;
 		}
 		return z;
 	}
