@@ -39,6 +39,7 @@ public class PresenceCounter {
 		List<double[][]> data = new ArrayList<double[][]>();
 		
 		for(String p : placemark_events.keySet()) {
+			labels.add(p);
 			List<CityEvent> pevents =  placemark_events.get(p);
 			double[][] result = new double[pevents.size()][2];
 			int i = 0;
