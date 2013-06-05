@@ -29,10 +29,11 @@ public class ReleventCellsExtractor {
 	
 	public static final boolean DRAW = true;
 	
-	public static final double z_threshold = 2.5;
+	public static final double z_threshold = 2;
 
-	public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
-	
+	//public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
+		public static final String[] pnames = new String[]{"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"};
+		
 	public static void main(String[] args) throws Exception {
 		
 		String odir = Config.getInstance().base_dir+"/ReleventCellsExtractor";
@@ -40,7 +41,7 @@ public class ReleventCellsExtractor {
 		
 		for(String pn : pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
-			Set<String> cells = process(p,1000);
+			Set<String> cells = process(p,500);
 			CopyAndSerializationUtils.save(new File(odir+"/"+pn+".ser"), cells);
 			
 			Logger.logln(pn+" HAS N. CELLS RELEVANT = "+cells.size());
@@ -55,7 +56,7 @@ public class ReleventCellsExtractor {
 		
 		Logger.logln("Done");
 	}
-	
+	/*
 	public static void main2(String[] args) throws Exception {
 		String odir = Config.getInstance().base_dir+"/ReleventCellsExtractor";
 		new File(odir).mkdirs();
@@ -68,7 +69,7 @@ public class ReleventCellsExtractor {
 		}
 		Logger.logln("TEST Main Done");
 	}
-	
+	*/
 	public static Set<String> process(Placemark op, double search_r) {
 		
 		Set<String> cells = new HashSet<String>();
