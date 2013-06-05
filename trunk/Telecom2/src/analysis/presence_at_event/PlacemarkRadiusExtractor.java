@@ -29,7 +29,9 @@ import area.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	
-	public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
+	//public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
+	public static final String[] pnames = new String[]{"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"};
+	
 	
 	public static final double z_threshold = 3;
 	
@@ -39,7 +41,7 @@ public class PlacemarkRadiusExtractor {
 		
 		for(String pn : pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
-		    p.changeRadius(500);
+		    p.changeRadius(1000);
 		    double bestr = getBestRadius(p);
 		    System.out.println(pn+" ---> "+bestr);
 		    bestRadius.put(pn, bestr);
