@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math.stat.regression.SimpleRegression;
@@ -17,7 +19,6 @@ import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.GraphScatterPlotter;
 import visual.Kml;
-import area.CityEvent;
 import area.ParserDatiISTAT;
 import area.Region;
 import area.RegionMap;
@@ -72,7 +73,13 @@ public class PopulationDensity {
 		SimpleRegression sr = new SimpleRegression();
 		sr.addData(result);
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
-		new GraphScatterPlotter("Result: "+region,"Estimated (log10)","GroundTruth (log10)",result);
+		
+		List<double[][]> ldata = new ArrayList<double[][]>();
+		ldata.add(result);
+		List<String> labels = new ArrayList<String>();
+		labels.add("population density");
+		
+		new GraphScatterPlotter("Result: "+region,"Estimated (log10)","GroundTruth (log10)",ldata,labels);
 		
 		
 	}
