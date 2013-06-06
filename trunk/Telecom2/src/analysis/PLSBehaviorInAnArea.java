@@ -59,6 +59,8 @@ public class PLSBehaviorInAnArea {
 		for(CityEvent e : events) 
 			if(e.spot.name.equals(p.name)) relevantEvents.add(e);
 		
+		for(CityEvent re : relevantEvents)
+			System.out.println("- "+re.toFileName());
 		
 		Map<String,PLSMap> cell_plsmap = getPLSMap(file,false);
 		
@@ -74,8 +76,8 @@ public class PLSBehaviorInAnArea {
 			double[] z_pls_data = getZ(stats[0]);
 			double[] z_usr_data =  getZ(stats[1]);
 			
-			StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
-			StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
+			//StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
+			//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
 			
 			
 			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,null,z_pls_data,z_usr_data,plsmap,relevantEvents);

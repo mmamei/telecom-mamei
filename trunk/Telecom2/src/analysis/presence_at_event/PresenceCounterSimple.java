@@ -43,8 +43,6 @@ public class PresenceCounterSimple {
 		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
-		
-		
 		//create a map that associates a Placemark with the list of events happening in there
 		Map<String,List<CityEvent>> placemark_events = new HashMap<String,List<CityEvent>>();
 		for(CityEvent ce: events) {
