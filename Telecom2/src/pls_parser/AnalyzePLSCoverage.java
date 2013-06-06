@@ -1,13 +1,12 @@
 package pls_parser;
 
 import java.io.File;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import utils.Config;
 import utils.Logger;
@@ -47,7 +46,6 @@ public class AnalyzePLSCoverage {
 		}
 		return allDays;
 	}
-	
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	private static void analyzeDirectory(File directory, Map<String,String> allDays) throws Exception{
