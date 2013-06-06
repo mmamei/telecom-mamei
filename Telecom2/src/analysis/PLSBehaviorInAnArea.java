@@ -53,6 +53,12 @@ public class PLSBehaviorInAnArea {
 		}
 		
 		
+		// get the city events to be considered to find relevant cells for this placemark
+		Collection<CityEvent> events = CityEvent.getEventsInData();
+		List<CityEvent> relevantEvents = new ArrayList<CityEvent>();
+		for(CityEvent e : events) 
+			if(e.spot.name.equals(p.name)) relevantEvents.add(e);
+		
 		
 		Map<String,PLSMap> cell_plsmap = getPLSMap(file,false);
 		
@@ -72,7 +78,7 @@ public class PLSBehaviorInAnArea {
 			StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
 			
 			
-			//drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,null,z_pls_data,z_usr_data);
+			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,null,z_pls_data,z_usr_data,plsmap,relevantEvents);
 		
 		}
 	}
@@ -97,7 +103,7 @@ public class PLSBehaviorInAnArea {
 	}
 	
 	
-	public static GraphPlotter[] drawGraph(String title, String[] domain, double[] pls_data,double[] usr_data,double[] z_pls_data,double[] z_usr_data) {
+	public static GraphPlotter[] drawGraph(String title, String[] domain, double[] pls_data,double[] usr_data,double[] z_pls_data,double[] z_usr_data, PLSMap plsmap, List<CityEvent> relevantEvents) {
 		List<String> labels = new ArrayList<String>();
 		List<String> titles = new ArrayList<String>();
 		List<String[]> domains = new ArrayList<String[]>();
@@ -138,7 +144,31 @@ public class PLSBehaviorInAnArea {
 			ncols = 2;
 		}
 	
-		return GraphPlotter.drawMultiGraph(nrows, ncols, "events around "+title, titles, "hour", "n.", labels, domains, data);
+		GraphPlotter[] gps =  GraphPlotter.drawMultiGraph(nrows, ncols, "events around "+title, titles, "hour", "n.", labels, domains, data);
+		
+		// draw events' annotations 
+		Calendar cal = (Calendar)plsmap.startTime.clone();
+		int i = 0;
+		next_event:
+		for(CityEvent e: relevantEvents) {
+			for(;i<plsmap.getHours();i++) {
+				boolean after_event = cal.after(e.et);
+				boolean in_event = e.st.before(cal) && e.et.after(cal);
+				if(in_event) {
+					for(GraphPlotter gp: gps){
+						String label = e.st.get(Calendar.DAY_OF_MONTH)+" "+MONTHS[e.st.get(Calendar.MONTH)];
+						gp.addAnnotation(label,i+0.5*e.durationH(),2);
+					}
+				}
+				cal.add(Calendar.HOUR_OF_DAY, 1);
+				if(after_event || in_event) {
+					i++;
+					continue next_event;
+				}
+			}
+		}
+		
+		return gps;
 	}
 	
 	

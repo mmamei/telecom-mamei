@@ -171,7 +171,7 @@ public class ReleventCellsExtractor {
 		double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0]);
 		double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1]);
 		
-		GraphPlotter[] g = PLSBehaviorInAnArea.drawGraph(title,totplsmap.getDomain(),null,null,z_pls_data,z_usr_data);
+		GraphPlotter[] g = PLSBehaviorInAnArea.drawGraph(title,totplsmap.getDomain(),null,null,z_pls_data,z_usr_data,totplsmap,releventEvents);
 		if(individual) {
 			for(String cell: relevant) {
 				PLSMap plsmap = cell_plsmap.get(cell);
@@ -182,29 +182,6 @@ public class ReleventCellsExtractor {
 				z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1]);
 				g[0].addData(cell, z_pls_data);
 				g[1].addData(cell, z_usr_data);
-			}
-		}
-		
-		
-		// draw events' annotations 
-		Calendar cal = (Calendar)totplsmap.startTime.clone();
-		int i = 0;
-		next_event:
-		for(CityEvent e: releventEvents) {
-			for(;i<totplsmap.getHours();i++) {
-				boolean after_event = cal.after(e.et);
-				boolean in_event = e.st.before(cal) && e.et.after(cal);
-				if(in_event) {
-					for(GraphPlotter gp: g){
-						String label = e.st.get(Calendar.DAY_OF_MONTH)+" "+MONTHS[e.st.get(Calendar.MONTH)];
-						gp.addAnnotation(label,i+0.5*e.durationH(),2);
-					}
-				}
-				cal.add(Calendar.HOUR_OF_DAY, 1);
-				if(after_event || in_event) {
-					i++;
-					continue next_event;
-				}
 			}
 		}
 	}	
