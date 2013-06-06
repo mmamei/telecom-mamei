@@ -18,6 +18,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import pls_parser.PLSEventsAroundAPlacemark;
 
 import utils.Config;
+import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import utils.StatsUtils;
 import visual.GraphPlotter;
@@ -32,9 +33,13 @@ public class PLSBehaviorInAnArea {
 	static String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
 	
 	public static void main(String[] args) throws Exception { 
+		
+		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
+		
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
-			p.changeRadius(500);
+			double bestr = bestRadius.get(pn);
+			p.changeRadius(bestr);
 			process(p);
 		}
 		Logger.logln("Done!");
