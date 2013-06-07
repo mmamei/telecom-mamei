@@ -23,9 +23,9 @@ public class Config {
 	}
 	
 	private Config() {
+		String line = "";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(CFILE)));
-			String line;
 			while((line = br.readLine()) != null) {
 				line = line.trim();
 				if(line.length()==0) continue;
@@ -34,7 +34,8 @@ public class Config {
 				parse(s[0].trim(),s[1].trim());
 			}
 		} catch(Exception e) {
-			System.err.println("Cannot read config file!");
+			System.err.println("Cannot read config file! "+line);
+			
 			e.printStackTrace();
 		}
 	}

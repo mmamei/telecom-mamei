@@ -60,6 +60,8 @@ public class CityEvent {
 		return CITY_EVENTS.get(event);
 	}
 	
+	
+	
 	public static List<CityEvent> getEventsInData() {
 		
 		Map<String,String> ad = AnalyzePLSCoverage.compute();
@@ -83,7 +85,6 @@ public class CityEvent {
 			}
 			
 		});
-		
 		
 		return result;
 	}
