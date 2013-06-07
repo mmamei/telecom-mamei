@@ -1,9 +1,10 @@
-package analysis.presence_at_event;
+package pre_delete;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,17 +28,22 @@ import area.Placemark;
 
 public class ReleventCellsExtractor {
 	
-	public static final boolean DRAW = true;
+	public static final boolean DRAW = false;
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	public static final double z_threshold = 2;
 
-	//public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
-	public static final String[] pnames = new String[]{"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"};
+	public static final String[] pnames = new String[]{
+		"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
+		"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"
+	};
 		
 	public static void main(String[] args) throws Exception {
 		
 		String odir = Config.getInstance().base_dir+"/ReleventCellsExtractor";
 		new File(odir).mkdirs();
+		
+		
+		Map<String,Double> bestRadius = new HashMap<String,Double>();
 		
 		for(String pn : pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
@@ -45,17 +51,37 @@ public class ReleventCellsExtractor {
 			CopyAndSerializationUtils.save(new File(odir+"/"+pn+".ser"), cells);
 			
 			Logger.logln(pn+" HAS N. CELLS RELEVANT = "+cells.size());
+			
+			
+			
+			double max = 0;
+			double avg = 0;
 			NetworkMap nm = NetworkMap.getInstance();
 			for(String cellac: cells) {
 				NetworkCell nc = nm.get(Long.parseLong(cellac));
 				int dist = (int)LatLonUtils.getHaversineDistance(nc.getPoint(), p.center_point);
 				int radius = (int)nc.getRadius();
 				Logger.logln(cellac+" --> dist = "+dist+"m, r = "+radius+"m ---> dist - r = "+(dist-radius)+" m ");
+				max = Math.max(max, dist-radius);
+				avg += (dist-radius);
 			}	
+			max = round_to_100m(max);
+			avg = avg / cells.size();
+			Logger.logln("max dist = "+(int)max+", avg = "+(int)avg);
+			bestRadius.put(pn, max);
 		}
+		
+		
+		CopyAndSerializationUtils.save(new File(odir+"/best_radii.ser"), bestRadius);
 		
 		Logger.logln("Done");
 	}
+	
+	public static double round_to_100m(double r) {
+		return 100.0 * (int)(r/100);
+	}
+	
+	
 	/*
 	public static void main2(String[] args) throws Exception {
 		String odir = Config.getInstance().base_dir+"/ReleventCellsExtractor";

@@ -31,13 +31,16 @@ public class PLSBehaviorInAnArea {
 	
 	
 	static String[] pnames = new String[]{
-		//"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
+		"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
 		"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"
 	};
 	
 	public static void main(String[] args) throws Exception { 
 		
-		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
+		//Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
+		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/ReleventCellsExtractor/best_radii.ser"));
+		
+		
 		
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
@@ -80,15 +83,15 @@ public class PLSBehaviorInAnArea {
 				
 			// compute data
 			//double[] pls_data = stats[0].getValues();
-			//double[] usr_data = stats[1].getValues();
-			double[] z_pls_data = getZ(stats[0],plsmap.startTime);
+			double[] usr_data = stats[1].getValues();
+			//double[] z_pls_data = getZ(stats[0],plsmap.startTime);
 			double[] z_usr_data =  getZ(stats[1],plsmap.startTime);
 			
 			//StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
 			//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
 			
 			
-			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,null,z_pls_data,z_usr_data,plsmap,relevantEvents);
+			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);
 		
 		}
 	}
@@ -225,13 +228,15 @@ public class PLSBehaviorInAnArea {
 	
 
 	
-	public static double[] getZ(DescriptiveStatistics stat, Calendar startcal) {
+	public static double[] getZ(DescriptiveStatistics stat, Calendar startTime) {
 		
 		DescriptiveStatistics stat2 = new DescriptiveStatistics();
+		Calendar cal = (Calendar)startTime.clone();
 		double[] vals = stat.getValues();
 		for(int i=0; i<vals.length;i++) {
-			if(vals[i] > 0)
+			if(cal.get(Calendar.HOUR_OF_DAY) > 10)
 				stat2.addValue(vals[i]);
+			cal.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		
 		double mean = stat2.getMean();
