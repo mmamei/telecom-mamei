@@ -1,4 +1,4 @@
-package analysis.presence_at_event;
+package pre_delete;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,19 +28,17 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 	
 	public static void main(String[] args) throws Exception {
 		
-		double o_radius = 1000;
+		double search_radius = 500;
 		int days = 5;
-
-		//for(o_radius=500; o_radius<=2000; o_radius=o_radius+500)
-		process(o_radius,days);
+		process(search_radius,days);
 		
 		Logger.logln("Done!");
 		
 	}
 		
-	public static void process(double o_radius, int days) throws Exception {
+	public static void process(double radius, int days) throws Exception {
 		
-		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
+		Logger.log("Processing: o_radius = "+radius+" days = "+days+" ");
 		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
@@ -64,9 +62,8 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 			double[][] result = new double[pevents.size()][2];
 			int i = 0;
 			for(CityEvent ce: pevents) {
-				ce.spot.changeRadius(1000);
-				o_radius = ce.spot.radius;
-				double c = count(ce,ce.spot.radius,o_radius,days);
+				ce.spot.changeRadius(radius);
+				double c = count(ce,ce.spot.radius,ce.spot.radius,days);
 				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
@@ -78,12 +75,12 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 				
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
-		new GraphScatterPlotter("Result: o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",data,labels);
+		new GraphScatterPlotter("Result: o_radius = "+radius+",days = "+days,"Estimated","GroundTruth",data,labels);
 		
 		String dir = Config.getInstance().base_dir +"/PresenceCounterSimpleWRelevantCellsOnly";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+o_radius+"_"+days+".csv"));
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+radius+"_"+days+".csv"));
 		out.println("event,estimated,groundtruth");
 		int i = 0;	
 		for(String p : placemark_events.keySet()) {

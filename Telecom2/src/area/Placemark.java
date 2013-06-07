@@ -18,7 +18,8 @@ import network.NetworkMap;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import analysis.presence_at_event.ReleventCellsExtractor;
+import pre_delete.ReleventCellsExtractor;
+
 
 import utils.Config;
 import utils.CopyAndSerializationUtils;

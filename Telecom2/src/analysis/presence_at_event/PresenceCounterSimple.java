@@ -29,8 +29,8 @@ public class PresenceCounterSimple {
 	
 	public static void main(String[] args) throws Exception {
 		
-		double o_radius = 1000;
-		int days = 5;
+		double o_radius = 2000;
+		int days = 3;
 		process(o_radius,days);
 		
 	}
@@ -40,6 +40,7 @@ public class PresenceCounterSimple {
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
 		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
+		//Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/ReleventCellsExtractor/best_radii.ser"));
 		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
@@ -64,7 +65,7 @@ public class PresenceCounterSimple {
 			int i = 0;
 			for(CityEvent ce: pevents) {
 				double bestr = bestRadius.get(ce.spot.name);
-				o_radius = bestr;
+				//o_radius = bestr;
 				double c = count(ce,bestr,o_radius,days);
 				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				result[i][0] = c;

@@ -39,7 +39,6 @@ public class AnalyzePLSCoverage {
 	
 	public static Map<String,String> compute() {
 		String dir = Config.getInstance().pls_folder;
-		System.out.println(dir);
 		return compute(dir);
 	}
 	

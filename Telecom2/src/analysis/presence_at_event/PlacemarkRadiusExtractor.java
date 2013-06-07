@@ -29,7 +29,8 @@ import area.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	
-	public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
+	public static final String[] pnames = new String[]{
+		"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
 		"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"};
 	
 	
@@ -42,7 +43,6 @@ public class PlacemarkRadiusExtractor {
 		
 		for(String pn : pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
-		    p.changeRadius(500);
 		    double bestr = getBestRadius(p);
 		    System.out.println(pn+" ---> "+bestr);
 		    bestRadius.put(pn, bestr);
@@ -59,6 +59,7 @@ public class PlacemarkRadiusExtractor {
 	public static double getBestRadius(Placemark p) throws Exception {
 		
 		Logger.logln("Processing "+p.name);
+		p.changeRadius(500);
 		
 		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+p.name+"_"+p.radius+".txt";
 		File f = new File(file);
@@ -74,14 +75,49 @@ public class PlacemarkRadiusExtractor {
 		for(CityEvent e : CityEvent.getEventsInData()) 
 			if(e.spot.name.equals(p.name)) releventEvents.add(e);
 		
+		int[][] n_outliersXradius =  getNOutliersXRadius(file,p,releventEvents);
 		
-		int max_outliers = 0;
-		double best_radius = p.radius;
-		for(double max_r = p.radius; max_r >= -500; max_r = max_r - 100) {
+		
+		for(int i=0; i<n_outliersXradius.length;i++)
+			Logger.logln("radius = "+n_outliersXradius[i][0]+" --> outliers = "+n_outliersXradius[i][1]);
+		
+		
+		
+	
+		// find max number of outliers
+		int max = n_outliersXradius[0][1];
+		for(int i=1; i<n_outliersXradius.length;i++)
+			if(n_outliersXradius[i][1] > max)
+				max = n_outliersXradius[i][1];
+		
+		
+		// find the average radius associated with that number of outliser
+		double avg_r = 0;
+		double cont = 0;
+		for(int i=0; i<n_outliersXradius.length;i++) 
+			if(n_outliersXradius[i][1] == max) {
+				avg_r += n_outliersXradius[i][0];
+				cont ++;
+			}
+		
+		avg_r = avg_r / cont;
+		
+		Logger.logln("best radius = "+avg_r);
+		
+		return avg_r;
+	}
+	
+	
+	public static int[][] getNOutliersXRadius(String file, Placemark p, List<CityEvent> releventEvents) throws Exception {
+		
+		int[][] n_outliersXradius = new int[11][2];
+		int index = 0;
+		
+		for(int max_r = 500; max_r >= -500; max_r = max_r - 100) {
 			PLSMap plsmap = getPLSMap(file,p,max_r);
 			
 			int outliers_count = 0;
-			boolean[] found = new boolean[releventEvents.size()];
+			
 			
 			if(plsmap.startTime != null) {
 				DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
@@ -92,22 +128,17 @@ public class PlacemarkRadiusExtractor {
 				int i = 0;
 				
 				
-				
 				next_event:	
 				for(int j=0; j<releventEvents.size();j++) {
 					CityEvent e = releventEvents.get(j);
-					//if(cell.equals("4004750727")) System.out.println(e);
 						
 					for(;i<plsmap.getHours();i++) {
 						
 						boolean after_event = cal.after(e.et);
 						boolean found_outlier = e.st.before(cal) && e.et.after(cal) && (z_pls_data[i] > z_threshold || z_usr_data[i] > z_threshold);
 							
-						if(found_outlier) {
+						if(found_outlier) 
 							outliers_count ++;
-							found[j] = true;
-						}
-						//if(cell.equals("4004750727")) System.out.println(i+" "+cal.getTime()+" -- oc -->"+outliers_count);
 							
 						cal.add(Calendar.HOUR_OF_DAY, 1);
 						if(after_event || found_outlier) {
@@ -118,22 +149,17 @@ public class PlacemarkRadiusExtractor {
 				}
 			}
 			
-			if(outliers_count > max_outliers) {
-				max_outliers = outliers_count;
-				best_radius = max_r;
-			}
-			/*
-			System.out.print(max_r+" = "+outliers_count+"/"+releventEvents.size());
-			if(outliers_count<releventEvents.size()) System.out.print(" MISSING EVENTS = ");
-			for(int j=0; j<found.length;j++) {
-				if(!found[j]) System.out.print(releventEvents.get(j).toString()+", ");
-			}
-			System.out.println();
-			*/
+			n_outliersXradius[index][0] = max_r;
+			n_outliersXradius[index][1] = outliers_count;
+			
+			index++;
+			
+			
 		}
 		
-		return best_radius;
+		return n_outliersXradius;	
 	}
+	
 	
 	
 	static NetworkMap nm = NetworkMap.getInstance();
