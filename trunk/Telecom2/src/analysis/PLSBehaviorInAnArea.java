@@ -30,7 +30,10 @@ public class PLSBehaviorInAnArea {
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	
 	
-	static String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
+	static String[] pnames = new String[]{
+		//"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
+		"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"
+	};
 	
 	public static void main(String[] args) throws Exception { 
 		
@@ -78,8 +81,8 @@ public class PLSBehaviorInAnArea {
 			// compute data
 			//double[] pls_data = stats[0].getValues();
 			//double[] usr_data = stats[1].getValues();
-			double[] z_pls_data = getZ(stats[0]);
-			double[] z_usr_data =  getZ(stats[1]);
+			double[] z_pls_data = getZ(stats[0],plsmap.startTime);
+			double[] z_usr_data =  getZ(stats[1],plsmap.startTime);
 			
 			//StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
 			//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
@@ -180,34 +183,49 @@ public class PLSBehaviorInAnArea {
 	
 	
 	
-	public static double[] getZ(DescriptiveStatistics stat) {
-		double[] z = stat.getValues();
-		DescriptiveStatistics[] hourly_stats = new DescriptiveStatistics[24];
-		for(int i=0; i<hourly_stats.length;i++) 
-			hourly_stats[i] = new DescriptiveStatistics();
+	public static double[] getZ2(DescriptiveStatistics stat, Calendar startTime) {
 		
-		for(int i=0; i<z.length;i++) 
-			if(z[i]>0)
-				hourly_stats[i%24].addValue(z[i]);
+		DescriptiveStatistics[] hstats = new DescriptiveStatistics[24];
+		for(int i=0; i<hstats.length;i++)
+			hstats[i] = new DescriptiveStatistics();
 		
-	
-		double[] m = new double[24];
-		double[] s = new double[24];
-		for(int i=0; i<hourly_stats.length;i++) {
-			m[i] = hourly_stats[i].getMean();
-			s[i] = hourly_stats[i].getStandardDeviation();
+		
+		Calendar cal = (Calendar)startTime.clone();
+		double[] vals = stat.getValues();
+		for(int i=0; i<vals.length;i++) {
+				hstats[cal.get(Calendar.HOUR_OF_DAY)].addValue(vals[i]);
+			cal.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		
+		double[] hmeans = new double[24];
+		double[] hsigmas = new double[24];
+		
+		for(int i=0; i<hstats.length;i++) {
+			hmeans[i] = hstats[i].getMean();
+			hsigmas[i] = hstats[i].getStandardDeviation();
+		}
+		
+		
+		double[] z = stat.getValues();
+		
+		
+		cal = (Calendar)startTime.clone();
+		for(int i=0; i<vals.length;i++) {
+			z[i] = (z[i] - hmeans[cal.get(Calendar.HOUR_OF_DAY)]) / hsigmas[cal.get(Calendar.HOUR_OF_DAY)];
+			cal.add(Calendar.HOUR_OF_DAY, 1);
+		}
+		
+		
 		for(int i=0; i<z.length;i++) {
-			z[i] = (z[i] - m[i%24]) / s[i%24];
 			if(z[i] < 0) z[i] = 0;
 		}
 		return z;
 	}
 	
 	
+
 	
-	public static double[] getZ3(DescriptiveStatistics stat) {
+	public static double[] getZ(DescriptiveStatistics stat, Calendar startcal) {
 		
 		DescriptiveStatistics stat2 = new DescriptiveStatistics();
 		double[] vals = stat.getValues();

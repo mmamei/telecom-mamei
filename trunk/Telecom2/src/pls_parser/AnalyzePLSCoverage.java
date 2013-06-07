@@ -35,9 +35,15 @@ public class AnalyzePLSCoverage {
 		int mins = (int)((endTime - startTime) / 60000);
 		Logger.logln("Completed after "+mins+" mins");
 	}
-		
+	
+	
 	public static Map<String,String> compute() {
 		String dir = Config.getInstance().pls_folder;
+		System.out.println(dir);
+		return compute(dir);
+	}
+	
+	public static Map<String,String> compute(String dir) {	
 		Map<String,String> allDays = new TreeMap<String,String>();
 		try {
 			analyzeDirectory(new File(dir),allDays);
@@ -62,6 +68,7 @@ public class AnalyzePLSCoverage {
 				
 				String key = cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
 				String h = allDays.get(key);
+						
 				allDays.put(key, h==null? cal.get(Calendar.HOUR_OF_DAY)+"-" : h+cal.get(Calendar.HOUR_OF_DAY)+"-");
 			}
 			else if(item.isDirectory())

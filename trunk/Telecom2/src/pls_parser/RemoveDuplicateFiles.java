@@ -28,7 +28,7 @@ public class RemoveDuplicateFiles {
 				
 				if(list.contains(item.getName())) {
 					System.out.println("Deleting "+item);
-					item.delete();
+					//item.delete();
 				}
 				else list.add(item.getName());
 				

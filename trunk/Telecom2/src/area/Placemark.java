@@ -21,6 +21,7 @@ import org.gps.utils.LatLonUtils;
 import analysis.presence_at_event.ReleventCellsExtractor;
 
 import utils.Config;
+import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.Kml;
 
@@ -146,10 +147,13 @@ public class Placemark {
 	
 	
 	public static void main(String[] args) throws Exception {
+		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
 		initPlacemaks();
 		for(String name: PLACEMARKS.keySet()) {
 			Placemark x = Placemark.getPlacemark(name);
-			x.changeRadius(-300);
+			System.out.println(name);
+			double bestr = bestRadius.get(name);
+			x.changeRadius(bestr);
 			String dir = Config.getInstance().base_dir+"/Placemark";
 			File d = new File(dir);
 			if(!d.exists()) d.mkdirs();

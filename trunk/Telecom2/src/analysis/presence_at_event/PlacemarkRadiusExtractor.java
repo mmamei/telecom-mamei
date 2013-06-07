@@ -29,11 +29,12 @@ import area.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	
-	public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)"};
-	//public static final String[] pnames = new String[]{"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"};
+	public static final String[] pnames = new String[]{"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
+		"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"};
 	
 	
-	public static final double z_threshold = 3;
+	
+	public static final double z_threshold = 2;
 	
 	public static void main(String[] args) throws Exception { 
 		
@@ -84,8 +85,8 @@ public class PlacemarkRadiusExtractor {
 			
 			if(plsmap.startTime != null) {
 				DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
-				double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0]);
-				double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1]);
+				double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0],plsmap.startTime);
+				double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1],plsmap.startTime);
 					
 			    Calendar cal = (Calendar)plsmap.startTime.clone();
 				int i = 0;

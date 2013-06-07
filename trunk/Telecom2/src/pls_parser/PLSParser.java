@@ -74,31 +74,36 @@ public class PLSParser {
 	}
 	
 	
-	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer) throws Exception {		
-		ZipFile zf = new ZipFile(plsFile);
-		ZipEntry ze = (ZipEntry) zf.entries().nextElement();
-			
-		InputStreamReader isr = new InputStreamReader(zf.getInputStream(ze));
-		int charRead = 0;
-		char[] read_buffer = new char[BUFFER_SIZE];
-		char[] buffer = new char[3*BUFFER_SIZE];
-		int x = -1;
-		int remainedChars = 0;
-		while(((charRead = isr.read(read_buffer)) > 0)){
-			if(x==-1){
-					x = analyzer.process(read_buffer, charRead);
-					remainedChars = (charRead-x);
-					System.arraycopy(read_buffer, x, buffer, 0, remainedChars);
+	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer) {	
+		try {
+			ZipFile zf = new ZipFile(plsFile);
+			ZipEntry ze = (ZipEntry) zf.entries().nextElement();
+				
+			InputStreamReader isr = new InputStreamReader(zf.getInputStream(ze));
+			int charRead = 0;
+			char[] read_buffer = new char[BUFFER_SIZE];
+			char[] buffer = new char[3*BUFFER_SIZE];
+			int x = -1;
+			int remainedChars = 0;
+			while(((charRead = isr.read(read_buffer)) > 0)){
+				if(x==-1){
+						x = analyzer.process(read_buffer, charRead);
+						remainedChars = (charRead-x);
+						System.arraycopy(read_buffer, x, buffer, 0, remainedChars);
+				}
+				else{
+					System.arraycopy(read_buffer, 0, buffer, remainedChars, charRead);
+					x = analyzer.process(buffer, (charRead+remainedChars));
+					remainedChars = (charRead+remainedChars-x);
+					System.arraycopy(buffer, x, buffer, 0, remainedChars);
+				}
+							
 			}
-			else{
-				System.arraycopy(read_buffer, 0, buffer, remainedChars, charRead);
-				x = analyzer.process(buffer, (charRead+remainedChars));
-				remainedChars = (charRead+remainedChars-x);
-				System.arraycopy(buffer, x, buffer, 0, remainedChars);
-			}
-						
+			isr.close();
+			zf.close();
+		}catch(Exception e) {
+			System.err.println("Problems wirh file: "+plsFile.getAbsolutePath());
+			e.printStackTrace();
 		}
-		isr.close();
-		zf.close();
 	}
 }
