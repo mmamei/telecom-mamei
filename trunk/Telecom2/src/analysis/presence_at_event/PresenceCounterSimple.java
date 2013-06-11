@@ -29,7 +29,7 @@ public class PresenceCounterSimple {
 	
 	public static void main(String[] args) throws Exception {
 		
-		double o_radius = 2000;
+		double o_radius = 0;
 		int days = 3;
 		process(o_radius,days);
 		
@@ -40,7 +40,6 @@ public class PresenceCounterSimple {
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
 		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
-		//Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/ReleventCellsExtractor/best_radii.ser"));
 		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
@@ -58,7 +57,11 @@ public class PresenceCounterSimple {
 		List<String> labels = new ArrayList<String>();
 		List<double[][]> data = new ArrayList<double[][]>();
 		SimpleRegression sr = new SimpleRegression();	
+		
 		for(String p : placemark_events.keySet()) {
+			
+			//if(!p.equals("Juventus Stadium (TO)") && !p.equals("Stadio Mario Rigamonti (BS)")) continue;
+			
 			labels.add(p);
 			List<CityEvent> pevents =  placemark_events.get(p);
 			double[][] result = new double[pevents.size()][2];
@@ -134,6 +137,19 @@ public class PresenceCounterSimple {
 			PLSEventsAroundAPlacemark.process(p);
 		}
 		//else Logger.logln(file+" already exists!");
+		/*
+		Logger.logln(p.name+", "+radius);
+		Set<String> cells = new HashSet<String>();
+		String line;
+		BufferedReader in = new BufferedReader(new FileReader(file));
+		while((line = in.readLine()) != null){
+			String[] splitted = line.split(",");
+			cells.add(splitted[3]);
+		}
+		in.close();
+		for(String cell: cells) 
+			Logger.logln(cell);
+		*/
 		return file;
 	}
 	

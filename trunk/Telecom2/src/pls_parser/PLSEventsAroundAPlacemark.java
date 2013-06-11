@@ -3,42 +3,44 @@ package pls_parser;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import network.NetworkCell;
 import network.NetworkMap;
 import utils.Config;
 import utils.Logger;
-import analysis.PlsEvent;
-import area.CityEvent;
 import area.Placemark;
 
 public class PLSEventsAroundAPlacemark extends BufferAnalyzer {	
 
-	private PrintWriter out = null;
-	private Placemark placemark;
+	private List<PrintWriter> outs;
+	private List<Placemark> placemarks;
 	
 	
-	public PLSEventsAroundAPlacemark(Placemark p) {
-		String dir = Config.getInstance().base_dir+"/"+this.getClass().getSimpleName();
-		File fd = new File(dir);
-		if(!fd.exists()) fd.mkdirs();
-		placemark = p;
-		Logger.logln("Extracting pls events  generated close to: "+p.name);
+	public PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
+		
+		outs = new ArrayList<PrintWriter>();
+		placemarks = new ArrayList<Placemark>();
 		
 		try {
-			out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.name+"_"+p.radius+".txt"))));
-		} catch (IOException e) {
+			String dir = Config.getInstance().base_dir+"/"+this.getClass().getSimpleName();
+			File fd = new File(dir);
+			if(!fd.exists()) fd.mkdirs();	
+			
+			for(Placemark p: ps)
+			for(double r: radii) {
+				outs.add(new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.name+"_"+r+".txt")))));
+				placemarks.add(new Placemark(p.name,p.center,r));
+			}
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	/*
@@ -55,34 +57,61 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
 	NetworkMap nm = NetworkMap.getInstance();
+	
 	public void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
 		imsi = fields[1];
 		celllac = fields[2];
 		timestamp = fields[3];
-		
-		if(!placemark.contains(celllac)) return;
-		
 		long cellac = Long.parseLong(celllac);
 		NetworkCell nc = nm.get(cellac);
-		if(nc == null) out.println(username+","+timestamp+","+imsi+",null");
-		else out.println(username+","+timestamp+","+imsi+","+cellac+","+nc.getCellName());
+		
+		for(int i=0; i<placemarks.size();i++) {
+			if(placemarks.get(i).contains(celllac)) {
+				if(nc == null) outs.get(i).println(username+","+timestamp+","+imsi+",null");
+				else outs.get(i).println(username+","+timestamp+","+imsi+","+cellac+","+nc.getCellName());
+			}
+		}
 	}
 	
 	public void finish() {
-		out.close();
+		for(PrintWriter out: outs)
+			out.close();
 	}
 	
 	public static void process(Placemark p) throws Exception {
-		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(p);
+		List<Placemark> ps = new ArrayList<Placemark>();
+		ps.add(p);
+		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps, new double[]{p.radius});
 		PLSParser.parse(ba);
 		ba.finish();
 	}
 	
+	public static void process(List<Placemark> p, double[] r) throws Exception {
+		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(p, r);
+		PLSParser.parse(ba);
+		ba.finish();
+	}
+	
+	
+	static double[] rs = new double[]{-500,-400,-300,-200,-100,0,100,200,300,400,500,1000};
+	static List<Placemark> ps = new ArrayList<Placemark>();
+	static {
+		/*
+		ps.add(Placemark.getPlacemark("Juventus Stadium (TO)"));
+		ps.add(Placemark.getPlacemark("Stadio Olimpico (TO)"));
+		ps.add(Placemark.getPlacemark("Stadio Silvio Piola (NO)"));
+		*/
+		ps.add(Placemark.getPlacemark("Stadio San Siro (MI)"));
+		ps.add(Placemark.getPlacemark("Stadio Atleti Azzurri d'Italia (BG)"));
+		ps.add(Placemark.getPlacemark("Stadio Mario Rigamonti (BS)"));
+		ps.add(Placemark.getPlacemark("Stadio Franco Ossola (VA)"));
+		
+	}
+	
 	public static void main(String[] args) throws Exception {
-		Placemark p = Placemark.getPlacemark("Stadio Olimpico (TO)");
-		process(p);
+		process(ps,rs);
 		Logger.logln("Done");
 	}
 }

@@ -59,7 +59,7 @@ public class PlacemarkRadiusExtractor {
 	public static double getBestRadius(Placemark p) throws Exception {
 		
 		Logger.logln("Processing "+p.name);
-		p.changeRadius(500);
+		p.changeRadius(1000);
 		
 		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+p.name+"_"+p.radius+".txt";
 		File f = new File(file);
@@ -83,7 +83,7 @@ public class PlacemarkRadiusExtractor {
 		
 		
 		
-	
+		/*
 		// find max number of outliers
 		int max = n_outliersXradius[0][1];
 		for(int i=1; i<n_outliersXradius.length;i++)
@@ -100,20 +100,39 @@ public class PlacemarkRadiusExtractor {
 				cont ++;
 			}
 		
-		avg_r = avg_r / cont;
+		avg_r = round(avg_r / cont);
+		*/
+		
+		double avg_r = 0;
+		double cont = 0;
+		for(int i=0; i<n_outliersXradius.length;i++) {
+			avg_r = avg_r + n_outliersXradius[i][0] * n_outliersXradius[i][1];
+			cont = cont + n_outliersXradius[i][1];
+		}
+		avg_r = round(avg_r / cont);
 		
 		Logger.logln("best radius = "+avg_r);
 		
 		return avg_r;
 	}
 	
+	static double[] rs = new double[]{-500,-400,-300,-200,-100,0,100,200,300,400,500,600,700,800,900,1000};
+	public static double round(double x) {
+		int ri = 0;
+		for(int i=1; i<rs.length;i++) {
+			if(Math.abs(x-rs[i]) < Math.abs(x-rs[ri]))
+				ri = i;
+		}
+		return rs[ri];
+	}
+	
 	
 	public static int[][] getNOutliersXRadius(String file, Placemark p, List<CityEvent> releventEvents) throws Exception {
 		
-		int[][] n_outliersXradius = new int[11][2];
+		int[][] n_outliersXradius = new int[16][2];
 		int index = 0;
 		
-		for(int max_r = 500; max_r >= -500; max_r = max_r - 100) {
+		for(int max_r = 1000; max_r >= -500; max_r = max_r - 100) {
 			PLSMap plsmap = getPLSMap(file,p,max_r);
 			
 			int outliers_count = 0;
