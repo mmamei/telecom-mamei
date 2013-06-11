@@ -28,17 +28,18 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 	
 	public static void main(String[] args) throws Exception {
 		
-		double search_radius = 1000;
+		double er = 500;
+		double or = 500;
 		int days = 3;
-		process(search_radius,days);
+		process(er,or,days);
 		
 		Logger.logln("Done!");
 		
 	}
 		
-	public static void process(double radius, int days) throws Exception {
+	public static void process(double er, double or, int days) throws Exception {
 		
-		Logger.log("Processing: o_radius = "+radius+" days = "+days+" ");
+		Logger.log("Processing: o_radius = "+or+" days = "+days+" ");
 		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
@@ -63,7 +64,7 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 			int i = 0;
 			for(CityEvent ce: pevents) {
 				//ce.spot.changeRadius(radius);
-				double c = count(ce,radius,radius,days);
+				double c = count(ce,er,or,days);
 				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
@@ -75,12 +76,12 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 				
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
-		new GraphScatterPlotter("Result: o_radius = "+radius+",days = "+days,"Estimated","GroundTruth",data,labels);
+		new GraphScatterPlotter("Result: o_radius = "+or+",days = "+days,"Estimated","GroundTruth",data,labels);
 		
 		String dir = Config.getInstance().base_dir +"/PresenceCounterSimpleWRelevantCellsOnly";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+radius+"_"+days+".csv"));
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+or+"_"+days+".csv"));
 		out.println("event,estimated,groundtruth");
 		int i = 0;	
 		for(String p : placemark_events.keySet()) {
@@ -123,7 +124,7 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et,null);
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et,relevantCells);
 		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
 		
