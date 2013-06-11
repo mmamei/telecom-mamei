@@ -30,7 +30,7 @@ public class ReleventCellsExtractor {
 	
 	public static final boolean DRAW = false;
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	public static final double z_threshold = -100;
+	public static final double z_threshold = 2;
 
 	public static final String[] pnames = new String[]{
 		"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
