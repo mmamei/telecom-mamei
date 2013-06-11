@@ -31,17 +31,19 @@ public class PLSBehaviorInAnArea {
 	
 	
 	static String[] pnames = new String[]{
-		"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
-		"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"
+		//"Juventus Stadium (TO)",
+		//"Stadio Olimpico (TO)",
+		//"Stadio Silvio Piola (NO)", 
+		//"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)",
+		"Stadio Mario Rigamonti (BS)",
+		//"Stadio Franco Ossola (VA)"
 	};
 	
 	public static void main(String[] args) throws Exception { 
 		
-		//Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
-		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/ReleventCellsExtractor/best_radii.ser"));
+		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
 		
-		
-		
+	
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
 			double bestr = bestRadius.get(pn);
@@ -73,7 +75,7 @@ public class PLSBehaviorInAnArea {
 		for(CityEvent re : relevantEvents)
 			System.out.println("- "+re.toFileName());
 		
-		Map<String,PLSMap> cell_plsmap = getPLSMap(file,false);
+		Map<String,PLSMap> cell_plsmap = getPLSMap(file,true);
 		
 		for(String cell: cell_plsmap.keySet()) {
 			

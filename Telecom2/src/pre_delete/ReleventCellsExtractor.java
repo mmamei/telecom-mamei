@@ -30,7 +30,7 @@ public class ReleventCellsExtractor {
 	
 	public static final boolean DRAW = false;
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	public static final double z_threshold = 2;
+	public static final double z_threshold = -100;
 
 	public static final String[] pnames = new String[]{
 		"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
@@ -42,18 +42,18 @@ public class ReleventCellsExtractor {
 		String odir = Config.getInstance().base_dir+"/ReleventCellsExtractor";
 		new File(odir).mkdirs();
 		
-		
-		Map<String,Double> bestRadius = new HashMap<String,Double>();
+		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
 		
 		for(String pn : pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
-			Set<String> cells = process(p,500);
+			Set<String> cells = process(p,bestRadius.get(pn));
 			CopyAndSerializationUtils.save(new File(odir+"/"+pn+".ser"), cells);
 			
 			Logger.logln(pn+" HAS N. CELLS RELEVANT = "+cells.size());
+			for(String c: cells)
+				Logger.logln(c);
 			
-			
-			
+			/*			
 			double max = 0;
 			double avg = 0;
 			NetworkMap nm = NetworkMap.getInstance();
@@ -68,11 +68,8 @@ public class ReleventCellsExtractor {
 			max = round_to_100m(max);
 			avg = avg / cells.size();
 			Logger.logln("max dist = "+(int)max+", avg = "+(int)avg);
-			bestRadius.put(pn, max);
+			*/
 		}
-		
-		
-		CopyAndSerializationUtils.save(new File(odir+"/best_radii.ser"), bestRadius);
 		
 		Logger.logln("Done");
 	}

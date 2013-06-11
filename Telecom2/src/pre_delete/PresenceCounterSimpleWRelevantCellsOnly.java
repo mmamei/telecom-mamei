@@ -28,8 +28,8 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 	
 	public static void main(String[] args) throws Exception {
 		
-		double search_radius = 500;
-		int days = 5;
+		double search_radius = 1000;
+		int days = 3;
 		process(search_radius,days);
 		
 		Logger.logln("Done!");
@@ -62,8 +62,8 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 			double[][] result = new double[pevents.size()][2];
 			int i = 0;
 			for(CityEvent ce: pevents) {
-				ce.spot.changeRadius(radius);
-				double c = count(ce,ce.spot.radius,ce.spot.radius,days);
+				//ce.spot.changeRadius(radius);
+				double c = count(ce,radius,radius,days);
 				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
@@ -95,7 +95,9 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		//Logger.logln("Done!");
 	}
 
-		
+	
+	//static Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
+
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
 		
 		Logger.logln("\n"+event.spot.name+", e_r = "+e_radius+", o_r = "+o_radius);
@@ -113,6 +115,7 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		Logger.logln("");
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null,relevantCells);
+		//System.err.println("Users during "+event+" = "+userPresentDuringEvent.size());
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
@@ -120,7 +123,7 @@ public class PresenceCounterSimpleWRelevantCellsOnly {
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et,relevantCells);
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et,null);
 		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
 		
