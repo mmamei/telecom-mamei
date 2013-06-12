@@ -21,10 +21,11 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.GraphScatterPlotter;
+import analysis.PlsEvent;
 import area.CityEvent;
 import area.Placemark;
 
-public class PresenceCounterSimple {
+public class PresenceCounterSimpleProbability {
 	
 	
 	public static void main(String[] args) throws Exception {
@@ -71,8 +72,8 @@ public class PresenceCounterSimple {
 				
 				double searchr = Double.isNaN(o_radius) ? bestr : o_radius;
 				
-				
 				double c = count(ce,bestr,searchr,days);
+				
 				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
@@ -108,8 +109,9 @@ public class PresenceCounterSimple {
 		//Logger.logln("Done!");
 	}
 		
+	
+	
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
-		
 		
 		
 		Logger.logln("\n"+event.spot.name+", e_r = "+e_radius+", o_r = "+o_radius);
@@ -118,18 +120,14 @@ public class PresenceCounterSimple {
 		String file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
+		Map<String,List<PlsEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
+		double prob = 0;
+		for(String u: usr_pls.keySet()) {
+			event.spot.changeRadius(o_radius);
+			prob += PresenceProbability.presenceProbabilityTest(u, usr_pls.get(u), event);
+		}
 		
-		Calendar start = (Calendar)event.st.clone();
-		start.add(Calendar.DAY_OF_MONTH, -days);
-		
-		Calendar end = (Calendar)event.et.clone();
-		end.add(Calendar.DAY_OF_MONTH, days);
-		
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
-		
-		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
-		
-		return userPresentDuringEvent.size();
+		return prob;
 	}
 	
 	public static String getFile(Placemark p, double radius) throws Exception{
@@ -179,4 +177,24 @@ public class PresenceCounterSimple {
 		in.close();
 		return users;
 	}
+	
+	
+	public static Map<String,List<PlsEvent>> getUsersPLS(String file, Set<String> users) throws Exception {
+		Map<String,List<PlsEvent>> usr_pls = new HashMap<String,List<PlsEvent>>();
+		for(String u: users)
+			usr_pls.put(u, new ArrayList<PlsEvent>());
+		
+		String line;
+		BufferedReader in = new BufferedReader(new FileReader(file));
+		while((line = in.readLine()) != null){
+			String[] splitted = line.split(",");
+			List<PlsEvent> list = usr_pls.get(splitted[0]);
+			if(list!=null) list.add(new PlsEvent(splitted[0],"imsi",Long.parseLong(splitted[3]),splitted[1]));
+		}
+		in.close();
+		return usr_pls;
+	}
+	
+	
+	
 }

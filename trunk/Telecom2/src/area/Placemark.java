@@ -158,7 +158,7 @@ public class Placemark {
 			String dir = Config.getInstance().base_dir+"/Placemark";
 			File d = new File(dir);
 			if(!d.exists()) d.mkdirs();
-			x.printKML(dir+"/"+x.name+"_"+x.radius+".kml");	
+			x.printKML(dir+"/"+x.name+"_best.kml");	
 		}
 		Logger.logln("Done!");
 	}
