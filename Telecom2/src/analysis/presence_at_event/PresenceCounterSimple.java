@@ -85,7 +85,7 @@ public class PresenceCounterSimple {
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
 		
-		new GraphScatterPlotter("Result: o_radius = "+o_radius+",days = "+days,"Estimated","GroundTruth",data,labels);
+		new GraphScatterPlotter("SC Result: o_radius = "+o_radius+",days = "+days+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
 		
 		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple";
 		File d = new File(dir);
@@ -121,16 +121,37 @@ public class PresenceCounterSimple {
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
+		start.set(Calendar.HOUR_OF_DAY, 0);
+		start.set(Calendar.MINUTE, 0);
+		start.set(Calendar.SECOND, 0);
 		
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, days);
+		end.set(Calendar.HOUR_OF_DAY, 23);
+		end.set(Calendar.MINUTE, 59);
+		end.set(Calendar.SECOND, 59);
 		
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
+		
+		Calendar start_day_event = (Calendar)event.st.clone();
+		start_day_event.set(Calendar.HOUR_OF_DAY, 0);
+		start_day_event.set(Calendar.MINUTE, 0);
+		start_day_event.set(Calendar.SECOND, 0);
+		
+		Calendar end_day_event = (Calendar)event.et.clone();
+		end_day_event.set(Calendar.HOUR_OF_DAY, 23);
+		end_day_event.set(Calendar.MINUTE, 59);
+		end_day_event.set(Calendar.SECOND, 59);
+		
+	
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,start_day_event,end_day_event);
 		
 		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
-		
 		return userPresentDuringEvent.size();
-	}
+		
+		
+		//userPresentAtTheEventTimeOnOtherDays.retainAll(userPresentDuringEvent);
+		//return userPresentAtTheEventTimeOnOtherDays.size();
+	} 
 	
 	public static String getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
@@ -163,6 +184,7 @@ public class PresenceCounterSimple {
 		String line;
 		Calendar cal = new GregorianCalendar();
 		BufferedReader in = new BufferedReader(new FileReader(file));
+		int cont = 0;
 		while((line = in.readLine()) != null){
 			String[] splitted = line.split(",");
 			if(splitted.length == 5) {
@@ -175,8 +197,10 @@ public class PresenceCounterSimple {
 				}
 			}
 			else System.out.println("Problems: "+line);
+			cont ++;
 		}
 		in.close();
+		//Logger.logln(file+" CONT = "+cont);
 		return users;
 	}
 }

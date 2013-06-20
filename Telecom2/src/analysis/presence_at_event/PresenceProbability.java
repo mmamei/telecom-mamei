@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +25,6 @@ import visual.GraphPlotter;
 import visual.KMLPath;
 import analysis.PlsEvent;
 import area.CityEvent;
-import area.Placemark;
 
 public class PresenceProbability {
 	
@@ -121,27 +121,21 @@ public class PresenceProbability {
 	
 	private static final DecimalFormat DF = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
 	
-	public static double presenceProbability(String username, List<PlsEvent> plsEvents, CityEvent event, double o_radius) {
-		double f1 = fractionOfTimeInWhichTheUserWasAtTheEvent(plsEvents,event);
-		Placemark p = event.spot.clone();
-		p.changeRadius(o_radius);
-		event.spot = p;
-		double f2 = fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(plsEvents,event);
+	public static double presenceProbability(String username, List<PlsEvent> plsEvents, CityEvent event) {
+		double f1 = fractionOfTimeInWhichTheUserWasAtTheEvent(plsEvents,event,false);
+		//Logger.logln("Radius = "+event.spot.radius);
+		double f2 = fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(plsEvents,event,1000,false);
 		//Logger.logln(username+" = "+f1+", "+f2);
 		return f1 * (1-f2);
 	}
 	
-	public static double presenceProbability(String username, List<PlsEvent> plsEvents, CityEvent event) {
-		return presenceProbability(username,plsEvents,event,event.spot.radius);
-	}
 	
 	
 	/*
 	 * This just returns 1 if the user was present during the event, but he was never present otherwise.
 	 * It returns 0 if the user was also present at other times
 	 */
-	public static double presenceProbabilityTest(String username, List<PlsEvent> plsEvents, CityEvent event) {
-		
+	public static double presenceProbabilityTest(String username, List<PlsEvent> plsEvents, CityEvent event) {	
 		for(PlsEvent pe: plsEvents) {
 			if((pe.getCalendar().before(event.st) || pe.getCalendar().after(event.et)) && event.spot.contains(pe.getCellac()))
 				return 0;
@@ -152,12 +146,16 @@ public class PresenceProbability {
 	}
 	
 	
-	public static double fractionOfTimeInWhichTheUserWasAtTheEvent(List<PlsEvent> plsEvents, CityEvent event) {
+	public static double fractionOfTimeInWhichTheUserWasAtTheEvent(List<PlsEvent> plsEvents, CityEvent event, boolean verbose) {
 		Calendar first = null;
 		Calendar last = null;
 		boolean inEvent = false;
-		for(PlsEvent pe: plsEvents) {			
-			if(pe.getCalendar().after(event.st) && pe.getCalendar().before(event.et)) {
+		for(PlsEvent pe: plsEvents) {	
+			
+			//if(verbose) System.err.println("-"+event);
+			//if(verbose) System.err.println("-"+pe);
+			
+			if(event.st.before(pe.getCalendar()) && event.et.after(pe.getCalendar())) {
 				//Logger.logln(">"+pe.getCalendar().getTime().toString());
 				if(event.spot.contains(pe.getCellac())){
 					if(inEvent==false) {
@@ -172,11 +170,12 @@ public class PresenceProbability {
 					inEvent = false;
 				}
 			}
-			if(pe.getCalendar().after(event.et)) break;
+			//if(pe.getCalendar().after(event.et)) break;
 			//else  Logger.logln(pe.getCalendar().getTime().toString());
 		}
 		
-		if(first == null && last==null) return 0;	
+		
+		if(first == null) return 0;
 		
 		first.add(Calendar.MINUTE, -10);
 		if(first.before(event.st)) first = event.st;
@@ -186,17 +185,22 @@ public class PresenceProbability {
 	}
 	
 	
-	public static double fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(List<PlsEvent> plsEvents, CityEvent event) {
+	public static double fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(List<PlsEvent> plsEvents, CityEvent event, int days, boolean verbose) {
 		
 		Map<String,List<PlsEvent>> eventsPerDay = new HashMap<String,List<PlsEvent>>();
+				
+		for(int d=-days; d<=days; d++) {
+			if(d == 0) continue; // do not consider the day of the event
+			Calendar cal = (Calendar)event.st.clone();
+			cal.add(Calendar.DAY_OF_MONTH, d);
+			eventsPerDay.put(getKey(cal), new ArrayList<PlsEvent>());
+		}
+		
 		
 		for(PlsEvent pe: plsEvents) {	
-			String k = pe.getCalendar().get(Calendar.DAY_OF_MONTH)+"-"+pe.getCalendar().get(Calendar.MONTH)+"-"+pe.getCalendar().get(Calendar.YEAR);
-			List<PlsEvent> de = eventsPerDay.get(k);
-			if(de == null) 
-				de = new ArrayList<PlsEvent>();
-			de.add(pe);
-			eventsPerDay.put(k, de);
+			List<PlsEvent> de = eventsPerDay.get(getKey(pe.getCalendar()));
+			if(de != null) 
+				de.add(pe);
 		}
 		
 		double f = 0;
@@ -206,11 +210,32 @@ public class PresenceProbability {
 			int day = Integer.parseInt(dmy[0]);
 			int month = Integer.parseInt(dmy[1]);
 			int year = Integer.parseInt(dmy[2]);
+			
+			//if(verbose) System.err.println(k+" = "+eventsPerDay.get(k).size());
+			
 			CityEvent ce = event.changeDay(day, month, year);
-			f += fractionOfTimeInWhichTheUserWasAtTheEvent(eventsPerDay.get(k),ce);
+			
+			ce.st.set(Calendar.HOUR_OF_DAY, 0);
+			ce.st.set(Calendar.MINUTE, 0);
+			ce.st.set(Calendar.SECOND, 0);
+			
+			ce.et.set(Calendar.HOUR_OF_DAY, 23);
+			ce.et.set(Calendar.MINUTE, 59);
+			ce.et.set(Calendar.SECOND, 59);
+			
+			
+			if(eventsPerDay.get(k)!=null && eventsPerDay.get(k).size() > 0) {
+				double frac = fractionOfTimeInWhichTheUserWasAtTheEvent(eventsPerDay.get(k),ce,verbose);
+				if(verbose) System.err.println(k+", frac = "+frac+", size = "+eventsPerDay.get(k).size()+" ... "+ce);
+				f += frac;
+			}
 		}
 		
 		return f / eventsPerDay.size();
+	}
+	
+	public static String getKey(Calendar cal) {
+		return cal.get(Calendar.DAY_OF_MONTH)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.YEAR);
 	}
 	
 }
