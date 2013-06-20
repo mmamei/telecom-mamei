@@ -170,15 +170,15 @@ public class PresenceCounterSimpleProbability {
 			
 			double f2 = 0;
 			//if(usr_other_pls.get(u)!=null) {
-				//f2 = PresenceProbability.fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(usr_other_pls.get(u),e2,days,false);
-				boolean verbose = false;
-				//if(u.equals("d026891a15a3ed758c4d605af28de954caddba55222fc8955d3724f39b941f")) verbose = true;
+			//f2 = PresenceProbability.fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(usr_other_pls.get(u),e2,days,false);
+			boolean verbose = false;
+			//if(u.equals("d026891a15a3ed758c4d605af28de954caddba55222fc8955d3724f39b941f")) verbose = true;
 				
-				f2 = PresenceProbability.fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),e2,event,verbose);
-				if(userPresentAtTheEventTimeOnOtherDays.contains(u) && f2 == 0) {
-					//System.err.println(event+" ==> "+u); 
-				}
-				if(f2 > 0) f2 = 1;
+			f2 = PresenceProbability.fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),e2,event,verbose);
+			if(userPresentAtTheEventTimeOnOtherDays.contains(u) && f2 == 0) {
+				//System.err.println(event+" ==> "+u); 
+			}
+			if(f2 > 0) f2 = 1;
 			//}
 			
 			prob += f1 * (1-f2);	

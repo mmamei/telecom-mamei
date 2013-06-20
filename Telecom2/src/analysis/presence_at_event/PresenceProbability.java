@@ -204,16 +204,14 @@ public class PresenceProbability {
 			
 			if(event.st.before(cal) && event.et.after(cal) && (cal.before(exclude.st) || cal.after(exclude.et))) {
 				
-					
-				
 					//Logger.logln(">"+pe.getCalendar().getTime().toString());
 					if(event.spot.contains(pe.getCellac())){
 						if(inEvent==false) {
 							//Logger.logln("The user enters the event!");
 							inEvent = true;
 						}
-						first = (first == null || first.after(pe.getCalendar())) ? pe.getCalendar() : first;
-						last = (last == null || last.before(pe.getCalendar())) ? pe.getCalendar() : last;
+						first = (first == null || first.after(cal)) ? (Calendar)cal.clone() : first;
+						last = (last == null || last.before(cal)) ? (Calendar)cal.clone() : last;
 					}
 					else if(inEvent) {
 						//Logger.logln("The user walks away before the end!");
@@ -226,14 +224,32 @@ public class PresenceProbability {
 		
 		
 		if(first == null) return 0;
-		return 1;
-		/*
+		
 		first.add(Calendar.MINUTE, -10);
 		if(first.before(event.st)) first = event.st;
 		last.add(Calendar.MINUTE, 10);
 		if(last.after(event.et)) last = event.et;
-		return 1.0 * (last.getTimeInMillis() - first.getTimeInMillis()) / (event.et.getTimeInMillis() - event.st.getTimeInMillis());
-		*/
+		
+		double ev_s = event.st.getTimeInMillis(); // event start
+		double ev_e = event.et.getTimeInMillis(); // event end
+		double ex_s = exclude.st.getTimeInMillis(); // exclude start
+		double ex_e = exclude.et.getTimeInMillis(); // exclude end
+		double f = first.getTimeInMillis(); // first
+		double l = last.getTimeInMillis(); // last
+		double ev_lenght = ev_e - ev_s;
+		double ex_lenght = ex_e - ex_s;
+		double ot_lenght = l - f;
+		double max = ev_lenght - ex_lenght;
+		
+		double f2 = (f < ex_s && l > ex_e) ? (ot_lenght - ex_lenght) / max : ot_lenght / max;
+		
+		if(f2<=0) {
+			System.err.println(event);
+			System.err.println(exclude);
+			System.err.println(first.getTime()+" - "+last.getTime());
+		}
+		
+		return f2;
 	}
 	
 	
