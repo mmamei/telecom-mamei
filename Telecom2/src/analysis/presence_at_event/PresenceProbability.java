@@ -184,6 +184,60 @@ public class PresenceProbability {
 	}
 	
 	
+	
+	public static double fractionOfTimeInWhichTheUserWasAtTheEvent(List<PlsEvent> plsEvents, CityEvent event, CityEvent exclude, boolean verbose) {
+		Calendar first = null;
+		Calendar last = null;
+		boolean inEvent = false;
+		
+		if(verbose) { 
+			System.err.println("EVENT = "+event);
+			System.err.println("EXCLUDE = "+exclude);
+		}
+		
+		for(PlsEvent pe: plsEvents) {	
+			
+			Calendar cal = pe.getCalendar();
+			
+			if(event.st.before(cal) && event.et.after(cal))
+			if(verbose) System.err.println("-"+pe);
+			
+			if(event.st.before(cal) && event.et.after(cal) && (cal.before(exclude.st) || cal.after(exclude.et))) {
+				
+					
+				
+					//Logger.logln(">"+pe.getCalendar().getTime().toString());
+					if(event.spot.contains(pe.getCellac())){
+						if(inEvent==false) {
+							//Logger.logln("The user enters the event!");
+							inEvent = true;
+						}
+						first = (first == null || first.after(pe.getCalendar())) ? pe.getCalendar() : first;
+						last = (last == null || last.before(pe.getCalendar())) ? pe.getCalendar() : last;
+					}
+					else if(inEvent) {
+						//Logger.logln("The user walks away before the end!");
+						inEvent = false;
+					}
+			}
+			//if(pe.getCalendar().after(event.et)) break;
+			//else  Logger.logln(pe.getCalendar().getTime().toString());
+		}
+		
+		
+		if(first == null) return 0;
+		return 1;
+		/*
+		first.add(Calendar.MINUTE, -10);
+		if(first.before(event.st)) first = event.st;
+		last.add(Calendar.MINUTE, 10);
+		if(last.after(event.et)) last = event.et;
+		return 1.0 * (last.getTimeInMillis() - first.getTimeInMillis()) / (event.et.getTimeInMillis() - event.st.getTimeInMillis());
+		*/
+	}
+	
+	
+	
 	public static double fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(List<PlsEvent> plsEvents, CityEvent event, int days, boolean verbose) {
 		
 		Map<String,List<PlsEvent>> eventsPerDay = new TreeMap<String,List<PlsEvent>>();
