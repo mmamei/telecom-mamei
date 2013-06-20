@@ -1,4 +1,4 @@
-package analysis.presence_at_event;
+package pre_delete;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,6 +14,7 @@ import utils.Config;
 import utils.Logger;
 import visual.GraphScatterPlotter;
 import analysis.PlsEvent;
+import analysis.presence_at_event.PresenceProbability;
 import area.CityEvent;
 
 public class PresenceCounter {
@@ -97,7 +98,7 @@ public class PresenceCounter {
 			String filename = f.getName();
 			String username = filename.substring(0, filename.indexOf(".csv"));
 			List<PlsEvent> plsEvents = PlsEvent.readEvents(f);
-			double p = PresenceProbability.presenceProbability(username,plsEvents,event,1000);	
+			double p = PresenceProbability.presenceProbability(username,plsEvents,event);	
 			count += p;	
 		}
 		return count;
