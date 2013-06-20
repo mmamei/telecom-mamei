@@ -9,11 +9,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -187,7 +186,7 @@ public class PresenceProbability {
 	
 	public static double fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(List<PlsEvent> plsEvents, CityEvent event, int days, boolean verbose) {
 		
-		Map<String,List<PlsEvent>> eventsPerDay = new HashMap<String,List<PlsEvent>>();
+		Map<String,List<PlsEvent>> eventsPerDay = new TreeMap<String,List<PlsEvent>>();
 				
 		for(int d=-days; d<=days; d++) {
 			if(d == 0) continue; // do not consider the day of the event
@@ -205,6 +204,7 @@ public class PresenceProbability {
 		
 		double f = 0;
 		
+		int count = 0;
 		for(String k: eventsPerDay.keySet()) {
 			String[] dmy = k.split("-");
 			int day = Integer.parseInt(dmy[0]);
@@ -215,20 +215,23 @@ public class PresenceProbability {
 			
 			CityEvent ce = event.changeDay(day, month, year);
 			
-			ce.st.set(Calendar.HOUR_OF_DAY, 0);
-			ce.st.set(Calendar.MINUTE, 0);
-			ce.st.set(Calendar.SECOND, 0);
-			
-			ce.et.set(Calendar.HOUR_OF_DAY, 23);
-			ce.et.set(Calendar.MINUTE, 59);
-			ce.et.set(Calendar.SECOND, 59);
-			
+			if(count > 0) {
+				ce.st.set(Calendar.HOUR_OF_DAY, 0);
+				ce.st.set(Calendar.MINUTE, 0);
+				ce.st.set(Calendar.SECOND, 0);
+			}
+			if(count < eventsPerDay.size() - 1) {
+				ce.et.set(Calendar.HOUR_OF_DAY, 23);
+				ce.et.set(Calendar.MINUTE, 59);
+				ce.et.set(Calendar.SECOND, 59);
+			}
 			
 			if(eventsPerDay.get(k)!=null && eventsPerDay.get(k).size() > 0) {
 				double frac = fractionOfTimeInWhichTheUserWasAtTheEvent(eventsPerDay.get(k),ce,verbose);
 				if(verbose) System.err.println(k+", frac = "+frac+", size = "+eventsPerDay.get(k).size()+" ... "+ce);
 				f += frac;
 			}
+			count ++;
 		}
 		
 		return f / eventsPerDay.size();
