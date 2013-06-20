@@ -122,40 +122,42 @@ public class PresenceCounterSimpleProbability {
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
+	
+		Calendar end = (Calendar)event.et.clone();
+		end.add(Calendar.DAY_OF_MONTH, days);
+		
+		/*
 		start.set(Calendar.HOUR_OF_DAY, 0);
 		start.set(Calendar.MINUTE, 0);
 		start.set(Calendar.SECOND, 0);
 		
-		Calendar end = (Calendar)event.et.clone();
-		end.add(Calendar.DAY_OF_MONTH, days);
 		end.set(Calendar.HOUR_OF_DAY, 23);
 		end.set(Calendar.MINUTE, 59);
 		end.set(Calendar.SECOND, 59);
+		*/
 		
+		//Calendar start_day_event = (Calendar)event.st.clone();
+		//Calendar end_day_event = (Calendar)event.et.clone();
 		
-		Calendar start_day_event = (Calendar)event.st.clone();
+		/*
 		start_day_event.set(Calendar.HOUR_OF_DAY, 0);
 		start_day_event.set(Calendar.MINUTE, 0);
 		start_day_event.set(Calendar.SECOND, 0);
 		
-		Calendar end_day_event = (Calendar)event.et.clone();
 		end_day_event.set(Calendar.HOUR_OF_DAY, 23);
 		end_day_event.set(Calendar.MINUTE, 59);
 		end_day_event.set(Calendar.SECOND, 59);
+		*/
+	
+		//Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,start_day_event,end_day_event);
 		
 	
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,start_day_event,end_day_event);
-		
-		/*
-		userPresentAtTheEventTimeOnOtherDays.retainAll(userPresentDuringEvent);
-		return userPresentAtTheEventTimeOnOtherDays.size();
-		*/
 		
 		CityEvent e2 = new CityEvent(event.spot.clone(),event.st,event.et,event.head_count);
 		e2.spot.changeRadius(o_radius);
 				
 		Map<String,List<PlsEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
-		Map<String,List<PlsEvent>> usr_other_pls = getUsersPLS(file_other,userPresentAtTheEventTimeOnOtherDays);
+		Map<String,List<PlsEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
 		
 
 		double prob = 0;
@@ -168,7 +170,7 @@ public class PresenceCounterSimpleProbability {
 			if(usr_other_pls.get(u)!=null) {
 				f2 = PresenceProbability.fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(usr_other_pls.get(u),e2,days,false);
 				if(f2 == 0) {
-					System.err.println(event+" ==> "+u);
+					//System.err.println(event+" ==> "+u);
 				}
 				if(f2 > 0) f2 = 1;
 			}
