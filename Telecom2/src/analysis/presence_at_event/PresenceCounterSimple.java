@@ -121,23 +121,29 @@ public class PresenceCounterSimple {
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
+		Calendar end = (Calendar)event.et.clone();
+		end.add(Calendar.DAY_OF_MONTH, days);
+		
+		
+		
 		start.set(Calendar.HOUR_OF_DAY, 0);
 		start.set(Calendar.MINUTE, 0);
 		start.set(Calendar.SECOND, 0);
 		
-		Calendar end = (Calendar)event.et.clone();
-		end.add(Calendar.DAY_OF_MONTH, days);
 		end.set(Calendar.HOUR_OF_DAY, 23);
 		end.set(Calendar.MINUTE, 59);
 		end.set(Calendar.SECOND, 59);
 		
 		
 		Calendar start_day_event = (Calendar)event.st.clone();
+		Calendar end_day_event = (Calendar)event.et.clone();
+		
+		
 		start_day_event.set(Calendar.HOUR_OF_DAY, 0);
 		start_day_event.set(Calendar.MINUTE, 0);
 		start_day_event.set(Calendar.SECOND, 0);
 		
-		Calendar end_day_event = (Calendar)event.et.clone();
+		
 		end_day_event.set(Calendar.HOUR_OF_DAY, 23);
 		end_day_event.set(Calendar.MINUTE, 59);
 		end_day_event.set(Calendar.SECOND, 59);
