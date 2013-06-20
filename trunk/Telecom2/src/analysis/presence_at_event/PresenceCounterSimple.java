@@ -137,7 +137,7 @@ public class PresenceCounterSimple {
 		Calendar start_day_event = (Calendar)event.st.clone();
 		Calendar end_day_event = (Calendar)event.et.clone();
 		
-		
+		/*
 		start_day_event.set(Calendar.HOUR_OF_DAY, 0);
 		start_day_event.set(Calendar.MINUTE, 0);
 		start_day_event.set(Calendar.SECOND, 0);
@@ -146,7 +146,7 @@ public class PresenceCounterSimple {
 		end_day_event.set(Calendar.HOUR_OF_DAY, 23);
 		end_day_event.set(Calendar.MINUTE, 59);
 		end_day_event.set(Calendar.SECOND, 59);
-		
+		*/
 	
 		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,start_day_event,end_day_event);
 		

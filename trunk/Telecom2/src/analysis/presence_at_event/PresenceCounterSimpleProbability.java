@@ -79,6 +79,7 @@ public class PresenceCounterSimpleProbability {
 				result[i][1] = ce.head_count;
 				sr.addData(result[i][0], result[i][1]);
 				i++;
+				//System.exit(0);
 			}
 			data.add(result);
 		}
@@ -149,15 +150,16 @@ public class PresenceCounterSimpleProbability {
 		end_day_event.set(Calendar.SECOND, 59);
 		*/
 	
-		//Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,start_day_event,end_day_event);
-		
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
+		//userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
+
 	
 		
-		CityEvent e2 = new CityEvent(event.spot.clone(),event.st,event.et,event.head_count);
+		CityEvent e2 = new CityEvent(event.spot.clone(),start,end,event.head_count);
 		e2.spot.changeRadius(o_radius);
 				
 		Map<String,List<PlsEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
-		Map<String,List<PlsEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
+		//Map<String,List<PlsEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
 		
 
 		double prob = 0;
@@ -167,13 +169,17 @@ public class PresenceCounterSimpleProbability {
 			if(f1 > 0) f1 = 1;
 			
 			double f2 = 0;
-			if(usr_other_pls.get(u)!=null) {
-				f2 = PresenceProbability.fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(usr_other_pls.get(u),e2,days,false);
-				if(f2 == 0) {
-					//System.err.println(event+" ==> "+u);
+			//if(usr_other_pls.get(u)!=null) {
+				//f2 = PresenceProbability.fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(usr_other_pls.get(u),e2,days,false);
+				boolean verbose = false;
+				//if(u.equals("d026891a15a3ed758c4d605af28de954caddba55222fc8955d3724f39b941f")) verbose = true;
+				
+				f2 = PresenceProbability.fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),e2,event,verbose);
+				if(userPresentAtTheEventTimeOnOtherDays.contains(u) && f2 == 0) {
+					//System.err.println(event+" ==> "+u); 
 				}
 				if(f2 > 0) f2 = 1;
-			}
+			//}
 			
 			prob += f1 * (1-f2);	
 		}

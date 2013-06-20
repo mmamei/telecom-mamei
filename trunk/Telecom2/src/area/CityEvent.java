@@ -24,16 +24,12 @@ public class CityEvent {
 	private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 								
 	public Placemark spot;
-	public String startTime;
-	public String endTime;
 	public Calendar st;
 	public Calendar et;
 	public int head_count;
 	
 	public CityEvent(Placemark spot, String startTime, String endTime, int head_count) {
 		this.spot = spot;
-		this.startTime = startTime;
-		this.endTime = endTime;
 		st = new GregorianCalendar();
 		et = new GregorianCalendar();
 		try {
@@ -127,21 +123,23 @@ public class CityEvent {
 		this.spot = spot;
 		this.st = st;
 		this.et = et;
-		try {
-			this.startTime = F.format(st.getTime());
-			this.endTime = F.format(et.getTime());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
 		this.head_count = head_count;
 	}
 	
 	
 	
 	public CityEvent changeDay(int day,int month,int year) {
-		String newStartTime = day+"/"+(month+1)+"/"+year+startTime.substring(startTime.indexOf(" "));
-		String newEndTime = day+"/"+(month+1)+"/"+year+endTime.substring(endTime.indexOf(" "));
-		return new CityEvent(spot,newStartTime,newEndTime,head_count);
+		Calendar start = (Calendar)st.clone();
+		start.set(Calendar.DAY_OF_MONTH, day);
+		start.set(Calendar.MONTH, month);
+		start.set(Calendar.YEAR, year);
+		
+		Calendar end = (Calendar)et.clone();
+		end.set(Calendar.DAY_OF_MONTH, day);
+		end.set(Calendar.MONTH, month);
+		end.set(Calendar.YEAR, year);
+		
+		return new CityEvent(spot,start,end,head_count);
 	}
 	 
 	public String toFileName() {
@@ -149,6 +147,8 @@ public class CityEvent {
 	}
 	
 	public String toString() {
+		String startTime = F.format(st.getTime());
+		String endTime = F.format(et.getTime());
 		return spot.name.replaceAll("[/\\:\\s]", "_")+"-"+startTime.replaceAll("[/\\:\\s]", "_")+"-"+endTime.replaceAll("[/\\:\\s]", "_");
 	}
 	
