@@ -13,7 +13,7 @@ public class Main {
 		
 		CityEvent event = new CityEvent(null,"9/10/2010 12:00","11/10/2010 15:00",3);
 		CityEvent exclude = new CityEvent(null,"10/10/2010 12:00","10/10/2010 15:00",3);
-		CityEvent fl = new CityEvent(null,"10/10/2010 10:00","10/10/2010 17:00",3);
+		CityEvent fl = new CityEvent(null,"9/10/2010 14:00","11/10/2010 10:00",3);
 		Calendar first = fl.st;
 		Calendar last = fl.et;
 
