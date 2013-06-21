@@ -95,7 +95,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	}
 	
 	
-	static double[] rs = new double[]{2000};
+	static double[] rs = new double[]{2500};
 	static List<Placemark> ps = new ArrayList<Placemark>();
 	static {
 		/*

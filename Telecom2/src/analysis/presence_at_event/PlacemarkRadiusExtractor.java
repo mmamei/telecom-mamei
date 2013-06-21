@@ -33,15 +33,16 @@ import area.Placemark;
 public class PlacemarkRadiusExtractor {
 	
 	
-	public static final int MAX_R = 1500;
+	public static final int MAX_R = 2500;
 	public static final int MIN_R = -500;
 	public static final int STEP = 100;
-	public static double[] RS = new double[]{-500,-400,-300,-200,-100,0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500};
+	public static double[] RS = new double[]{-500,-400,-300,-200,-100,0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,
+											1600,1700,1800,1900,2000,2100,2200,2300,2400,2500};
 	
 	public static final String[] pnames = new String[]{
-		"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
+		//"Juventus Stadium (TO)","Stadio Olimpico (TO)","Stadio Silvio Piola (NO)",
 		"Stadio San Siro (MI)",
-		"Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"
+		//"Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"
 		};
 	
 	
