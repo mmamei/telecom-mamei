@@ -70,9 +70,6 @@ public class PresenceCounterProbability {
 			int i = 0;
 			for(CityEvent ce: pevents) {
 				double bestr = bestRadius.get(ce.spot.name);
-				
-				if(ce.spot.name.equals("Stadio San Siro (MI)")) bestr = 500;
-				
 				ce.spot.changeRadius(bestr);
 				
 				double c = count(ce,o_radius,days);

@@ -72,8 +72,6 @@ public class PresenceCounter {
 			for(CityEvent ce: pevents) {
 				double bestr = bestRadius.get(ce.spot.name);
 				
-				if(ce.spot.name.equals("Stadio San Siro (MI)")) bestr = 900;
-				
 				double searchr = Double.isNaN(o_radius) ? bestr : o_radius;
 				
 				
