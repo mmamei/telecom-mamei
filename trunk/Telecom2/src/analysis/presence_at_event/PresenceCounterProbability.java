@@ -31,7 +31,7 @@ public class PresenceCounterProbability {
 	public static void main(String[] args) throws Exception {
 		
 		double o_radius = 0;
-		int days = 3;
+		int days = 5;
 		process(o_radius,days);
 		
 	}
