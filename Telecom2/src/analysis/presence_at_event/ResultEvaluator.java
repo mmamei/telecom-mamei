@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import utils.Config;
@@ -42,19 +43,37 @@ public class ResultEvaluator {
 		}
 		br.close();
 		
+		DescriptiveStatistics ds = new DescriptiveStatistics();
+		
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
-		Logger.logln("Y = "+sr.getSlope()+" * X + "+sr.getIntercept());
+		
+		
+		double s = sr.getSlope();
+		double sconf = sr.getSlopeConfidenceInterval(); 
+		
+		double i = sr.getIntercept();
+		double iconf = sr.getInterceptStdErr();
+		
+		Logger.logln("Y = "+s+" * X + "+i);
+		
+		
+		
+		Logger.logln("SLOPE CONF INTERVAL =  ["+(s-sconf)+","+(s+sconf)+"]");
+		Logger.logln("INTERCEPT CONNF INTERVAL =  ["+(i-iconf)+","+(i+iconf)+"]");
+		
 		for(String placemark: map.keySet()) {
 			System.out.println(placemark);
 			for(double[] x : map.get(placemark)) {
 				double est = Math.max(0, sr.predict(x[0]));
 				double gt = x[1];
 				double abserr = Math.abs(est - gt);
-				System.out.println("GT = "+(int)gt+" EST = "+(int)est+" ABS_ERR = "+(int)abserr+" %ERR = "+(int)100*(abserr/gt)+"%");
+				double perr = 100*(abserr/gt);
+				Logger.logln("GT = "+(int)gt+" EST = "+(int)est+" ABS_ERR = "+(int)abserr+" %ERR = "+(int)perr+"%");
+				ds.addValue(perr);
 			}
 		}
-		
-		
+		Logger.logln("AVG % ERROR = "+(int)ds.getMean()+"%");
+		Logger.logln("MEDIAN % ERROR = "+(int)ds.getPercentile(50)+"%");
 		draw(map);
 		
 	}
