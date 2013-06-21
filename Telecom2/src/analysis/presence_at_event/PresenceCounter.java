@@ -21,11 +21,10 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.GraphScatterPlotter;
-import analysis.PlsEvent;
 import area.CityEvent;
 import area.Placemark;
 
-public class PresenceCounterSimpleProbability {
+public class PresenceCounter {
 	
 	
 	public static void main(String[] args) throws Exception {
@@ -61,8 +60,7 @@ public class PresenceCounterSimpleProbability {
 		
 		for(String p : placemark_events.keySet()) {
 			
-
-			//if(!p.equals("Juventus Stadium (TO)")) continue;
+			//if(!p.equals("Juventus Stadium (TO)") && !p.equals("Stadio Mario Rigamonti (BS)")) continue;
 			
 			labels.add(p);
 			List<CityEvent> pevents =  placemark_events.get(p);
@@ -70,16 +68,16 @@ public class PresenceCounterSimpleProbability {
 			int i = 0;
 			for(CityEvent ce: pevents) {
 				double bestr = bestRadius.get(ce.spot.name);
-				ce.spot.changeRadius(bestr);
 				
-				double c = count(ce,o_radius,days);
+				double searchr = Double.isNaN(o_radius) ? bestr : o_radius;
 				
+				
+				double c = count(ce,bestr,searchr,days);
 				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
 				sr.addData(result[i][0], result[i][1]);
 				i++;
-				//System.exit(0);
 			}
 			data.add(result);
 		}
@@ -87,9 +85,9 @@ public class PresenceCounterSimpleProbability {
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
 		
-		new GraphScatterPlotter("PC Result: o_radius = "+o_radius+",days = "+days+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
+		new GraphScatterPlotter("SC Result: o_radius = "+o_radius+",days = "+days+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounterSimple";
+		String dir = Config.getInstance().base_dir +"/PresenceCounter";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+o_radius+"_"+days+".csv"));
@@ -110,20 +108,19 @@ public class PresenceCounterSimpleProbability {
 		//Logger.logln("Done!");
 	}
 		
-	
-	
-	public static double count(CityEvent event, double o_radius, int days) throws Exception {	
+	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
 		
-		Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
 		
-		String file_event = getFile(event.spot.clone(),event.spot.radius);
+		
+		Logger.logln("\n"+event.spot.name+", e_r = "+e_radius+", o_r = "+o_radius);
+		
+		String file_event = getFile(event.spot.clone(),e_radius);
 		String file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
-	
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
@@ -137,56 +134,29 @@ public class PresenceCounterSimpleProbability {
 		end.set(Calendar.SECOND, 59);
 		*/
 		
-		//Calendar start_day_event = (Calendar)event.st.clone();
-		//Calendar end_day_event = (Calendar)event.et.clone();
+		Calendar start_day_event = (Calendar)event.st.clone();
+		Calendar end_day_event = (Calendar)event.et.clone();
 		
 		/*
 		start_day_event.set(Calendar.HOUR_OF_DAY, 0);
 		start_day_event.set(Calendar.MINUTE, 0);
 		start_day_event.set(Calendar.SECOND, 0);
 		
+		
 		end_day_event.set(Calendar.HOUR_OF_DAY, 23);
 		end_day_event.set(Calendar.MINUTE, 59);
 		end_day_event.set(Calendar.SECOND, 59);
 		*/
 	
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,event.st,event.et);
-		//userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
-
-	
+		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,start_day_event,end_day_event);
 		
-		CityEvent e2 = new CityEvent(event.spot.clone(),start,end,event.head_count);
-		e2.spot.changeRadius(o_radius);
-				
-		Map<String,List<PlsEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
-		//Map<String,List<PlsEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
+		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
+		return userPresentDuringEvent.size();
 		
-
-		double prob = 0;
-		for(String u: usr_pls.keySet()) {
-			
-			double f1 = PresenceProbability.fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),event,false);
-			if(f1 > 0) f1 = 1;
-			
-			double f2 = 0;
-			//if(usr_other_pls.get(u)!=null) {
-			//f2 = PresenceProbability.fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(usr_other_pls.get(u),e2,days,false);
-			boolean verbose = false;
-			//if(u.equals("d026891a15a3ed758c4d605af28de954caddba55222fc8955d3724f39b941f")) verbose = true;
-				
-			f2 = PresenceProbability.fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),e2,event,verbose);
-			if(userPresentAtTheEventTimeOnOtherDays.contains(u) && f2 == 0) {
-				//System.err.println(event+" ==> "+u); 
-			}
-			if(f2 > 0) f2 = 1;
-			//}
-			
-			prob += f1 * (1-f2);	
-		}
 		
-		return prob;
-		
-	}
+		//userPresentAtTheEventTimeOnOtherDays.retainAll(userPresentDuringEvent);
+		//return userPresentAtTheEventTimeOnOtherDays.size();
+	} 
 	
 	public static String getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
@@ -219,6 +189,7 @@ public class PresenceCounterSimpleProbability {
 		String line;
 		Calendar cal = new GregorianCalendar();
 		BufferedReader in = new BufferedReader(new FileReader(file));
+		int cont = 0;
 		while((line = in.readLine()) != null){
 			String[] splitted = line.split(",");
 			if(splitted.length == 5) {
@@ -226,37 +197,15 @@ public class PresenceCounterSimpleProbability {
 				if(start.before(cal) && end.after(cal)) {
 					if(start_exclude == null || end_exclude ==null)
 						users.add(splitted[0]);
-					else if(cal.before(start_exclude) || cal.after(end_exclude)) {
-						if(splitted[0].equals("d66b2019ce10a2927f19aad6a3242bf85f5bdfa487a4dd1c82966451d6221732")) {
-							//System.err.println(line+" --> "+cal.getTime());
-						}
+					else if(cal.before(start_exclude) || cal.after(end_exclude))
 						users.add(splitted[0]);
-					}
 				}
 			}
 			else System.out.println("Problems: "+line);
+			cont ++;
 		}
 		in.close();
+		//Logger.logln(file+" CONT = "+cont);
 		return users;
 	}
-	
-	
-	public static Map<String,List<PlsEvent>> getUsersPLS(String file, Set<String> users) throws Exception {
-		Map<String,List<PlsEvent>> usr_pls = new HashMap<String,List<PlsEvent>>();
-		for(String u: users)
-			usr_pls.put(u, new ArrayList<PlsEvent>());
-		
-		String line;
-		BufferedReader in = new BufferedReader(new FileReader(file));
-		while((line = in.readLine()) != null){
-			String[] splitted = line.split(",");
-			List<PlsEvent> list = usr_pls.get(splitted[0]);
-			if(list!=null) list.add(new PlsEvent(splitted[0],"imsi",Long.parseLong(splitted[3]),splitted[1]));
-		}
-		in.close();
-		return usr_pls;
-	}
-	
-	
-	
 }
