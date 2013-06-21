@@ -166,7 +166,7 @@ public class PresenceCounterProbability {
 		for(String u: usr_pls.keySet()) {
 			
 			double f1 = fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),event,null,false);
-			if(f1 > 0) f1 = 1;
+			//if(f1 > 0) f1 = 1;
 			
 			double f2 = 0;
 			//if(usr_other_pls.get(u)!=null) {
@@ -180,7 +180,7 @@ public class PresenceCounterProbability {
 				//System.err.println(event+" ==> "+u); 
 			}
 			//System.err.println(f2);
-			if(f2 > 0) f2 = 1;
+			//if(f2 > 0) f2 = 1;
 			//}
 			
 			prob += f1 * (1-f2);	
