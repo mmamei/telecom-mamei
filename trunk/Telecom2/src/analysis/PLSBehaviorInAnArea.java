@@ -34,8 +34,9 @@ public class PLSBehaviorInAnArea {
 		//"Juventus Stadium (TO)",
 		//"Stadio Olimpico (TO)",
 		//"Stadio Silvio Piola (NO)", 
-		//"Stadio San Siro (MI)","Stadio Atleti Azzurri d'Italia (BG)",
-		"Stadio Mario Rigamonti (BS)",
+		"Stadio San Siro (MI)",
+		//"Stadio Atleti Azzurri d'Italia (BG)",
+		//"Stadio Mario Rigamonti (BS)",
 		//"Stadio Franco Ossola (VA)"
 	};
 	
@@ -47,6 +48,7 @@ public class PLSBehaviorInAnArea {
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
 			double bestr = bestRadius.get(pn);
+			System.out.println("BEST RADIUS = "+bestr);
 			p.changeRadius(bestr);
 			process(p);
 		}
@@ -75,7 +77,7 @@ public class PLSBehaviorInAnArea {
 		for(CityEvent re : relevantEvents)
 			System.out.println("- "+re.toFileName());
 		
-		Map<String,PLSMap> cell_plsmap = getPLSMap(file,true);
+		Map<String,PLSMap> cell_plsmap = getPLSMap(file,false);
 		
 		for(String cell: cell_plsmap.keySet()) {
 			

@@ -40,8 +40,8 @@ public class PresenceCounterProbability {
 		
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
-		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));		
-		
+		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
+
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
 		//create a map that associates a Placemark with the list of events happening in there
@@ -70,6 +70,9 @@ public class PresenceCounterProbability {
 			int i = 0;
 			for(CityEvent ce: pevents) {
 				double bestr = bestRadius.get(ce.spot.name);
+				
+				if(ce.spot.name.equals("Stadio San Siro (MI)")) bestr = 500;
+				
 				ce.spot.changeRadius(bestr);
 				
 				double c = count(ce,o_radius,days);

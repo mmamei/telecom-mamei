@@ -95,7 +95,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	}
 	
 	
-	static double[] rs = new double[]{-500,-400,-300,-200,-100,0,100,200,300,400,500,1000};
+	static double[] rs = new double[]{2000};
 	static List<Placemark> ps = new ArrayList<Placemark>();
 	static {
 		/*
@@ -104,9 +104,9 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		ps.add(Placemark.getPlacemark("Stadio Silvio Piola (NO)"));
 		*/
 		ps.add(Placemark.getPlacemark("Stadio San Siro (MI)"));
-		ps.add(Placemark.getPlacemark("Stadio Atleti Azzurri d'Italia (BG)"));
-		ps.add(Placemark.getPlacemark("Stadio Mario Rigamonti (BS)"));
-		ps.add(Placemark.getPlacemark("Stadio Franco Ossola (VA)"));
+		//ps.add(Placemark.getPlacemark("Stadio Atleti Azzurri d'Italia (BG)"));
+		//ps.add(Placemark.getPlacemark("Stadio Mario Rigamonti (BS)"));
+		//ps.add(Placemark.getPlacemark("Stadio Franco Ossola (VA)"));
 		
 	}
 	

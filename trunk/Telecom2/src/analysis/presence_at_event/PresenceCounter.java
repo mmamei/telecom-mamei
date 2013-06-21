@@ -39,7 +39,10 @@ public class PresenceCounter {
 		
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
-		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));		
+		
+		
+		
+		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
 		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
@@ -68,6 +71,8 @@ public class PresenceCounter {
 			int i = 0;
 			for(CityEvent ce: pevents) {
 				double bestr = bestRadius.get(ce.spot.name);
+				
+				if(ce.spot.name.equals("Stadio San Siro (MI)")) bestr = 900;
 				
 				double searchr = Double.isNaN(o_radius) ? bestr : o_radius;
 				
@@ -107,6 +112,10 @@ public class PresenceCounter {
 		out.close();
 		//Logger.logln("Done!");
 	}
+	
+	
+	
+	
 		
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
 		
