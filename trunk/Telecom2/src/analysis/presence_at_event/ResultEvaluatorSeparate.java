@@ -14,15 +14,15 @@ import utils.Config;
 import utils.Logger;
 import visual.GraphScatterPlotter;
 
-public class ResultEvaluator {
+public class ResultEvaluatorSeparate {
 	public static void main(String[] args) throws Exception {
 		
 		String file = Config.getInstance().base_dir +"/PresenceCounter/result_0.0_3.csv";
 		
 		
-		SimpleRegression sr = new SimpleRegression();
-		Map<String,List<double[]>> map = new HashMap<String,List<double[]>>();
 		
+		Map<String,List<double[]>> map = new HashMap<String,List<double[]>>();
+		Map<String,SimpleRegression> sr_map = new HashMap<String,SimpleRegression>();
 		
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String line;
@@ -32,6 +32,12 @@ public class ResultEvaluator {
 			String placemark = e[0].substring(0,e[0].indexOf("-"));
 			double estimated = Double.parseDouble(e[1]);
 			double groundtruth = Double.parseDouble(e[2]);
+			
+			SimpleRegression sr = sr_map.get(placemark);
+			if(sr == null) {
+				sr = new SimpleRegression();
+				sr_map.put(placemark, sr);
+			}
 			sr.addData(estimated, groundtruth);
 			
 			List<double[]> p = map.get(placemark);
@@ -43,25 +49,28 @@ public class ResultEvaluator {
 		}
 		br.close();
 		
+		
 		DescriptiveStatistics ds1 = new DescriptiveStatistics();
 		DescriptiveStatistics ds2 = new DescriptiveStatistics();
 		
-		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
-		
-		double s = sr.getSlope();
-		double sconf = sr.getSlopeConfidenceInterval(); 
-		
-		double i = sr.getIntercept();
-		double iconf = sr.getInterceptStdErr();
-		
-		Logger.logln("Y = "+s+" * X + "+i);
-		
-		
-		Logger.logln("SLOPE CONF INTERVAL =  ["+(s-sconf)+","+(s+sconf)+"]");
-		Logger.logln("INTERCEPT CONNF INTERVAL =  ["+(i-iconf)+","+(i+iconf)+"]");
-		
 		for(String placemark: map.keySet()) {
 			System.out.println(placemark);
+			
+			SimpleRegression sr = sr_map.get(placemark);
+			
+			Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
+			
+			double s = sr.getSlope();
+			double sconf = sr.getSlopeConfidenceInterval(); 
+			
+			double i = sr.getIntercept();
+			double iconf = sr.getInterceptStdErr();
+			
+			Logger.logln("Y = "+s+" * X + "+i);
+			Logger.logln("SLOPE CONF INTERVAL =  ["+(s-sconf)+","+(s+sconf)+"]");
+			Logger.logln("INTERCEPT CONNF INTERVAL =  ["+(i-iconf)+","+(i+iconf)+"]");
+			
+			
 			for(double[] x : map.get(placemark)) {
 				double est = Math.max(0, sr.predict(x[0]));
 				double gt = x[1];
@@ -73,14 +82,20 @@ public class ResultEvaluator {
 				Logger.logln("GT = "+(int)gt+" EST = "+(int)est+" ABS_ERR = "+(int)abserr+" %ERR = "+(int)perr+"%");
 				ds2.addValue(perr);
 			}
+			
+			Map<String,List<double[]>> pm = new HashMap<String,List<double[]>>();
+			pm.put(placemark, map.get(placemark));
+			draw(placemark,pm);
 		}
+		
+		
 		
 		Logger.logln("MEAN ABS ERROR = "+(int)ds1.getMean());
 		Logger.logln("MEDIAN ABS ERROR = "+(int)ds1.getPercentile(50));
 		
 		Logger.logln("MEAN % ERROR = "+(int)ds2.getMean()+"%");
 		Logger.logln("MEDIAN % ERROR = "+(int)ds2.getPercentile(50)+"%");
-		draw("Result",map);
+		
 	}
 	
 	
