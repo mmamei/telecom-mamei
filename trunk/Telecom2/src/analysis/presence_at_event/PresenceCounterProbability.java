@@ -168,17 +168,17 @@ public class PresenceCounterProbability {
 			double f1 = fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),event,null,false);
 			//if(f1 > 0) f1 = 1;
 			
-			double f2 = 0;
+			//double f2 = 0;
 			//if(usr_other_pls.get(u)!=null) {
 			//f2 = PresenceProbability.fractionOfTimeInWhichTheUserIsUsuallyInTheEventArea(usr_other_pls.get(u),e2,days,false);
 			
 			boolean verbose = false;
 			//if(u.equals("d026891a15a3ed758c4d605af28de954caddba55222fc8955d3724f39b941f")) verbose = true;
 				
-			f2 = fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),e2,event,verbose);
-			if(userPresentAtTheEventTimeOnOtherDays.contains(u) && f2 == 0) {
+			double f2 = fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),e2,event,verbose);
+			//if(userPresentAtTheEventTimeOnOtherDays.contains(u) && f2 == 0) {
 				//System.err.println(event+" ==> "+u); 
-			}
+			//}
 			//System.err.println(f2);
 			//if(f2 > 0) f2 = 1;
 			//}
@@ -301,9 +301,9 @@ public class PresenceCounterProbability {
 		
 		if(first == null) return 0;
 		
-		first.add(Calendar.MINUTE, -10);
+		first.add(Calendar.MINUTE, -50);
 		if(first.before(event.st)) first = event.st;
-		last.add(Calendar.MINUTE, 10);
+		last.add(Calendar.MINUTE, 50);
 		if(last.after(event.et)) last = event.et;
 		
 		double ev_s = event.st.getTimeInMillis(); // event start

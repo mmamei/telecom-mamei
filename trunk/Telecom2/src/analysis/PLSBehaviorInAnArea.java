@@ -3,6 +3,9 @@ package analysis;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -16,25 +19,26 @@ import java.util.TreeSet;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import pls_parser.PLSEventsAroundAPlacemark;
-
 import utils.Config;
-import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import utils.StatsUtils;
 import visual.GraphPlotter;
+import analysis.presence_at_event.PlacemarkRadiusExtractor;
 import area.CityEvent;
 import area.Placemark;
 
 public class PLSBehaviorInAnArea {
 	
-	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	
+	public static final boolean VERBOSE = false;
+	
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+	private static final DecimalFormat DF = new DecimalFormat("#######.####");
 	
 	static String[] pnames = new String[]{
 		//"Juventus Stadium (TO)",
 		//"Stadio Olimpico (TO)",
-		//"Stadio Silvio Piola (NO)", 
-		"Stadio San Siro (MI)",
+		"Stadio Silvio Piola (NO)", 
+		//"Stadio San Siro (MI)",
 		//"Stadio Atleti Azzurri d'Italia (BG)",
 		//"Stadio Mario Rigamonti (BS)",
 		//"Stadio Franco Ossola (VA)"
@@ -42,12 +46,12 @@ public class PLSBehaviorInAnArea {
 	
 	public static void main(String[] args) throws Exception { 
 		
-		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
+		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
 		
-	
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
 			double bestr = bestRadius.get(pn);
+			bestr = -300;
 			System.out.println("BEST RADIUS = "+bestr);
 			p.changeRadius(bestr);
 			process(p);
@@ -93,6 +97,17 @@ public class PLSBehaviorInAnArea {
 			
 			//StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
 			//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
+			
+			if(VERBOSE) {
+				
+				PrintWriter out = new PrintWriter(new FileWriter(Config.getInstance().base_dir+"/PLSBehaviorInAnArea/"+p.name+"_"+p.radius+".csv"));
+				out.println("time,n_user,z_score");
+				for(int i=0; i<plsmap.getDomain().length;i++) {
+					out.println(plsmap.getDomain()[i]+";"+(int)usr_data[i]+";"+DF.format(z_usr_data[i]));
+				}
+				
+				out.close();
+			}
 			
 			
 			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);

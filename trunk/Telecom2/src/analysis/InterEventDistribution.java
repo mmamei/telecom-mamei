@@ -1,27 +1,23 @@
 package analysis;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import pls_parser.UsersCSVCreator;
-
-import area.CityEvent;
-
 import utils.Config;
 import utils.Logger;
 import visual.GraphPlotter;
+import area.CityEvent;
 
 public class InterEventDistribution {
 	public static void main(String[] args) throws Exception {
-		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
+		//CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),29/04/2012");
+		CityEvent ce = CityEvent.getEvent("Juventus Stadium (TO),20/03/2012");
 		process(ce);
 	}
 	
@@ -50,11 +46,13 @@ public class InterEventDistribution {
 			File f = files[i];	
 			if(!f.isFile()) continue;
 			
-			String filename = f.getName();
 			List<PlsEvent> events = PlsEvent.readEvents(f);
 			
 			DescriptiveStatistics ustats = new DescriptiveStatistics();
 			for(int j=1;j<events.size();j++) {
+				
+				int d1 = events.get(j).getCalendar().get(Calendar.DAY_OF_YEAR);
+				int d2 = events.get(j-1).getCalendar().get(Calendar.DAY_OF_YEAR);
 				
 				int h1 = events.get(j).getCalendar().get(Calendar.HOUR_OF_DAY);
 				int h2 = events.get(j-1).getCalendar().get(Calendar.HOUR_OF_DAY);
@@ -62,17 +60,29 @@ public class InterEventDistribution {
 				if(h1 < startH || h1 > endH) continue;
 				if(h2 < startH || h2 > endH) continue;
 				
-				int dt = (int)((events.get(j).getTimeStamp() - events.get(j-1).getTimeStamp())/60000);
+				if(d1 != d2) continue;
+				
+				if(events.get(j).getCalendar().before(e.st) || events.get(j).getCalendar().after(e.et)) continue;
+				if(events.get(j-1).getCalendar().before(e.st) || events.get(j-1).getCalendar().after(e.et)) continue;
+					
+				double dt = (1.0 * (events.get(j).getTimeStamp() - events.get(j-1).getTimeStamp())/60000);
+				if(dt == 0) {
+					System.err.println("Warning:");
+					System.err.println("-- "+events.get(j).getTimeStamp());
+					System.err.println("-- "+events.get(j-1).getTimeStamp());
+				}
 				stats.addValue(dt);
 				ustats.addValue(dt);
 			}
-			
 			if(ustats.getN() == 0) continue;
 			
 			per_user_first_q.addValue(ustats.getPercentile(25));
 			per_user_median.addValue(ustats.getPercentile(50));
 			per_user_third_q.addValue(ustats.getPercentile(75));
 		}
+		
+		System.err.println("MEAN OF MEDIAN = "+per_user_median.getMean());
+		System.err.println("GEOM. MEAN OF MEDIAN = "+per_user_median.getGeometricMean());
 		
 		Logger.logln("Gobal population resutls:");
 		for(int i=10;i<100;i+=10)
@@ -83,12 +93,61 @@ public class InterEventDistribution {
 		for(int i=10;i<100;i+=10)
 			Logger.logln(i+"th Percentile = "+(int)per_user_median.getPercentile(i)+" mins");
 		
-		GraphPlotter gp = GraphPlotter.drawGraph("Distribution of interevent time", "Distribution of interevent time", 
-												 "1st quartile", "log_10(interevent time) mins", "fraction of users", 
-											     new String[]{"0.1","1","10","100","1000","1000"}, hist(per_user_first_q.getSortedValues()));
-		gp.addData("median",hist(per_user_median.getSortedValues()));
-		gp.addData("3rd quartile",hist(per_user_third_q.getSortedValues()));
 		
+		double[] xaxis = new double[100];
+		for(int i=0; i<xaxis.length;i++)
+			xaxis[i] = i;
+		
+		String[] labels = new String[xaxis.length];
+		for(int i = 0; i<xaxis.length; i++)
+			labels[i] = String.valueOf((int)xaxis[i]);
+		
+		
+		PrintWriter out = new PrintWriter(new FileWriter(new File(Config.getInstance().base_dir+"/InterEventDistribution/InterEventDistrib"+e.toFileName())));
+		out.print("xlabels");
+		for(String l: labels)
+			out.print(","+l);
+		out.println();
+		
+		
+		double[] h = hist(per_user_first_q.getSortedValues(),xaxis);
+		out.print("1st q");
+		for(double l: h)
+			out.print(","+l);
+		out.println();
+		
+		
+		GraphPlotter gp = GraphPlotter.drawGraph("Distribution of interevent time", "Distribution of interevent time", 
+												 "1st quartile", "interevent time (mins)", "fraction of users", 
+											     labels, h);
+		
+		h = hist(per_user_median.getSortedValues(),xaxis);
+		out.print("median");
+		for(double l: h)
+			out.print(","+l);
+		out.println();
+		gp.addData("median",h);
+		
+		h = hist(per_user_third_q.getSortedValues(),xaxis);
+		out.print("3rd q");
+		for(double l: h)
+			out.print(","+l);
+		out.println();
+		gp.addData("3rd quartile",h);
+		
+		
+		xaxis = new double[10];
+		for(int i=0; i<xaxis.length;i++)
+			xaxis[i] = 10*i;
+		labels = new String[xaxis.length];
+		for(int i = 0; i<xaxis.length; i++)
+			labels[i] = String.valueOf((int)xaxis[i]);
+		
+		GraphPlotter gp2 = GraphPlotter.drawGraph("Distribution of interevent time", "Distribution of interevent time", 
+				 "all", "interevent time (mins)", "fraction of users", 
+			     labels, hist(stats.getSortedValues(),xaxis));
+		
+		out.close();
 		Logger.logln("Done!");
 	}
 	
@@ -99,15 +158,17 @@ public class InterEventDistribution {
 		Logger.logln(String.valueOf(h[h.length-1]));
 	}
 	
-	public static double[] hist(double[] sortedvalues) {
-			
-		double[] h = new double[6];
-		for(int i=0;i<h.length;i++) 
-		for(int j=0; j<sortedvalues.length && sortedvalues[j] <= Math.pow(10, i-1); j++) 
+	
+	public static double[] hist(double[] sortedvalues, double[] x) {
+		
+		double[] h = new double[x.length];
+		for(int i=0;i<x.length;i++) 
+		for(int j=0; j<sortedvalues.length && sortedvalues[j] <= x[i]; j++) 
 				h[i] ++;
 		
 		for(int i=h.length-1; i > 0; i--)
 			h[i] = (h[i] - h[i-1])/sortedvalues.length;
+		h[0] = h[0] / sortedvalues.length;
 		
 		return h;
 	}
