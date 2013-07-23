@@ -50,11 +50,19 @@ public class PopulationDensity {
 		for(String r: density.keySet()) {
 			int estimated = density.get(r).intValue();
 			Integer groundtruth = istat.get(r);
-			if(groundtruth != null) {
+			if(groundtruth != null && estimated>10) {
 				size++;
 				//System.out.println(r+","+estimated+","+groundtruth);
 			}
 		}
+		
+		
+		String dir = Config.getInstance().base_dir+"/PopulationDensity";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
+		
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/"+region+"_hist.csv")));
+		out.println("estimated;groundtruth");
 		
 		
 		double[][] result = new double[size][2];
@@ -63,12 +71,19 @@ public class PopulationDensity {
 			int estimated = density.get(r).intValue();
 			Integer groundtruth = istat.get(r);
 			if(groundtruth != null && estimated>0 && groundtruth>0) {
-				result[i][0] = Math.log10(estimated);
-				result[i][1] = Math.log10(groundtruth);
-				i++;
+				out.println(estimated+";"+groundtruth);
+				
+				if(estimated>10){
+					result[i][0] = Math.log10(estimated);
+					result[i][1] = Math.log10(groundtruth);
+					i++;
+				}
+				
+				
 			}
 		}
 		
+		out.close();
 		
 		SimpleRegression sr = new SimpleRegression();
 		sr.addData(result);
@@ -80,6 +95,7 @@ public class PopulationDensity {
 		labels.add("population density");
 		
 		new GraphScatterPlotter("Result: "+region,"Estimated (log10)","GroundTruth (log10)",ldata,labels);
+		
 		
 		
 	}

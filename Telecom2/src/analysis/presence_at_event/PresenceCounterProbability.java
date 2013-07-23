@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import pls_parser.PLSEventsAroundAPlacemark;
@@ -301,9 +302,12 @@ public class PresenceCounterProbability {
 		
 		if(first == null) return 0;
 		
-		first.add(Calendar.MINUTE, -50);
+		int iet = getAvgInterEventTime(plsEvents,event);
+		//System.out.println("***** "+iet);
+		
+		first.add(Calendar.MINUTE, -iet);
 		if(first.before(event.st)) first = event.st;
-		last.add(Calendar.MINUTE, 50);
+		last.add(Calendar.MINUTE, iet);
 		if(last.after(event.et)) last = event.et;
 		
 		double ev_s = event.st.getTimeInMillis(); // event start
@@ -334,6 +338,41 @@ public class PresenceCounterProbability {
 		}
 		
 		return f2;
+	}
+	
+	
+	public static int getAvgInterEventTime(List<PlsEvent> plsEvents, CityEvent e) {
+		
+		Calendar startTime = e.st;
+		Calendar endTime = e.et;
+		int startH = startTime.get(Calendar.HOUR_OF_DAY);
+		int endH = endTime.get(Calendar.HOUR_OF_DAY);
+		
+		
+		DescriptiveStatistics ustats = new DescriptiveStatistics();
+		for(int j=1;j<plsEvents.size();j++) {
+			
+			int d1 = plsEvents.get(j).getCalendar().get(Calendar.DAY_OF_YEAR);
+			int d2 = plsEvents.get(j-1).getCalendar().get(Calendar.DAY_OF_YEAR);
+			
+			int h1 = plsEvents.get(j).getCalendar().get(Calendar.HOUR_OF_DAY);
+			int h2 = plsEvents.get(j-1).getCalendar().get(Calendar.HOUR_OF_DAY);
+			
+			if(h1 < startH || h1 > endH) continue;
+			if(h2 < startH || h2 > endH) continue;
+			
+			if(d1 != d2) continue;
+			
+			//if(plsEvents.get(j).getCalendar().before(e.st) || plsEvents.get(j).getCalendar().after(e.et)) continue;
+			//if(plsEvents.get(j-1).getCalendar().before(e.st) || plsEvents.get(j-1).getCalendar().after(e.et)) continue;
+				
+			double dt = (1.0 * (plsEvents.get(j).getTimeStamp() - plsEvents.get(j-1).getTimeStamp())/60000);
+			ustats.addValue(dt);
+		}
+		
+		int iet = (int)ustats.getMean();
+		if(iet == 0) iet = 100;
+		return iet;
 	}
 	
 	

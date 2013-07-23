@@ -17,7 +17,7 @@ import visual.GraphScatterPlotter;
 public class ResultEvaluatorSeparate {
 	public static void main(String[] args) throws Exception {
 		
-		String file = Config.getInstance().base_dir +"/PresenceCounter/result_0.0_3.csv";
+		String file = Config.getInstance().base_dir +"/PresenceCounter/result_0.0_5.csv";
 		
 		
 		
