@@ -17,7 +17,7 @@ import visual.GraphScatterPlotter;
 public class ResultEvaluator {
 	public static void main(String[] args) throws Exception {
 		
-		String file = Config.getInstance().base_dir +"/PresenceCounter/result_0.0_3.csv";
+		String file = Config.getInstance().base_dir +"/PresenceCounterProbability/result_0.0_5.csv";
 		
 		
 		SimpleRegression sr = new SimpleRegression();
