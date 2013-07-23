@@ -2,13 +2,9 @@ package analysis.densityANDflows;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.HashMap;
-import java.util.Map;
 
 import utils.Config;
 import utils.Logger;
-import area.Region;
-import area.RegionMap;
 import area.SpaceGrid;
 
 public class PopulationDensityGrid {

@@ -48,7 +48,7 @@ public class Colors {
 	public static String val01_to_color(double x) {
 		if(x == 0) return "00000000";
 		int index = Colors.HEAT_COLORS.length - 1 - (int)(x * (Colors.HEAT_COLORS.length-1));
-		return "aa"+Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]);
+		return "77"+Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]);
 	}
 	
 }
