@@ -170,7 +170,7 @@ public class SpaceGrid {
 			ll[2] = grid2geo(i+1, j+1);
 			ll[3] = grid2geo(i, j+1);
 			ll[4] = grid2geo(i, j);
-			out.println(kmlsq.draw(ll, "vals["+i+"]["+j+"] = "+(int)vals[i][j], Colors.val01_to_color(norm[i][j]), "ffaaaaaa", "..."));
+			out.println(kmlsq.draw(ll, "vals["+i+"]["+j+"] = "+(int)vals[i][j], Colors.val01_to_color(norm[i][j]), "44aaaaaa", "..."));
 		}
 		kml.printFooterDocument(out);
 		out.close();
