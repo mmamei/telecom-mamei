@@ -1,4 +1,4 @@
-package analysis.place_recognizer;
+package analysis.densityANDflows;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
