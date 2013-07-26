@@ -70,30 +70,7 @@ public class SpaceGrid {
 		
 		return new double[]{cell_lon,cell_lat};
 	}
-	
-	
-	/*
-	public List<Integer>[][] divideInRegions(TweetDataset data) throws Exception {
-		
-		
-		//System.out.println("d_lat = "+d_lat+", d_lon = "+d_lon);
-		
-		List<Integer>[][] grid = new List[N_CELL_LAT][N_CELL_LON];
-		for(int i=0; i<N_CELL_LAT;i++)
-		for(int j=0; j<N_CELL_LON;j++)
-			grid[i][j] = new ArrayList<Integer>();
-		
-		int i=0;
-		for (Iterator<Tweet> it = data; it.hasNext(); ) {
-			Tweet t = it.next();
-			int[] ij = getGridCoord(t);
-			grid[ij[0]][ij[1]].add(i);
-			i++;
- 		}
-		
-		return grid;
-	}
-	*/
+
 	
 	public int[] getGridCoord(double lon, double lat) {
 		double d_lat = (max_lat - min_lat) / n_cell_lat;
@@ -137,7 +114,7 @@ public class SpaceGrid {
 		out.close();
 	}
 	
-	public void draw(String title,double[][] vals) throws Exception {
+	public void draw(String file, String title, double[][] vals) throws Exception {
 		
 		
 		// normalize vals
@@ -153,11 +130,7 @@ public class SpaceGrid {
 		for(int j=0;j<vals[i].length;j++)
 			norm[i][j] = vals[i][j] / max;
 		
-		String dir = Config.getInstance().base_dir+"/SpaceGrid";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
-		
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/"+title+".kml")));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 		Kml kml = new Kml();
 		KMLSquare kmlsq = new KMLSquare();
 		kml.printHeaderDocument(out, title);
