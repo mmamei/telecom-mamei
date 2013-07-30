@@ -23,7 +23,7 @@ import utils.Logger;
  * http://localmapping.wordpress.com/2008/11/20/i-confini-amministrativi-degli-8101-comuni-ditalia-al-2001/
  */
 
-public class ParserComuniItalia {
+public class CreatorRegionMapComuni {
 	
 	public static final String xpath_name = "kml/Document/Folder[1]/Placemark/name";
 	public static final String xpath_coor = "kml/Document/Folder/Placemark/Polygon/outerBoundaryIs/LinearRing/coordinates";

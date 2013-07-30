@@ -22,115 +22,79 @@ import visual.Kml;
 import area.region.ParserDatiISTAT;
 import area.region.Region;
 import area.region.RegionMap;
+import area.region.SpaceGrid;
 
 public class PopulationDensity {
 	public static void main(String[] args) throws Exception {
-		String region = "Piemonte";
-		String kind_of_place = "HOME";
+		String region = "TorinoGrid20";
+		String kind_of_place = "SATURDAY_NIGHT";
+		String exclude_kind_of_place = "HOME";
 		
 		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+region+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
 			System.exit(0);
 		}
+		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
-		Map<String,Double> density = process(rm,kind_of_place);
+		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_dir+"/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
 		
-		printKML(density,rm,kind_of_place,true);
 		
-		compareWithISTAT(density,region);
+		Map<String,Double> density = process(rm,up,kind_of_place,exclude_kind_of_place);
+		String description = kind_of_place;
+		
+		
+		
+		printKML(density,rm,description,true);
+		
+		
 	
 		Logger.logln("Done!");
 	}
 	
 	
-	public static void compareWithISTAT(Map<String,Double> density, String region) throws Exception {
-		Map<String,Integer> istat = ParserDatiISTAT.load(region);
-		int size = 0;
-		for(String r: density.keySet()) {
-			int estimated = density.get(r).intValue();
-			Integer groundtruth = istat.get(r);
-			if(groundtruth != null && estimated>10) {
-				size++;
-				//System.out.println(r+","+estimated+","+groundtruth);
-			}
-		}
-		
-		
-		String dir = Config.getInstance().base_dir+"/PopulationDensity";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
-		
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/"+region+"_hist.csv")));
-		out.println("estimated;groundtruth");
-		
-		
-		double[][] result = new double[size][2];
-		int i = 0;
-		for(String r: density.keySet()) {
-			int estimated = density.get(r).intValue();
-			Integer groundtruth = istat.get(r);
-			if(groundtruth != null && estimated>0 && groundtruth>0) {
-				out.println(estimated+";"+groundtruth);
-				
-				if(estimated>10){
-					result[i][0] = Math.log10(estimated);
-					result[i][1] = Math.log10(groundtruth);
-					i++;
-				}
-				
-				
-			}
-		}
-		
-		out.close();
-		
-		SimpleRegression sr = new SimpleRegression();
-		sr.addData(result);
-		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
-		
-		List<double[][]> ldata = new ArrayList<double[][]>();
-		ldata.add(result);
-		List<String> labels = new ArrayList<String>();
-		labels.add("population density");
-		
-		new GraphScatterPlotter("Result: "+region,"Estimated (log10)","GroundTruth (log10)",ldata,labels);
-		
-		
-		
-	}
-	
-	public static Map<String,Double> process(RegionMap rm, String kind_of_place) throws Exception {
+	public static Map<String,Double> process(RegionMap rm, Map<String,UserPlaces> up, String kind_of_place, String exclude_kind_of_place) {
 		
 		Map<String,Double> density = new HashMap<String,Double>();
 		
-		BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().base_dir+"/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv"));
-		String line;
-		String[] elements;
-		while((line = br.readLine())!=null) {
-			if(line.contains(","+kind_of_place+",")) {
-				line = line.substring(line.indexOf(kind_of_place)+kind_of_place.length()+1, line.length());
-				elements = line.split(",");
-				for(String c: elements) {
-					double lon = Double.parseDouble(c.substring(0,c.indexOf(" ")));
-					double lat = Double.parseDouble(c.substring(c.indexOf(" ")+1));
-					Region reg = rm.get(lon, lat);
-					if(reg == null) 
-						Logger.logln(lon+","+lat+" is outside "+rm.getName());
-					else {
-						Double val = density.get(reg.getName());
-						if(val == null) val = 0.0;
-						val += 1.0 / elements.length;
-						density.put(reg.getName(), val);
-					}
+		for(UserPlaces p: up.values()) {
+			List<double[]> lkop = p.places.get(kind_of_place);
+			List<double[]> lnokop = p.places.get(exclude_kind_of_place);
+			List<double[]> r = exclude_nopkop(rm,lkop,lnokop);
+			if(r != null)
+			for(double[] ll: r) {
+				Region reg = rm.get(ll[0], ll[1]);
+				if(reg == null) 
+					Logger.logln(ll[0]+","+ll[1]+" is outside "+rm.getName());
+				else {
+					Double val = density.get(reg.getName());
+					if(val == null) val = 0.0;
+					val += 1.0;
+					density.put(reg.getName(), val);
 				}
 			}
 		}
-		br.close();
 		return density;
 	}
 	
-	public static void printKML(Map<String,Double> den, RegionMap rm , String kop, boolean logscale) throws Exception {
+	
+	public static List<double[]> exclude_nopkop(RegionMap rm, List<double[]> kop, List<double[]> nokop) {
+		if(kop==null) return null;
+		if(nokop==null) return kop;
+		List<double[]> r = new ArrayList<double[]>();
+		for(double[] p1: kop) {
+			boolean found = false;
+			Region r1 = rm.get(p1[0],p1[1]);
+			for(double[] p2 : nokop) {
+				Region r2 = rm.get(p2[0],p2[1]);;
+				if(r1!=null && r2!=null && r1.equals(r2)) found = true;
+			}
+			if(!found) r.add(p1);
+		}
+		return r;
+	}
+	
+	public static void printKML(Map<String,Double> den, RegionMap rm , String desc, boolean logscale) throws Exception {
 		
 		
 		Map<String,Double> density = new HashMap<String,Double>();
@@ -152,15 +116,15 @@ public class PopulationDensity {
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/"+rm.getName()+"_"+kop+".kml")));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/"+rm.getName()+"_"+desc+".kml")));
 		Kml kml = new Kml();
 		kml.printHeaderFolder(out, rm.getName());
 		
 		for(Region r: rm.getRegions()) {
 			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
 			int index = Colors.HEAT_COLORS.length - 1 - (int)(val/max * (Colors.HEAT_COLORS.length-1));
-			String desc = kop+" DENSITY = "+(logscale ? Math.pow(10, val) : val);
-			out.println(r.toKml("ff"+Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]),desc));
+			String description = desc+" DENSITY = "+(logscale ? Math.pow(10, val) : val);
+			out.println(r.toKml("ff"+Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]),description));
 		}
 		
 		kml.printFooterFolder(out);
