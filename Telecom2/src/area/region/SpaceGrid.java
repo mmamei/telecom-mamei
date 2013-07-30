@@ -1,4 +1,4 @@
-package area;
+package area.region;
 
 import java.io.BufferedWriter;
 import java.io.File;

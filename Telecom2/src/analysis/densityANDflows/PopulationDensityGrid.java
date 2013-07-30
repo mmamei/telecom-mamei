@@ -14,7 +14,7 @@ import java.util.Map;
 import utils.Config;
 import utils.Logger;
 import visual.HeatMapGoogleMaps;
-import area.SpaceGrid;
+import area.region.SpaceGrid;
 
 public class PopulationDensityGrid {
 	public static void main(String[] args) throws Exception {
