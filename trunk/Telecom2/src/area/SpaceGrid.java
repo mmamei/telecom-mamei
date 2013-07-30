@@ -63,7 +63,7 @@ public class SpaceGrid {
 	}
 	
 	
-	public double[] grid2geo(int i, int j) {
+	public double[] grid2LonLat(int i, int j) {
 		
 		double cell_lon = min_lon + j * d_lon;
 		double cell_lat = min_lat + i * d_lat;
@@ -71,6 +71,11 @@ public class SpaceGrid {
 		return new double[]{cell_lon,cell_lat};
 	}
 
+	public double[] grid2LatLon(int i, int j) {
+		
+		double[] x = grid2LonLat(i,j);
+		return new double[]{x[1],x[0]};
+	}
 	
 	public int[] getGridCoord(double lon, double lat) {
 		double d_lat = (max_lat - min_lat) / n_cell_lat;
@@ -99,11 +104,11 @@ public class SpaceGrid {
 		for(int i=0; i<n_cell_lon;i++)
 		for(int j=0; j<n_cell_lat;j++) {
 			double[][] ll = new double[5][2];
-			ll[0] = grid2geo(i, j);
-			ll[1] = grid2geo(i+1, j);
-			ll[2] = grid2geo(i+1, j+1);
-			ll[3] = grid2geo(i, j+1);
-			ll[4] = grid2geo(i, j);
+			ll[0] = grid2LonLat(i, j);
+			ll[1] = grid2LonLat(i+1, j);
+			ll[2] = grid2LonLat(i+1, j+1);
+			ll[3] = grid2LonLat(i, j+1);
+			ll[4] = grid2LonLat(i, j);
 			String desc = "("+DF.format(ll[0][0])+";"+DF.format(ll[0][1])+")<br>" +
 						  "("+DF.format(ll[1][0])+";"+DF.format(ll[1][1])+")<br>" +
 						  "("+DF.format(ll[2][0])+";"+DF.format(ll[2][1])+")<br>" +
@@ -138,11 +143,11 @@ public class SpaceGrid {
 		for(int i=0; i<n_cell_lon;i++)
 		for(int j=0; j<n_cell_lat;j++) {
 			double[][] ll = new double[5][2];
-			ll[0] = grid2geo(i, j);
-			ll[1] = grid2geo(i+1, j);
-			ll[2] = grid2geo(i+1, j+1);
-			ll[3] = grid2geo(i, j+1);
-			ll[4] = grid2geo(i, j);
+			ll[0] = grid2LonLat(i, j);
+			ll[1] = grid2LonLat(i+1, j);
+			ll[2] = grid2LonLat(i+1, j+1);
+			ll[3] = grid2LonLat(i, j+1);
+			ll[4] = grid2LonLat(i, j);
 			out.println(kmlsq.draw(ll, "vals["+i+"]["+j+"] = "+(int)vals[i][j], Colors.val01_to_color(norm[i][j]), "44aaaaaa", "..."));
 		}
 		kml.printFooterDocument(out);
