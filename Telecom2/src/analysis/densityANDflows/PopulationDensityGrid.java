@@ -13,6 +13,7 @@ import java.util.Map;
 
 import utils.Config;
 import utils.Logger;
+import visual.HeatMapGoogleMaps;
 import area.SpaceGrid;
 
 public class PopulationDensityGrid {
@@ -30,9 +31,23 @@ public class PopulationDensityGrid {
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
-		String file = dir+"/"+ kop+"-"+nokop+"-"+size+".kml";
+		//String file = dir+"/"+ kop+"-"+nokop+"-"+size+".kml";
+		//sg.draw(file, kop+"-"+nokop, density);
 		
-		sg.draw(file, kop+"-"+nokop, density);
+		String file = dir+"/"+ kop+"-"+nokop+"-"+size+".html";
+		String title = kop+"-"+nokop+"-"+size;
+		List<double[]> points = new ArrayList<double[]>();
+		List<Double> weights = new ArrayList<Double>();
+		
+		for(int i=0; i<size;i++)
+		for(int j=0; j<size;j++) {
+			if(density[i][j] > 1) {
+				points.add(sg.grid2LatLon(i, j));
+				weights.add(density[i][j]);
+			}
+		}
+		
+		HeatMapGoogleMaps.draw(file, title, points, weights);
 	}
 	
 	public static double[][] process(SpaceGrid sg, String kop, String nokop) throws Exception {
