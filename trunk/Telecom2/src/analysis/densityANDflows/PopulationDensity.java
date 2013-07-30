@@ -19,9 +19,9 @@ import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.GraphScatterPlotter;
 import visual.Kml;
-import area.ParserDatiISTAT;
-import area.Region;
-import area.RegionMap;
+import area.region.ParserDatiISTAT;
+import area.region.Region;
+import area.region.RegionMap;
 
 public class PopulationDensity {
 	public static void main(String[] args) throws Exception {

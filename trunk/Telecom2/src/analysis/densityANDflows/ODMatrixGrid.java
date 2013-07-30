@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import utils.Config;
 import utils.Logger;
 import visual.ArrowsGoogleMaps;
-import area.SpaceGrid;
+import area.region.SpaceGrid;
 
 public class ODMatrixGrid {
 	public static void main(String[] args) throws Exception {
