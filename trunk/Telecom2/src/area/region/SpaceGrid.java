@@ -91,6 +91,19 @@ public class SpaceGrid {
 	}
 	
 	private static final DecimalFormat DF = new DecimalFormat("##.###");
+	
+	
+	public double[][] getBorderLonLat(int i, int j) {
+		double[][] ll = new double[5][2];
+		ll[0] = grid2LonLat(i, j);
+		ll[1] = grid2LonLat(i+1, j);
+		ll[2] = grid2LonLat(i+1, j+1);
+		ll[3] = grid2LonLat(i, j+1);
+		ll[4] = grid2LonLat(i, j);
+		return ll;
+	}
+	
+	
 	public void draw(String title) throws Exception {
 		String dir = Config.getInstance().base_dir+"/SpaceGrid";
 		File d = new File(dir);
@@ -103,12 +116,7 @@ public class SpaceGrid {
 		
 		for(int i=0; i<n_cell_lon;i++)
 		for(int j=0; j<n_cell_lat;j++) {
-			double[][] ll = new double[5][2];
-			ll[0] = grid2LonLat(i, j);
-			ll[1] = grid2LonLat(i+1, j);
-			ll[2] = grid2LonLat(i+1, j+1);
-			ll[3] = grid2LonLat(i, j+1);
-			ll[4] = grid2LonLat(i, j);
+			double[][] ll = getBorderLonLat(i,j);
 			String desc = "("+DF.format(ll[0][0])+";"+DF.format(ll[0][1])+")<br>" +
 						  "("+DF.format(ll[1][0])+";"+DF.format(ll[1][1])+")<br>" +
 						  "("+DF.format(ll[2][0])+";"+DF.format(ll[2][1])+")<br>" +
