@@ -22,7 +22,7 @@ public class IstatComparator {
 	
 	public static void main(String[] args) throws Exception {
 		
-		String region = "TorinoGrid20";
+		String region = "Piemonte";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
 		
