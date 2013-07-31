@@ -80,22 +80,23 @@ public class Region implements Serializable {
 	}
 
 	public String toKml(String color) {
-		return toKml(color,"");
+		return toKml(color,color,"");
 	}
 	
-	public String toKml(String color, String description) {
-		return "<Style id=\""+color+"\">" +
+	public String toKml(String areacolor, String bordercolor, String description) {
+		String id = areacolor+"-"+bordercolor;
+		return "<Style id=\""+id+"\">" +
 				"<LineStyle>" +
-				"<color>"+color+"</color>" +
+				"<color>"+bordercolor+"</color>" +
 				"</LineStyle>" +
 				"<PolyStyle>" +
-				"<color>"+color+"</color>" +
+				"<color>"+areacolor+"</color>" +
 				"</PolyStyle>" +
 				"</Style>" +
 				"<Placemark>" +
 				"<name>"+name+"</name>" +
 				"<description>"+description+"</description>" +
-				"<styleUrl>#"+color+"</styleUrl>" +
+				"<styleUrl>#"+id+"</styleUrl>" +
 				"<Polygon>" +
 				"<outerBoundaryIs>" +
 				"<LinearRing>" +

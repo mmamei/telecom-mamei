@@ -2,6 +2,9 @@ package area.region;
 
 import java.io.File;
 
+import org.gps.utils.LatLonPoint;
+import org.gps.utils.LatLonUtils;
+
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -31,3 +34,90 @@ public class CreatorRegionMapGrid {
 	}
 	
 }
+
+
+class SpaceGrid {
+	
+	private double min_lon;
+	private double min_lat;
+	private double max_lon;
+	private double max_lat;
+	 
+	
+	private int n_cell_lat;
+	private int n_cell_lon;
+	private double d_lat;
+	private double d_lon;
+	
+	
+	public SpaceGrid(double min_lon, double min_lat, double max_lon, double max_lat, int n_cell_lon, int n_cell_lat) {
+		this.min_lon = min_lon;
+		this.min_lat = min_lat;
+		this.max_lon = max_lon;
+		this.max_lat = max_lat;
+		
+		this.n_cell_lon = n_cell_lon;
+		this.n_cell_lat = n_cell_lat;
+		
+		d_lon = (max_lon - min_lon) / n_cell_lon;
+		d_lat = (max_lat - min_lat) / n_cell_lat;
+	}
+	
+	public void printSize() {
+		LatLonPoint p0 = new LatLonPoint(min_lat,min_lon);
+		LatLonPoint p1 = new LatLonPoint(min_lat,max_lon);
+		LatLonPoint p2 = new LatLonPoint(max_lat,min_lon);
+		
+		double d_lon = LatLonUtils.getHaversineDistance(p0, p1);
+		double d_lat = LatLonUtils.getHaversineDistance(p0, p2);
+		
+		d_lon = d_lon / n_cell_lon;
+		d_lat = d_lat / n_cell_lat;
+		
+		System.out.println("cell size: "+d_lon+", "+d_lat+" meters");
+	}
+	
+	public int[] size() {
+		return new int[]{n_cell_lon,n_cell_lat};
+	}
+	
+	
+	public double[] grid2LonLat(int i, int j) {
+		
+		double cell_lon = min_lon + j * d_lon;
+		double cell_lat = min_lat + i * d_lat;
+		
+		return new double[]{cell_lon,cell_lat};
+	}
+
+	public double[] grid2LatLon(int i, int j) {
+		
+		double[] x = grid2LonLat(i,j);
+		return new double[]{x[1],x[0]};
+	}
+	
+	public int[] getGridCoord(double lon, double lat) {
+		double d_lat = (max_lat - min_lat) / n_cell_lat;
+		double d_lon = (max_lon - min_lon) / n_cell_lon;
+		
+		int grid_i = (int)Math.floor((lat - min_lat) / d_lat);
+		int grid_j = (int)Math.floor((lon - min_lon) / d_lon);
+		
+		// deal with the maximum lat and maximum lon
+		if(grid_i == n_cell_lat) grid_i = n_cell_lat - 1;
+		if(grid_j == n_cell_lon) grid_j = n_cell_lon - 1;
+		return new int[]{grid_i,grid_j};
+	}
+	
+
+	public double[][] getBorderLonLat(int i, int j) {
+		double[][] ll = new double[5][2];
+		ll[0] = grid2LonLat(i, j);
+		ll[1] = grid2LonLat(i+1, j);
+		ll[2] = grid2LonLat(i+1, j+1);
+		ll[3] = grid2LonLat(i, j+1);
+		ll[4] = grid2LonLat(i, j);
+		return ll;
+	}
+}
+
