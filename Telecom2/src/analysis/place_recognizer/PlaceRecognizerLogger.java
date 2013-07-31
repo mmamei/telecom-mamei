@@ -19,7 +19,7 @@ import network.NetworkCell;
 import org.gps.utils.LatLonPoint;
 
 import utils.Config;
-import visual.Kml;
+import visual.kml.KML;
 import analysis.PlsEvent;
 
 
@@ -97,11 +97,11 @@ public class PlaceRecognizerLogger {
 	
 	
 	private static PrintWriter outKml;
-	private static Kml kml;
+	private static KML kml;
 	public static void openKMLFile(String file) {
 		try {
 			outKml = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-			kml = new Kml();
+			kml = new KML();
 			kml.printHeaderFolder(outKml, "Results");
 		} catch(Exception e) {
 			e.printStackTrace();

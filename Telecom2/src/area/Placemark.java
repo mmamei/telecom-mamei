@@ -24,7 +24,7 @@ import pre_delete.ReleventCellsExtractor;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import visual.Kml;
+import visual.kml.KML;
 
 
 
@@ -114,7 +114,7 @@ public class Placemark {
 	
 	public void printKML(String file) throws Exception {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-		Kml kml = new Kml();
+		KML kml = new KML();
 		String name = file.substring(file.lastIndexOf("/")+1,file.lastIndexOf("."));
 		kml.printHeaderFolder(out, name);
 			

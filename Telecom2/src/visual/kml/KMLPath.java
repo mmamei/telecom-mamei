@@ -1,4 +1,4 @@
-package visual;
+package visual.kml;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -20,12 +20,12 @@ import analysis.PlsEvent;
 public class KMLPath {
 	public static final boolean JITTER = false;
 	private static PrintWriter out;
-	private static Kml kml;
+	private static KML kml;
 	
 	public static void openFile(String file) {
 		try {
 			out = new PrintWriter(new FileWriter(file));
-			kml = new Kml();
+			kml = new KML();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

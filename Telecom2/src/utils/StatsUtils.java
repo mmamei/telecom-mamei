@@ -7,7 +7,7 @@ import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.inference.TestUtils;
 
-import visual.GraphPlotter;
+import visual.java.GraphPlotter;
 
 public class StatsUtils {
 	

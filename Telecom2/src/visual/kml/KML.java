@@ -1,9 +1,9 @@
-package visual;
+package visual.kml;
 
 import java.io.PrintWriter;
 
 
-public class Kml {
+public class KML {
 	
 	public static String MRTYP_LOGO = "http://pervasive2.morselli.unimo.it/~laura/images/logo_mrtyp.png";
 	

@@ -14,8 +14,8 @@ import pls_parser.UsersCSVCreator;
 
 import utils.Config;
 import utils.Logger;
-import visual.KMLHeatMap;
-import visual.Kml;
+import visual.kml.KMLHeatMap;
+import visual.kml.KML;
 import area.CityEvent;
 import area.Placemark;
 
@@ -66,7 +66,7 @@ public class AreaHeatMap {
 		
 		
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File("output/heat/HeatMap_"+ce.toFileName()+".kml"))));
-		Kml kml = new Kml();
+		KML kml = new KML();
 		kml.printHeaderDocument(out, ce.toString());
 		// create the heat map
 		Calendar startTime = events.get(0).getCalendar();

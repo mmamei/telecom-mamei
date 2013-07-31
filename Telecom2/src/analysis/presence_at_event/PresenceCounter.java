@@ -20,7 +20,7 @@ import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import visual.GraphScatterPlotter;
+import visual.java.GraphScatterPlotter;
 import area.CityEvent;
 import area.Placemark;
 
