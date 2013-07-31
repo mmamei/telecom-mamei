@@ -13,10 +13,10 @@ import visual.ArrowsGoogleMaps;
 import area.region.Region;
 import area.region.RegionMap;
 
-public class ODMatrixGrid {
+public class ODMatrix {
 	public static void main(String[] args) throws Exception {
 		
-		String region = "TorinoGrid20";
+		String region = "Piemonte";//"TorinoGrid20";
 		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+region+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
@@ -51,10 +51,16 @@ public class ODMatrixGrid {
 			}
 		}
 		
+		/*
+		for(String key: list_od.keySet()) {
+			System.out.println(key+" = "+list_od.get(key));
+		}
+		*/
+		
 		
 		// prepare for drawing
 		
-		String dir = Config.getInstance().base_dir+"/ODMatrixGrid";
+		String dir = Config.getInstance().base_dir+"/ODMatrix";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
@@ -79,7 +85,7 @@ public class ODMatrixGrid {
 			
 		}
 		
-		ArrowsGoogleMaps.draw(dir+"/od.html","OD-HOME-WORK",points,w);
+		ArrowsGoogleMaps.draw(dir+"/od"+region+".html","OD-HOME-WORK",points,w);
 		Logger.log("Done!");
 		
 			

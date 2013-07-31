@@ -20,9 +20,10 @@ import area.region.RegionMap;
 
 public class PopulationDensity {
 	public static void main(String[] args) throws Exception {
-		String region = "TorinoGrid20";
+		String region = "Piemonte";
+		//String region = "TorinoGrid20";
 		String kind_of_place = "SATURDAY_NIGHT";
-		String exclude_kind_of_place = "HOME";
+		String exclude_kind_of_place = null;//"HOME";
 		
 		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+region+".ser");
 		if(!input_obj_file.exists()) {
