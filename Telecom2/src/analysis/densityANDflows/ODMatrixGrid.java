@@ -7,19 +7,27 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import utils.Config;
+import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.ArrowsGoogleMaps;
-import area.region.SpaceGrid;
+import area.region.Region;
+import area.region.RegionMap;
 
 public class ODMatrixGrid {
 	public static void main(String[] args) throws Exception {
-		int size = 20;
-		double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
-		SpaceGrid sg = new SpaceGrid(bbox[0][0],bbox[0][1],bbox[1][0],bbox[1][1],size,size);
+		
+		String region = "TorinoGrid20";
+		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+region+".ser");
+		if(!input_obj_file.exists()) {
+			System.out.println(input_obj_file+" does not exist... run the region parser first!");
+			System.exit(0);
+		}
+		
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
 		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_dir+"/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
-		int[] gsize = sg.size();
-		// associated "i1,j1->i2,j2" to the counter c
-		// example "0,0->1,2" = 3 meaning 3 users commute from 0,0 to 1,2
+		
+		
+		// associated "latH,lonH->latW,lonW" to the counter c
 		Map<String,Double> list_od = new TreeMap<String,Double>();
 		
 		for(UserPlaces p: up.values()) {
@@ -29,13 +37,12 @@ public class ODMatrixGrid {
 				double z = 1.0 / homes.size() * works.size();
 				for(double[] h: homes)
 				for(double[] w: works) {
-					int[] hij = sg.getGridCoord(h[0], h[1]);
-					int[] wij = sg.getGridCoord(w[0], w[1]);
 					
-					if(hij[0] >= 0 && hij[0] < gsize[0] && hij[1] >= 0 && hij[1] < gsize[1] &&
-					wij[0] >= 0 && wij[0] < gsize[0] && wij[1] >= 0 && wij[1] < gsize[1]) {
-						
-						String key = hij[0]+","+hij[1]+"->"+wij[0]+","+wij[1];
+					Region rh = rm.get(h[0], h[1]);
+					Region rw = rm.get(w[0], w[1]);
+
+					if(rh!=null && rw!=null) {
+						String key = rh.getCenterLat()+","+rh.getCenterLon()+"->"+rw.getCenterLat()+","+rw.getCenterLon();
 						Double c = list_od.get(key);
 						c = c == null ? z : c+z;
 						list_od.put(key, c);
@@ -56,16 +63,16 @@ public class ODMatrixGrid {
 		
 		for(String k: list_od.keySet()) {
 			String[] x = k.split("->");
-			String[] ij1 = x[0].split(",");
-			String[] ij2 = x[1].split(",");
-			int i1 = Integer.parseInt(ij1[0]);
-			int j1 = Integer.parseInt(ij1[1]);
-			int i2 = Integer.parseInt(ij2[0]);
-			int j2 = Integer.parseInt(ij2[1]);
+			String[] llH = x[0].split(",");
+			String[] llW = x[1].split(",");
+			double latH = Double.parseDouble(llH[0]);
+			double lonH = Double.parseDouble(llH[1]);
+			double latW = Double.parseDouble(llW[0]);
+			double lonW = Double.parseDouble(llW[1]);
 			double weight = list_od.get(k);
-			if((i1 != i2 || j1 != j2) && weight>5) {
-				double[] p1 = sg.grid2LatLon(i1, j1);
-				double[] p2 = sg.grid2LatLon(i2, j2);
+			if(!x[0].equals(x[1]) && weight>5) {
+				double[] p1 = new double[]{latH,lonH};
+				double[] p2 = new double[]{latW,lonW};
 				points.add(new double[][]{p1,p2});
 				w.add(1.0);
 			}

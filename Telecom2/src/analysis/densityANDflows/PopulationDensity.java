@@ -1,9 +1,7 @@
 package analysis.densityANDflows;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -11,18 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math.stat.regression.SimpleRegression;
-
 import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import visual.GraphScatterPlotter;
+import visual.HeatMapGoogleMaps;
 import visual.Kml;
-import area.region.ParserDatiISTAT;
 import area.region.Region;
 import area.region.RegionMap;
-import area.region.SpaceGrid;
 
 public class PopulationDensity {
 	public static void main(String[] args) throws Exception {
@@ -41,11 +35,37 @@ public class PopulationDensity {
 		
 		
 		Map<String,Double> density = process(rm,up,kind_of_place,exclude_kind_of_place);
-		String description = kind_of_place;
 		
 		
 		
-		printKML(density,rm,description,true);
+		String dir = Config.getInstance().base_dir+"/PopulationDensity";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
+		
+		
+		String title = rm.getName()+"-"+kind_of_place+"-"+exclude_kind_of_place;
+		String kmlfile = dir+"/"+title+".kml";
+		String htmlfile = dir+"/"+title+".html";
+		
+		
+		printKML(kmlfile,density,rm,title,false);
+		
+		
+	
+		List<double[]> points = new ArrayList<double[]>();
+		List<Double> weights = new ArrayList<Double>();
+		
+		
+		for(Region r: rm.getRegions()) {
+			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
+			if(val > 1) {
+				points.add(new double[]{r.getCenterLat(),r.getCenterLon()});
+				weights.add(val);
+			}
+		}
+		
+		
+		HeatMapGoogleMaps.draw(htmlfile, title, points, weights);
 		
 		
 	
@@ -94,7 +114,7 @@ public class PopulationDensity {
 		return r;
 	}
 	
-	public static void printKML(Map<String,Double> den, RegionMap rm , String desc, boolean logscale) throws Exception {
+	public static void printKML(String file, Map<String,Double> den, RegionMap rm , String desc, boolean logscale) throws Exception {
 		
 		
 		Map<String,Double> density = new HashMap<String,Double>();
@@ -112,20 +132,18 @@ public class PopulationDensity {
 		for(double v: density.values()) 
 			max = Math.max(max, v);
 		
-		String dir = Config.getInstance().base_dir+"/PopulationDensity";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
 		
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/"+rm.getName()+"_"+desc+".kml")));
+		
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 		Kml kml = new Kml();
 		kml.printHeaderFolder(out, rm.getName());
 		
 		for(Region r: rm.getRegions()) {
 			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
-			int index = Colors.HEAT_COLORS.length - 1 - (int)(val/max * (Colors.HEAT_COLORS.length-1));
 			String description = desc+" DENSITY = "+(logscale ? Math.pow(10, val) : val);
-			out.println(r.toKml("ff"+Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]),description));
+			out.println(r.toKml(Colors.val01_to_color(val/max),"44aaaaaa",description));
 		}
+	
 		
 		kml.printFooterFolder(out);
 		out.close();
