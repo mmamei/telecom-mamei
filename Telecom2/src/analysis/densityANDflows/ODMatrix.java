@@ -1,15 +1,21 @@
 package analysis.densityANDflows;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.html.ArrowsGoogleMaps;
+import visual.kml.KML;
+import visual.kml.KMLArrow;
 import area.region.Region;
 import area.region.RegionMap;
 
@@ -60,9 +66,7 @@ public class ODMatrix {
 		
 		// prepare for drawing
 		
-		String dir = Config.getInstance().base_dir+"/ODMatrix";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
+		
 		
 		List<double[][]> points = new ArrayList<double[][]>();
 		List<Double> w = new ArrayList<Double>();
@@ -85,9 +89,32 @@ public class ODMatrix {
 			
 		}
 		
-		ArrowsGoogleMaps.draw(dir+"/od"+region+".html","OD-HOME-WORK",points,w);
-		Logger.log("Done!");
 		
-			
+		String dir = Config.getInstance().base_dir+"/ODMatrix";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
+		
+		ArrowsGoogleMaps.draw(dir+"/od"+region+".html","OD-HOME-WORK",points,w);
+		printKML(dir+"/od"+region+".kml","OD-HOME-WORK",points,w);
+		
+		
+		Logger.log("Done!");
 	}
+	
+	
+	public static void printKML(String file, String title, List<double[][]> points, List<Double> weights) throws Exception {
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+		KML kml = new KML();
+		kml.printHeaderFolder(out, title);
+		
+		for(int i=0; i<points.size();i++) {
+			double[][] p = points.get(i);
+			double w = weights.get(i);
+			out.println(KMLArrow.printArrow(p[0][1], p[0][0], p[1][1], p[1][0], w, "#ff0000ff"));
+		}
+		
+		kml.printFooterFolder(out);
+		out.close();
+	}
+	
 }
