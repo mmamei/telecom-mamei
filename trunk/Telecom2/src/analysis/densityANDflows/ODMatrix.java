@@ -57,15 +57,7 @@ public class ODMatrix {
 			}
 		}
 		
-		/*
-		for(String key: list_od.keySet()) {
-			System.out.println(key+" = "+list_od.get(key));
-		}
-		*/
-		
-		
 		// prepare for drawing
-		
 		
 		
 		List<double[][]> points = new ArrayList<double[][]>();
@@ -84,9 +76,8 @@ public class ODMatrix {
 				double[] p1 = new double[]{latH,lonH};
 				double[] p2 = new double[]{latW,lonW};
 				points.add(new double[][]{p1,p2});
-				w.add(1.0);
+				w.add(weight);
 			}
-			
 		}
 		
 		
