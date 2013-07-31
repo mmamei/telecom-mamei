@@ -11,7 +11,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import pls_parser.UsersCSVCreator;
 import utils.Config;
 import utils.Logger;
-import visual.GraphPlotter;
+import visual.java.GraphPlotter;
 import area.CityEvent;
 
 public class InterEventDistribution {

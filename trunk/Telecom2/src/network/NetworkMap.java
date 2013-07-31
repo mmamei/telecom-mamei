@@ -23,7 +23,7 @@ import utils.kdtree.GenericPoint;
 import utils.kdtree.KDTree;
 import utils.kdtree.Point;
 import utils.kdtree.RangeSearchTree;
-import visual.Kml;
+import visual.kml.KML;
 
 
 public class NetworkMap {
@@ -101,7 +101,7 @@ public class NetworkMap {
 	
 	public void printKML(String file, double[] ll, double[] tr) throws Exception {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-		Kml kml = new Kml();
+		KML kml = new KML();
 		String name = file.substring(file.lastIndexOf("/")+1,file.lastIndexOf("."));
 		kml.printHeaderFolder(out, name);
 		Iterator<Map.Entry<Point<Double>,NetworkCell>> iter = rangetree.iterator(toPoint(ll), toPoint(tr));

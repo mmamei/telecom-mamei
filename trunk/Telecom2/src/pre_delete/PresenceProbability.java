@@ -20,8 +20,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import pls_parser.UsersCSVCreator;
 import utils.Config;
 import utils.Logger;
-import visual.GraphPlotter;
-import visual.KMLPath;
+import visual.java.GraphPlotter;
+import visual.kml.KMLPath;
 import analysis.PlsEvent;
 import area.CityEvent;
 

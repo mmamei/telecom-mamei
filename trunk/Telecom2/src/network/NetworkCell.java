@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.gps.utils.LatLonPoint;
 
-import visual.KmlCircle;
+import visual.kml.KMLCircle;
 
 public class NetworkCell implements Serializable {
 
@@ -82,7 +82,7 @@ public class NetworkCell implements Serializable {
 	public String toKml(String color, String name, String desc) {
 		String incolor = "#7f"+color;
 		String bcolor = "#ff"+color;
-		return new KmlCircle().draw(barycentre_lon, barycentre_lat, radius, 10, 0, 360, name, incolor, bcolor, desc);
+		return new KMLCircle().draw(barycentre_lon, barycentre_lat, radius, 10, 0, 360, name, incolor, bcolor, desc);
 	}
 
 	

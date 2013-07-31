@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import visual.ArrowsGoogleMaps;
+import visual.html.ArrowsGoogleMaps;
 import area.region.Region;
 import area.region.RegionMap;
 

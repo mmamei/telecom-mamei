@@ -19,7 +19,7 @@ import utils.kdtree.GenericPoint;
 import utils.kdtree.KDTree;
 import utils.kdtree.Point;
 import utils.kdtree.RangeSearchTree;
-import visual.Kml;
+import visual.kml.KML;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -84,7 +84,7 @@ public class RegionMap implements Serializable {
 		if(!d.exists()) d.mkdirs();
 		
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/"+name+".kml")));
-		Kml kml = new Kml();
+		KML kml = new KML();
 		kml.printHeaderFolder(out, name);
 		int index = 0;
 		for(Region r: rm) {

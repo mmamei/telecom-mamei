@@ -13,8 +13,8 @@ import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import visual.HeatMapGoogleMaps;
-import visual.Kml;
+import visual.html.HeatMapGoogleMaps;
+import visual.kml.KML;
 import area.region.Region;
 import area.region.RegionMap;
 
@@ -136,7 +136,7 @@ public class PopulationDensity {
 		
 		
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-		Kml kml = new Kml();
+		KML kml = new KML();
 		kml.printHeaderFolder(out, rm.getName());
 		
 		for(Region r: rm.getRegions()) {

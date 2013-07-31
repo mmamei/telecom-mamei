@@ -1,4 +1,4 @@
-package visual;
+package visual.html;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;

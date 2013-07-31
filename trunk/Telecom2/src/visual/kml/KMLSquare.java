@@ -1,4 +1,4 @@
-package visual;
+package visual.kml;
 
 
 import java.util.ArrayList;

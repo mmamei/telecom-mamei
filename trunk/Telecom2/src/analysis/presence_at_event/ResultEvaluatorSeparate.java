@@ -12,7 +12,7 @@ import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import utils.Config;
 import utils.Logger;
-import visual.GraphScatterPlotter;
+import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluatorSeparate {
 	public static void main(String[] args) throws Exception {

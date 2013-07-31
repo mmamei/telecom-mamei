@@ -24,7 +24,7 @@ import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import visual.GraphPlotter;
+import visual.java.GraphPlotter;
 import analysis.PLSBehaviorInAnArea;
 import analysis.PLSMap;
 import area.CityEvent;

@@ -1,4 +1,4 @@
-package visual;
+package visual.kml;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -7,14 +7,14 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KmlCircle {
+public class KMLCircle {
 	
 public List<String> STYLES;
 	
 	private static final DecimalFormat D_FORMATTER_COARSE = new DecimalFormat("0.00");
 	
 	public static void main(String[] args) throws Exception {
-		KmlCircle kml_circle = new KmlCircle();
+		KMLCircle kml_circle = new KMLCircle();
 		File fileOutput = new File("CircleTest.kml"); 
 		PrintWriter out = new PrintWriter(new FileWriter(fileOutput));
 		out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -28,7 +28,7 @@ public List<String> STYLES;
 	}
 
 
-	public KmlCircle() {
+	public KMLCircle() {
 		STYLES = new ArrayList<String>();
 	}
 	

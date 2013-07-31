@@ -6,7 +6,7 @@ import java.util.Locale;
 
 import pre_delete.PresenceProbability;
 
-import visual.GraphPlotter;
+import visual.java.GraphPlotter;
 
 
 

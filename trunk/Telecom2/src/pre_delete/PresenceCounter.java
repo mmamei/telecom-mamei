@@ -12,7 +12,7 @@ import java.util.Map;
 import pls_parser.UsersCSVCreator;
 import utils.Config;
 import utils.Logger;
-import visual.GraphScatterPlotter;
+import visual.java.GraphScatterPlotter;
 import analysis.PlsEvent;
 import area.CityEvent;
 

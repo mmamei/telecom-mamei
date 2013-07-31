@@ -21,7 +21,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
 import utils.Logger;
-import visual.GraphPlotter;
+import visual.java.GraphPlotter;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
 import area.CityEvent;
 import area.Placemark;
