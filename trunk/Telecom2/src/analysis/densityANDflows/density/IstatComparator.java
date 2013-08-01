@@ -1,4 +1,4 @@
-package analysis.densityANDflows;
+package analysis.densityANDflows.density;
 
 import java.io.BufferedWriter;
 import java.io.File;

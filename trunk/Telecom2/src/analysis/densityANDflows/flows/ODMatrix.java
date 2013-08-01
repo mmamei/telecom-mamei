@@ -1,4 +1,4 @@
-package analysis.densityANDflows;
+package analysis.densityANDflows.flows;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.html.ArrowsGoogleMaps;
 import visual.kml.KML;
 import visual.kml.KMLArrow;
+import analysis.densityANDflows.density.UserPlaces;
 import area.region.Region;
 import area.region.RegionMap;
 
@@ -33,8 +33,7 @@ public class ODMatrix {
 		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_dir+"/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
 		
 		
-		// associated "latH,lonH->latW,lonW" to the counter c
-		Map<String,Double> list_od = new TreeMap<String,Double>();
+		Map<Move,Double> list_od = new TreeMap<Move,Double>();
 		
 		for(UserPlaces p: up.values()) {
 			List<double[]> homes = p.places.get("HOME");
@@ -48,33 +47,31 @@ public class ODMatrix {
 					Region rw = rm.get(w[0], w[1]);
 
 					if(rh!=null && rw!=null) {
-						String key = rh.getCenterLat()+","+rh.getCenterLon()+"->"+rw.getCenterLat()+","+rw.getCenterLon();
-						Double c = list_od.get(key);
+						Move m = new Move(rh,rw);
+						Double c = list_od.get(m);
 						c = c == null ? z : c+z;
-						list_od.put(key, c);
+						list_od.put(m, c);
 					}
 				}
 			}
 		}
 		
 		// prepare for drawing
+		draw(region,list_od);
 		
-		
+		Logger.log("Done!");
+	}
+	
+	
+	public static void draw(String title, Map<Move,Double> list_od) throws Exception {
 		List<double[][]> points = new ArrayList<double[][]>();
 		List<Double> w = new ArrayList<Double>();
 		
-		for(String k: list_od.keySet()) {
-			String[] x = k.split("->");
-			String[] llH = x[0].split(",");
-			String[] llW = x[1].split(",");
-			double latH = Double.parseDouble(llH[0]);
-			double lonH = Double.parseDouble(llH[1]);
-			double latW = Double.parseDouble(llW[0]);
-			double lonW = Double.parseDouble(llW[1]);
-			double weight = list_od.get(k);
-			if(!x[0].equals(x[1]) && weight>5) {
-				double[] p1 = new double[]{latH,lonH};
-				double[] p2 = new double[]{latW,lonW};
+		for(Move m: list_od.keySet()) {
+			double weight = list_od.get(m);
+			if(!m.sameSourceAndDestination() && weight>5) {
+				double[] p1 = new double[]{m.s.getCenterLat(),m.s.getCenterLon()};
+				double[] p2 = new double[]{m.d.getCenterLat(),m.d.getCenterLon()};
 				points.add(new double[][]{p1,p2});
 				w.add(weight);
 			}
@@ -85,11 +82,8 @@ public class ODMatrix {
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
-		ArrowsGoogleMaps.draw(dir+"/od"+region+".html","OD-HOME-WORK",points,w);
-		printKML(dir+"/od"+region+".kml","OD-HOME-WORK",points,w);
-		
-		
-		Logger.log("Done!");
+		ArrowsGoogleMaps.draw(dir+"/od"+title+".html","OD-HOME-WORK",points,w);
+		printKML(dir+"/od"+title+".kml","OD-HOME-WORK",points,w);
 	}
 	
 	
