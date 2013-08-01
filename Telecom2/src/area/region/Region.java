@@ -111,4 +111,8 @@ public class Region implements Serializable {
 	public boolean equals(Object o) {
 		return name.equals(((Region)o).name);
 	}
+	public int hashCode(){
+		return name.hashCode();
+	}
+	
 }

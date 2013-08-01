@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import utils.Config;
 import utils.CopyAndSerializationUtils;
@@ -30,10 +30,12 @@ public class ODMatrix {
 		}
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
+		
+		
 		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_dir+"/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
 		
 		
-		Map<Move,Double> list_od = new TreeMap<Move,Double>();
+		Map<Move,Double> list_od = new HashMap<Move,Double>();
 		
 		for(UserPlaces p: up.values()) {
 			List<double[]> homes = p.places.get("HOME");
