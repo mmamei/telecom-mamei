@@ -1,4 +1,4 @@
-package analysis.densityANDflows;
+package analysis.densityANDflows.density;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class UserPlaces {
-	String username;
-	Map<String,List<double[]>> places;
+	public String username;
+	public Map<String,List<double[]>> places;
 	
 	UserPlaces(String username) {
 		this.username = username;
