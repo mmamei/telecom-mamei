@@ -195,6 +195,4 @@ public class CityEvent {
 		for(CityEvent ce : coll)
 			System.out.println(ce);
 	}
-	
-	
 }
