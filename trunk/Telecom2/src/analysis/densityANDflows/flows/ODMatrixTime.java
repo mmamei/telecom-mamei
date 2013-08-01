@@ -3,8 +3,8 @@ package analysis.densityANDflows.flows;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import network.NetworkCell;
 import network.NetworkMap;
@@ -27,17 +27,13 @@ public class ODMatrixTime {
 		}
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
-		
+		Map<Move,Double> list_od = new HashMap<Move,Double>();
 		
 		Placemark p = new Placemark("Torino",new double[]{45.073036,7.679733},5000);
 		CityEvent ce = new CityEvent(p,"11/03/2012 17:00","11/03/2012 19:00",-1);
-		
 		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent/"+ce.toFileName())));
 		String line;
-		
 		NetworkMap nm = NetworkMap.getInstance();
-		
-		Map<Move,Double> list_od = new TreeMap<Move,Double>();
 		
 		while((line=br.readLine())!=null) {
 			line = line.substring(line.indexOf(",")+1).trim();

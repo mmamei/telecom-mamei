@@ -24,4 +24,8 @@ public class Move {
 		return s.equals(d);
 	}
 	
+	public int hashCode() {
+		return s.hashCode()+d.hashCode();
+	}
+	
 }
