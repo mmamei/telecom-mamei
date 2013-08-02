@@ -11,8 +11,6 @@ import network.NetworkMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import area.CityEvent;
-import area.Placemark;
 import area.region.Region;
 import area.region.RegionMap;
 
@@ -29,9 +27,8 @@ public class ODMatrixTime {
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
 		Map<Move,Double> list_od = new HashMap<Move,Double>();
 		
-		Placemark p = new Placemark("Torino",new double[]{45.073036,7.679733},5000);
-		CityEvent ce = new CityEvent(p,"11/03/2012 17:00","11/03/2012 19:00",-1);
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent/"+ce.toFileName())));
+		String file = "Torino-11_03_2012_17_00-11_03_2012_19_00.txt";
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent/"+file)));
 		String line;
 		NetworkMap nm = NetworkMap.getInstance();
 		
@@ -57,7 +54,7 @@ public class ODMatrixTime {
 		br.close();
 		
 		
-		ODMatrix.draw(ce.toFileName(), list_od);
+		ODMatrixVisual.draw(file, list_od);
 		
 		Logger.logln("Done");
 	}
