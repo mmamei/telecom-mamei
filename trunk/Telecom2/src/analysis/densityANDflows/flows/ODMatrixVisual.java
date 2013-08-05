@@ -36,9 +36,9 @@ public class ODMatrixVisual {
 
 		
 		Logger.logln("Percentiles:");
-		Logger.logln(p25+"");
-		Logger.logln(p50+"");
-		Logger.logln(p75+"");
+		Logger.logln("25th percentile = "+p25);
+		Logger.logln("50th percentile = "+p50);
+		Logger.logln("75th percentile = "+p75);
 	
 		
 		for(Move m: list_od.keySet()) {

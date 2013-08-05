@@ -62,6 +62,20 @@ public class Placemark {
 		this.cellsAround = getCellsAround();
 	}
 	
+	//double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
+	public double[][] getBBox() {
+		double[][] bbox = new double[2][2];
+		
+		LatLonPoint bottom_left = LatLonUtils.getPointAtDistance(center_point, (180+45), radius);
+		LatLonPoint top_right = LatLonUtils.getPointAtDistance(center_point, 45, radius);
+		
+		bbox[0][0] = bottom_left.getLongitude();
+		bbox[0][1] = bottom_left.getLatitude();
+		bbox[1][0] = top_right.getLongitude();
+		bbox[1][1] = top_right.getLatitude();
+		return bbox;
+	}
+	
 	
 	public static Placemark getPlacemark(String placemark) {
 		if(PLACEMARKS == null) initPlacemaks();

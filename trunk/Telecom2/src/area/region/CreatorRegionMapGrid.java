@@ -5,6 +5,8 @@ import java.io.File;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import area.CityEvent;
+
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -13,10 +15,19 @@ public class CreatorRegionMapGrid {
 	
 	public static void main(String[] args) throws Exception {
 		
-		int size = 20;
-		String name = "TorinoGrid"+size;
-		double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
+		int size = 5;
+		
+		//String name = "TorinoGrid"+size;
+		//double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
+		
+		
+		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
+		ce = CityEvent.expand(ce, 1, 2000);
+		String name = ce.spot.name;
+		double[][] bbox = ce.spot.getBBox();
+		
 		String output_obj_file=Config.getInstance().base_dir+"/cache/"+name+".ser";
+		
 		SpaceGrid sg = new SpaceGrid(bbox[0][0],bbox[0][1],bbox[1][0],bbox[1][1],size,size);
 		
 		
@@ -27,7 +38,7 @@ public class CreatorRegionMapGrid {
 			rm.add(new Region(i+","+j,sg.getBorderLonLat(i, j)));
 		}
 		
-	
+		rm.printKML();
 		
 		CopyAndSerializationUtils.save(new File(output_obj_file), rm);
 		Logger.logln("Done!");
