@@ -10,13 +10,13 @@ import org.gps.utils.LatLonUtils;
 public class KMLArrow {
 	
 	
-	public static String printArrow(double lon1, double lat1, double lon2, double lat2, double size, String color) {
+	public static String printArrow(double lon1, double lat1, double lon2, double lat2, double size, String color, boolean directed) {
 		
 	
 		LatLonPoint p1 = new LatLonPoint(lat1,lon1);
 		LatLonPoint p2 = new LatLonPoint(lat2,lon2);
 		double slope = LatLonUtils.getSlope(p2, p1);
-		double dist = 100; //LatLonUtils.getHaversineDistance(p1, p2) / 8;
+		double dist = directed? 100 : 0; //LatLonUtils.getHaversineDistance(p1, p2) / 8;
 		LatLonPoint tip1 = LatLonUtils.getPointAtDistance(p2, slope+10, dist);
 		LatLonPoint tip2 = LatLonUtils.getPointAtDistance(p2, slope-10, dist);
 		LatLonPoint p2shorter = LatLonUtils.getPointAtDistance(p2, slope, dist/2);

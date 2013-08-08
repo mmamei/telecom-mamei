@@ -13,7 +13,7 @@ public class ArrowsGoogleMaps {
 	public static int zoom = 6;
 	public static String color = "#FF0000";
 	
-	public static void draw(String file,String title,List<double[][]> points,List<Double> w) throws Exception {
+	public static void draw(String file,String title,List<double[][]> points,List<Double> w, boolean directed) throws Exception {
 		PrintWriter out = new PrintWriter(new FileWriter(file));
 		out.println("<html>");
 		out.println("<head>");
@@ -58,7 +58,7 @@ public class ArrowsGoogleMaps {
 		out.println("};");
 
 		for(int i=0;i<points.size();i++) {
-			drawArrow(out,points.get(i),w.get(i),color);
+			drawArrow(out,points.get(i),w.get(i),color,directed);
 		}
 
 		out.println("}");
@@ -76,7 +76,7 @@ public class ArrowsGoogleMaps {
 	}
 	
 		
-	public static void drawArrow(PrintWriter out, double[][] p, double w, String color){
+	public static void drawArrow(PrintWriter out, double[][] p, double w, String color, boolean directed){
 		out.println("var line = new google.maps.Polyline({");
 		out.println("path: [");
 		out.println("new google.maps.LatLng("+p[0][0]+","+p[0][1]+"),");
@@ -86,13 +86,16 @@ public class ArrowsGoogleMaps {
 		out.println("strokeColor: '"+color+"',");
 		//out.println("strokeOpacity: 0.8,");
 		out.println("strokeWeight: "+w+",");
-
-		out.println("icons: [{");
-		out.println("icon: lineSymbol,");
-		out.println("offset: '100%'");
-		out.println("}],");
+		
+		if(directed) {
+			out.println("icons: [{");
+			out.println("icon: lineSymbol,");
+			out.println("offset: '100%'");
+			out.println("}],");
+		}
 		out.println("map: map");
 		out.println("});");
+		
 	}
 	
 	
@@ -108,7 +111,7 @@ public class ArrowsGoogleMaps {
 		w.add(3.0);
 		
 		
-		draw(Config.getInstance().base_dir+"/arrows.html","Arrow Map Example",points,w);
+		draw(Config.getInstance().base_dir+"/arrows.html","Arrow Map Example",points,w,false);
 		Logger.log("Done!");
 	}
 	

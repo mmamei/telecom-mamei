@@ -49,8 +49,9 @@ public class Region implements Serializable {
 	
 	private void process() {
 		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
-		
-		String[] coord = kmlToOpenGISCoordinates().split(",");
+		String x = kmlToOpenGISCoordinates();
+		if(x.equals("")) return;
+		String[] coord = x.split(",");
 		for(String c: coord) {
 			double lon = Double.parseDouble(c.substring(0,c.indexOf(" ")));
 			double lat = Double.parseDouble(c.substring(c.indexOf(" ")+1));
@@ -72,6 +73,7 @@ public class Region implements Serializable {
 	}
 	
 	public String kmlToOpenGISCoordinates() {
+		if(kmlcoordinates.equals("")) return "";
 		String openGIScoordinates = kmlcoordinates.replaceAll(",", ";");
 		openGIScoordinates = openGIScoordinates.replaceAll(";0 ", ",");
 		openGIScoordinates = openGIScoordinates.replaceAll(";", " ");
