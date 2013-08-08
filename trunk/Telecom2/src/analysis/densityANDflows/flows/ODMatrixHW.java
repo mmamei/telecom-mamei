@@ -59,7 +59,7 @@ public class ODMatrixHW {
 		}
 		
 		// prepare for drawing
-		ODMatrixVisual.draw(region,list_od,false);
+		ODMatrixVisual.draw("ODMatrixHW_"+region,list_od,false);
 		
 		Logger.log("Done!");
 	}

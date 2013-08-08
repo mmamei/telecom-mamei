@@ -22,7 +22,7 @@ public class CreatorRegionMapGrid {
 		
 		
 		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
-		ce = CityEvent.expand(ce, 1, 2000);
+		ce = CityEvent.expand(ce, 1, 40000);
 		String name = ce.spot.name;
 		double[][] bbox = ce.spot.getBBox();
 		

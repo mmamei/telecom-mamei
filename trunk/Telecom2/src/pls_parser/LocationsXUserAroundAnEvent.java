@@ -89,7 +89,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 	public static void main(String[] args) throws Exception {
 		
 		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
-		ce = CityEvent.expand(ce, 1, 2000);
+		ce = CityEvent.expand(ce, 1, 40000);
 		
 		//Placemark p = new Placemark("Torino",new double[]{45.073036,7.679733},5000);
 		//CityEvent ce = new CityEvent(p,"11/03/2012 17:00","11/03/2012 19:00",-1);

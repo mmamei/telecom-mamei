@@ -62,7 +62,7 @@ public class ODMatrixTime {
 		br.close();
 		
 		
-		ODMatrixVisual.draw(file, list_od,false);
+		ODMatrixVisual.draw("ODMatrixTime_"+file, list_od,false);
 		
 		Logger.logln("Done");
 	}

@@ -2,15 +2,15 @@ package utils;
 
 public class Colors {
 	public static final String[] RANDOM_COLORS = new String[]{
-		"ff0000ff", "ffff0000", "ff00ff00", "ffff00ff", "ffffff00", "ff00ffff",
-		"ff000077", "ff770000", "ff007700", "ff770077", "ff777700", "ff007777",
-		"ffbb0000", "ff330000", "ffbb0077", "ff77bb33", "ff33bb77", "ffbb3377",
-		"ffddaaee", "ffee9900", "ff55f63e", "ffc3c433", "ffffff00", "ff00ffff",
+		"990000ff", "99ff0000", "9900ff00", "99ff00ff", "99ffff00", "9900ffff",
+		"99000077", "99770000", "99007700", "99770077", "99777700", "99007777",
+		"99bb0000", "99330000", "99bb0077", "9977bb33", "9933bb77", "99bb3377",
+		"99ddaaee", "99ee9900", "9955f63e", "99c3c433", "99ffff00", "9900ffff",
 		
-		"ff0000aa", "ffaa0000", "ff00aa00", "ffaa00aa", "faaaaf00", "ff00faaf",
-		"ff0aa077", "ff770aa0", "ff0077a0", "ff770a77", "ff7777a0", "ff00a777",
-		"ffbb0a00", "ff330a00", "ffbb0a77", "ff77abaa", "ffaabb77", "ffbbaa77",
-		"ffdaaaea", "ffee990a", "ff55fa3e", "ffc3ca33", "f1ff1100", "ff00f11f"
+		"990000aa", "99aa0000", "9900aa00", "99aa00aa", "faaaaf00", "9900faaf",
+		"990aa077", "99770aa0", "990077a0", "99770a77", "997777a0", "9900a777",
+		"99bb0a00", "99330a00", "99bb0a77", "9977abaa", "99aabb77", "99bbaa77",
+		"99daaaea", "99ee990a", "9955fa3e", "99c3ca33", "f1ff1100", "9900f11f"
 	};
 	
 	
