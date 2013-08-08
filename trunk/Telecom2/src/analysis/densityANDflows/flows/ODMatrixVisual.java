@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,21 @@ import visual.kml.KMLArrow;
 public class ODMatrixVisual {
 		
 	
-	public static void draw(String title, Map<Move,Double> list_od) throws Exception {
+	public static void draw(String title, Map<Move,Double> list_od, boolean directed) throws Exception {
+		
+		
+		if(!directed) {
+			Map<Move,Double> list_od_undirected = new HashMap<Move,Double>();
+			// change the list_od so that a --> b and b-->a are merged together
+			for(Move m: list_od.keySet()) {
+				Move m2 = new Move(m.s,m.d,false);
+				Double v2 = list_od_undirected.get(m2);
+				if(v2 == null) v2 = 0.0;
+				v2 += list_od.get(m);
+				list_od_undirected.put(m2, v2);
+			}
+			list_od = list_od_undirected;
+		}
 		
 		
 		List<double[][]> points = new ArrayList<double[][]>();
@@ -59,12 +74,12 @@ public class ODMatrixVisual {
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
-		ArrowsGoogleMaps.draw(dir+"/od"+title+".html",title,points,w);
-		printKML(dir+"/od"+title+".kml",title,points,w);
+		ArrowsGoogleMaps.draw(dir+"/od"+title+".html",title,points,w,directed);
+		printKML(dir+"/od"+title+".kml",title,points,w,directed);
 	}
 	
 	
-	public static void printKML(String file, String title, List<double[][]> points, List<Double> weights) throws Exception {
+	public static void printKML(String file, String title, List<double[][]> points, List<Double> weights, boolean directed) throws Exception {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 		KML kml = new KML();
 		kml.printHeaderFolder(out, title);
@@ -72,7 +87,7 @@ public class ODMatrixVisual {
 		for(int i=0; i<points.size();i++) {
 			double[][] p = points.get(i);
 			double w = weights.get(i);
-			out.println(KMLArrow.printArrow(p[0][1], p[0][0], p[1][1], p[1][0], w, "#ff0000ff"));
+			out.println(KMLArrow.printArrow(p[0][1], p[0][0], p[1][1], p[1][0], w, "#ff0000ff",directed));
 		}
 		
 		kml.printFooterFolder(out);
