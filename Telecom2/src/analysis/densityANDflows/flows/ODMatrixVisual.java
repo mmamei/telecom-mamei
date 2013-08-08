@@ -74,8 +74,8 @@ public class ODMatrixVisual {
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
-		ArrowsGoogleMaps.draw(dir+"/od"+title+".html",title,points,w,directed);
-		printKML(dir+"/od"+title+".kml",title,points,w,directed);
+		ArrowsGoogleMaps.draw(dir+"/"+title+".html",title,points,w,directed);
+		printKML(dir+"/"+title+".kml",title,points,w,directed);
 	}
 	
 	

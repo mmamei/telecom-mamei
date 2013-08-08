@@ -68,7 +68,7 @@ public class RegionMap implements Serializable {
 			if(p.within(g)) return r;
 		}
 		
-		Logger.logln("Fast search has failed, try complete search!");
+		//Logger.logln("Fast search has failed, try complete search!");
 		for(Region r: rm) {
 			//System.out.println(r.getName()+" = "+r.getCenterLon()+","+r.getCenterLat());
 			if(p.within(r.getGeom())) return r;

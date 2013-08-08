@@ -10,7 +10,7 @@ import utils.Logger;
 
 public class ArrowsGoogleMaps {
 	
-	public static int zoom = 6;
+	public static int zoom = 12;
 	public static String color = "#FF0000";
 	
 	public static void draw(String file,String title,List<double[][]> points,List<Double> w, boolean directed) throws Exception {
@@ -95,7 +95,6 @@ public class ArrowsGoogleMaps {
 		}
 		out.println("map: map");
 		out.println("});");
-		
 	}
 	
 	

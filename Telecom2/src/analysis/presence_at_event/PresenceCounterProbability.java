@@ -115,6 +115,12 @@ public class PresenceCounterProbability {
 	
 	public static double count(CityEvent event, double o_radius, int days) throws Exception {	
 		
+		String dir = Config.getInstance().base_dir +"/PresenceCounterProbability/ProbScores";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+event.toFileName()));
+		
+		
 		Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
 		
 		String file_event = getFile(event.spot.clone(),event.spot.radius);
@@ -184,9 +190,13 @@ public class PresenceCounterProbability {
 			//if(f2 > 0) f2 = 1;
 			//}
 			
-			prob += f1 * (1-f2);	
+			out.println(u+";"+(f1 * (1-f2)));
+			
+			prob += f1 * (1-f2);
+			
 		}
 		
+		out.close();
 		return prob;
 		
 	}
