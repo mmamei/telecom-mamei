@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/jfreechart-1.0.12.jar"/>
 	<classpathentry kind="lib" path="lib/LatLongLib.jar"/>
 	<classpathentry kind="lib" path="lib/jts-1.8.jar"/>
+	<classpathentry kind="lib" path="lib/GraphHopper.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
