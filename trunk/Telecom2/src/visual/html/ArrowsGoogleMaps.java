@@ -79,8 +79,9 @@ public class ArrowsGoogleMaps {
 	public static void drawArrow(PrintWriter out, double[][] p, double w, String color, boolean directed){
 		out.println("var line = new google.maps.Polyline({");
 		out.println("path: [");
-		out.println("new google.maps.LatLng("+p[0][0]+","+p[0][1]+"),");
-		out.println("new google.maps.LatLng("+p[1][0]+","+p[1][1]+")");
+		for(int i=0; i<p.length-1;i++)
+			out.println("new google.maps.LatLng("+p[i][0]+","+p[i][1]+"),");
+		out.println("new google.maps.LatLng("+p[p.length-1][0]+","+p[p.length-1][1]+")");
 		out.println("],");
 		
 		out.println("strokeColor: '"+color+"',");
