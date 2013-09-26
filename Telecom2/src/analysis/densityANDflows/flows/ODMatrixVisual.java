@@ -23,7 +23,7 @@ import visual.html.ArrowsGoogleMaps;
 import visual.kml.KML;
 import visual.kml.KMLArrow;
 
-public class ODMatrixVisual2 {
+public class ODMatrixVisual {
 		
 	
 	private static final String ghLoc = "C:/DATASET/graph_hopper";
