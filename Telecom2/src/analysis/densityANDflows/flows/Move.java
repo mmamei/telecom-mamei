@@ -28,6 +28,11 @@ public class Move {
 			return s.getName()+" --- "+d.getName();
 	}
 	
+	public String toCoordString() {
+		return s.getCenterLat()+" "+s.getCenterLon()+";"+d.getCenterLat()+" "+d.getCenterLon();
+	}
+	
+	
 	public boolean equals(Object  other) {
 		Move o = (Move)other;
 		
