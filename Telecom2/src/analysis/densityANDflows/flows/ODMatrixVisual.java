@@ -11,6 +11,12 @@ import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
+import com.graphhopper.GHRequest;
+import com.graphhopper.GHResponse;
+import com.graphhopper.GraphHopper;
+import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.util.PointList;
+
 import utils.Config;
 import utils.Logger;
 import visual.html.ArrowsGoogleMaps;
@@ -20,8 +26,14 @@ import visual.kml.KMLArrow;
 public class ODMatrixVisual {
 		
 	
+	private static final String ghLoc = "C:/DATASET/graph_hopper";
+    private static final String testOsm = "C:/DATASET/graph_hopper/piemonte.pbf";
+	
 	public static void draw(String title, Map<Move,Double> list_od, boolean directed) throws Exception {
 		
+		GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager("CAR")).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
+		gh.setPreciseIndexResolution(10000); // to be set about the grid size
+		gh.importOrLoad();
 		
 		if(!directed) {
 			Map<Move,Double> list_od_undirected = new HashMap<Move,Double>();
@@ -56,21 +68,30 @@ public class ODMatrixVisual {
 		Logger.logln("75th percentile = "+p75);
 	
 		
-		String dir = Config.getInstance().base_dir+"/ODMatrix";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
-		
-		PrintWriter out = new PrintWriter(new FileWriter(new File(dir+"/viaggi.txt")));
-		
 		for(Move m: list_od.keySet()) {
 			double weight = list_od.get(m);
 			if(!m.sameSourceAndDestination() && weight > p25) {
-				
-				out.println(m.toCoordString());
-				
 				double[] p1 = new double[]{m.s.getCenterLat(),m.s.getCenterLon()};
 				double[] p2 = new double[]{m.d.getCenterLat(),m.d.getCenterLon()};
-				points.add(new double[][]{p1,p2});
+				double[][] route;
+				GHResponse ph = gh.route(new GHRequest(m.s.getCenterLat(),m.s.getCenterLon(),m.d.getCenterLat(),m.d.getCenterLon()));
+		        
+				
+				if(ph.isFound()) {
+					route = new double[ph.getPoints().getSize()][2];
+			        PointList list = ph.getPoints();
+			        for(int i=0; i<list.getSize();i++) {
+			        	route[i][0] = list.getLatitude(i);
+			        	route[i][1] = list.getLongitude(i);
+			        }
+				}
+				else { 
+					// if graphhopper does not return valid path, just use the straight line between points.
+					Logger.logln("!!! NO ROUTE BETWEEN: "+ m + " USE STRAIGHT LINE INSTEAD");
+					route = new double[][]{p1,p2};
+				}
+				
+				points.add(route);
 				
 				if(weight < p50) w.add(1.0);
 				else if(weight < p75) w.add(2.0);
@@ -78,9 +99,10 @@ public class ODMatrixVisual {
 			}
 		}
 		
-		out.close();
 		
-		
+		String dir = Config.getInstance().base_dir+"/ODMatrix";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
 		
 		ArrowsGoogleMaps.draw(dir+"/"+title+".html",title,points,w,directed);
 		printKML(dir+"/"+title+".kml",title,points,w,directed);
@@ -95,7 +117,8 @@ public class ODMatrixVisual {
 		for(int i=0; i<points.size();i++) {
 			double[][] p = points.get(i);
 			double w = weights.get(i);
-			out.println(KMLArrow.printArrow(p[0][1], p[0][0], p[1][1], p[1][0], w, "#ff0000ff",directed));
+			//out.println(KMLArrow.printArrow(p[0][1], p[0][0], p[1][1], p[1][0], w, "#ff0000ff",directed));
+			out.println(KMLArrow.printArrow(p, w, "#ff0000ff",directed));
 		}
 		
 		kml.printFooterFolder(out);
