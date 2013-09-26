@@ -56,9 +56,18 @@ public class ODMatrixVisual {
 		Logger.logln("75th percentile = "+p75);
 	
 		
+		String dir = Config.getInstance().base_dir+"/ODMatrix";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
+		
+		PrintWriter out = new PrintWriter(new FileWriter(new File(dir+"/viaggi.txt")));
+		
 		for(Move m: list_od.keySet()) {
 			double weight = list_od.get(m);
 			if(!m.sameSourceAndDestination() && weight > p25) {
+				
+				out.println(m.toCoordString());
+				
 				double[] p1 = new double[]{m.s.getCenterLat(),m.s.getCenterLon()};
 				double[] p2 = new double[]{m.d.getCenterLat(),m.d.getCenterLon()};
 				points.add(new double[][]{p1,p2});
@@ -69,10 +78,9 @@ public class ODMatrixVisual {
 			}
 		}
 		
+		out.close();
 		
-		String dir = Config.getInstance().base_dir+"/ODMatrix";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
+		
 		
 		ArrowsGoogleMaps.draw(dir+"/"+title+".html",title,points,w,directed);
 		printKML(dir+"/"+title+".kml",title,points,w,directed);

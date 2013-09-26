@@ -42,8 +42,8 @@ public class ODMatrixTime {
 				NetworkCell nc1 = nm.get(Long.parseLong(cells[i-1]));
 				NetworkCell nc2 = nm.get(Long.parseLong(cells[i]));
 				
-				System.out.print(nc1.getBarycentreLongitude()+","+nc1.getBarycentreLatitude()+" ---> ");
-				System.out.println(nc2.getBarycentreLongitude()+","+nc2.getBarycentreLatitude());
+				//System.out.print(nc1.getBarycentreLongitude()+","+nc1.getBarycentreLatitude()+" ---> ");
+				//System.out.println(nc2.getBarycentreLongitude()+","+nc2.getBarycentreLatitude());
 				
 				Region r1 = rm.get(nc1.getBarycentreLongitude(), nc1.getBarycentreLatitude());
 				Region r2 = rm.get(nc2.getBarycentreLongitude(), nc2.getBarycentreLatitude());
@@ -61,6 +61,12 @@ public class ODMatrixTime {
 		}
 		br.close();
 		
+		/*
+		for(Move m: list_od.keySet()) {
+			if(!m.sameSourceAndDestination())
+				System.out.println(m.toCoordString());
+		}
+		*/
 		
 		ODMatrixVisual.draw("ODMatrixTime_"+file, list_od,false);
 		
