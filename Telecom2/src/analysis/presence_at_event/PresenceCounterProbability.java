@@ -42,7 +42,7 @@ public class PresenceCounterProbability {
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
 		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
-
+		Map<String,Double> bestRadiusIE = PlacemarkRadiusExtractorIndividualEvent.readBestR();	
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
 		//create a map that associates a Placemark with the list of events happening in there
@@ -71,7 +71,8 @@ public class PresenceCounterProbability {
 			int i = 0;
 			for(CityEvent ce: pevents) {
 				double bestr = bestRadius.get(ce.spot.name);
-				ce.spot.changeRadius(bestr);
+				double bestrIE = bestRadiusIE.get(ce.toString());
+				ce.spot.changeRadius(bestrIE);
 				
 				double c = count(ce,o_radius,days);
 				

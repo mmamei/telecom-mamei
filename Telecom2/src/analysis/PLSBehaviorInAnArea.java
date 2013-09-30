@@ -178,28 +178,29 @@ public class PLSBehaviorInAnArea {
 	
 		GraphPlotter[] gps =  GraphPlotter.drawMultiGraph(nrows, ncols, "events around "+title, titles, "hour", "n.", labels, domains, data);
 		
-		// draw events' annotations 
-		Calendar cal = (Calendar)plsmap.startTime.clone();
-		int i = 0;
-		next_event:
-		for(CityEvent e: relevantEvents) {
-			for(;i<plsmap.getHours();i++) {
-				boolean after_event = cal.after(e.et);
-				boolean in_event = e.st.before(cal) && e.et.after(cal);
-				if(in_event) {
-					for(GraphPlotter gp: gps){
-						String label = e.st.get(Calendar.DAY_OF_MONTH)+" "+MONTHS[e.st.get(Calendar.MONTH)];
-						gp.addAnnotation(label,i+0.5*e.durationH(),2);
+		if(relevantEvents!=null) {
+			// draw events' annotations 
+			Calendar cal = (Calendar)plsmap.startTime.clone();
+			int i = 0;
+			next_event:
+			for(CityEvent e: relevantEvents) {
+				for(;i<plsmap.getHours();i++) {
+					boolean after_event = cal.after(e.et);
+					boolean in_event = e.st.before(cal) && e.et.after(cal);
+					if(in_event) {
+						for(GraphPlotter gp: gps){
+							String label = e.st.get(Calendar.DAY_OF_MONTH)+" "+MONTHS[e.st.get(Calendar.MONTH)];
+							gp.addAnnotation(label,i+0.5*e.durationH(),2);
+						}
 					}
-				}
-				cal.add(Calendar.HOUR_OF_DAY, 1);
-				if(after_event || in_event) {
-					i++;
-					continue next_event;
+					cal.add(Calendar.HOUR_OF_DAY, 1);
+					if(after_event || in_event) {
+						i++;
+						continue next_event;
+					}
 				}
 			}
 		}
-		
 		return gps;
 	}
 	

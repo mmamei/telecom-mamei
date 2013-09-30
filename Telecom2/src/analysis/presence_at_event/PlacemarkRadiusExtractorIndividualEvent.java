@@ -37,7 +37,7 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		
 		for(CityEvent e : CityEvent.getEventsInData()) {
 			
-			if(e.spot.name.equals("Stadio Olimpico (TO)")) {
+			if(e.spot.name.equals("Juventus Stadium (TO)")) {
 			    double bestr = getBestRadius(e);
 			    out.println(e+","+bestr);
 			    System.out.println(e+","+bestr);
