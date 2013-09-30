@@ -11,15 +11,23 @@ import network.NetworkMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
+import analysis.presence_at_event.PlacemarkRadiusExtractor;
 import area.CityEvent;
 import area.region.Region;
 import area.region.RegionMap;
 
 public class ODMatrixEventPresence {
 	public static void main(String[] args) throws Exception {
+		process("Juventus Stadium (TO),20/03/2012",2000);
+	}
+	
+	public static void process(String event, double expand) throws Exception {
 		
-		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
-		CityEvent ce_expand = CityEvent.expand(ce, 1, 40000);
+		CityEvent ce = CityEvent.getEvent(event);
+		Map<String,Double> bestR = PlacemarkRadiusExtractor.readBestR();
+		ce.spot.changeRadius(bestR.get(ce.spot.name));
+		
+		CityEvent ce_expand = CityEvent.expand(ce, 1, expand);
 		
 		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+ce.spot.name+".ser");
 		if(!input_obj_file.exists()) {
@@ -44,20 +52,29 @@ public class ODMatrixEventPresence {
 		
 		
 		// READ INFORMATION ABOUT MOVEMENT
-		Map<Move,Double> list_od = new HashMap<Move,Double>();
+		Map<Move,Double> incoming_od = new HashMap<Move,Double>();
+		Map<Move,Double> outgoing_od = new HashMap<Move,Double>();
+		
 		BufferedReader br2 = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent/"+ce_expand.toFileName())));
 		NetworkMap nm = NetworkMap.getInstance();
 		while((line=br2.readLine())!=null) {
 			String user = line.substring(0, line.indexOf(","));
-			Double upp = user_pres_prob.get(user);
-			if(upp == null) upp = 0.0;
+			Double upp = user_pres_prob.get(user); // user presence probability
+			if(upp == null || upp == 0) continue;
 			line = line.substring(line.indexOf(",")+1).trim();
 			String[] cells = line.split(" ");
+			
+			boolean before = true;
 			for(int i=1;i<cells.length;i++) {
 				NetworkCell nc1 = nm.get(Long.parseLong(cells[i-1]));
 				NetworkCell nc2 = nm.get(Long.parseLong(cells[i]));
+				
+				if(ce.spot.contains(nc1.getCellac()) && !ce.spot.contains(nc2.getCellac())) before = false;
+				
 				Region r1 = rm.get(nc1.getBarycentreLongitude(), nc1.getBarycentreLatitude());
 				Region r2 = rm.get(nc2.getBarycentreLongitude(), nc2.getBarycentreLatitude());
+				
+				Map<Move,Double> list_od = before ? incoming_od : outgoing_od;
 				
 				if(r1!=null && r2!=null) {
 					Move m = new Move(r1,r2);
@@ -70,7 +87,7 @@ public class ODMatrixEventPresence {
 		br2.close();
 		
 		
-		ODMatrixVisual.draw("ODMatrixEventPresence_"+ce.toFileName(), list_od,false);
+		ODMatrixVisual.draw("ODMatrixEventPresence_"+ce.toFileName(), incoming_od, outgoing_od, true);
 		
 		Logger.logln("Done");
 	}

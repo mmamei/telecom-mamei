@@ -21,8 +21,12 @@ public class CreatorRegionMapGrid {
 		//double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
 		
 		
-		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
-		ce = CityEvent.expand(ce, 1, 40000);
+		//CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
+		//ce = CityEvent.expand(ce, 1, 40000);
+	
+		CityEvent ce = CityEvent.getEvent("Juventus Stadium (TO),20/03/2012");
+		ce = CityEvent.expand(ce, 1, 10000);
+		
 		String name = ce.spot.name;
 		double[][] bbox = ce.spot.getBBox();
 		
