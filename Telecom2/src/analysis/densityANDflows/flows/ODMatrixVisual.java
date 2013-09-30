@@ -25,11 +25,92 @@ import visual.kml.KMLArrow;
 
 public class ODMatrixVisual {
 		
-	
+
 	private static final String ghLoc = "C:/DATASET/graph_hopper";
     private static final String testOsm = "C:/DATASET/graph_hopper/piemonte.pbf";
 	
-	public static void draw(String title, Map<Move,Double> list_od, boolean directed) throws Exception {
+    
+    
+    
+    
+    public static void draw(String title, Map<Move,Double> list_od, boolean directed) throws Exception {
+    	Map<String,Double> map = getSegmentOD(list_od,directed);
+    	
+    	DescriptiveStatistics stats = new DescriptiveStatistics();
+		for(Double x: map.values()) 
+			stats.addValue(x);
+		double p25 = stats.getPercentile(25); 
+		double max = stats.getMax();
+		
+		List<double[][]> points = new ArrayList<double[][]>();
+		List<Double> w = new ArrayList<Double>();	
+		List<String> colors = new ArrayList<String>();
+		
+		for(String k: map.keySet()) {
+			double weight = map.get(k);
+			if(weight > p25) {
+				points.add(toCoord(k));
+				w.add(10 * weight / max);
+				colors.add("#ff0000");
+			}
+		}
+		
+		
+		String dir = Config.getInstance().base_dir+"/ODMatrix";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
+		
+		ArrowsGoogleMaps.draw(dir+"/"+title+".html",title,points,w,colors,false);
+		printKML(dir+"/"+title+".kml",title,points,w,colors,false);
+    }
+    
+    
+    // this is the same method as before but changes color for incoming/outgoing routes
+    public static void draw(String title, Map<Move,Double> incoming_od, Map<Move,Double> outgoing_od, boolean directed) throws Exception {
+    	Map<String,Double> in_map = getSegmentOD(incoming_od,directed);
+    	Map<String,Double> out_map = getSegmentOD(outgoing_od,directed);
+    	
+    	DescriptiveStatistics stats = new DescriptiveStatistics();
+		for(Double x: in_map.values()) 
+			stats.addValue(x);
+		for(Double x: out_map.values()) 
+			stats.addValue(x);
+		double p25 = stats.getPercentile(25); 
+		double max = stats.getMax();
+		
+		List<double[][]> points = new ArrayList<double[][]>();
+		List<Double> w = new ArrayList<Double>();	
+		List<String> colors = new ArrayList<String>();
+		
+		for(String k: in_map.keySet()) {
+			double weight = in_map.get(k);
+			if(weight > p25) {
+				points.add(toCoord(k));
+				w.add(10 * weight / max);
+				colors.add("#ff0000");
+			}
+		}
+		for(String k: out_map.keySet()) {
+			double weight = out_map.get(k);
+			if(weight > p25) {
+				points.add(toCoord(k));
+				w.add(10 * weight / max);
+				colors.add("#0000ff");
+			}
+		}
+		
+		
+		String dir = Config.getInstance().base_dir+"/ODMatrix";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
+		
+		ArrowsGoogleMaps.draw(dir+"/"+title+".html",title,points,w,colors,false);
+		printKML(dir+"/"+title+".kml",title,points,w,colors,false);
+    }
+    
+    
+    
+	private static Map<String,Double> getSegmentOD(Map<Move,Double> list_od, boolean directed) throws Exception {
 		
 		GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager("CAR")).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
 		gh.setPreciseIndexResolution(10000); // to be set about the grid size
@@ -90,48 +171,17 @@ public class ODMatrixVisual {
 			}
 		}
 		
-		
-	
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		for(Double x: map.values()) 
-			stats.addValue(x);
-		double p25 = stats.getPercentile(25); 
-		double p50 = stats.getPercentile(50); 
-		double p75 = stats.getPercentile(75); 
-		double max = stats.getMax();
-		
-		List<double[][]> points = new ArrayList<double[][]>();
-		List<Double> w = new ArrayList<Double>();		
-		for(String k: map.keySet()) {
-			double weight = map.get(k);
-			if(weight > p25) {
-				points.add(toCoord(k));
-				/*
-				if(weight < p50) w.add(1.0);
-				else if(weight < p75) w.add(4.0);
-				else w.add(8.0);	
-				*/
-				w.add(10 * weight / max);
-			}
-		}
-		
-		
-		String dir = Config.getInstance().base_dir+"/ODMatrix";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
-		
-		ArrowsGoogleMaps.draw(dir+"/"+title+".html",title,points,w,false);
-		printKML(dir+"/"+title+".kml",title,points,w,false);
+		return map;
 	}
 	
 	
 	
 	
-	public static String toKey(double[][] segment) {
+	private static String toKey(double[][] segment) {
 		String k =  segment[0][0]+","+segment[0][1]+","+segment[1][0]+","+segment[1][1];
 		return k;
 	}
-	public static double[][] toCoord(String k) {
+	private static double[][] toCoord(String k) {
 		String[] e = k.split(",");
 		double[][] segment = new double[2][2];
 		segment[0][0] = Double.parseDouble(e[0]);
@@ -142,20 +192,31 @@ public class ODMatrixVisual {
 	}
 	
 	
-	public static void printKML(String file, String title, List<double[][]> points, List<Double> weights, boolean directed) throws Exception {
+	private static void printKML(String file, String title, List<double[][]> points, List<Double> weights, List<String> colors, boolean directed) throws Exception {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 		KML kml = new KML();
 		kml.printHeaderFolder(out, title);
-		
+		kml.printFolder(out, "incoming");
 		for(int i=0; i<points.size();i++) {
 			double[][] p = points.get(i);
 			double w = weights.get(i);
+			if(i>0 && !colors.get(i).equals(colors.get(i-1))) {
+				kml.closeFolder(out);
+				kml.printFolder(out, "outgoing");
+			}
 			//out.println(KMLArrow.printArrow(p[0][1], p[0][0], p[1][1], p[1][0], w, "#ff0000ff",directed));
-			out.println(KMLArrow.printArrow(p, w, "#ff0000ff",directed));
+			out.println(KMLArrow.printArrow(p, w, html2kmlColor(colors.get(i)),directed));
 		}
-		
+		kml.closeFolder(out);
 		kml.printFooterFolder(out);
 		out.close();
 	}
+	
+	private static String html2kmlColor(String rgb) {
+    	String r = rgb.substring(1,3);
+    	String g = rgb.substring(3,5);
+    	String b = rgb.substring(5);
+    	return "#ff"+b+g+r;
+    }
 	
 }

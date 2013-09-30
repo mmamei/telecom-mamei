@@ -11,9 +11,8 @@ import utils.Logger;
 public class ArrowsGoogleMaps {
 	
 	public static int zoom = 12;
-	public static String color = "#FF0000";
 	
-	public static void draw(String file,String title,List<double[][]> points,List<Double> w, boolean directed) throws Exception {
+	public static void draw(String file,String title,List<double[][]> points,List<Double> w, List<String> colors, boolean directed) throws Exception {
 		PrintWriter out = new PrintWriter(new FileWriter(file));
 		out.println("<html>");
 		out.println("<head>");
@@ -58,7 +57,7 @@ public class ArrowsGoogleMaps {
 		out.println("};");
 
 		for(int i=0;i<points.size();i++) {
-			drawArrow(out,points.get(i),w.get(i),color,directed);
+			drawArrow(out,points.get(i),w.get(i),colors.get(i),directed);
 		}
 
 		out.println("}");
@@ -75,13 +74,17 @@ public class ArrowsGoogleMaps {
 		out.close();
 	}
 	
-		
+	
 	public static void drawArrow(PrintWriter out, double[][] p, double w, String color, boolean directed){
 		out.println("var line = new google.maps.Polyline({");
 		out.println("path: [");
+		
+		
+		double jitter = color.equals("#0000ff") ? 0.0001 * w : 0;
+		
 		for(int i=0; i<p.length-1;i++)
-			out.println("new google.maps.LatLng("+p[i][0]+","+p[i][1]+"),");
-		out.println("new google.maps.LatLng("+p[p.length-1][0]+","+p[p.length-1][1]+")");
+			out.println("new google.maps.LatLng("+(p[i][0]+jitter)+","+(p[i][1]+jitter)+"),");
+		out.println("new google.maps.LatLng("+(p[p.length-1][0]+jitter)+","+(p[p.length-1][1]+jitter)+")");
 		out.println("],");
 		
 		out.println("strokeColor: '"+color+"',");
@@ -103,15 +106,17 @@ public class ArrowsGoogleMaps {
 		
 		List<double[][]> points = new ArrayList<double[][]>();
 		List<Double> w = new ArrayList<Double>();
+		List<String> colors = new ArrayList<String>();
 		
 		points.add(new double[][]{{22.291, 153.027},{18.291, 153.027}});
 		w.add(2.0);
+		colors.add("#ff0000");
 		
 		points.add(new double[][]{{22.291, 153.027},{18.491, 153.427}});
 		w.add(3.0);
+		colors.add("#00ff");
 		
-		
-		draw(Config.getInstance().base_dir+"/arrows.html","Arrow Map Example",points,w,false);
+		draw(Config.getInstance().base_dir+"/arrows.html","Arrow Map Example",points,w,colors,false);
 		Logger.log("Done!");
 	}
 	
