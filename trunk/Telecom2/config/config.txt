@@ -26,4 +26,4 @@ base_dir = C:/BASE
 placemarks_file = config/placemarks.csv
 
 // File with the events happening in the city
-events_file = config/cityevents.csv
+events_file = config/cityevents_piem.csv

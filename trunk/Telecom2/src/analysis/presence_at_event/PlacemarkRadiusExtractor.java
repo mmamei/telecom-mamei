@@ -51,7 +51,7 @@ public class PlacemarkRadiusExtractor {
 	
 	public static void main(String[] args) throws Exception { 
 		
-		Map<String,Double> bestRadius = new HashMap<String,Double>();
+		//Map<String,Double> bestRadius = new HashMap<String,Double>();
 		
 		String odir = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor";
 		new File(odir).mkdirs();
@@ -61,7 +61,7 @@ public class PlacemarkRadiusExtractor {
 			Placemark p = Placemark.getPlacemark(pn);
 		    double bestr = getBestRadius(p);
 		    out.println(pn+","+bestr);
-		    bestRadius.put(pn, bestr);
+		    //bestRadius.put(pn, bestr);
 		} 
 		
 		out.close();

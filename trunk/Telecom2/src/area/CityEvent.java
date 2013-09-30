@@ -57,9 +57,17 @@ public class CityEvent {
 	}
 	
 	
+	/*
+	 * This method retrieves only those events that happen in a time covered by PLS data
+	 */
 	
 	public static List<CityEvent> getEventsInData() {
 		
+		/*
+		 * create a map with the days covered by the dataset
+		 * key = 2013/Jul/18
+		 * values = 0-0-1-1-2-2-3-3-4-4-5-5-6-6-7-7-8-.... 23
+		 */
 		Map<String,String> ad = AnalyzePLSCoverage.compute();
 
 		if(CITY_EVENTS == null) init();
