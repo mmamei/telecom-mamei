@@ -3,6 +3,7 @@ package visual.java;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +13,13 @@ import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.HighLowRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RefineryUtilities;
@@ -27,11 +28,10 @@ public class GraphPlotter {
 	
 	private XYSeriesCollection dataset;
 	private ChartPanel chartpanel;
-
+	
 	public GraphPlotter(String title, String xlabel, String ylabel, String[] domain) {
 		dataset = new XYSeriesCollection();
 		dataset.setAutoWidth(true);
-
 		JFreeChart jfreechart = ChartFactory.createXYAreaChart(title, xlabel, ylabel, dataset, PlotOrientation.VERTICAL, true, true, false);
 		jfreechart.setBackgroundPaint(Color.white);
 		XYPlot plot = (XYPlot) jfreechart.getPlot();
@@ -72,12 +72,22 @@ public class GraphPlotter {
 	public ChartPanel getChart() {
 		return chartpanel;
 	}
+	
+	public void save(String file) {
+		try {
+			Thread.sleep(1000); // avoid concurrent modification, by waiting the graph to be displayed
+			ChartUtilities.saveChartAsPNG(new File(file), chartpanel.getChart(), 980, 550);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	
 	public static void main(String args[]) throws Exception {
 		GraphPlotter gp = drawGraph("Main Frame","Title", "s1", "xlabel", "ylabel",new String[]{"a","b","c","d"},new double[]{1,4,9,16});
 		gp.addData("s2",new double[]{1,2,3,4});
 		gp.addAnnotation("marco", 2.3, 2);
+		//gp.save("x.png");
 		
 		
 		List<String[]> domains = new ArrayList<String[]>();
