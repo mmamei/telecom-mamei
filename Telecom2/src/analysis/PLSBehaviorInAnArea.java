@@ -135,6 +135,35 @@ public class PLSBehaviorInAnArea {
 	}
 	
 	
+	
+	public static GraphPlotter drawGraph(String title, String[] domain, double[] data, PLSMap plsmap, List<CityEvent> relevantEvents) {
+		
+		GraphPlotter gps =  GraphPlotter.drawGraph("events around "+title, "", "hour", "n.", "", domain, data);
+		
+		if(relevantEvents!=null) {
+			// draw events' annotations 
+			Calendar cal = (Calendar)plsmap.startTime.clone();
+			int i = 0;
+			next_event:
+			for(CityEvent e: relevantEvents) {
+				for(;i<plsmap.getHours();i++) {
+					boolean after_event = cal.after(e.et);
+					boolean in_event = e.st.before(cal) && e.et.after(cal);
+					if(in_event) {
+						String label = e.st.get(Calendar.DAY_OF_MONTH)+" "+MONTHS[e.st.get(Calendar.MONTH)];
+						gps.addAnnotation(label,i+0.5*e.durationH(),2);
+					}
+					cal.add(Calendar.HOUR_OF_DAY, 1);
+					if(after_event || in_event) {
+						i++;
+						continue next_event;
+					}
+				}
+			}
+		}
+		return gps;
+	}
+	
 	public static GraphPlotter[] drawGraph(String title, String[] domain, double[] pls_data,double[] usr_data,double[] z_pls_data,double[] z_usr_data, PLSMap plsmap, List<CityEvent> relevantEvents) {
 		List<String> labels = new ArrayList<String>();
 		List<String> titles = new ArrayList<String>();

@@ -5,15 +5,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import pls_parser.PLSEventsAroundAPlacemark;
-
 import utils.Config;
+import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.java.GraphPlotter;
 import analysis.PLSBehaviorInAnArea;
@@ -26,22 +28,23 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 	
 	public static final int MAX_R = 1500;
 	public static final int MIN_R = -500;
-	public static final int STEP = 100;
+	public static final int STEP = 200;
 	
+	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractorIndividualEvent";
 	
 	public static void main(String[] args) throws Exception { 
-	
-		String odir = Config.getInstance().base_dir+"/PlacemarkRadiusExtractorIndividualEvent";
-		new File(odir).mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(new File(odir+"/result.csv")));
+		
+		new File(ODIR).mkdirs();
+		PrintWriter out = new PrintWriter(new FileWriter(new File(ODIR+"/result.csv")));
 		
 		for(CityEvent e : CityEvent.getEventsInData()) {
+					
 			
-			if(e.spot.name.equals("Juventus Stadium (TO)")) {
+			//if(e.spot.name.equals("Juventus Stadium (TO)")) {
 			    double bestr = getBestRadius(e);
 			    out.println(e+","+bestr);
 			    System.out.println(e+","+bestr);
-		    }
+		   // }
 		} 
 		
 		out.close();
@@ -49,13 +52,20 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 	}
 	
 	
-	public static double getBestRadius(CityEvent e) throws Exception {
-		double[][] zXradius = getZXRadius(e);
+	
+	public static double[][] createOrLoadZRadiusDistrib(CityEvent e) throws Exception {
+		double[][] zXradius  = null;
+		// restore
+		File f = new File(ODIR+"/"+e.toFileName()+"/zXradius.ser");
+		if(f.exists()) zXradius = (double[][])CopyAndSerializationUtils.restore(f);
+		else {
+			//create
+			File d = new File(ODIR+"/"+e.toFileName());
+			if(!d.exists()) d.mkdirs();
+			zXradius = getZXRadius(e);
+			CopyAndSerializationUtils.save(f, zXradius);
+		}
 		
-		/*
-		for(int i=0; i<zXradius.length;i++)
-			Logger.logln("radius = "+zXradius[i][0]+" --> z = "+zXradius[i][1]);
-		*/
 		String[] domain = new String[zXradius.length];
 		double[] data = new double[zXradius.length];
 		for(int i=0; i<domain.length;i++) {
@@ -63,20 +73,64 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			data[i] = zXradius[i][1];
 		}
 		
-		GraphPlotter.drawGraph(e.toString(), e.toFileName(), "z", "radius", "z", domain, data);
+		GraphPlotter g = GraphPlotter.drawGraph(e.toString(), e.toFileName(), "z", "radius", "z", domain, data);
+		g.save(ODIR+"/"+e.toFileName()+"/z_dist.png");
 		
+		return zXradius;
+	}
+	
+	
+	public static double getBestRadius(CityEvent e) throws Exception {
+		
+		File f = new File(ODIR+"/"+e.toFileName());
+		if(!f.exists()) f.mkdirs();
+		
+		double[][] zXradius = createOrLoadZRadiusDistrib(e);
+		
+		return getWeightedAverageWithThreshold(zXradius);
+		
+	}
+	
+	
+	public static double getWeightedAverage(double[][] zXradius) {
 		double avg_r = 0;
-		double cont = 0;
+		double cont = 1; // kind of laplace smoothing
 		for(int i=0; i<zXradius.length;i++) {
-			avg_r = avg_r + zXradius[i][0] * zXradius[i][1];
-			cont = cont + zXradius[i][1];
+				avg_r = avg_r + zXradius[i][0] * zXradius[i][1];
+				cont = cont + zXradius[i][1];
 		}
 		avg_r = PlacemarkRadiusExtractor.round(avg_r / cont);
-		
-		//Logger.logln("best radius = "+avg_r);
-		
+			
 		return avg_r;
 	}
+	
+	public static double getWeightedAverageWithThreshold(double[][] zXradius) {
+		double th = 1;
+		double avg_r = 0;
+		double cont = 1; // kind of laplace smoothing
+		for(int i=0; i<zXradius.length;i++) {
+			if(zXradius[i][1] > th) {
+				avg_r = avg_r + zXradius[i][0] * zXradius[i][1];
+				cont = cont + zXradius[i][1];
+			}
+		}
+		avg_r = PlacemarkRadiusExtractor.round(avg_r / cont);
+			
+		return avg_r;
+	}
+	
+	public static double getMax(double[][] zXradius) {
+		double maxR = zXradius[0][0];
+		double maxZ = zXradius[0][1];
+		for(int i=1; i<zXradius.length;i++) {
+			if(zXradius[i][1] > maxZ) {
+				maxR = zXradius[i][0];
+				maxZ = zXradius[i][1];
+			}
+		}
+		return maxR;
+	}
+	
 	
 	
 	public static double[][] getZXRadius(CityEvent e) throws Exception {
@@ -99,6 +153,8 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			PLSMap plsmap = PlacemarkRadiusExtractor.getPLSMap(file,p,max_r);
 			
 			double max_z = 0;
+			double sum_z = 0;
+			double h = 0;
 			
 			if(plsmap.startTime != null) {
 				
@@ -106,8 +162,12 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 				DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
 				//double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0],plsmap.startTime);
 				double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1],plsmap.startTime);
+				List<CityEvent> relevant = new ArrayList<CityEvent>();
+				relevant.add(e);
+							
+				GraphPlotter gs = PLSBehaviorInAnArea.drawGraph(p.name+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevant);
+				gs.save(ODIR+"/"+e.toFileName()+"/maxr="+max_r+".png");
 				
-				//PLSBehaviorInAnArea.drawGraph(p.name+"_"+max_r,plsmap.getDomain(),null,z_usr_data,null,z_usr_data,plsmap,null);
 				
 				Calendar cal = (Calendar)plsmap.startTime.clone();
 				
@@ -115,18 +175,20 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 					
 					if(cal.after(e.et)) break; // we are already after the event
 					
-					if(e.st.before(cal) && e.et.after(cal)) 
+					if(e.st.before(cal) && e.et.after(cal)) {
 						max_z = Math.max(max_z, z_usr_data[i]);
+						sum_z = sum_z + z_usr_data[i];
+						h ++;
+					}
 						
 					cal.add(Calendar.HOUR_OF_DAY, 1);
 				}
 			
 			}
 			zXradius[index][0] = max_r;
+			//zXradius[index][1] = sum_z/h;
 			zXradius[index][1] = max_z;
-			
 			index++;
-			
 		}
 		
 		
@@ -136,7 +198,7 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 	
 	public static Map<String,Double> readBestR() throws Exception {
 		Map<String,Double> best = new HashMap<String,Double>();
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractorIndividualEvent/result_piem.csv")));
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractorIndividualEvent/result.csv")));
 		String line;
 		while((line = br.readLine())!=null) {
 			String[] e = line.split(",");

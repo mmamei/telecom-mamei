@@ -69,6 +69,7 @@ public class PresenceCounterProbability {
 			List<CityEvent> pevents =  placemark_events.get(p);
 			double[][] result = new double[pevents.size()][2];
 			int i = 0;
+			
 			for(CityEvent ce: pevents) {
 				double bestr = bestRadius.get(ce.spot.name);
 				double bestrIE = bestRadiusIE.get(ce.toString());
@@ -83,6 +84,7 @@ public class PresenceCounterProbability {
 				i++;
 				//System.exit(0);
 			}
+			
 			data.add(result);
 		}
 		
