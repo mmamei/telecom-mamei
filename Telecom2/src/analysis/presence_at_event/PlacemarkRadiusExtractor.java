@@ -41,11 +41,14 @@ public class PlacemarkRadiusExtractor {
 	public static final String[] pnames = new String[]{
 		//"Juventus Stadium (TO)"//,"Stadio Olimpico (TO)",
 		//"Stadio Silvio Piola (NO)",
-		"Stadio San Siro (MI)",
+		//"Stadio San Siro (MI)",
 		//"Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"
-		};
-	
-	
+		"Stadio Olimpico (TO)",
+		"Piazza San Carlo (TO)",
+		"Piazza Castello (TO)",
+		"Piazza Vittorio (TO)",
+		"Parco Dora (TO)"
+	};
 	
 	public static final double z_threshold = 2;
 	

@@ -18,6 +18,8 @@ import network.NetworkMap;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import analysis.presence_at_event.PlacemarkRadiusExtractor;
+
 import pre_delete.ReleventCellsExtractor;
 
 
@@ -88,6 +90,7 @@ public class Placemark {
 		BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().placemarks_file));
 		String line;
 		while((line = br.readLine())!=null) {
+			if(line.startsWith("//") || line.trim().length() < 3) continue;
 			String[] el = line.split(",");
 			String name = el[0].trim();
 			double lat = Double.parseDouble(el[1].trim());
@@ -162,12 +165,13 @@ public class Placemark {
 	
 	
 	public static void main(String[] args) throws Exception {
-		Map<String,Double> bestRadius = (Map<String,Double>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.ser"));
+		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
 		initPlacemaks();
 		for(String name: PLACEMARKS.keySet()) {
 			Placemark x = Placemark.getPlacemark(name);
 			System.out.println(name);
-			double bestr = bestRadius.get(name);
+			//double bestr = bestRadius.get(name);
+			double bestr = 0;
 			x.changeRadius(bestr);
 			String dir = Config.getInstance().base_dir+"/Placemark";
 			File d = new File(dir);
