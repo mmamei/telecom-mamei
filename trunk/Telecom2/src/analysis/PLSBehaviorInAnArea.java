@@ -23,6 +23,7 @@ import utils.Config;
 import utils.Logger;
 import visual.java.GraphPlotter;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
+import analysis.presence_at_event.PlacemarkRadiusExtractorIndividualEvent;
 import area.CityEvent;
 import area.Placemark;
 
@@ -36,22 +37,28 @@ public class PLSBehaviorInAnArea {
 	
 	static String[] pnames = new String[]{
 		//"Juventus Stadium (TO)",
-		//"Stadio Olimpico (TO)",
-		"Stadio Silvio Piola (NO)", 
+		"Stadio Olimpico (TO)",
+		//"Stadio Silvio Piola (NO)", 
 		//"Stadio San Siro (MI)",
 		//"Stadio Atleti Azzurri d'Italia (BG)",
 		//"Stadio Mario Rigamonti (BS)",
-		//"Stadio Franco Ossola (VA)"
+		//"Stadio Franco Ossola (VA)",
+		"Piazza San Carlo (TO)",
+		"Piazza Castello (TO)",
+		"Piazza Vittorio (TO)",
+		"Parco Dora (TO)"
+		
 	};
 	
 	public static void main(String[] args) throws Exception { 
 		
 		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
+		Map<String,Double> bestRadiusIE = PlacemarkRadiusExtractorIndividualEvent.readBestR();	
 		
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
-			double bestr = bestRadius.get(pn);
-			bestr = -300;
+			//double bestr = bestRadiusIE.get(pn);
+			double bestr = 0;
 			System.out.println("BEST RADIUS = "+bestr);
 			p.changeRadius(bestr);
 			process(p);
@@ -283,7 +290,7 @@ public class PLSBehaviorInAnArea {
 		Calendar cal = (Calendar)startTime.clone();
 		double[] vals = stat.getValues();
 		for(int i=0; i<vals.length;i++) {
-			if(cal.get(Calendar.HOUR_OF_DAY) > 10)
+			if(cal.get(Calendar.HOUR_OF_DAY) > 10 && vals[i] > 0)
 				stat2.addValue(vals[i]);
 			cal.add(Calendar.HOUR_OF_DAY, 1);
 		}
