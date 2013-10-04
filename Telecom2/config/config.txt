@@ -7,10 +7,10 @@
 // according to Windows-like systems, to avoid errors.
 
 // File di rete
-network_map_file = C:/DATASET/PLS/file_rete/dfl_network_20120406.txt
+network_map_file = C:/DATASET/PLS/file_rete/dfl_network_20130516.txt
 
 // File di rete serializzato
-network_map_bin = C:/BASE/cache/network.bin
+network_map_bin = C:/BASE/cache/network2013.bin
 
 // Cartella con i PLS
 pls_folder = C:/DATASET/PLS/file_pls/file_pls_piem/2013

@@ -37,15 +37,15 @@ public class PLSBehaviorInAnArea {
 	
 	static String[] pnames = new String[]{
 		//"Juventus Stadium (TO)",
-		"Stadio Olimpico (TO)",
+		//"Stadio Olimpico (TO)",
 		//"Stadio Silvio Piola (NO)", 
 		//"Stadio San Siro (MI)",
 		//"Stadio Atleti Azzurri d'Italia (BG)",
 		//"Stadio Mario Rigamonti (BS)",
 		//"Stadio Franco Ossola (VA)",
-		"Piazza San Carlo (TO)",
-		"Piazza Castello (TO)",
-		"Piazza Vittorio (TO)",
+		//"Piazza San Carlo (TO)",
+		//"Piazza Castello (TO)",
+		//"Piazza Vittorio (TO)",
 		"Parco Dora (TO)"
 		
 	};
@@ -58,7 +58,7 @@ public class PLSBehaviorInAnArea {
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
 			//double bestr = bestRadiusIE.get(pn);
-			double bestr = 0;
+			double bestr = 1500;
 			System.out.println("BEST RADIUS = "+bestr);
 			p.changeRadius(bestr);
 			process(p);

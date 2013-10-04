@@ -91,6 +91,20 @@ public class NetworkMap {
 		return dist/count;
 	}
 	
+	
+	public int getNumCells(LatLonPoint c, double radius) {
+		double d = Math.toDegrees(radius/1000/earth_radius);
+		Point<Double> lower_point = new GenericPoint<Double>(c.getLatitude()-d,c.getLongitude()-d);
+		Point<Double> upper_point = new GenericPoint<Double>(c.getLatitude()+d,c.getLongitude()+d);
+		Iterator<Map.Entry<Point<Double>,NetworkCell>> iter = rangetree.iterator(lower_point, upper_point);
+		int count = 0;
+		while(iter.hasNext()) {
+			iter.next();
+			count++;
+		}
+		return count;
+	}
+	
 	// radius in meters
 	public void printKML(String file, double[] center, double radius) throws Exception {
 		double d = Math.toDegrees(radius/1000/earth_radius);
