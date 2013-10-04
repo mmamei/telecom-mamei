@@ -70,7 +70,7 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		double[] data = new double[zXradius.length];
 		for(int i=0; i<domain.length;i++) {
 			domain[i] = ""+zXradius[i][0];
-			data[i] = zXradius[i][1];
+			data[i] = zXradius[i][1] / zXradius[0][1];
 		}
 		
 		GraphPlotter g = GraphPlotter.drawGraph(e.toString(), e.toFileName(), "z", "radius", "z", domain, data);
@@ -87,14 +87,13 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		
 		double[][] zXradius = createOrLoadZRadiusDistrib(e);
 		
-		return getWeightedAverageWithThreshold(zXradius);
-		
+		return getWeightedAverageWithThreshold(zXradius,1.5);
 	}
 	
 	
 	public static double getWeightedAverage(double[][] zXradius) {
 		double avg_r = 0;
-		double cont = 1; // kind of laplace smoothing
+		double cont = 1.5; // kind of laplace smoothing
 		for(int i=0; i<zXradius.length;i++) {
 				avg_r = avg_r + zXradius[i][0] * zXradius[i][1];
 				cont = cont + zXradius[i][1];
@@ -104,19 +103,18 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		return avg_r;
 	}
 	
-	public static double getWeightedAverageWithThreshold(double[][] zXradius) {
-		double th = 1;
+	public static double getWeightedAverageWithThreshold(double[][] zXradius,double th) {
 		double avg_r = 0;
-		double cont = 1; // kind of laplace smoothing
+		double cont = 0;
 		for(int i=0; i<zXradius.length;i++) {
-			if(zXradius[i][1] > th) {
+			if(zXradius[0][1] == 0 || zXradius[i][1]/zXradius[0][1] > th) {
 				avg_r = avg_r + zXradius[i][0] * zXradius[i][1];
 				cont = cont + zXradius[i][1];
 			}
 		}
-		avg_r = PlacemarkRadiusExtractor.round(avg_r / cont);
-			
-		return avg_r;
+		
+		if(cont == 0) return -100;
+		else return PlacemarkRadiusExtractor.round(avg_r / cont);
 	}
 	
 	public static double getMax(double[][] zXradius) {
@@ -161,7 +159,7 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			
 				DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
 				//double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0],plsmap.startTime);
-				double[] z_usr_data =  PLSBehaviorInAnArea.getZ(stats[1],plsmap.startTime);
+				double[] z_usr_data =  PLSBehaviorInAnArea.getZ2(stats[1],plsmap.startTime);
 				List<CityEvent> relevant = new ArrayList<CityEvent>();
 				relevant.add(e);
 							
