@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import pls_parser.AnalyzePLSCoverage;
@@ -77,8 +78,11 @@ public class CityEvent {
 			String[] s = get(ce.st);
 			String[] e = get(ce.et);
 			
-			if(ad.get(s[0])!=null && ad.get(s[0]).contains(s[1]) &&
-			   ad.get(e[0])!=null && ad.get(e[0]).contains(e[1]))
+			String key_s = ce.spot.region+"-"+s[0];
+			String key_e = ce.spot.region+"-"+e[0];
+			
+			if(ad.get(key_s)!=null && ad.get(key_s).contains(s[1]) &&
+			   ad.get(key_e)!=null && ad.get(key_e).contains(e[1]))
 				result.add(ce);
 		}
 		
@@ -107,7 +111,7 @@ public class CityEvent {
 	
 	
 	public static void init() {
-		CITY_EVENTS = new HashMap<String,CityEvent>();
+		CITY_EVENTS = new HashMap<String,CityEvent>();		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().events_file));
 			String line;
@@ -118,7 +122,8 @@ public class CityEvent {
 				String start = el[1].trim();
 				String end = el[2].trim();
 				int hc = Integer.parseInt(el[3].trim());
-				CITY_EVENTS.put(placemark+","+start.substring(0, start.indexOf(" ")),new CityEvent(Placemark.getPlacemark(placemark),start,end,hc));
+				CityEvent ce = new CityEvent(Placemark.getPlacemark(placemark),start,end,hc);
+				CITY_EVENTS.put(placemark+","+start.substring(0, start.indexOf(" ")),ce);
 			}
 			br.close();
 		}catch(Exception e) {
@@ -126,6 +131,29 @@ public class CityEvent {
 		}
 	}
 	
+	/*
+	private static final SimpleDateFormat F2 = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
+	public static boolean isInCoverage(CityEvent ce, Map<String,String> coverage) {
+		boolean startCovered = false;
+		boolean endCovered = false;
+		for(String key: coverage.keySet()) {
+			String[] elements = key.split("-");
+			String region = elements[0];
+			String day = elements[1];
+			String hours = coverage.get(key);
+			if(ce.spot.region.equals(region)) {
+				String start_day = F2.format(ce.st.getTime());
+				String start_h = ce.st.get(Calendar.HOUR_OF_DAY)+"-";
+				String end_day = F2.format(ce.et.getTime());
+				String end_h = ce.et.get(Calendar.HOUR_OF_DAY)+"-";
+				if(start_day.equals(day) && hours.contains(start_h)) startCovered = true;
+				if(end_day.equals(day) && hours.contains(end_h)) endCovered = true;
+				if(startCovered && endCovered) break;
+			} 
+		}
+		return startCovered && endCovered;
+	}
+	*/
 	
 	public CityEvent(Placemark spot, Calendar st, Calendar et,int head_count) {
 		this.spot = spot;
@@ -188,7 +216,7 @@ public class CityEvent {
 	
 	
 	public static CityEvent expand(CityEvent ce, int time_shift, double space_shift) {
-		Placemark p = new Placemark(ce.spot.name,ce.spot.center,ce.spot.radius+space_shift);
+		Placemark p = new Placemark(ce.spot.region,ce.spot.name,ce.spot.center,ce.spot.radius+space_shift);
 		Calendar st = (Calendar)ce.st.clone();
 		st.add(Calendar.HOUR_OF_DAY, -time_shift);
 		Calendar et = (Calendar)ce.et.clone();
@@ -198,7 +226,7 @@ public class CityEvent {
 	}
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Collection<CityEvent> coll = getEventsInData();
 		for(CityEvent ce : coll)
 			System.out.println(ce);

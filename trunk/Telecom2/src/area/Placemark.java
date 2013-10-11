@@ -35,13 +35,15 @@ public class Placemark {
 	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
 	private static Map<String,Placemark> PLACEMARKS = null;
 	
+	public String region;
 	public String name;
 	public double[] center;
 	public LatLonPoint center_point;
 	public double radius;
 	public Set<String> cellsAround;
 	
-	public Placemark(String name, double[] point, double radius) {
+	public Placemark(String region, String name, double[] point, double radius) {
+		this.region = region;
 		this.name = name;
 		this.center = point;
 		center_point = new LatLonPoint(center[0],center[1]);
@@ -50,7 +52,7 @@ public class Placemark {
 	}
 	
 	public Placemark clone() {
-		return new Placemark(name,center,radius);
+		return new Placemark(region,name,center,radius);
 	}
 	
 	public boolean equals(Object o) {
@@ -93,11 +95,12 @@ public class Placemark {
 		while((line = br.readLine())!=null) {
 			if(line.startsWith("//") || line.trim().length() < 3) continue;
 			String[] el = line.split(",");
-			String name = el[0].trim();
-			double lat = Double.parseDouble(el[1].trim());
-			double lon = Double.parseDouble(el[2].trim());
-			double r = Double.parseDouble(el[3].trim());
-			PLACEMARKS.put(name, new Placemark(name, new double[]{lat,lon},r));
+			String region = el[0].trim();
+			String name = el[1].trim();
+			double lat = Double.parseDouble(el[2].trim());
+			double lon = Double.parseDouble(el[3].trim());
+			double r = Double.parseDouble(el[4].trim());
+			PLACEMARKS.put(name, new Placemark(region,name, new double[]{lat,lon},r));
 		}
 		br.close();
 		} catch(Exception e) {
