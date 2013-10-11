@@ -15,13 +15,16 @@ import java.util.Set;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 
 import org.gps.utils.LatLonUtils;
 
 import utils.Config;
 
 public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
-
+	
+	static NetworkMap NM = null;
+	
 	private String username;
 	private String imsi;
 	private long cellac;
@@ -32,6 +35,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 		this.imsi = imsi;
 		this.cellac = cellac;
 		this.timestamp = Long.parseLong(timestamp);
+		if(NM == null) NM = NetworkMapFactory.getNetworkMap(getTime());
 	}
 	
 	public PlsEvent clone(){
@@ -89,18 +93,18 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	}
 	
 	public String toKml(){
-		NetworkCell c = NetworkMap.getInstance().get(cellac);
+		NetworkCell c = NM.get(cellac);
 		return c.toKml();
 	}
 	
 	public String toString(){
-		NetworkCell nc = NetworkMap.getInstance().get(cellac);
+		NetworkCell nc = NM.get(cellac);
 		String cn = nc == null ? "null" : nc.getCellName();
 		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+cn;
 	}
 	
 	public String toCSV(){
-		NetworkCell nc = NetworkMap.getInstance().get(cellac);
+		NetworkCell nc = NM.get(cellac);
 		String cn = nc == null ? "null" : nc.getCellName();
 		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+cn;
 	}
@@ -168,10 +172,10 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 			c.add(e.clone());
 		return c;
 	}
+
 	
-	static NetworkMap nm = NetworkMap.getInstance();
-	public double spatialDistance(PlsEvent x) {
-		return LatLonUtils.getHaversineDistance(nm.get(cellac).getPoint(),nm.get(x.cellac).getPoint());
+	public double spatialDistance(PlsEvent x) {		
+		return LatLonUtils.getHaversineDistance(NM.get(cellac).getPoint(),NM.get(x.cellac).getPoint());
 	}
 	
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -31,10 +32,10 @@ public class ODMatrixTime {
 		Map<Move,Double> list_od = new HashMap<Move,Double>();
 		
 		String file = "Stadio_Silvio_Piola_(NO)-11_03_2012_18_00-12_03_2012_00_00.txt";//"Torino-11_03_2012_17_00-11_03_2012_19_00.txt";
+		NetworkMap nm = NetworkMapFactory.getNetworkMap("11/03/2012");
+		
 		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent/"+file)));
 		String line;
-		NetworkMap nm = NetworkMap.getInstance();
-		
 		while((line=br.readLine())!=null) {
 			line = line.substring(line.indexOf(",")+1).trim();
 			String[] cells = line.split(" ");

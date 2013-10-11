@@ -42,8 +42,7 @@ public class Config {
 	
 	
 	
-	public String network_map_file = null;
-	public String network_map_bin = null;
+	public String network_map_dir = null;
 	public String pls_folder = null;
 	public Calendar pls_start_time = null;
 	public Calendar	pls_end_time = null;
@@ -52,14 +51,8 @@ public class Config {
 	public String events_file = null;
 	
 	private void parse(String name, String value) {
-		if(name.equals("network_map_file")) {
-			network_map_file = value;
-		}
-		else if(name.equals("network_map_bin")) {
-			network_map_bin = value;
-			// get dir
-			File f = new File(network_map_bin.substring(0,network_map_bin.lastIndexOf("/")));
-			f.mkdirs();
+		if(name.equals("network_map_dir")) {
+			network_map_dir = value;
 		}
 		else if(name.equals("pls_folder")) {
 			pls_folder = value;

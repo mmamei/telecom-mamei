@@ -8,6 +8,7 @@ import java.util.Map;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -56,7 +57,9 @@ public class ODMatrixEventPresence {
 		Map<Move,Double> outgoing_od = new HashMap<Move,Double>();
 		
 		BufferedReader br2 = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent/"+ce_expand.toFileName())));
-		NetworkMap nm = NetworkMap.getInstance();
+		
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(event.substring(event.indexOf(",")+1));
+		
 		while((line=br2.readLine())!=null) {
 			String user = line.substring(0, line.indexOf(","));
 			Double upp = user_pres_prob.get(user); // user presence probability

@@ -16,6 +16,7 @@ import java.util.TreeSet;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.gps.utils.LatLonUtils;
@@ -221,7 +222,7 @@ public class PlacemarkRadiusExtractor {
 	
 	
 	
-	static NetworkMap nm = NetworkMap.getInstance();
+	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
 	public static PLSMap getPLSMap(String file, Placemark p, double maxr) throws Exception {
 		PLSMap plsmap = new PLSMap();
 		String[] splitted;
@@ -239,7 +240,7 @@ public class PlacemarkRadiusExtractor {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
 				String key = PLSBehaviorInAnArea.getKey(cal);
 				String celllac = splitted[3]; 
-				NetworkCell nc = nm.get(Long.parseLong(celllac));
+				NetworkCell nc = NM.get(Long.parseLong(celllac));
 				double dist = LatLonUtils.getHaversineDistance(nc.getPoint(), p.center_point) - nc.getRadius();
 				//System.out.println(dist);
 				

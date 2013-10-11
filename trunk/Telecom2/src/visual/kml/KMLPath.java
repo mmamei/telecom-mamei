@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import network.NetworkMap;
+import network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
 import utils.FilterAndCounterUtils;
@@ -39,7 +40,7 @@ public class KMLPath {
 		Map<String,List<PlsEvent>> evPerDay = splitByDay(s);
 		
 		
-		NetworkMap nm = NetworkMap.getInstance();
+		NetworkMap nm =  NetworkMapFactory.getNetworkMap();
 		
 		kml.printFolder(out, "cells");
 		for(String day: evPerDay.keySet()) {

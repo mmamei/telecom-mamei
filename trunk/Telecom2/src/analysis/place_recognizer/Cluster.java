@@ -9,6 +9,7 @@ import java.util.Map;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
@@ -19,6 +20,8 @@ import analysis.PlsEvent;
 public class Cluster implements Serializable {
 	private List<PlsEvent> events;
 	private Map<String,Double> weights;
+	
+	private static NetworkMap NM = null;
 	
 	public Cluster() {
 		events = new ArrayList<PlsEvent>();
@@ -32,10 +35,12 @@ public class Cluster implements Serializable {
 	
 	public void addAll(Cluster c) {
 		events.addAll(c.getEvents());
+		if(NM == null) NM = NetworkMapFactory.getNetworkMap(c.getEvents().get(0).getTime());
 	}
 	
 	public void add(PlsEvent e) {
 		events.add(e);
+		if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTime());
 	} 
 	
 	public List<PlsEvent> getEvents() {
@@ -75,7 +80,7 @@ public class Cluster implements Serializable {
 		double tot_w = w(weights);
 		double r = 0;
 		for(PlsEvent e: events) {
-			NetworkCell x = NetworkMap.getInstance().get(e.getCellac());
+			NetworkCell x = NM.get(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			r += x.getRadius() * f;
 		}
@@ -89,7 +94,7 @@ public class Cluster implements Serializable {
 		
 		double tot_w = w(weights);
 		for(PlsEvent e: events) {
-			NetworkCell x = NetworkMap.getInstance().get(e.getCellac());
+			NetworkCell x = NM.get(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			aLat += x.getBarycentreLatitude() * f;
 			aLon += x.getBarycentreLongitude() * f;
@@ -107,7 +112,7 @@ public class Cluster implements Serializable {
 		double maxLat=0, maxLon=0;
 		double minLat = Double.MAX_VALUE, minLon = Double.MAX_VALUE;
 		for(PlsEvent e: events){
-			NetworkCell cell = NetworkMap.getInstance().get(e.getCellac());
+			NetworkCell cell = NM.get(e.getCellac());
 			maxLat = Math.max(maxLat, cell.getBarycentreLatitude());
 			maxLon = Math.max(maxLon, cell.getBarycentreLongitude());
 			minLat = Math.min(minLat, cell.getBarycentreLatitude());

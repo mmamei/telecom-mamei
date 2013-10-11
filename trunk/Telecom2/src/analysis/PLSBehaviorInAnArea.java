@@ -43,10 +43,10 @@ public class PLSBehaviorInAnArea {
 		//"Stadio Atleti Azzurri d'Italia (BG)",
 		//"Stadio Mario Rigamonti (BS)",
 		//"Stadio Franco Ossola (VA)",
-		//"Piazza San Carlo (TO)",
+		"Piazza San Carlo (TO)",
 		//"Piazza Castello (TO)",
 		//"Piazza Vittorio (TO)",
-		"Parco Dora (TO)"
+		//"Parco Dora (TO)"
 		
 	};
 	
@@ -58,7 +58,7 @@ public class PLSBehaviorInAnArea {
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
 			//double bestr = bestRadiusIE.get(pn);
-			double bestr = 1500;
+			double bestr = 300;
 			System.out.println("BEST RADIUS = "+bestr);
 			p.changeRadius(bestr);
 			process(p);
@@ -100,7 +100,7 @@ public class PLSBehaviorInAnArea {
 			//double[] pls_data = stats[0].getValues();
 			double[] usr_data = stats[1].getValues();
 			//double[] z_pls_data = getZ(stats[0],plsmap.startTime);
-			double[] z_usr_data =  getZ(stats[1],plsmap.startTime);
+			double[] z_usr_data =  getZ2(stats[1],plsmap.startTime);
 			
 			//StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
 			//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
@@ -137,7 +137,6 @@ public class PLSBehaviorInAnArea {
 			usr_stats.addValue(usr);
 			cal.add(Calendar.HOUR, 1);
 		}
-		
 		return new DescriptiveStatistics[]{pls_stats,usr_stats};
 	}
 	
@@ -270,7 +269,11 @@ public class PLSBehaviorInAnArea {
 		
 		cal = (Calendar)startTime.clone();
 		for(int i=0; i<vals.length;i++) {
-			z[i] = (z[i] - hmeans[cal.get(Calendar.HOUR_OF_DAY)]) / hsigmas[cal.get(Calendar.HOUR_OF_DAY)];
+			
+			if( hsigmas[cal.get(Calendar.HOUR_OF_DAY)] == 0)
+				z[i] = 0;
+			else
+				z[i] = (z[i] - hmeans[cal.get(Calendar.HOUR_OF_DAY)]) / hsigmas[cal.get(Calendar.HOUR_OF_DAY)];
 			cal.add(Calendar.HOUR_OF_DAY, 1);
 		}
 		

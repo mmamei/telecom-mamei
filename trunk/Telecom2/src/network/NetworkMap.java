@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,10 +17,7 @@ import java.util.Set;
 
 import org.gps.utils.LatLonPoint;
 
-import area.Placemark;
-
 import utils.Config;
-import utils.Logger;
 import utils.kdtree.GenericPoint;
 import utils.kdtree.KDTree;
 import utils.kdtree.Point;
@@ -30,20 +29,16 @@ public class NetworkMap {
 	private HashMap<Long, NetworkCell> hm;
 	private KDTree<Double,Point<Double>,NetworkCell> kdtree;
 	private RangeSearchTree<Double,Point<Double>,NetworkCell> rangetree;
-	 
 	
-	private static NetworkMap net = null;
-	
-	
-	private NetworkMap() {
-		try { 
-			ObjectInputStream in_network = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(Config.getInstance().network_map_bin))));
+	NetworkMap(String file) {
+		try {
+			ObjectInputStream in_network = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(file))));
 			hm = (HashMap<Long, NetworkCell>)in_network.readObject();
 			in_network.close();
-			
+				
 			kdtree = new KDTree<Double,Point<Double>,NetworkCell>(2);
 			rangetree = (RangeSearchTree<Double,Point<Double>,NetworkCell>)kdtree;
-			
+				
 			for(NetworkCell cell: hm.values()){
 				Point<Double> cellPoint = new GenericPoint<Double>(cell.getBarycentreLatitude(),cell.getBarycentreLongitude());
 				kdtree.put(cellPoint, cell);
@@ -51,12 +46,6 @@ public class NetworkMap {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static NetworkMap getInstance() {
-		if(net == null) 
-			net = new NetworkMap();
-		return net;
 	}
 	
 	
