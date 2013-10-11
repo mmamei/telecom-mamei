@@ -22,18 +22,11 @@ public class AnalyzePLSCoverage {
 	
 	
 	public static void main(String[] args) {
-		long startTime = System.currentTimeMillis();
-		
 		Map<String,String> allDays = compute();
 		
 		Logger.logln("Days in the dataset:");
 		for(String d:allDays.keySet()) 
 			Logger.logln(d+" = "+allDays.get(d));
-		
-		
-		long endTime = System.currentTimeMillis();
-		int mins = (int)((endTime - startTime) / 60000);
-		Logger.logln("Completed after "+mins+" mins");
 	}
 	
 	
@@ -65,13 +58,27 @@ public class AnalyzePLSCoverage {
 				int day =  cal.get(Calendar.DAY_OF_MONTH);
 				String sday = day < 10 ? "0"+day : ""+day;
 				
-				String key = cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
+				String key = getRegion(item)+"-"+cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
+				
 				String h = allDays.get(key);
-						
-				allDays.put(key, h==null? cal.get(Calendar.HOUR_OF_DAY)+"-" : h+cal.get(Calendar.HOUR_OF_DAY)+"-");
+				
+				if(h == null) h = "";
+				if(!h.contains(cal.get(Calendar.HOUR_OF_DAY)+"-")) 
+					h =  h + cal.get(Calendar.HOUR_OF_DAY)+"-";
+			
+				allDays.put(key, h);
 			}
 			else if(item.isDirectory())
 				analyzeDirectory(item,allDays);
 		}	
 	}
+	
+	
+	static final String[] REGIONS = new String[]{"piem","lomb","ve","fi"};
+	public static String getRegion(File f) {
+		for(String r: REGIONS)
+			if(f.getAbsolutePath().contains(r)) return r;
+		return "nan";
+	}
+	
 }
