@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import network.NetworkMap;
+import network.NetworkMapFactory;
 
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
@@ -84,14 +85,14 @@ public class PlaceRecognizerEvaluator {
 		
 	}
 	
-	
+	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
 	
 	public int[] analyze(LatLonPoint ref, List<LatLonPoint> res) {
 		int tp = 0;
 		int fp = 0;
 		int fn = 0;
 		
-		double avg_r = NetworkMap.getInstance().getAvgCellRadiusAround(ref, 4000);
+		double avg_r = NM.getAvgCellRadiusAround(ref, 4000);
 		
 		double max_dist = 1.0 * (maxdist + avg_r); // avg_r * UserNew.RESULT_FACTOR; 
 		//max_dist = Math.max(4000, avg_r * factor);

@@ -40,8 +40,6 @@ public class PresenceCounter {
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
 		
-		
-		
 		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
 		
 		List<CityEvent> events = CityEvent.getEventsInData();

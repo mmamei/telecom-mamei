@@ -13,6 +13,7 @@ import java.util.Map;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 import utils.Config;
 import utils.Logger;
 import area.Placemark;
@@ -21,7 +22,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 
 	private List<PrintWriter> outs;
 	private List<Placemark> placemarks;
-	
+	private NetworkMap nm = NetworkMapFactory.getNetworkMap();
 	
 	public PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
 		
@@ -56,7 +57,6 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	String celllac;
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
-	NetworkMap nm = NetworkMap.getInstance();
 	
 	public void analyze(String line) {
 		fields = line.split("\t");

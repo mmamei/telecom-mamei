@@ -15,6 +15,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import network.NetworkCell;
+import network.NetworkMap;
+import network.NetworkMapFactory;
 
 import org.gps.utils.LatLonPoint;
 
@@ -127,7 +129,7 @@ public class PlaceRecognizerLogger {
 		kml.closeFolder(outKml);
 	}
 	
-	
+	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
 	public static void logkml(String kind_of_place, Map<Integer, Cluster> clusters, List<LatLonPoint> placemarks) {
 		try {
 			
@@ -185,7 +187,7 @@ public class PlaceRecognizerLogger {
 				for(long celllac: clusterByCells.keySet()){
 					String desc = getDescription(clusterEvents, clusterByCells.get(celllac));
 					int cellsize = clusterByCells.get(celllac).size();
-					NetworkCell cell = network.NetworkMap.getInstance().get(celllac);
+					NetworkCell cell = NM.get(celllac);
 					String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
 					outKml.println(cell.toKml(COLORS[colorIndex % (COLORS.length)],name,desc));
 				}

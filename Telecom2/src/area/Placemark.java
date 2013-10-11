@@ -14,6 +14,7 @@ import java.util.Set;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
@@ -31,7 +32,7 @@ import visual.kml.KML;
 
 
 public class Placemark {
-	
+	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
 	private static Map<String,Placemark> PLACEMARKS = null;
 	
 	public String name;
@@ -104,13 +105,13 @@ public class Placemark {
 		}
 	}
 	
+	
 	private Set<String> getCellsAround() { 
 		Set<String> cellsAround = new HashSet<String>();
-		NetworkMap nm = NetworkMap.getInstance();
 		double bbox = 1;
 		double[] ll = new double[]{center[0]-bbox,center[1]-bbox};
 		double[] tr = new double[]{center[0]+bbox,center[1]+bbox};
-		Set<NetworkCell> ncells = nm.getCellsIn(ll, tr);
+		Set<NetworkCell> ncells = NM.getCellsIn(ll, tr);
 		for(NetworkCell nc: ncells) 
 			if( (LatLonUtils.getHaversineDistance(nc.getPoint(),center_point) - nc.getRadius()) < radius )
 				cellsAround.add(String.valueOf(nc.getCellac()));
@@ -135,10 +136,8 @@ public class Placemark {
 		String name = file.substring(file.lastIndexOf("/")+1,file.lastIndexOf("."));
 		kml.printHeaderFolder(out, name);
 			
-		
-		NetworkMap nm = NetworkMap.getInstance();
 		for(String cell: cellsAround) 
-			out.println(nm.get(Long.parseLong(cell)).toKml());
+			out.println(NM.get(Long.parseLong(cell)).toKml());
 		
 		
 		out.println("<Style id=\"placemark\">");
@@ -176,7 +175,7 @@ public class Placemark {
 			String dir = Config.getInstance().base_dir+"/Placemark";
 			File d = new File(dir);
 			if(!d.exists()) d.mkdirs();
-			x.printKML(dir+"/"+x.name+"_best.kml");	
+			x.printKML(dir+"/"+x.name+"_"+(int)bestr+".kml");	
 		}
 		Logger.logln("Done!");
 	}

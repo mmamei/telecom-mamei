@@ -39,18 +39,29 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		
 		for(CityEvent e : CityEvent.getEventsInData()) {
 					
-			
-			//if(e.spot.name.equals("Juventus Stadium (TO)")) {
+			//if(e.spot.name.contains("Carlo")) {
 			    double bestr = getBestRadius(e);
 			    out.println(e+","+bestr);
 			    System.out.println(e+","+bestr);
-		   // }
+		    //}
 		} 
 		
 		out.close();
 		Logger.logln("Done");
+		
+		PresenceCounterProbability.process(0,5);
 	}
 	
+	
+	public static double getBestRadius(CityEvent e) throws Exception {
+		
+		File f = new File(ODIR+"/"+e.toFileName());
+		if(!f.exists()) f.mkdirs();
+		
+		double[][] zXradius = createOrLoadZRadiusDistrib(e);
+		
+		return getWeightedAverageWithThreshold(zXradius,0.5);
+	}
 	
 	
 	public static double[][] createOrLoadZRadiusDistrib(CityEvent e) throws Exception {
@@ -62,15 +73,27 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			//create
 			File d = new File(ODIR+"/"+e.toFileName());
 			if(!d.exists()) d.mkdirs();
-			zXradius = getZXRadius(e);
+			zXradius = computeZXRadius(e);
 			CopyAndSerializationUtils.save(f, zXradius);
 		}
+		
+		
+		
+		// spatial normalization
+		if(zXradius[0][1]==0) zXradius[0][1]=0.0001; // laplace smoothing
+		double zarea =  zXradius[0][1];
+		for(int i=0; i<zXradius.length;i++) {
+			zXradius[i][1] = zXradius[i][1] - zarea;
+			if(zXradius[i][1] < 0) zXradius[i][1] = 0;
+		}
+		
+		
 		
 		String[] domain = new String[zXradius.length];
 		double[] data = new double[zXradius.length];
 		for(int i=0; i<domain.length;i++) {
 			domain[i] = ""+zXradius[i][0];
-			data[i] = zXradius[i][1] / zXradius[0][1];
+			data[i] = zXradius[i][1];
 		}
 		
 		GraphPlotter g = GraphPlotter.drawGraph(e.toString(), e.toFileName(), "z", "radius", "z", domain, data);
@@ -80,20 +103,12 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 	}
 	
 	
-	public static double getBestRadius(CityEvent e) throws Exception {
-		
-		File f = new File(ODIR+"/"+e.toFileName());
-		if(!f.exists()) f.mkdirs();
-		
-		double[][] zXradius = createOrLoadZRadiusDistrib(e);
-		
-		return getWeightedAverageWithThreshold(zXradius,1.5);
-	}
 	
 	
+	/*
 	public static double getWeightedAverage(double[][] zXradius) {
 		double avg_r = 0;
-		double cont = 1.5; // kind of laplace smoothing
+		double cont = 1; // kind of laplace smoothing
 		for(int i=0; i<zXradius.length;i++) {
 				avg_r = avg_r + zXradius[i][0] * zXradius[i][1];
 				cont = cont + zXradius[i][1];
@@ -102,21 +117,24 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			
 		return avg_r;
 	}
+	*/
 	
 	public static double getWeightedAverageWithThreshold(double[][] zXradius,double th) {
 		double avg_r = 0;
 		double cont = 0;
+			
 		for(int i=0; i<zXradius.length;i++) {
-			if(zXradius[0][1] == 0 || zXradius[i][1]/zXradius[0][1] > th) {
+			if(zXradius[i][1] > th) {
 				avg_r = avg_r + zXradius[i][0] * zXradius[i][1];
 				cont = cont + zXradius[i][1];
 			}
 		}
 		
-		if(cont == 0) return -100;
+		if(cont == 0) return -200;
 		else return PlacemarkRadiusExtractor.round(avg_r / cont);
 	}
 	
+	/*
 	public static double getMax(double[][] zXradius) {
 		double maxR = zXradius[0][0];
 		double maxZ = zXradius[0][1];
@@ -128,10 +146,10 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		}
 		return maxR;
 	}
+	*/
 	
 	
-	
-	public static double[][] getZXRadius(CityEvent e) throws Exception {
+	public static double[][] computeZXRadius(CityEvent e) throws Exception {
 		
 		Placemark p = e.spot;
 		p.changeRadius(MAX_R);
@@ -146,20 +164,47 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		
 		double[][] zXradius = new double[1+(MAX_R - MIN_R)/STEP][2];
 		int index = 0;
+		
+		
+		DescriptiveStatistics[] maxr_stats = null;
+		
 		for(int max_r = MAX_R; max_r >= MIN_R; max_r = max_r - STEP) {
 			
 			PLSMap plsmap = PlacemarkRadiusExtractor.getPLSMap(file,p,max_r);
+					
 			
 			double max_z = 0;
 			double sum_z = 0;
-			double h = 0;
-			
+		
 			if(plsmap.startTime != null) {
 				
 			
 				DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
-				//double[] z_pls_data = PLSBehaviorInAnArea.getZ(stats[0],plsmap.startTime);
-				double[] z_usr_data =  PLSBehaviorInAnArea.getZ2(stats[1],plsmap.startTime);
+				
+				if(max_r == MAX_R) 
+					maxr_stats = clone(stats);
+				
+				/* space norm */
+				/*
+				DescriptiveStatistics[] norm_stats = new DescriptiveStatistics[stats.length];
+				
+				for(int i=0; i<stats.length;i++) {
+					norm_stats[i] = new DescriptiveStatistics();
+					double[] vals = stats[i].getValues();
+					double[] maxr_vals = maxr_stats[i].getValues();
+					for(int j=0; j<vals.length;j++)
+						if(maxr_vals[j] == 0) {
+							if(vals[j] != 0) 
+								System.err.println("error!");
+							norm_stats[i].addValue(0);
+						}  
+						else norm_stats[i].addValue(vals[j]/maxr_vals[j]);
+				}
+				*/
+				DescriptiveStatistics[] norm_stats = stats;
+				
+				//double[] z_pls_data = PLSBehaviorInAnArea.getZ(norm_stats[0],plsmap.startTime);
+				double[] z_usr_data =  PLSBehaviorInAnArea.getZ2(norm_stats[1],plsmap.startTime);
 				List<CityEvent> relevant = new ArrayList<CityEvent>();
 				relevant.add(e);
 							
@@ -176,7 +221,6 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 					if(e.st.before(cal) && e.et.after(cal)) {
 						max_z = Math.max(max_z, z_usr_data[i]);
 						sum_z = sum_z + z_usr_data[i];
-						h ++;
 					}
 						
 					cal.add(Calendar.HOUR_OF_DAY, 1);
@@ -186,12 +230,27 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			zXradius[index][0] = max_r;
 			//zXradius[index][1] = sum_z/h;
 			zXradius[index][1] = max_z;
+			
+			System.out.println(max_r+"  --> "+max_z);
+			
 			index++;
 		}
-		
-		
 		return zXradius;		
 	}
+
+
+	public static  DescriptiveStatistics[] clone(DescriptiveStatistics[] x) {
+		DescriptiveStatistics[] y = new DescriptiveStatistics[x.length];
+		
+		for(int i=0; i<y.length;i++) {
+			y[i] = new DescriptiveStatistics();
+			double[] vals = x[i].getValues();
+			for(int j=0; j<vals.length;j++)
+				y[i].addValue(vals[j]);
+		}
+		return y;
+	}
+	
 	
 	
 	public static Map<String,Double> readBestR() throws Exception {

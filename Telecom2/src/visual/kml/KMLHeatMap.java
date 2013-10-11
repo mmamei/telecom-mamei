@@ -6,6 +6,7 @@ import utils.Colors;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 
 
 
@@ -13,7 +14,7 @@ import network.NetworkMap;
 public class KMLHeatMap {
 	
 	public static String drawHeatMap(String name, Map<Long,Double> map, double max) {
-		NetworkMap nm = NetworkMap.getInstance();
+		NetworkMap nm = NetworkMapFactory.getNetworkMap();
 		StringBuffer result = new StringBuffer();
 		for(long celllac: map.keySet()) {
 			NetworkCell nc = nm.get(celllac);

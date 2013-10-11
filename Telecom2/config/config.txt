@@ -7,10 +7,7 @@
 // according to Windows-like systems, to avoid errors.
 
 // File di rete
-network_map_file = C:/DATASET/PLS/file_rete/dfl_network_20130516.txt
-
-// File di rete serializzato
-network_map_bin = C:/BASE/cache/network2013.bin
+network_map_dir = C:/DATASET/PLS/file_rete
 
 // Cartella con i PLS
 pls_folder = C:/DATASET/PLS/file_pls/file_pls_piem/2013
@@ -26,4 +23,4 @@ base_dir = C:/BASE
 placemarks_file = config/placemarks.csv
 
 // File with the events happening in the city
-events_file = config/cityevents_piem_2013.csv
+events_file = config/cityevents_piem.csv

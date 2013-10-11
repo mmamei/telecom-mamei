@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import network.NetworkMap;
+import network.NetworkMapFactory;
 import utils.Config;
 import utils.Logger;
 import area.CityEvent;
@@ -45,7 +46,6 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 	String celllac;
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
-	NetworkMap nm = NetworkMap.getInstance();
 	
 	public void analyze(String line) {
 		fields = line.split("\t");

@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 
 import network.NetworkCell;
 import network.NetworkMap;
+import network.NetworkMapFactory;
 
 import utils.Config;
 import utils.Logger;
@@ -19,7 +20,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 
 	private CityEvent cevent;
 	private PrintWriter out = null;
-	
+	private NetworkMap nm;
 	public PLSEventsAroundAnEvent(CityEvent ce, int time_shift, double space_shift) {
 		String dir = Config.getInstance().base_dir+"/"+this.getClass().getSimpleName();
 		File fd = new File(dir);
@@ -31,6 +32,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		nm = NetworkMapFactory.getNetworkMap(cevent.st);
 		
 	}
 	
@@ -57,7 +59,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 	String celllac;
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
-	NetworkMap nm = NetworkMap.getInstance();
+	
 	public void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
