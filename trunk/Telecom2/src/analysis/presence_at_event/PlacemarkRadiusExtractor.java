@@ -37,19 +37,7 @@ public class PlacemarkRadiusExtractor {
 	public static final int MAX_R = 1500;
 	public static final int MIN_R = -500;
 	public static final int STEP = 100;
-	public static double[] RS = new double[]{-500,-400,-300,-200,-100,0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500};
 	
-	public static final String[] pnames = new String[]{
-		//"Juventus Stadium (TO)"//,"Stadio Olimpico (TO)",
-		//"Stadio Silvio Piola (NO)",
-		//"Stadio San Siro (MI)",
-		//"Stadio Atleti Azzurri d'Italia (BG)","Stadio Mario Rigamonti (BS)","Stadio Franco Ossola (VA)"
-		"Stadio Olimpico (TO)",
-		"Piazza San Carlo (TO)",
-		"Piazza Castello (TO)",
-		"Piazza Vittorio (TO)",
-		"Parco Dora (TO)"
-	};
 	
 	public static final double z_threshold = 2;
 	
@@ -57,8 +45,6 @@ public class PlacemarkRadiusExtractor {
 	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir();
 	
 	public static void main(String[] args) throws Exception { 
-		
-		//Map<String,Double> bestRadius = new HashMap<String,Double>();
 		
 		new File(ODIR).mkdirs();
 		
@@ -70,91 +56,44 @@ public class PlacemarkRadiusExtractor {
 		
 		PrintWriter out = new PrintWriter(new FileWriter(new File(ODIR+"/result.csv")));
 		
-		for(String pn : pnames) {
-			Placemark p = Placemark.getPlacemark(pn);
-		    double bestr = getBestRadius(p);
-		    out.println(pn+","+bestr);
-		    //bestRadius.put(pn, bestr);
+		
+		List<CityEvent> all = CityEvent.getEventsInData();
+		// divide all the events by placemark
+		Map<String,List<CityEvent>> eventsByPlacemark = new HashMap<String,List<CityEvent>>();
+		for(CityEvent ce: all) {
+			List<CityEvent> l = eventsByPlacemark.get(ce.spot.name);
+			if(l==null) {
+				l = new ArrayList<CityEvent>();
+				eventsByPlacemark.put(ce.spot.name, l);
+			}
+			l.add(ce);
+		}
+		
+		for(String p : eventsByPlacemark.keySet()) {
+		    double bestr = getBestRadius(eventsByPlacemark.get(p));
+		    out.println(p+","+bestr);
+		    Logger.logln(p+","+bestr);
 		} 
 		
 		out.close();
-		//CopyAndSerializationUtils.save(new File(odir+"/result.ser"), bestRadius);
-		
 		Logger.logln("Done");
 	}
 	
 	
 	public static Map<String,Double> readBestR() throws Exception {
-		Map<String,Double> best = new HashMap<String,Double>();
-		BufferedReader br = new BufferedReader(new FileReader(new File(ODIR+"/result.csv")));
-		String line;
-		while((line = br.readLine())!=null) {
-			String[] e = line.split(",");
-			best.put(e[0], Double.parseDouble(e[1]));
-		}
-		br.close();
-		return best;
+		return readBestR(ODIR+"/result.csv");
 	}
 	
 	
 	
-	public static double getBestRadius(Placemark p) throws Exception {
-		
-		Logger.logln("Processing "+p.name);
-		p.changeRadius(MAX_R);
-		
-		String subdir = Config.getInstance().get_pls_subdir();
-		
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.radius+".txt";
-		File f = new File(file);
-		if(!f.exists()) {
-			Logger.logln(file+" does not exist");
-			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
-			PLSEventsAroundAPlacemark.process(p);
-		}
-		
-		
-		// get the city events to be considered to find relevant cells for this placemark
-		List<CityEvent> releventEvents = new ArrayList<CityEvent>();
-		for(CityEvent e : CityEvent.getEventsInData()) 
-			if(e.spot.name.equals(p.name)) releventEvents.add(e);
-		
-		int[][] n_outliersXradius =  getNOutliersXRadius(file,p,releventEvents);
-		
-		
-		for(int i=0; i<n_outliersXradius.length;i++)
-			Logger.logln("radius = "+n_outliersXradius[i][0]+" --> outliers = "+n_outliersXradius[i][1]);
-		
-		String[] domain = new String[n_outliersXradius.length];
-		double[] data = new double[n_outliersXradius.length];
-		for(int i=0; i<domain.length;i++) {
-			domain[i] = ""+n_outliersXradius[i][0];
-			data[i] = n_outliersXradius[i][1];
-		}
-		
-		GraphPlotter.drawGraph(p.name, p.name, "outliers", "radius", "n outliers", domain, data);
-		
-		
-		/*
-		// find max number of outliers
-		int max = n_outliersXradius[0][1];
-		for(int i=1; i<n_outliersXradius.length;i++)
-			if(n_outliersXradius[i][1] > max)
-				max = n_outliersXradius[i][1];
-		
-		
-		// find the average radius associated with that number of outliser
-		double avg_r = 0;
-		double cont = 0;
-		for(int i=0; i<n_outliersXradius.length;i++) 
-			if(n_outliersXradius[i][1] == max) {
-				avg_r += n_outliersXradius[i][0];
-				cont ++;
-			}
-		
-		avg_r = round(avg_r / cont);
-		*/
-		
+	public static double getBestRadius(List<CityEvent> re) throws Exception {
+		double[][] n_outliersXradius =  createOrLoadNOutliersRadiusDistrib(re);
+		return getWeightedAverage(n_outliersXradius);
+	}
+	
+	
+	
+	public static double getWeightedAverage(double[][] n_outliersXradius) throws Exception {	
 		double avg_r = 0;
 		double cont = 0;
 		for(int i=0; i<n_outliersXradius.length;i++) {
@@ -169,19 +108,43 @@ public class PlacemarkRadiusExtractor {
 	}
 	
 	
-	public static double round(double x) {
-		int ri = 0;
-		for(int i=1; i<RS.length;i++) {
-			if(Math.abs(x-RS[i]) < Math.abs(x-RS[ri]))
-				ri = i;
+	
+	public static double[][] createOrLoadNOutliersRadiusDistrib(List<CityEvent> relevantEvents) throws Exception {
+		Placemark p = relevantEvents.get(0).spot;
+		double[][] n_outliersXradius  = null;
+		// restore
+		File f = new File(ODIR+"/"+p.name+"/zXradius.ser");
+		if(f.exists()) n_outliersXradius = (double[][])CopyAndSerializationUtils.restore(f);
+		else {
+			//create
+			File d = new File(ODIR+"/"+p.name);
+			if(!d.exists()) d.mkdirs();
+			n_outliersXradius = computeNOutliersRadiusDistrib(relevantEvents);
+			CopyAndSerializationUtils.save(f, n_outliersXradius);
 		}
-		return RS[ri];
+		
+		
+		plot(p.name,n_outliersXradius,null);
+		
+		return n_outliersXradius;
 	}
 	
 	
-	public static int[][] getNOutliersXRadius(String file, Placemark p, List<CityEvent> releventEvents) throws Exception {
+	public static double[][] computeNOutliersRadiusDistrib(List<CityEvent> relevantEvents) throws Exception {
 		
-		int[][] n_outliersXradius = new int[RS.length][2];
+		Placemark p = relevantEvents.get(0).spot;
+		Logger.logln("Processing "+p.name);
+		p.changeRadius(MAX_R);
+		String subdir = Config.getInstance().get_pls_subdir();
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.radius+".txt";
+		File f = new File(file);
+		if(!f.exists()) {
+			Logger.logln(file+" does not exist");
+			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
+			PLSEventsAroundAPlacemark.process(p);
+		}
+		
+		double[][] n_outliersXradius = new double[1+(MAX_R - MIN_R)/STEP][2];
 		int index = 0;
 		
 		for(int max_r = MAX_R; max_r >= MIN_R; max_r = max_r - STEP) {
@@ -200,8 +163,8 @@ public class PlacemarkRadiusExtractor {
 				
 				
 				next_event:	
-				for(int j=0; j<releventEvents.size();j++) {
-					CityEvent e = releventEvents.get(j);
+				for(int j=0; j<relevantEvents.size();j++) {
+					CityEvent e = relevantEvents.get(j);
 						
 					for(;i<plsmap.getHours();i++) {
 						
@@ -227,14 +190,53 @@ public class PlacemarkRadiusExtractor {
 			
 			
 		}
-		
 		return n_outliersXradius;	
 	}
 	
 	
+	/**********************************************************************************************************/
+	
+	static Map<String,Double> readBestR(String file) throws Exception {
+		Map<String,Double> best = new HashMap<String,Double>();
+		BufferedReader br = new BufferedReader(new FileReader(new File(file)));
+		String line;
+		while((line = br.readLine())!=null) {
+			String[] e = line.split(",");
+			best.put(e[0], Double.parseDouble(e[1]));
+		}
+		br.close();
+		return best;
+	}
+	
+	static double round(double x) {
+		int best = MAX_R;
+		for(int r = MAX_R; r >= MIN_R; r = r - STEP) 
+			if(Math.abs(x-r) < Math.abs(x-best))
+				best = r;
+		return best;
+	}
+	
+	
+	static void plot(String title, double[][] n_outliersXradius, String save_file) {
+		
+		for(int i=0; i<n_outliersXradius.length;i++)
+			Logger.logln("radius = "+n_outliersXradius[i][0]+" --> outliers = "+n_outliersXradius[i][1]);
+		
+		
+		String[] domain = new String[n_outliersXradius.length];
+		double[] data = new double[n_outliersXradius.length];
+		for(int i=0; i<domain.length;i++) {
+			domain[i] = ""+n_outliersXradius[i][0];
+			data[i] = n_outliersXradius[i][1];
+		}
+		
+		GraphPlotter g = GraphPlotter.drawGraph(title, title, "outliers", "radius", "n outliers", domain, data);
+		if(save_file != null)
+			g.save(save_file);
+	}
 	
 	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
-	public static PLSMap getPLSMap(String file, Placemark p, double maxr) throws Exception {
+	static PLSMap getPLSMap(String file, Placemark p, double maxr) throws Exception {
 		PLSMap plsmap = new PLSMap();
 		String[] splitted;
 		String line;

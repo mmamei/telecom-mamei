@@ -35,23 +35,30 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 	public static void main(String[] args) throws Exception { 
 		
 		new File(ODIR).mkdirs();
+		
+		
+		if(new File(ODIR+"/result.csv").exists()) {
+			System.err.println(ODIR+"/result.csv already exists!!!!!");
+			System.err.println("Manually remove the file before proceeding!");
+			System.exit(0);
+		}
+		
 		PrintWriter out = new PrintWriter(new FileWriter(new File(ODIR+"/result.csv")));
 		
 		for(CityEvent e : CityEvent.getEventsInData()) {
-					
-			//if(e.spot.name.contains("Carlo")) {
 			    double bestr = getBestRadius(e);
 			    out.println(e+","+bestr);
-			    System.out.println(e+","+bestr);
-		    //}
+			    Logger.logln(e+","+bestr);
 		} 
 		
 		out.close();
 		Logger.logln("Done");
-		
-		PresenceCounterProbability.process(0,5);
 	}
 	
+	
+	public static Map<String,Double> readBestR() throws Exception {
+		return PlacemarkRadiusExtractor.readBestR(ODIR+"/result.csv");
+	}
 	
 	public static double getBestRadius(CityEvent e) throws Exception {
 		
@@ -77,8 +84,6 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			CopyAndSerializationUtils.save(f, zXradius);
 		}
 		
-		
-		
 		// spatial normalization
 		if(zXradius[0][1]==0) zXradius[0][1]=0.0001; // laplace smoothing
 		double zarea =  zXradius[0][1];
@@ -87,37 +92,11 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			if(zXradius[i][1] < 0) zXradius[i][1] = 0;
 		}
 		
-		
-		
-		String[] domain = new String[zXradius.length];
-		double[] data = new double[zXradius.length];
-		for(int i=0; i<domain.length;i++) {
-			domain[i] = ""+zXradius[i][0];
-			data[i] = zXradius[i][1];
-		}
-		
-		GraphPlotter g = GraphPlotter.drawGraph(e.toString(), e.toFileName(), "z", "radius", "z", domain, data);
-		g.save(ODIR+"/"+e.toFileName()+"/z_dist.png");
+		PlacemarkRadiusExtractor.plot(e.toString(), zXradius, ODIR+"/"+e.toFileName()+"/z_dist.png");
 		
 		return zXradius;
 	}
 	
-	
-	
-	
-	/*
-	public static double getWeightedAverage(double[][] zXradius) {
-		double avg_r = 0;
-		double cont = 1; // kind of laplace smoothing
-		for(int i=0; i<zXradius.length;i++) {
-				avg_r = avg_r + zXradius[i][0] * zXradius[i][1];
-				cont = cont + zXradius[i][1];
-		}
-		avg_r = PlacemarkRadiusExtractor.round(avg_r / cont);
-			
-		return avg_r;
-	}
-	*/
 	
 	public static double getWeightedAverageWithThreshold(double[][] zXradius,double th) {
 		double avg_r = 0;
@@ -133,21 +112,6 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		if(cont == 0) return -200;
 		else return PlacemarkRadiusExtractor.round(avg_r / cont);
 	}
-	
-	/*
-	public static double getMax(double[][] zXradius) {
-		double maxR = zXradius[0][0];
-		double maxZ = zXradius[0][1];
-		for(int i=1; i<zXradius.length;i++) {
-			if(zXradius[i][1] > maxZ) {
-				maxR = zXradius[i][0];
-				maxZ = zXradius[i][1];
-			}
-		}
-		return maxR;
-	}
-	*/
-	
 	
 	public static double[][] computeZXRadius(CityEvent e) throws Exception {
 		
@@ -255,16 +219,6 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 	
 	
 	
-	public static Map<String,Double> readBestR() throws Exception {
-		Map<String,Double> best = new HashMap<String,Double>();
-		BufferedReader br = new BufferedReader(new FileReader(new File(ODIR+"/result.csv")));
-		String line;
-		while((line = br.readLine())!=null) {
-			String[] e = line.split(",");
-			best.put(e[0], Double.parseDouble(e[1]));
-		}
-		br.close();
-		return best;
-	}
+	
 	
 }
