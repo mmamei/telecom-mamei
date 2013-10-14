@@ -74,7 +74,7 @@ public class PresenceCounter {
 				
 				
 				double c = count(ce,bestr,searchr,days);
-				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
+				Logger.logln(ce.toString()+" [bestr="+bestr+",or="+searchr+"] estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
 				sr.addData(result[i][0], result[i][1]);
@@ -115,9 +115,7 @@ public class PresenceCounter {
 		
 	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
 		
-		
-		
-		Logger.logln("\n"+event.spot.name+", e_r = "+e_radius+", o_r = "+o_radius);
+		//Logger.logln("\n"+event.spot.name+", e_r = "+e_radius+", o_r = "+o_radius);
 		
 		String file_event = getFile(event.spot.clone(),e_radius);
 		String file_other = getFile(event.spot.clone(),o_radius);
@@ -165,7 +163,7 @@ public class PresenceCounter {
 	
 	public static String getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+p.name+"_"+p.radius+".txt";
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.radius+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");

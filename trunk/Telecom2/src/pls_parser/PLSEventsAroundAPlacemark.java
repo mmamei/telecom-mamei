@@ -30,7 +30,14 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		placemarks = new ArrayList<Placemark>();
 		
 		try {
-			String dir = Config.getInstance().base_dir+"/"+this.getClass().getSimpleName();
+			String dir = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark";
+			
+			String subdir = Config.getInstance().get_pls_subdir();
+			
+			dir = dir+"/"+subdir;
+			
+			System.out.println("Output Dir = "+dir);
+			
 			File fd = new File(dir);
 			if(!fd.exists()) fd.mkdirs();	
 			

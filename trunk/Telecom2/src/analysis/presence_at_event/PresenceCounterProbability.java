@@ -206,7 +206,7 @@ public class PresenceCounterProbability {
 	
 	public static String getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+p.name+"_"+p.radius+".txt";
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.radius+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");

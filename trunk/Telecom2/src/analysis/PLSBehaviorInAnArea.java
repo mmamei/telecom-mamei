@@ -70,7 +70,9 @@ public class PLSBehaviorInAnArea {
 		
 		Logger.logln("Processing... "+p.name);
 		
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+p.name+"_"+p.radius+".txt";
+		String subdir = Config.getInstance().get_pls_subdir();
+		
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.radius+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");

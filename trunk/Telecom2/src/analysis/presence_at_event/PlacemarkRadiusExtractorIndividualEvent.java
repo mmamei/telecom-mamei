@@ -30,7 +30,7 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 	public static final int MIN_R = -500;
 	public static final int STEP = 200;
 	
-	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractorIndividualEvent";
+	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractorIndividualEvent/"+Config.getInstance().get_pls_subdir();
 	
 	public static void main(String[] args) throws Exception { 
 		
@@ -154,7 +154,9 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		Placemark p = e.spot;
 		p.changeRadius(MAX_R);
 		
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+p.name+"_"+p.radius+".txt";
+		String subdir = Config.getInstance().get_pls_subdir();
+		
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.radius+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -255,7 +257,7 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 	
 	public static Map<String,Double> readBestR() throws Exception {
 		Map<String,Double> best = new HashMap<String,Double>();
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractorIndividualEvent/result.csv")));
+		BufferedReader br = new BufferedReader(new FileReader(new File(ODIR+"/result.csv")));
 		String line;
 		while((line = br.readLine())!=null) {
 			String[] e = line.split(",");
