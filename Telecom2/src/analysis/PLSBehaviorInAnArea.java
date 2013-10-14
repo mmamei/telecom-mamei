@@ -23,7 +23,6 @@ import utils.Config;
 import utils.Logger;
 import visual.java.GraphPlotter;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
-import analysis.presence_at_event.PlacemarkRadiusExtractorIndividualEvent;
 import area.CityEvent;
 import area.Placemark;
 
@@ -53,7 +52,7 @@ public class PLSBehaviorInAnArea {
 	public static void main(String[] args) throws Exception { 
 		
 		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
-		Map<String,Double> bestRadiusIE = PlacemarkRadiusExtractorIndividualEvent.readBestR();	
+		Map<String,Double> bestRadiusIE = PlacemarkRadiusExtractor.readBestRIndividual();	
 		
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
