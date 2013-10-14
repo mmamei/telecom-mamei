@@ -16,19 +16,20 @@ import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluator {
 	
-	
-	public static final String[] FILES = new String[]{
-		Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
-		Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
-	};
-	
-	
 	public static void main(String[] args) throws Exception {
+		String[] files = new String[]{
+				Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
+				Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
+		};
+		run(files);
+	}
+	
+	public static void run(String[] files) throws Exception {
 		
 		SimpleRegression sr = new SimpleRegression();
 		Map<String,List<double[]>> map = new HashMap<String,List<double[]>>();
 		
-		for(String file: FILES) {
+		for(String file: files) {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line;
 			br.readLine(); // skip header
