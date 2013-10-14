@@ -87,4 +87,13 @@ public class Config {
 			Logger.logln("Warning: parameter "+name+" = "+value+" unrecognized!");
 		}
 	}
+	
+	
+	public String get_pls_subdir() {
+		String subdir = pls_folder;
+		subdir = subdir.replaceAll(":", "");
+		subdir = subdir.replaceAll("/", "_");
+		return subdir;
+	}
+	
 }

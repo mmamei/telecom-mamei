@@ -53,13 +53,15 @@ public class PlacemarkRadiusExtractor {
 	
 	public static final double z_threshold = 2;
 	
+	
+	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir();
+	
 	public static void main(String[] args) throws Exception { 
 		
 		//Map<String,Double> bestRadius = new HashMap<String,Double>();
 		
-		String odir = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor";
-		new File(odir).mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(new File(odir+"/result_s.csv")));
+		new File(ODIR).mkdirs();
+		PrintWriter out = new PrintWriter(new FileWriter(new File(ODIR+"/result.csv")));
 		
 		for(String pn : pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
@@ -77,7 +79,7 @@ public class PlacemarkRadiusExtractor {
 	
 	public static Map<String,Double> readBestR() throws Exception {
 		Map<String,Double> best = new HashMap<String,Double>();
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/result.csv")));
+		BufferedReader br = new BufferedReader(new FileReader(new File(ODIR+"/result.csv")));
 		String line;
 		while((line = br.readLine())!=null) {
 			String[] e = line.split(",");
@@ -94,7 +96,9 @@ public class PlacemarkRadiusExtractor {
 		Logger.logln("Processing "+p.name);
 		p.changeRadius(MAX_R);
 		
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+p.name+"_"+p.radius+".txt";
+		String subdir = Config.getInstance().get_pls_subdir();
+		
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.radius+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
