@@ -46,7 +46,9 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		PrintWriter out = new PrintWriter(new FileWriter(new File(ODIR+"/result.csv")));
 		
 		for(CityEvent e : CityEvent.getEventsInData()) {
-			    double bestr = getBestRadius(e);
+				List<CityEvent> le = new ArrayList<CityEvent>();
+				le.add(e);
+			    double bestr = getBestRadius(le);
 			    out.println(e+","+bestr);
 			    Logger.logln(e+","+bestr);
 		} 
@@ -60,27 +62,27 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 		return PlacemarkRadiusExtractor.readBestR(ODIR+"/result.csv");
 	}
 	
-	public static double getBestRadius(CityEvent e) throws Exception {
+	public static double getBestRadius(List<CityEvent> le) throws Exception {
 		
-		File f = new File(ODIR+"/"+e.toFileName());
+		File f = new File(ODIR+"/"+le.get(0).toFileName());
 		if(!f.exists()) f.mkdirs();
 		
-		double[][] zXradius = createOrLoadZRadiusDistrib(e);
+		double[][] zXradius = createOrLoadZRadiusDistrib(le);
 		
 		return getWeightedAverageWithThreshold(zXradius,0.5);
 	}
 	
 	
-	public static double[][] createOrLoadZRadiusDistrib(CityEvent e) throws Exception {
+	public static double[][] createOrLoadZRadiusDistrib(List<CityEvent> le) throws Exception {
 		double[][] zXradius  = null;
 		// restore
-		File f = new File(ODIR+"/"+e.toFileName()+"/zXradius.ser");
+		File f = new File(ODIR+"/"+le.get(0).toFileName()+"/zXradius.ser");
 		if(f.exists()) zXradius = (double[][])CopyAndSerializationUtils.restore(f);
 		else {
 			//create
-			File d = new File(ODIR+"/"+e.toFileName());
+			File d = new File(ODIR+"/"+le.get(0).toFileName());
 			if(!d.exists()) d.mkdirs();
-			zXradius = computeZXRadius(e);
+			zXradius = computeZXRadius(le.get(0));
 			CopyAndSerializationUtils.save(f, zXradius);
 		}
 		
@@ -92,7 +94,7 @@ public class PlacemarkRadiusExtractorIndividualEvent {
 			if(zXradius[i][1] < 0) zXradius[i][1] = 0;
 		}
 		
-		PlacemarkRadiusExtractor.plot(e.toString(), zXradius, ODIR+"/"+e.toFileName()+"/z_dist.png");
+		PlacemarkRadiusExtractor.plot(le.get(0).toString(), zXradius, ODIR+"/"+le.get(0).toFileName()+"/z_dist.png");
 		
 		return zXradius;
 	}
