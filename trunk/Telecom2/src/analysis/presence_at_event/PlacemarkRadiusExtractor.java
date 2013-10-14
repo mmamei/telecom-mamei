@@ -38,10 +38,6 @@ public class PlacemarkRadiusExtractor {
 	public static final int MIN_R = -500;
 	public static final int STEP = 100;
 	
-	
-	public static final double z_threshold = 2;
-	
-	
 	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir();
 	
 	public static void main(String[] args) throws Exception { 
@@ -57,7 +53,6 @@ public class PlacemarkRadiusExtractor {
 			System.err.println("Manually remove the file before proceeding!");
 			System.exit(0);
 		}
-		
 		
 		
 		List<CityEvent> all = CityEvent.getEventsInData();
@@ -107,17 +102,40 @@ public class PlacemarkRadiusExtractor {
 	}
 	
 	
+	public static double getBestRadius(List<CityEvent> le) throws Exception {
+		
+		String name = le.size() == 1 ? le.get(0).toFileName() : le.get(0).spot.name;
+		double[][] valXradius = createOrLoadValueRadiusDistrib(name, le);
 	
-	public static double getBestRadius(List<CityEvent> re) throws Exception {
-		if(re.size()==1) {
-			double[][] zXradius = createOrLoadZRadiusDistrib(re);
-			return getWeightedAverageWithThreshold(zXradius,0.5);
-		}
-		else {
-			double[][] n_outliersXradius =  createOrLoadNOutliersRadiusDistrib(re);
-			return getWeightedAverage(n_outliersXradius);
-		}
+		if(le.size()==1) 
+			return getWeightedAverageWithThreshold(valXradius,0.5);	
+		else 
+			return getWeightedAverage(valXradius);
 	}
+	
+	
+	public static double[][] createOrLoadValueRadiusDistrib(String name, List<CityEvent> le) throws Exception {
+		double[][] valueRadiusDistrib  = null;
+		// restore
+		File f = new File(ODIR+"/"+name+"/zXradius.ser");
+		if(f.exists()) valueRadiusDistrib = (double[][])CopyAndSerializationUtils.restore(f);
+		else {
+			//create
+			File d = new File(ODIR+"/"+name);
+			if(!d.exists()) d.mkdirs();
+			
+			if(le.size()==1)
+				valueRadiusDistrib = computeZXRadius(le.get(0));
+			else
+				valueRadiusDistrib = computeNOutliersRadiusDistrib(le);
+			CopyAndSerializationUtils.save(f, valueRadiusDistrib);
+		}
+		plot(name,valueRadiusDistrib,ODIR+"/"+le.get(0).toFileName()+"/val_r_distrib.png");
+		
+		return valueRadiusDistrib;
+	}
+	
+	
 	
 	
 	
@@ -153,53 +171,9 @@ public class PlacemarkRadiusExtractor {
 	
 	
 	
-	public static double[][] createOrLoadNOutliersRadiusDistrib(List<CityEvent> relevantEvents) throws Exception {
-		Placemark p = relevantEvents.get(0).spot;
-		double[][] n_outliersXradius  = null;
-		// restore
-		File f = new File(ODIR+"/"+p.name+"/zXradius.ser");
-		if(f.exists()) n_outliersXradius = (double[][])CopyAndSerializationUtils.restore(f);
-		else {
-			//create
-			File d = new File(ODIR+"/"+p.name);
-			if(!d.exists()) d.mkdirs();
-			n_outliersXradius = computeNOutliersRadiusDistrib(relevantEvents);
-			CopyAndSerializationUtils.save(f, n_outliersXradius);
-		}
-		
-		
-		plot(p.name,n_outliersXradius,null);
-		
-		return n_outliersXradius;
-	}
-	
-	public static double[][] createOrLoadZRadiusDistrib(List<CityEvent> le) throws Exception {
-		double[][] zXradius  = null;
-		// restore
-		File f = new File(ODIR+"/"+le.get(0).toFileName()+"/zXradius.ser");
-		if(f.exists()) zXradius = (double[][])CopyAndSerializationUtils.restore(f);
-		else {
-			//create
-			File d = new File(ODIR+"/"+le.get(0).toFileName());
-			if(!d.exists()) d.mkdirs();
-			zXradius = computeZXRadius(le.get(0));
-			CopyAndSerializationUtils.save(f, zXradius);
-		}
-		
-		// spatial normalization
-		if(zXradius[0][1]==0) zXradius[0][1]=0.0001; // laplace smoothing
-		double zarea =  zXradius[0][1];
-		for(int i=0; i<zXradius.length;i++) {
-			zXradius[i][1] = zXradius[i][1] - zarea;
-			if(zXradius[i][1] < 0) zXradius[i][1] = 0;
-		}
-		
-		PlacemarkRadiusExtractor.plot(le.get(0).toString(), zXradius, ODIR+"/"+le.get(0).toFileName()+"/z_dist.png");
-		
-		return zXradius;
-	}
 	
 	
+	public static final double z_threshold = 2;
 	public static double[][] computeNOutliersRadiusDistrib(List<CityEvent> relevantEvents) throws Exception {
 		
 		Placemark p = relevantEvents.get(0).spot;
@@ -352,20 +326,20 @@ public static double[][] computeZXRadius(CityEvent e) throws Exception {
 			
 			index++;
 		}
+		
+		// spatial normalization
+		if(zXradius[0][1]==0) zXradius[0][1]=0.0001; // laplace smoothing
+		double zarea =  zXradius[0][1];
+		for(int i=0; i<zXradius.length;i++) {
+			zXradius[i][1] = zXradius[i][1] - zarea;
+			if(zXradius[i][1] < 0) zXradius[i][1] = 0;
+		}
+		
+		
 		return zXradius;		
 	}
 
-	public static  DescriptiveStatistics[] clone(DescriptiveStatistics[] x) {
-		DescriptiveStatistics[] y = new DescriptiveStatistics[x.length];
-		
-		for(int i=0; i<y.length;i++) {
-			y[i] = new DescriptiveStatistics();
-			double[] vals = x[i].getValues();
-			for(int j=0; j<vals.length;j++)
-				y[i].addValue(vals[j]);
-		}
-		return y;
-	}
+	
 	
 	
 	/**********************************************************************************************************/
@@ -445,5 +419,17 @@ public static double[][] computeZXRadius(CityEvent e) throws Exception {
 		}
 		in.close();
 		return plsmap;
-	}	
+	}
+	
+	static  DescriptiveStatistics[] clone(DescriptiveStatistics[] x) {
+		DescriptiveStatistics[] y = new DescriptiveStatistics[x.length];
+		
+		for(int i=0; i<y.length;i++) {
+			y[i] = new DescriptiveStatistics();
+			double[] vals = x[i].getValues();
+			for(int j=0; j<vals.length;j++)
+				y[i].addValue(vals[j]);
+		}
+		return y;
+	}
 }
