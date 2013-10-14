@@ -61,6 +61,13 @@ public class PlacemarkRadiusExtractor {
 		//Map<String,Double> bestRadius = new HashMap<String,Double>();
 		
 		new File(ODIR).mkdirs();
+		
+		if(new File(ODIR+"/result.csv").exists()) {
+			System.err.println(ODIR+"/result.csv already exists!!!!!");
+			System.err.println("Manually remove the file before proceeding!");
+			System.exit(0);
+		}
+		
 		PrintWriter out = new PrintWriter(new FileWriter(new File(ODIR+"/result.csv")));
 		
 		for(String pn : pnames) {
