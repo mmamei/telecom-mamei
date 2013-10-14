@@ -15,34 +15,39 @@ import utils.Logger;
 import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluator {
+	
+	
+	public static final String[] FILES = new String[]{
+		Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
+		Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
+	};
+	
+	
 	public static void main(String[] args) throws Exception {
-		
-		String file = Config.getInstance().base_dir +"/PresenceCounterProbability/result_0.0_5.csv";
-		
 		
 		SimpleRegression sr = new SimpleRegression();
 		Map<String,List<double[]>> map = new HashMap<String,List<double[]>>();
 		
-		
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		String line;
-		br.readLine(); // skip header
-		while((line = br.readLine()) != null) {
-			String[] e = line.split(",");
-			String placemark = e[0].substring(0,e[0].indexOf("-"));
-			double estimated = Double.parseDouble(e[1]);
-			double groundtruth = Double.parseDouble(e[2]);
-			sr.addData(estimated, groundtruth);
-			
-			List<double[]> p = map.get(placemark);
-			if(p==null) {
-				p = new ArrayList<double[]>();
-				map.put(placemark, p);
+		for(String file: FILES) {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String line;
+			br.readLine(); // skip header
+			while((line = br.readLine()) != null) {
+				String[] e = line.split(",");
+				String placemark = e[0].substring(0,e[0].indexOf("-"));
+				double estimated = Double.parseDouble(e[1]);
+				double groundtruth = Double.parseDouble(e[2]);
+				sr.addData(estimated, groundtruth);
+				
+				List<double[]> p = map.get(placemark);
+				if(p==null) {
+					p = new ArrayList<double[]>();
+					map.put(placemark, p);
+				}
+				p.add(new double[]{estimated, groundtruth});
 			}
-			p.add(new double[]{estimated, groundtruth});
+			br.close();
 		}
-		br.close();
-		
 		DescriptiveStatistics ds1 = new DescriptiveStatistics();
 		DescriptiveStatistics ds2 = new DescriptiveStatistics();
 		

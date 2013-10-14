@@ -15,40 +15,44 @@ import utils.Logger;
 import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluatorSeparate {
+	
+	public static final String[] FILES = new String[]{
+		Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
+		Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
+	};
+	
+	
 	public static void main(String[] args) throws Exception {
-		
-		String file = Config.getInstance().base_dir +"/PresenceCounter/result_0.0_5.csv";
-		
-		
 		
 		Map<String,List<double[]>> map = new HashMap<String,List<double[]>>();
 		Map<String,SimpleRegression> sr_map = new HashMap<String,SimpleRegression>();
 		
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		String line;
-		br.readLine(); // skip header
-		while((line = br.readLine()) != null) {
-			String[] e = line.split(",");
-			String placemark = e[0].substring(0,e[0].indexOf("-"));
-			double estimated = Double.parseDouble(e[1]);
-			double groundtruth = Double.parseDouble(e[2]);
-			
-			SimpleRegression sr = sr_map.get(placemark);
-			if(sr == null) {
-				sr = new SimpleRegression();
-				sr_map.put(placemark, sr);
+		for(String file: FILES) {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String line;
+			br.readLine(); // skip header
+			while((line = br.readLine()) != null) {
+				String[] e = line.split(",");
+				String placemark = e[0].substring(0,e[0].indexOf("-"));
+				double estimated = Double.parseDouble(e[1]);
+				double groundtruth = Double.parseDouble(e[2]);
+				
+				SimpleRegression sr = sr_map.get(placemark);
+				if(sr == null) {
+					sr = new SimpleRegression();
+					sr_map.put(placemark, sr);
+				}
+				sr.addData(estimated, groundtruth);
+				
+				List<double[]> p = map.get(placemark);
+				if(p==null) {
+					p = new ArrayList<double[]>();
+					map.put(placemark, p);
+				}
+				p.add(new double[]{estimated, groundtruth});
 			}
-			sr.addData(estimated, groundtruth);
-			
-			List<double[]> p = map.get(placemark);
-			if(p==null) {
-				p = new ArrayList<double[]>();
-				map.put(placemark, p);
-			}
-			p.add(new double[]{estimated, groundtruth});
+			br.close();
 		}
-		br.close();
-		
 		
 		DescriptiveStatistics ds1 = new DescriptiveStatistics();
 		DescriptiveStatistics ds2 = new DescriptiveStatistics();
