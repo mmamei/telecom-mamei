@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import pls_parser.PLSEventsAroundAPlacemark;
@@ -21,26 +22,32 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
+import analysis.PlsEvent;
 import area.CityEvent;
 import area.Placemark;
 
 public class PresenceCounter {
 	
 	
-	public static void main(String[] args) throws Exception {
-		
+	
+	public static boolean USE_PROBABILITY = true;
+	public static boolean USE_INDIVIDUAL_EVENT = true;
+	
+	
+	public static void main(String[] args) throws Exception {		
 		double o_radius = 0;
 		int days = 3;
 		process(o_radius,days);
 		
 	}
 		
+	
 	public static void process(double o_radius, int days) throws Exception {
 		
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
 		
-		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
+		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(USE_INDIVIDUAL_EVENT);	
 		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
@@ -61,34 +68,40 @@ public class PresenceCounter {
 		
 		for(String p : placemark_events.keySet()) {
 			
-			//if(!p.equals("Juventus Stadium (TO)") && !p.equals("Stadio Mario Rigamonti (BS)")) continue;
+
+			//if(!p.equals("Piazza San Carlo (TO)")) continue;
 			
 			labels.add(p);
 			List<CityEvent> pevents =  placemark_events.get(p);
 			double[][] result = new double[pevents.size()][2];
 			int i = 0;
+			
 			for(CityEvent ce: pevents) {
-				double bestr = bestRadius.get(ce.spot.name);
 				
-				double searchr = Double.isNaN(o_radius) ? bestr : o_radius;
+				String key = USE_INDIVIDUAL_EVENT ? ce.toString() : ce.spot.name;
+				double bestr = bestRadius.get(key);
 				
+				ce.spot.changeRadius(bestr);
 				
-				double c = count(ce,bestr,searchr,days);
-				Logger.logln(ce.toString()+" [bestr="+bestr+",or="+searchr+"] estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
+				double c = count(ce,o_radius,days);
+				
+				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
 				sr.addData(result[i][0], result[i][1]);
 				i++;
+				//System.exit(0);
 			}
+			
 			data.add(result);
 		}
 		
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
 		
-		new GraphScatterPlotter("SC Result: o_radius = "+o_radius+",days = "+days+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
+		new GraphScatterPlotter("PC Result: o_radius = "+o_radius+",days = "+days+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir();
+		String dir = Config.getInstance().base_dir +"/PresenceCounterProbability";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+o_radius+"_"+days+".csv"));
@@ -108,58 +121,59 @@ public class PresenceCounter {
 		out.close();
 		//Logger.logln("Done!");
 	}
-	
-	
-	
-	
 		
-	public static double count(CityEvent event, double e_radius, double o_radius, int days) throws Exception {	
+	
+	
+	public static double count(CityEvent event, double o_radius, int days) throws Exception {	
 		
-		//Logger.logln("\n"+event.spot.name+", e_r = "+e_radius+", o_r = "+o_radius);
+		String dir = Config.getInstance().base_dir +"/PresenceCounterProbability/ProbScores";
+		File d = new File(dir);
+		if(!d.exists()) d.mkdirs();
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+event.toFileName()));
 		
-		String file_event = getFile(event.spot.clone(),e_radius);
+		
+		Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
+		
+		String file_event = getFile(event.spot.clone(),event.spot.radius);
 		String file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
 		
 		Calendar start = (Calendar)event.st.clone();
 		start.add(Calendar.DAY_OF_MONTH, -days);
+	
 		Calendar end = (Calendar)event.et.clone();
 		end.add(Calendar.DAY_OF_MONTH, days);
 		
-		/*
-		start.set(Calendar.HOUR_OF_DAY, 0);
-		start.set(Calendar.MINUTE, 0);
-		start.set(Calendar.SECOND, 0);
 		
-		end.set(Calendar.HOUR_OF_DAY, 23);
-		end.set(Calendar.MINUTE, 59);
-		end.set(Calendar.SECOND, 59);
-		*/
+		CityEvent e2 = new CityEvent(event.spot.clone(),start,end,event.head_count);
+		e2.spot.changeRadius(o_radius);
+				
+		Map<String,List<PlsEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
+		Map<String,List<PlsEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
 		
-		Calendar start_day_event = (Calendar)event.st.clone();
-		Calendar end_day_event = (Calendar)event.et.clone();
-		
-		/*
-		start_day_event.set(Calendar.HOUR_OF_DAY, 0);
-		start_day_event.set(Calendar.MINUTE, 0);
-		start_day_event.set(Calendar.SECOND, 0);
+
+		double prob = 0;
 		
 		
-		end_day_event.set(Calendar.HOUR_OF_DAY, 23);
-		end_day_event.set(Calendar.MINUTE, 59);
-		end_day_event.set(Calendar.SECOND, 59);
-		*/
-	
-		Set<String> userPresentAtTheEventTimeOnOtherDays = getUsers(file_other,start,end,start_day_event,end_day_event);
+		for(String u: usr_pls.keySet()) {
+			
+			double f1 = fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),event,null,false);
+			double f2 = fractionOfTimeInWhichTheUserWasAtTheEvent(usr_other_pls.get(u),e2,event,false);
+			
+			
+			if(!USE_PROBABILITY) {
+				if(f1 > 0) f1 = 1;
+				if(f2 > 0) f2 = 1;
+			}
+			
+			out.println(u+";"+(f1 * (1-f2)));
+			prob +=  f1*(1-f2);
+		}
 		
-		userPresentDuringEvent.removeAll(userPresentAtTheEventTimeOnOtherDays);
-		return userPresentDuringEvent.size();
-		
-		
-		//userPresentAtTheEventTimeOnOtherDays.retainAll(userPresentDuringEvent);
-		//return userPresentAtTheEventTimeOnOtherDays.size();
-	} 
+		out.close();
+		return prob;
+	}
 	
 	public static String getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
@@ -170,20 +184,6 @@ public class PresenceCounter {
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
 			PLSEventsAroundAPlacemark.process(p);
 		}
-		//else Logger.logln(file+" already exists!");
-		/*
-		Logger.logln(p.name+", "+radius);
-		Set<String> cells = new HashSet<String>();
-		String line;
-		BufferedReader in = new BufferedReader(new FileReader(file));
-		while((line = in.readLine()) != null){
-			String[] splitted = line.split(",");
-			cells.add(splitted[3]);
-		}
-		in.close();
-		for(String cell: cells) 
-			Logger.logln(cell);
-		*/
 		return file;
 	}
 	
@@ -192,7 +192,6 @@ public class PresenceCounter {
 		String line;
 		Calendar cal = new GregorianCalendar();
 		BufferedReader in = new BufferedReader(new FileReader(file));
-		int cont = 0;
 		while((line = in.readLine()) != null){
 			String[] splitted = line.split(",");
 			if(splitted.length == 5) {
@@ -200,15 +199,152 @@ public class PresenceCounter {
 				if(start.before(cal) && end.after(cal)) {
 					if(start_exclude == null || end_exclude ==null)
 						users.add(splitted[0]);
-					else if(cal.before(start_exclude) || cal.after(end_exclude))
+					else if(cal.before(start_exclude) || cal.after(end_exclude)) {
+						if(splitted[0].equals("d66b2019ce10a2927f19aad6a3242bf85f5bdfa487a4dd1c82966451d6221732")) {
+							//System.err.println(line+" --> "+cal.getTime());
+						}
 						users.add(splitted[0]);
+					}
 				}
 			}
 			else System.out.println("Problems: "+line);
-			cont ++;
 		}
 		in.close();
-		//Logger.logln(file+" CONT = "+cont);
 		return users;
 	}
+	
+	
+	public static Map<String,List<PlsEvent>> getUsersPLS(String file, Set<String> users) throws Exception {
+		Map<String,List<PlsEvent>> usr_pls = new HashMap<String,List<PlsEvent>>();
+		for(String u: users)
+			usr_pls.put(u, new ArrayList<PlsEvent>());
+		
+		String line;
+		BufferedReader in = new BufferedReader(new FileReader(file));
+		while((line = in.readLine()) != null){
+			String[] splitted = line.split(",");
+			List<PlsEvent> list = usr_pls.get(splitted[0]);
+			if(list!=null) list.add(new PlsEvent(splitted[0],"imsi",Long.parseLong(splitted[3]),splitted[1]));
+		}
+		in.close();
+		return usr_pls;
+	}
+	
+	
+	
+	public static double fractionOfTimeInWhichTheUserWasAtTheEvent(List<PlsEvent> plsEvents, CityEvent event, CityEvent exclude, boolean verbose) {
+		Calendar first = null;
+		Calendar last = null;
+		boolean inEvent = false;
+		
+		if(verbose) { 
+			System.err.println("EVENT = "+event);
+			System.err.println("EXCLUDE = "+exclude);
+		}
+		
+		for(PlsEvent pe: plsEvents) {	
+			
+			Calendar cal = pe.getCalendar();
+			
+			if(event.st.before(cal) && event.et.after(cal))
+			if(verbose) System.err.println("-"+pe);
+			
+			if(event.st.before(cal) && event.et.after(cal) && (exclude == null || cal.before(exclude.st) || cal.after(exclude.et))) {
+				
+					//Logger.logln(">"+pe.getCalendar().getTime().toString());
+					if(event.spot.contains(pe.getCellac())){
+						if(inEvent==false) {
+							//Logger.logln("The user enters the event!");
+							inEvent = true;
+						}
+						first = (first == null || first.after(cal)) ? (Calendar)cal.clone() : first;
+						last = (last == null || last.before(cal)) ? (Calendar)cal.clone() : last;
+					}
+					else if(inEvent) {
+						//Logger.logln("The user walks away before the end!");
+						inEvent = false;
+					}
+			}
+			//if(pe.getCalendar().after(event.et)) break;
+			//else  Logger.logln(pe.getCalendar().getTime().toString());
+		}
+		
+		
+		if(first == null) return 0;
+		
+		int iet = getAvgInterEventTime(plsEvents,event);
+		//System.out.println("***** "+iet);
+		
+		first.add(Calendar.MINUTE, -iet);
+		if(first.before(event.st)) first = event.st;
+		last.add(Calendar.MINUTE, iet);
+		if(last.after(event.et)) last = event.et;
+		
+		double ev_s = event.st.getTimeInMillis(); // event start
+		double ev_e = event.et.getTimeInMillis(); // event end
+		
+		double ex_s = 0;
+		double ex_e = 0;
+		
+		if(exclude!=null) {
+			ex_s = exclude.st.getTimeInMillis(); // exclude start
+			ex_e = exclude.et.getTimeInMillis(); // exclude end
+		}
+		
+		
+		double f = first.getTimeInMillis(); // first
+		double l = last.getTimeInMillis(); // last
+		double ev_lenght = ev_e - ev_s;
+		double ex_lenght = ex_e - ex_s;
+		double ot_lenght = l - f;
+		double max = ev_lenght - ex_lenght;
+		
+		double f2 = (f < ex_s && l > ex_e) ? (ot_lenght - ex_lenght) / max : ot_lenght / max;
+		
+		if(f2<=0) {
+			System.err.println(event);
+			System.err.println(exclude);
+			System.err.println(first.getTime()+" - "+last.getTime());
+		}
+		
+		return f2;
+	}
+	
+	
+	public static int getAvgInterEventTime(List<PlsEvent> plsEvents, CityEvent e) {
+		
+		Calendar startTime = e.st;
+		Calendar endTime = e.et;
+		int startH = startTime.get(Calendar.HOUR_OF_DAY);
+		int endH = endTime.get(Calendar.HOUR_OF_DAY);
+		
+		
+		DescriptiveStatistics ustats = new DescriptiveStatistics();
+		for(int j=1;j<plsEvents.size();j++) {
+			
+			int d1 = plsEvents.get(j).getCalendar().get(Calendar.DAY_OF_YEAR);
+			int d2 = plsEvents.get(j-1).getCalendar().get(Calendar.DAY_OF_YEAR);
+			
+			int h1 = plsEvents.get(j).getCalendar().get(Calendar.HOUR_OF_DAY);
+			int h2 = plsEvents.get(j-1).getCalendar().get(Calendar.HOUR_OF_DAY);
+			
+			if(h1 < startH || h1 > endH) continue;
+			if(h2 < startH || h2 > endH) continue;
+			
+			if(d1 != d2) continue;
+			
+			//if(plsEvents.get(j).getCalendar().before(e.st) || plsEvents.get(j).getCalendar().after(e.et)) continue;
+			//if(plsEvents.get(j-1).getCalendar().before(e.st) || plsEvents.get(j-1).getCalendar().after(e.et)) continue;
+				
+			double dt = (1.0 * (plsEvents.get(j).getTimeStamp() - plsEvents.get(j-1).getTimeStamp())/60000);
+			ustats.addValue(dt);
+		}
+		
+		int iet = (int)ustats.getMean();
+		if(iet == 0) iet = 100;
+		return iet;
+	}
+	
+	
+	
 }

@@ -25,7 +25,7 @@ public class ODMatrixEventPresence {
 	public static void process(String event, double expand) throws Exception {
 		
 		CityEvent ce = CityEvent.getEvent(event);
-		Map<String,Double> bestR = PlacemarkRadiusExtractor.readBestR();
+		Map<String,Double> bestR = PlacemarkRadiusExtractor.readBestR(true);
 		ce.spot.changeRadius(bestR.get(ce.spot.name));
 		
 		CityEvent ce_expand = CityEvent.expand(ce, 1, expand);

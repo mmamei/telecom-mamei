@@ -167,7 +167,7 @@ public class Placemark {
 	
 	
 	public static void main(String[] args) throws Exception {
-		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR();	
+		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
 		initPlacemaks();
 		for(String name: PLACEMARKS.keySet()) {
 			Placemark x = Placemark.getPlacemark(name);
