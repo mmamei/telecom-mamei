@@ -1,4 +1,4 @@
-package analysis.presence_at_event;
+package pre_delete;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,9 +16,9 @@ import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluatorSeparate {
 	
-	public static final String[] FILES = new String[]{
-		Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
-		Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
+	static String[] FILES = new String[]{
+			Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
+			Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
 	};
 	
 	
