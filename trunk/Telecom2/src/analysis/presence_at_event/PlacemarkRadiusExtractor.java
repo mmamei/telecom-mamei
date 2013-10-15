@@ -93,12 +93,11 @@ public class PlacemarkRadiusExtractor {
 	}
 	
 	
-	public static Map<String,Double> readBestR() throws Exception {
-		return readBestR(ODIR+"/result.csv");
-	}
-	
-	public static Map<String,Double> readBestRIndividual() throws Exception {
-		return readBestR(ODIR+"/result_individual.csv");
+	public static Map<String,Double> readBestR(boolean individual) throws Exception {
+		if(individual)
+			return readBestR(ODIR+"/result_individual.csv");
+		else
+			return readBestR(ODIR+"/result.csv");
 	}
 	
 	
