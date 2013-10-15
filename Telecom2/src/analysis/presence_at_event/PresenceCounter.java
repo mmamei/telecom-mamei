@@ -104,7 +104,9 @@ public class PresenceCounter {
 		String dir = Config.getInstance().base_dir +"/PresenceCounterProbability";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/result_"+o_radius+"_"+days+".csv"));
+		
+		String file = USE_INDIVIDUAL_EVENT ? "result_individual_"+o_radius+"_"+days+".csv" : "result_"+o_radius+"_"+days+".csv";
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+file));
 		out.println("event,estimated,groundtruth");
 		
 		int i = 0;	
@@ -119,7 +121,7 @@ public class PresenceCounter {
 		
 		
 		out.close();
-		//Logger.logln("Done!");
+		Logger.logln("Done!");
 	}
 		
 	

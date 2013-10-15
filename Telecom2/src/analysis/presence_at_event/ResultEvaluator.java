@@ -16,16 +16,83 @@ import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluator {
 	
+	
 	public static void main(String[] args) throws Exception {
 		String[] files = new String[]{
 				Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
 				Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
 		};
-		run(files);
+		run(files,files);
+		Logger.logln("Done");
 	}
 	
-	public static void run(String[] files) throws Exception {
+	
+	public static void run(String[] training_files, String[] testing_files) throws Exception {
 		
+		Envelope training_data = read(training_files);
+		SimpleRegression training_sr = training_data.sr;
+		//Map<String,List<double[]>> training_map = training_data.map;
+		
+		Envelope testing_data = read(testing_files);
+		SimpleRegression testing_sr = testing_data.sr;
+		Map<String,List<double[]>> testing_map = testing_data.map;
+		
+		Logger.logln("TRAINING: r="+training_sr.getR()+", r^2="+training_sr.getRSquare()+", sse="+training_sr.getSumSquaredErrors());
+		Logger.logln("TESTING: r="+testing_sr.getR()+", r^2="+testing_sr.getRSquare()+", sse="+testing_sr.getSumSquaredErrors());
+		
+		DescriptiveStatistics abs_err_stat = new DescriptiveStatistics();
+		DescriptiveStatistics perc_err_stat = new DescriptiveStatistics();
+		
+		double s = training_sr.getSlope();
+		double sconf = training_sr.getSlopeConfidenceInterval(); 
+		
+		double i = training_sr.getIntercept();
+		double iconf = training_sr.getInterceptStdErr();
+		
+		Logger.logln("Y = "+s+" * X + "+i);
+		
+		Logger.logln("TRAINING: SLOPE CONF INTERVAL =  ["+(s-sconf)+","+(s+sconf)+"]");
+		Logger.logln("TRAINING: INTERCEPT CONNF INTERVAL =  ["+(i-iconf)+","+(i+iconf)+"]");
+		
+		for(String placemark: testing_map.keySet()) {
+			Logger.logln(placemark);
+			List<double[]> list_est = new ArrayList<double[]>(); 
+			for(double[] x : testing_map.get(placemark)) {
+				double est = Math.max(0, training_sr.predict(x[0]));
+				double gt = x[1];
+				list_est.add(new double[]{est,gt});
+				
+				double abserr = Math.abs(est - gt);
+				abs_err_stat.addValue(abserr);
+				
+				double perc = 100*(abserr/gt);
+				perc_err_stat.addValue(perc);
+				
+				Logger.logln("GT = "+(int)gt+" EST = "+(int)est+" ABS_ERR = "+(int)abserr+" %ERR = "+(int)perc+"%");
+				
+			}
+			testing_map.put(placemark, list_est);
+		}
+		
+		Logger.logln("MEAN ABS ERROR = "+(int)abs_err_stat.getMean());
+		Logger.logln("MEDIAN ABS ERROR = "+(int)abs_err_stat.getPercentile(50));
+		
+		Logger.logln("MEAN % ERROR = "+(int)perc_err_stat.getMean()+"%");
+		Logger.logln("MEDIAN % ERROR = "+(int)perc_err_stat.getPercentile(50)+"%");
+		
+		draw("Result",testing_map);
+		
+		for(String placemark: testing_map.keySet()) {
+			for(double[] x : testing_map.get(placemark)) {
+				double est = x[0];
+				double gt = x[1];
+				System.out.println(placemark+";"+(int)est+";"+(int)gt);
+			}
+		}
+	}
+	
+	
+	public static Envelope read(String[] files) throws Exception {
 		SimpleRegression sr = new SimpleRegression();
 		Map<String,List<double[]>> map = new HashMap<String,List<double[]>>();
 		
@@ -49,44 +116,8 @@ public class ResultEvaluator {
 			}
 			br.close();
 		}
-		DescriptiveStatistics ds1 = new DescriptiveStatistics();
-		DescriptiveStatistics ds2 = new DescriptiveStatistics();
 		
-		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
-		
-		double s = sr.getSlope();
-		double sconf = sr.getSlopeConfidenceInterval(); 
-		
-		double i = sr.getIntercept();
-		double iconf = sr.getInterceptStdErr();
-		
-		Logger.logln("Y = "+s+" * X + "+i);
-		
-		
-		Logger.logln("SLOPE CONF INTERVAL =  ["+(s-sconf)+","+(s+sconf)+"]");
-		Logger.logln("INTERCEPT CONNF INTERVAL =  ["+(i-iconf)+","+(i+iconf)+"]");
-		
-		for(String placemark: map.keySet()) {
-			System.out.println(placemark);
-			for(double[] x : map.get(placemark)) {
-				double est = Math.max(0, sr.predict(x[0]));
-				double gt = x[1];
-				double abserr = Math.abs(est - gt);
-				
-				ds1.addValue(abserr);
-				
-				double perr = 100*(abserr/gt);
-				Logger.logln("GT = "+(int)gt+" EST = "+(int)est+" ABS_ERR = "+(int)abserr+" %ERR = "+(int)perr+"%");
-				ds2.addValue(perr);
-			}
-		}
-		
-		Logger.logln("MEAN ABS ERROR = "+(int)ds1.getMean());
-		Logger.logln("MEDIAN ABS ERROR = "+(int)ds1.getPercentile(50));
-		
-		Logger.logln("MEAN % ERROR = "+(int)ds2.getMean()+"%");
-		Logger.logln("MEDIAN % ERROR = "+(int)ds2.getPercentile(50)+"%");
-		draw("Result",map);
+		return new Envelope(sr,map);
 	}
 	
 	
@@ -106,3 +137,16 @@ public class ResultEvaluator {
 		new GraphScatterPlotter(title,"Estimated","GroundTruth",data,labels);
 	}
 }
+
+class Envelope {
+	SimpleRegression sr;
+	Map<String,List<double[]>> map;
+	
+	Envelope(SimpleRegression sr, Map<String,List<double[]>> map) {
+		this.sr = sr;
+		this.map = map;
+	}
+	
+}
+
+
