@@ -167,18 +167,20 @@ public class Placemark {
 	
 	
 	public static void main(String[] args) throws Exception {
-		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
+		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
 		initPlacemaks();
 		for(String name: PLACEMARKS.keySet()) {
+			System.out.println(name);
+			if(!name.equals("Venezia")) continue;
 			Placemark x = Placemark.getPlacemark(name);
 			System.out.println(name);
 			//double bestr = bestRadius.get(name);
-			double bestr = 0;
-			x.changeRadius(bestr);
+			//double bestr = 0;
+			//x.changeRadius(bestr);
 			String dir = Config.getInstance().base_dir+"/Placemark";
 			File d = new File(dir);
 			if(!d.exists()) d.mkdirs();
-			x.printKML(dir+"/"+x.name+"_"+(int)bestr+".kml");	
+			x.printKML(dir+"/"+x.name+"_"+(int)x.radius+".kml");	
 		}
 		Logger.logln("Done!");
 	}

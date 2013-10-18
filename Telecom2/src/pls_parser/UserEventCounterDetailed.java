@@ -44,22 +44,26 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 	long timestamp;
 	
 	public void analyze(String line) {
-		fields = line.split("\t");
-		username = fields[0];
-		imsi = fields[1];
-		celllac = fields[2];
-		timestamp = Long.parseLong(fields[3]);
-		
-		if(placemark.contains(celllac)){
-			UserInfo info = users_info.get(username);
-			if(info == null) {
-				info = new UserInfo();
-				info.imsi = imsi;
-				users_info.put(username, info);
+		try {
+			fields = line.split("\t");
+			username = fields[0];
+			imsi = fields[1];
+			celllac = fields[2];
+			timestamp = Long.parseLong(fields[3]);
+			
+			if(placemark.contains(celllac)){
+				UserInfo info = users_info.get(username);
+				if(info == null) {
+					info = new UserInfo();
+					info.imsi = imsi;
+					users_info.put(username, info);
+				}
+				info.num_pls++;
+				info.time_of_first_pls = Math.min(info.time_of_first_pls,timestamp);
+				info.time_of_last_pls = Math.max(info.time_of_last_pls, timestamp);
 			}
-			info.num_pls++;
-			info.time_of_first_pls = Math.min(info.time_of_first_pls,timestamp);
-			info.time_of_last_pls = Math.max(info.time_of_last_pls, timestamp);
+		} catch(Exception e) {
+			System.err.println("Problems... "+line);
 		}
 	}
 	
@@ -82,6 +86,7 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 			ba.finish();
 			Logger.logln("Done");
 		}
+		else Logger.logln("file already exists!");
 	}
 	
 }

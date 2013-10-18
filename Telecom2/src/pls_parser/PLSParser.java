@@ -75,6 +75,7 @@ public class PLSParser {
 	
 	
 	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer) {	
+		//System.out.println(plsFile.getAbsolutePath());
 		try {
 			ZipFile zf = new ZipFile(plsFile);
 			ZipEntry ze = (ZipEntry) zf.entries().nextElement();
