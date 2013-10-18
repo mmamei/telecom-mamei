@@ -2,10 +2,9 @@ package utils;
 
 import java.util.Random;
 
-import org.apache.commons.math.distribution.NormalDistribution;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.inference.TestUtils;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.inference.TestUtils;
 
 import visual.java.GraphPlotter;
 
@@ -44,7 +43,7 @@ public class StatsUtils {
 		
 		double[] sets = new double[]{Double.NEGATIVE_INFINITY,-3,-2,-1,0,1,2,3,Double.POSITIVE_INFINITY};
 		
-		NormalDistribution nd = new NormalDistributionImpl();
+		NormalDistribution nd = new NormalDistribution();
 		
 		long[] count = new long[sets.length-1];
 		for(int j=0; j<z.length;j++) {

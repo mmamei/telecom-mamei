@@ -1,27 +1,7 @@
 package pre_delete;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import pls_parser.UsersCSVCreator;
-import utils.Config;
-import utils.Logger;
-import visual.java.GraphPlotter;
-import visual.kml.KMLPath;
 import analysis.PlsEvent;
 import area.CityEvent;
 

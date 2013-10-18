@@ -18,7 +18,7 @@ import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.gps.utils.LatLonUtils;
 
 import pls_parser.PLSEventsAroundAPlacemark;
@@ -36,7 +36,7 @@ public class PlacemarkRadiusExtractor {
 	
 	public static final int MAX_R = 1500;
 	public static final int MIN_R = -500;
-	public static final int STEP = 100;
+	public static final int STEP = 200;
 	
 	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir();
 	
@@ -117,6 +117,7 @@ public class PlacemarkRadiusExtractor {
 		double[][] valueRadiusDistrib  = null;
 		// restore
 		File f = new File(ODIR+"/"+name+"/zXradius.ser");
+		
 		if(f.exists()) valueRadiusDistrib = (double[][])CopyAndSerializationUtils.restore(f);
 		else {
 			//create
@@ -239,6 +240,8 @@ public class PlacemarkRadiusExtractor {
 	
 public static double[][] computeZXRadius(CityEvent e) throws Exception {
 		
+	Logger.logln("Processing "+e.toString());
+	
 		Placemark p = e.spot;
 		p.changeRadius(MAX_R);
 		
@@ -262,7 +265,6 @@ public static double[][] computeZXRadius(CityEvent e) throws Exception {
 			
 			PLSMap plsmap = PlacemarkRadiusExtractor.getPLSMap(file,p,max_r);
 					
-			
 			double max_z = 0;
 			double sum_z = 0;
 		
@@ -298,7 +300,7 @@ public static double[][] computeZXRadius(CityEvent e) throws Exception {
 				List<CityEvent> relevant = new ArrayList<CityEvent>();
 				relevant.add(e);
 							
-				GraphPlotter gs = PLSBehaviorInAnArea.drawGraph(p.name+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevant);
+				GraphPlotter gs = PLSBehaviorInAnArea.drawGraph(e.toString()+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevant);
 				gs.save(ODIR+"/"+e.toFileName()+"/maxr="+max_r+".png");
 				
 				
@@ -321,7 +323,7 @@ public static double[][] computeZXRadius(CityEvent e) throws Exception {
 			//zXradius[index][1] = sum_z/h;
 			zXradius[index][1] = max_z;
 			
-			System.out.println(max_r+"  --> "+max_z);
+			System.out.println(max_r+"  ----> "+max_z);
 			
 			index++;
 		}
@@ -367,7 +369,7 @@ public static double[][] computeZXRadius(CityEvent e) throws Exception {
 	static void plot(String title, double[][] n_outliersXradius, String save_file) {
 		
 		for(int i=0; i<n_outliersXradius.length;i++)
-			Logger.logln("radius = "+n_outliersXradius[i][0]+" --> outliers = "+n_outliersXradius[i][1]);
+			Logger.logln("radius = "+n_outliersXradius[i][0]+" --> val = "+n_outliersXradius[i][1]);
 		
 		
 		String[] domain = new String[n_outliersXradius.length];
@@ -397,7 +399,12 @@ public static double[][] computeZXRadius(CityEvent e) throws Exception {
 			if(splitted.length == 5 && !splitted[3].equals("null")) {
 				
 				String username = splitted[0];
+				try{
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
+				}catch(Exception e) {
+					System.err.println("bad read: "+line);
+					continue;
+				}
 				String key = PLSBehaviorInAnArea.getKey(cal);
 				String celllac = splitted[3]; 
 				NetworkCell nc = NM.get(Long.parseLong(celllac));
