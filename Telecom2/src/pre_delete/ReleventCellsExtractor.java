@@ -4,17 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import network.NetworkCell;
-import network.NetworkMap;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.gps.utils.LatLonUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;

@@ -1,7 +1,9 @@
 package pls_parser;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Calendar;
@@ -79,7 +81,7 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Placemark p = Placemark.getPlacemark("Venezia");
+		Placemark p = Placemark.getPlacemark("Asti");
 		UserEventCounterDetailed ba = new UserEventCounterDetailed(p);
 		if(!new File(ba.hashmap_outputfile).exists()) {
 			PLSParser.parse(ba);
@@ -89,6 +91,22 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 		else Logger.logln("file already exists!");
 	}
 	
+	/*
+	 * This main is places here for convenience. It just read the file and remove all the users producing few events
+	 */
+	public static void main2(String[] args) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/UserEventCounterDetailed/file_pls_fi.csv")));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(Config.getInstance().base_dir+"/UserEventCounterDetailed/file_pls_fi5.csv"))));
+		String line;
+		while((line = br.readLine()) != null) {
+			int num_pls = Integer.parseInt(line.split(",")[2]);
+			if(num_pls >= 3)
+				out.println(line);
+		}
+		br.close();
+		out.close();
+		Logger.logln("Done!");
+	}
 }
 
 

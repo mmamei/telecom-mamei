@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
-import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 import analysis.PlsEvent;
@@ -31,7 +30,7 @@ public class PresenceCounter {
 	
 	
 	public static boolean USE_PROBABILITY = true;
-	public static boolean USE_INDIVIDUAL_EVENT = true;
+	public static boolean USE_INDIVIDUAL_EVENT = false;
 	
 	
 	public static void main(String[] args) throws Exception {		
@@ -101,7 +100,7 @@ public class PresenceCounter {
 		
 		new GraphScatterPlotter("PC Result: o_radius = "+o_radius+",days = "+days+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounterProbability";
+		String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir();
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
@@ -128,7 +127,7 @@ public class PresenceCounter {
 	
 	public static double count(CityEvent event, double o_radius, int days) throws Exception {	
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounterProbability/ProbScores";
+		String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir()+"/ProbScores";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+event.toFileName()));
@@ -162,7 +161,6 @@ public class PresenceCounter {
 			
 			double f1 = fractionOfTimeInWhichTheUserWasAtTheEvent(usr_pls.get(u),event,null,false);
 			double f2 = fractionOfTimeInWhichTheUserWasAtTheEvent(usr_other_pls.get(u),e2,event,false);
-			
 			
 			if(!USE_PROBABILITY) {
 				if(f1 > 0) f1 = 1;

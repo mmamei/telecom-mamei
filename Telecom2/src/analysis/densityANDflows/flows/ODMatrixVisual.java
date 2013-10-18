@@ -9,19 +9,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import com.graphhopper.GHRequest;
-import com.graphhopper.GHResponse;
-import com.graphhopper.GraphHopper;
-import com.graphhopper.routing.util.EncodingManager;
-import com.graphhopper.util.PointList;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import utils.Config;
 import utils.Logger;
 import visual.html.ArrowsGoogleMaps;
 import visual.kml.KML;
 import visual.kml.KMLArrow;
+
+import com.graphhopper.GHRequest;
+import com.graphhopper.GHResponse;
+import com.graphhopper.GraphHopper;
+import com.graphhopper.routing.util.EncodingManager;
+import com.graphhopper.util.PointList;
 
 public class ODMatrixVisual {
 		

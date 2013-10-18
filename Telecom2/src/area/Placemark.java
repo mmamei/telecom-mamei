@@ -171,7 +171,7 @@ public class Placemark {
 		initPlacemaks();
 		for(String name: PLACEMARKS.keySet()) {
 			System.out.println(name);
-			if(!name.equals("Venezia")) continue;
+			if(!name.equals("Asti")) continue;
 			Placemark x = Placemark.getPlacemark(name);
 			System.out.println(name);
 			//double bestr = bestRadius.get(name);

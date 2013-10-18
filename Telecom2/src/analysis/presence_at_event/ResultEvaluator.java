@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.regression.SimpleRegression;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import utils.Config;
 import utils.Logger;
@@ -17,13 +17,21 @@ import visual.java.GraphScatterPlotter;
 public class ResultEvaluator {
 	
 	
+	public static final boolean INTERCEPT = false;
+	
 	public static void main(String[] args) throws Exception {
 		String[] files = new String[]{
 				Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
 				Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
 		};
-		//run(files,files);
-		runSeparate(files,files);
+		
+		
+		String[] training = new String[]{Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv"};
+		String[] testing = new String[]{Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv"};
+		
+		
+		run(training,testing);
+		//runSeparate(files,files);
 		Logger.logln("Done");
 	}
 	
@@ -42,7 +50,7 @@ public class ResultEvaluator {
 		
 		// scale testing data according to training regression
 		Map<String,List<double[]>> scaled = scale(testing_map,training_sr);
-		draw("Result",testing_map);
+		draw("Result",scaled);
 		
 		// compute error
 		DescriptiveStatistics[] abs_perc_errors = computeErrorStats(scaled);
@@ -195,12 +203,15 @@ public class ResultEvaluator {
 	
 	
 	public static SimpleRegression getRegression(Map<String,List<double[]>> map) {
-		SimpleRegression sr = new SimpleRegression();
+		SimpleRegression sr = new SimpleRegression(INTERCEPT);
 		for(List<double[]> lv: map.values())
 		for(double[] v: lv)
 			sr.addData(v[0], v[1]);
 		return sr;
 	}	
+	
+	
+	
 	
 	
 	public static void draw(String title, Map<String,List<double[]>> map) {
