@@ -27,10 +27,8 @@ import area.Placemark;
 
 public class PresenceCounter {
 	
-	
-	
 	public static boolean USE_PROBABILITY = true;
-	public static boolean USE_INDIVIDUAL_EVENT = false;
+	public static boolean USE_INDIVIDUAL_EVENT = true;
 	
 	
 	public static void main(String[] args) throws Exception {		
