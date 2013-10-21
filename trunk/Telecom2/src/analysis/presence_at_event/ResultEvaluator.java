@@ -26,7 +26,7 @@ public class ResultEvaluator {
 		};
 		
 		
-		String[] training = new String[]{Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv"};
+		String[] training = new String[]{Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_individual_0.0_3.csv"};
 		String[] testing = new String[]{Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv"};
 		
 		

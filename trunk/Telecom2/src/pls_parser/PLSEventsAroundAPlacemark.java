@@ -102,25 +102,26 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	}
 	
 	
-	static double[] rs = new double[]{1500,1400,1300,1200,1100,1000,900,800,700,600,500,400,300,200,100,0,-100,-200,-300,-400,-500};
+	static double[] rs = new double[]{2500};//{1500,1400,1300,1200,1100,1000,900,800,700,600,500,400,300,200,100,0,-100,-200,-300,-400,-500};
 	static List<Placemark> ps = new ArrayList<Placemark>();
 	static {
-		/*
-		ps.add(Placemark.getPlacemark("Juventus Stadium (TO)"));
-		*/
+		
+		//ps.add(Placemark.getPlacemark("Juventus Stadium (TO)"));
+		
 		ps.add(Placemark.getPlacemark("Stadio Olimpico (TO)"));
-		/*
+		
 		ps.add(Placemark.getPlacemark("Stadio Silvio Piola (NO)"));
+		/*
 		ps.add(Placemark.getPlacemark("Stadio San Siro (MI)"));
 		ps.add(Placemark.getPlacemark("Stadio Atleti Azzurri d'Italia (BG)"));
 		ps.add(Placemark.getPlacemark("Stadio Mario Rigamonti (BS)"));
 		ps.add(Placemark.getPlacemark("Stadio Franco Ossola (VA)"));
 		*/
 		
-		ps.add(Placemark.getPlacemark("Piazza San Carlo (TO)"));
-		ps.add(Placemark.getPlacemark("Piazza Castello (TO)"));
-		ps.add(Placemark.getPlacemark("Piazza Vittorio (TO)"));
-		ps.add(Placemark.getPlacemark("Parco Dora (TO)"));
+		//ps.add(Placemark.getPlacemark("Piazza San Carlo (TO)"));
+		//ps.add(Placemark.getPlacemark("Piazza Castello (TO)"));
+		//ps.add(Placemark.getPlacemark("Piazza Vittorio (TO)"));
+		//ps.add(Placemark.getPlacemark("Parco Dora (TO)"));
 	}
 	
 	public static void main(String[] args) throws Exception {
