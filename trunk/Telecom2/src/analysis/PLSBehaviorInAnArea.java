@@ -287,7 +287,7 @@ public class PLSBehaviorInAnArea {
 	
 
 	
-	public static double[] getZ(org.apache.commons.math3.stat.descriptive.DescriptiveStatistics stat, Calendar startTime) {
+	public static double[] getZ(DescriptiveStatistics stat, Calendar startTime) {
 		
 		DescriptiveStatistics stat2 = new DescriptiveStatistics();
 		Calendar cal = (Calendar)startTime.clone();

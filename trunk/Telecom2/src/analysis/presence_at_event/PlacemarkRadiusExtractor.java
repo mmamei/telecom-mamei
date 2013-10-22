@@ -33,6 +33,7 @@ import area.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	
+	public static final boolean PLOT = false;
 	
 	public static final int MAX_R = 1500;
 	public static final int MIN_R = -500;
@@ -52,7 +53,7 @@ public class PlacemarkRadiusExtractor {
 		if(f.exists() && f.length() > 0) {
 			System.err.println(ODIR+"/"+file+" already exists!!!!!");
 			System.err.println("Manually remove the file before proceeding!");
-			System.exit(0);
+			//System.exit(0);
 		}
 		
 		List<CityEvent> all = CityEvent.getEventsInData();
@@ -76,14 +77,14 @@ public class PlacemarkRadiusExtractor {
 			if(INDIVIDUAL) {
 				for(int i=0; i<le.size(); i++) {
 					double[][] vxr = valXradius.get(i);
-					double bestr = getWeightedAverageWithThreshold(vxr,0);
-					//double bestr = getMaxZDrop(vxr);
+					double bestr = getWeightedAverage(vxr);
+					//double bestr = getMaxZDrop(vxr,le.get(i).toString());
 					out.println(le.get(i).toString()+","+bestr);
 					Logger.logln(le.get(i).toString()+","+bestr);
 				}
 			}
 			else {
-				double bestr = getWeightedAverageWithThreshold(group(valXradius),0);	
+				double bestr = getWeightedAverage(group(valXradius));	
 				out.println(p+","+bestr);
 				Logger.logln(p+","+bestr);
 			}
@@ -104,6 +105,7 @@ public class PlacemarkRadiusExtractor {
 			CopyAndSerializationUtils.save(f, list_valueRadiusDistrib);
 		}
 		
+		if(PLOT)
 		for(int i=0; i<le.size();i++) 
 			plot(le.get(i).toString(),list_valueRadiusDistrib.get(i),ODIR+"/"+le.get(i).toFileName()+"_val_r_distrib.png");
 		
@@ -112,45 +114,59 @@ public class PlacemarkRadiusExtractor {
 
 	
 	
-	public static double getWeightedAverageWithThreshold(double[][] valXradius,double th) {
+	public static double getWeightedAverage(double[][] valXradius) {
 		double avg_r = 0;
 		double cont = 0;
-			
 		for(int i=0; i<valXradius.length;i++) {
-			if(valXradius[i][1] > th) {
-				avg_r = avg_r + valXradius[i][0] * valXradius[i][1];
-				cont = cont + valXradius[i][1];
-			}
+			avg_r = avg_r + valXradius[i][0] * valXradius[i][1];
+			cont = cont + valXradius[i][1];
 		}
 		if(cont == 0) return -200;
 		else return round(avg_r / cont);
 	}
 	
 	
-	public static double getMaxZDrop(double[][] valXradius) {
+	public static double getMaxZDrop(double[][] valXradius, String title) {
 		
-		double[] derivative = new double[valXradius.length-1];
-		for(int i=1; i<valXradius.length;i++) 
-			derivative[i-1] = valXradius[i][1] - valXradius[i-1][1];
+		// get values
+		double[] f = new double[valXradius.length+1];
+		f[0] = valXradius[0][1];
+		for(int i=1; i<f.length;i++)
+			f[i] = valXradius[i-1][1] == 0 ? f[i-1] : valXradius[i-1][1];
+		
+	
+		double[] derivative = new double[valXradius.length];
+		for(int i=0; i<valXradius.length;i++) 
+			derivative[i] = f[i+1] - f[i];
 		
 		// smooth
-		double[] smooth = new double[derivative.length];
-		for(int i=0; i<smooth.length-1;i++)
-			smooth[i] = (2*derivative[i] + derivative[i+1]) / 3;
+		
+		double[] smooth = new double[derivative.length-2];
+		
+		for(int i=0; i<smooth.length;i++)
+			smooth[i] = (derivative[i]+ 2*derivative[i+1] + derivative[i+2]) / 4;
 		
 		// get max
 		
 		int imax = 0;
+		int imin = 0;
 		for(int i=1; i<smooth.length;i++) {
 			if(smooth[i] > smooth[imax])
 				imax = i;
+			if(smooth[i] > 0 && smooth[imin] > smooth[i])
+				imin = i;
 		}
-		return valXradius[imax+1][0];
+		
+		if(PLOT) {
+			// plot derivative
+			String[] domain = new String[smooth.length];
+			for(int i=0; i<domain.length;i++)
+				domain[i] = ""+valXradius[i+1][0];
+			
+			GraphPlotter.drawGraph("d/dX "+title, "d/dX "+title, "", "radius", "smooth", domain, smooth);
+		}
+		return valXradius[imax][0];
 	}
-	
-	
-	
-	
 	
 	
 	public static final double z_threshold = 2;
