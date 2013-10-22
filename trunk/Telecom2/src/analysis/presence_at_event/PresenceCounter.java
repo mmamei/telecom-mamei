@@ -133,7 +133,7 @@ public class PresenceCounter {
 		
 		//Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
 		
-		String file_event = getFile(event.spot.clone(),event.spot.radius);
+		String file_event = getFile(event.spot.clone(),event.spot.getR());
 		String file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
@@ -175,7 +175,7 @@ public class PresenceCounter {
 	
 	public static String getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.radius+".txt";
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");

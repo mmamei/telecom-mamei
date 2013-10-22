@@ -70,7 +70,7 @@ public class PLSBehaviorInAnArea {
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.radius+".txt";
+		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -107,7 +107,7 @@ public class PLSBehaviorInAnArea {
 			
 			if(VERBOSE) {
 				
-				PrintWriter out = new PrintWriter(new FileWriter(Config.getInstance().base_dir+"/PLSBehaviorInAnArea/"+p.name+"_"+p.radius+".csv"));
+				PrintWriter out = new PrintWriter(new FileWriter(Config.getInstance().base_dir+"/PLSBehaviorInAnArea/"+p.name+"_"+p.getR()+".csv"));
 				out.println("time,n_user,z_score");
 				for(int i=0; i<plsmap.getDomain().length;i++) {
 					out.println(plsmap.getDomain()[i]+";"+(int)usr_data[i]+";"+DF.format(z_usr_data[i]));
@@ -117,7 +117,7 @@ public class PLSBehaviorInAnArea {
 			}
 			
 			
-			drawGraph(p.name+"_"+p.radius+" Cell = "+cell,plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);
+			drawGraph(p.name+"_"+p.getR()+" Cell = "+cell,plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);
 		
 		}
 	}
