@@ -74,6 +74,7 @@ public class NetworkMapFactory {
 	
 	private static String getPLS(String dir) {
 		File[] files = new File(dir).listFiles();
+		Logger.logln("bad directory = "+dir);
 		for(File f: files) {
 			if(f.isDirectory()) return getPLS(f.getAbsolutePath());
 			else return f.getName();

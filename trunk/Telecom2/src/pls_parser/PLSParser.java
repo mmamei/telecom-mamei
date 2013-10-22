@@ -76,11 +76,12 @@ public class PLSParser {
 	
 	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer) {	
 		//System.out.println(plsFile.getAbsolutePath());
+		ZipFile zf = null;
+		InputStreamReader isr = null;
 		try {
-			ZipFile zf = new ZipFile(plsFile);
+			zf = new ZipFile(plsFile);
 			ZipEntry ze = (ZipEntry) zf.entries().nextElement();
-				
-			InputStreamReader isr = new InputStreamReader(zf.getInputStream(ze));
+			isr = new InputStreamReader(zf.getInputStream(ze));
 			int charRead = 0;
 			char[] read_buffer = new char[BUFFER_SIZE];
 			char[] buffer = new char[3*BUFFER_SIZE];
@@ -100,10 +101,15 @@ public class PLSParser {
 				}
 							
 			}
+		}catch(Exception e) {
+			System.err.println("Problems wirh file: "+plsFile.getAbsolutePath());
+			e.printStackTrace();
+		}
+		
+		try {
 			isr.close();
 			zf.close();
 		}catch(Exception e) {
-			System.err.println("Problems wirh file: "+plsFile.getAbsolutePath());
 			e.printStackTrace();
 		}
 	}
