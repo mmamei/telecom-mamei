@@ -216,7 +216,7 @@ public class CityEvent {
 	
 	
 	public static CityEvent expand(CityEvent ce, int time_shift, double space_shift) {
-		Placemark p = new Placemark(ce.spot.region,ce.spot.name,ce.spot.center,ce.spot.radius+space_shift);
+		Placemark p = new Placemark(ce.spot.region,ce.spot.name,ce.spot.center,ce.spot.getR()+space_shift);
 		Calendar st = (Calendar)ce.st.clone();
 		st.add(Calendar.HOUR_OF_DAY, -time_shift);
 		Calendar et = (Calendar)ce.et.clone();

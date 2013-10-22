@@ -90,7 +90,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	public static void process(Placemark p) throws Exception {
 		List<Placemark> ps = new ArrayList<Placemark>();
 		ps.add(p);
-		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps, new double[]{p.radius});
+		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps, new double[]{p.getR()});
 		PLSParser.parse(ba);
 		ba.finish();
 	}

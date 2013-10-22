@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,13 +18,7 @@ import network.NetworkMapFactory;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import analysis.presence_at_event.PlacemarkRadiusExtractor;
-
-import pre_delete.ReleventCellsExtractor;
-
-
 import utils.Config;
-import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.kml.KML;
 
@@ -39,8 +32,9 @@ public class Placemark {
 	public String name;
 	public double[] center;
 	public LatLonPoint center_point;
-	public double radius;
+	private double radius;
 	public Set<String> cellsAround;
+	private boolean ring = false;
 	
 	public Placemark(String region, String name, double[] point, double radius) {
 		this.region = region;
@@ -60,11 +54,21 @@ public class Placemark {
 		return name.equals(op.name) && radius == op.radius;
 	}
 	
-	
+	public double getR() {
+		if(ring) return -radius;
+		return radius;
+	}
 	
 	public void changeRadius(double r) {
+		ring = false;
 		this.radius = r;
 		this.cellsAround = getCellsAround();
+	}
+	
+	public void changeRadiusRing(double r) {
+		ring = true;
+		this.radius = r;
+		this.cellsAround = getCellsAroundRing();
 	}
 	
 	//double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
@@ -121,6 +125,21 @@ public class Placemark {
 		return cellsAround;
 	}
 	
+	
+	private Set<String> getCellsAroundRing() { 
+		Set<String> cellsAround = new HashSet<String>();
+		double bbox = 1;
+		double[] ll = new double[]{center[0]-bbox,center[1]-bbox};
+		double[] tr = new double[]{center[0]+bbox,center[1]+bbox};
+		Set<NetworkCell> ncells = NM.getCellsIn(ll, tr);
+		for(NetworkCell nc: ncells) {
+			double d = LatLonUtils.getHaversineDistance(nc.getPoint(),center_point) - nc.getRadius();
+			if(d < 1500 && d > radius)
+				cellsAround.add(String.valueOf(nc.getCellac()));
+		}
+		return cellsAround;
+	}
+	
 	public boolean contains(long celllac) {
 		return cellsAround.contains(String.valueOf(celllac));
 	}
@@ -160,6 +179,7 @@ public class Placemark {
 		out.println("</Point>");
 		out.println("</Placemark>");
 		
+		
 		kml.printFooterFolder(out);
 		out.close();
 	} 
@@ -171,16 +191,12 @@ public class Placemark {
 		initPlacemaks();
 		for(String name: PLACEMARKS.keySet()) {
 			System.out.println(name);
-			if(!name.equals("Asti")) continue;
 			Placemark x = Placemark.getPlacemark(name);
-			System.out.println(name);
-			//double bestr = bestRadius.get(name);
-			//double bestr = 0;
-			//x.changeRadius(bestr);
+			x.changeRadiusRing(500);
 			String dir = Config.getInstance().base_dir+"/Placemark";
 			File d = new File(dir);
 			if(!d.exists()) d.mkdirs();
-			x.printKML(dir+"/"+x.name+"_"+(int)x.radius+".kml");	
+			x.printKML(dir+"/"+x.name+"_"+(int)x.getR()+".kml");	
 		}
 		Logger.logln("Done!");
 	}
