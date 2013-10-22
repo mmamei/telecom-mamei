@@ -75,9 +75,11 @@ public class PlacemarkRadiusExtractor {
 			
 			if(INDIVIDUAL) {
 				for(int i=0; i<le.size(); i++) {
-					double bestr = getWeightedAverageWithThreshold(valXradius.get(i),0);	
-					 out.println(le.get(i).toString()+","+bestr);
-					 Logger.logln(le.get(i).toString()+","+bestr);
+					double[][] vxr = valXradius.get(i);
+					double bestr = getWeightedAverageWithThreshold(vxr,0);
+					//double bestr = getMaxZDrop(vxr);
+					out.println(le.get(i).toString()+","+bestr);
+					Logger.logln(le.get(i).toString()+","+bestr);
 				}
 			}
 			else {
@@ -123,6 +125,31 @@ public class PlacemarkRadiusExtractor {
 		if(cont == 0) return -200;
 		else return round(avg_r / cont);
 	}
+	
+	
+	public static double getMaxZDrop(double[][] valXradius) {
+		
+		double[] derivative = new double[valXradius.length-1];
+		for(int i=1; i<valXradius.length;i++) 
+			derivative[i-1] = valXradius[i][1] - valXradius[i-1][1];
+		
+		// smooth
+		double[] smooth = new double[derivative.length];
+		for(int i=0; i<smooth.length-1;i++)
+			smooth[i] = (2*derivative[i] + derivative[i+1]) / 3;
+		
+		// get max
+		
+		int imax = 0;
+		for(int i=1; i<smooth.length;i++) {
+			if(smooth[i] > smooth[imax])
+				imax = i;
+		}
+		return valXradius[imax+1][0];
+	}
+	
+	
+	
 	
 	
 	
@@ -226,6 +253,7 @@ public class PlacemarkRadiusExtractor {
 					zXradius.get(i)[index][0] = max_r;
 					zXradius.get(i)[index][1] = 0;
 				}
+				index++;
 				continue;
 			}
 			
@@ -256,7 +284,6 @@ public class PlacemarkRadiusExtractor {
 						continue next_event;
 					}
 				}
-				
 			}
 			index++;
 		}

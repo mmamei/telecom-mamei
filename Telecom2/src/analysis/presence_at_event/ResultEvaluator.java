@@ -20,15 +20,15 @@ public class ResultEvaluator {
 	public static final boolean INTERCEPT = false;
 	
 	public static void main(String[] args) throws Exception {
-		String[] files = new String[]{
-				Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_0.0_3.csv",
-				Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_0.0_3.csv",
-		};
 		
 		
-		String[] training = new String[]{Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_individual_0.0_3.csv"};
-		String[] testing = new String[]{Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv"};
+		String lomb = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_individual_0.0_3.csv";
+		String piem2012 = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_individual_0.0_3.csv";
+		String piem2013 = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv";
 		
+
+		String[] training = new String[]{piem2012,piem2013};
+		String[] testing = new String[]{piem2012,piem2013};
 		
 		run(training,testing);
 		//runSeparate(files,files);

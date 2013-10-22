@@ -31,7 +31,8 @@ public class PresenceCounter {
 	public static boolean USE_INDIVIDUAL_EVENT = true;
 	
 	
-	public static void main(String[] args) throws Exception {		
+	public static void main(String[] args) throws Exception {	
+		System.gc();
 		double o_radius = 0;
 		int days = 3;
 		process(o_radius,days);
@@ -65,9 +66,6 @@ public class PresenceCounter {
 		
 		for(String p : placemark_events.keySet()) {
 			
-
-			//if(!p.equals("Piazza San Carlo (TO)")) continue;
-			
 			labels.add(p);
 			List<CityEvent> pevents =  placemark_events.get(p);
 			double[][] result = new double[pevents.size()][2];
@@ -82,7 +80,9 @@ public class PresenceCounter {
 				
 				double c = count(ce,o_radius,days);
 				
-				Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
+				//Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
+				Logger.logln(ce.toString()+","+bestr+","+(int)c+","+ce.head_count);
+				
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
 				sr.addData(result[i][0], result[i][1]);
@@ -131,7 +131,7 @@ public class PresenceCounter {
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+event.toFileName()));
 		
 		
-		Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
+		//Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
 		
 		String file_event = getFile(event.spot.clone(),event.spot.radius);
 		String file_other = getFile(event.spot.clone(),o_radius);
