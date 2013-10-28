@@ -33,11 +33,11 @@ import area.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	
-	public static final boolean PLOT = false;
+	public static final boolean PLOT = true;
 	
 	public static final int MAX_R = 1500;
 	public static final int MIN_R = -500;
-	public static final int STEP = 200;
+	public static final int STEP = 100;
 	
 	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir();
 	
@@ -120,7 +120,7 @@ public class PlacemarkRadiusExtractor {
 			for(int i=0;i<vxr.length;i++) {
 				if(p.ring) p.changeRadiusRing(vxr[i][0]);
 				else p.changeRadius(vxr[i][0]);
-				double a = p.getArea();
+				double a = p.getSumRadii();//p.getArea();
 				vxr[i][1] = a == 0 ? 0 : vxr[i][1] / a;
 			}
 		}

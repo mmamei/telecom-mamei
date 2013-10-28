@@ -87,6 +87,23 @@ public class Placemark {
 		return a;
 	}
 	
+	public double getSumRadii() {
+		double a = 0;
+		for(String c: cellsAround) {
+			double r = NM.get(Long.parseLong(c)).getRadius();
+			a = a + r;
+		}
+		return a;
+	}
+	
+	
+	public double getNumCells() {
+		return cellsAround.size();
+	}
+	
+	
+	
+	
 	//double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
 	public double[][] getBBox() {
 		double[][] bbox = new double[2][2];
