@@ -34,7 +34,7 @@ public class Placemark {
 	public LatLonPoint center_point;
 	private double radius;
 	public Set<String> cellsAround;
-	private boolean ring = false;
+	public boolean ring = false;
 	
 	public Placemark(String region, String name, double[] point, double radius) {
 		this.region = region;
@@ -45,17 +45,23 @@ public class Placemark {
 		this.cellsAround = getCellsAround();
 	}
 	
+	public String toString() {
+		String n = ring? "ring_"+name : name;
+		return n+"_"+(int)radius;
+	}
+	
 	public Placemark clone() {
-		return new Placemark(region,name,center,radius);
+		Placemark c = new Placemark(region,name,center,radius);
+		if(ring) c.changeRadiusRing(radius);
+		return c;
 	}
 	
 	public boolean equals(Object o) {
 		Placemark op = (Placemark)o;
-		return name.equals(op.name) && radius == op.radius;
+		return name.equals(op.name) && radius == op.radius && ring == op.ring;
 	}
 	
 	public double getR() {
-		if(ring) return -radius;
 		return radius;
 	}
 	
@@ -69,6 +75,16 @@ public class Placemark {
 		ring = true;
 		this.radius = r;
 		this.cellsAround = getCellsAroundRing();
+	}
+	
+	
+	public double getArea() {
+		double a = 0;
+		for(String c: cellsAround) {
+			double r = NM.get(Long.parseLong(c)).getRadius();
+			a = a + (Math.pow(r, 2) * Math.PI);
+		}
+		return a;
 	}
 	
 	//double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
@@ -172,7 +188,8 @@ public class Placemark {
 		out.println("</Style>");
 			
 		out.println("<Placemark>");
-		out.println("<name>"+name+"</name>");
+		String n = ring ? "ring_"+name : name;
+		out.println("<name>"+n+"</name>");
 		out.println("<styleUrl>#placemark</styleUrl>");
 		out.println("<Point>");
 		out.println("<coordinates>"+center[1]+","+center[0]+",0</coordinates>");
@@ -196,7 +213,7 @@ public class Placemark {
 			String dir = Config.getInstance().base_dir+"/Placemark";
 			File d = new File(dir);
 			if(!d.exists()) d.mkdirs();
-			x.printKML(dir+"/"+x.name+"_"+(int)x.getR()+".kml");	
+			x.printKML(dir+"/"+x+".kml");	
 		}
 		Logger.logln("Done!");
 	}
