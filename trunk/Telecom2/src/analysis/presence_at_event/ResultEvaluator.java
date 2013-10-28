@@ -27,8 +27,8 @@ public class ResultEvaluator {
 		String piem2013 = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv";
 		
 
-		String[] training = new String[]{piem2012,piem2013};
-		String[] testing = new String[]{piem2012,piem2013};
+		String[] training = new String[]{lomb,piem2012,piem2013};
+		String[] testing = new String[]{lomb,piem2012,piem2013};
 		
 		run(training,testing);
 		//runSeparate(files,files);

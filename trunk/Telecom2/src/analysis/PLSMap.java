@@ -1,5 +1,6 @@
 package analysis;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.Set;
@@ -10,7 +11,7 @@ import java.util.TreeMap;
  * USED in combination with PLSBehaviorInAnArea...
  */
 
-public class PLSMap {
+public class PLSMap implements Serializable {
 	public Map<String,Set<String>> usr_counter;
 	public Map<String,Integer> pls_counter;
 	public Calendar startTime = null;
