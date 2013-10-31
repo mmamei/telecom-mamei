@@ -3,6 +3,8 @@ package analysis.presence_at_event;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +18,9 @@ import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluator {
 	
-	
-	public static final boolean INTERCEPT = false;
-	public static final boolean LOG = true;
+	public static boolean PIECEWISE = true;
+	public static final boolean INTERCEPT = true;
+	public static final boolean LOG = false;
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -28,11 +30,11 @@ public class ResultEvaluator {
 		String piem2013 = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv";
 		
 
-		String[] training = new String[]{piem2012,lomb};
+		String[] training = new String[]{lomb,piem2012};
 		String[] testing = new String[]{piem2013};
 		
 		run(training,testing);
-		//runSeparate(files,files);
+		
 		Logger.logln("Done");
 	}
 	
@@ -42,15 +44,12 @@ public class ResultEvaluator {
 	public static void run(String[] training_files, String[] testing_files) throws Exception {
 		Map<String,List<double[]>> training_map = read(training_files);
 		Map<String,List<double[]>> testing_map = read(testing_files);
-
-		SimpleRegression training_sr = getRegression(training_map);
-		SimpleRegression testing_sr = getRegression(testing_map);
 		
-		printInfo("TRAINING",training_sr);
-		printInfo("TESTING",testing_sr);
 		
 		// scale testing data according to training regression
-		Map<String,List<double[]>> scaled = scale(testing_map,training_sr);
+		
+		Map<String,List<double[]>> scaled = PIECEWISE? scalePiecewise(testing_map,training_map) : scale(testing_map,training_map);
+		
 		draw("Testing",testing_map);
 		draw("Result after scaling",scaled);
 		
@@ -68,67 +67,11 @@ public class ResultEvaluator {
 	
 	
 	
-	public static void runSeparate(String[] training_files, String[] testing_files) throws Exception {
-		Map<String,List<double[]>> training_map = read(training_files);
-		Map<String,List<double[]>> testing_map = read(testing_files);
-		
-		Map<String,Map<String,List<double[]>>> sep_training_map = separate(training_map);
-		Map<String,Map<String,List<double[]>>> sep_testing_map = separate(testing_map);
-		
-		// overall error statistics
-		
-		DescriptiveStatistics overall_abs_err_stat = new DescriptiveStatistics();
-		DescriptiveStatistics overall_perc_err_stat = new DescriptiveStatistics();
-		
-		for(String p: sep_training_map.keySet()) {
-			Map<String,List<double[]>> individual_training_map = sep_training_map.get(p);
-			Map<String,List<double[]>> individual_testing_map = sep_testing_map.get(p);
-			
-			SimpleRegression training_sr = getRegression(individual_training_map);
-			SimpleRegression testing_sr = getRegression(individual_testing_map);
-			
-			printInfo("TRAINING",training_sr);
-			printInfo("TESTING",testing_sr);
-			
-			// scale testing data according to training regression
-			Map<String,List<double[]>> scaled = scale(individual_testing_map,training_sr);
-			draw(p,individual_testing_map);
-			
-			// compute error
-			DescriptiveStatistics[] abs_perc_errors = computeErrorStats(scaled);
-			DescriptiveStatistics abs_err_stat = abs_perc_errors[0];
-			DescriptiveStatistics perc_err_stat = abs_perc_errors[1];
-					
-			Logger.logln(p+" MEAN ABS ERROR = "+(int)abs_err_stat.getMean());
-			Logger.logln(p+" MEDIAN ABS ERROR = "+(int)abs_err_stat.getPercentile(50));
-			
-			Logger.logln(p+" MEAN % ERROR = "+(int)perc_err_stat.getMean()+"%");
-			Logger.logln(p+" MEDIAN % ERROR = "+(int)perc_err_stat.getPercentile(50)+"%");
-			
-			// add error values to the overall error statis
-			for(double v: abs_err_stat.getSortedValues()) overall_abs_err_stat.addValue(v);
-			for(double v: perc_err_stat.getSortedValues()) overall_perc_err_stat.addValue(v);
-		}
-		
-		Logger.logln("OVERALL MEAN ABS ERROR = "+(int)overall_abs_err_stat.getMean());
-		Logger.logln("OVERALL MEDIAN ABS ERROR = "+(int)overall_abs_err_stat.getPercentile(50));
-		
-		Logger.logln("OVERALL MEAN % ERROR = "+(int)overall_perc_err_stat.getMean()+"%");
-		Logger.logln("OVERALL MEDIAN % ERROR = "+(int)overall_perc_err_stat.getPercentile(50)+"%");
-	}
 	
 	
-	public static Map<String,Map<String,List<double[]>>> separate(Map<String,List<double[]>> map) {
-		Map<String,Map<String,List<double[]>>> sep = new HashMap<String,Map<String,List<double[]>>>();
-		for(String p: map.keySet()) {
-			Map<String,List<double[]>> s = new HashMap<String,List<double[]>>();
-			s.put(p, map.get(p));
-			sep.put(p, s);
-		}
-		return sep;
-	}
 	
-	public static Map<String,List<double[]>> scale(Map<String,List<double[]>> testing_map, SimpleRegression training_sr) {
+	public static Map<String,List<double[]>> scale(Map<String,List<double[]>> testing_map, Map<String,List<double[]>> training_map) {
+		SimpleRegression training_sr = getRegression(training_map);
 		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
 		for(String placemark: testing_map.keySet()) {
 			Logger.logln(placemark);
@@ -142,6 +85,28 @@ public class ResultEvaluator {
 		}
 		return scaled;
 	}
+	
+	
+	public static Map<String,List<double[]>> scalePiecewise(Map<String,List<double[]>> testing_map, Map<String,List<double[]>> training_map) {
+		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
+		
+		for(String placemark: testing_map.keySet()) {
+			Logger.logln(placemark);
+			List<double[]> list_est = new ArrayList<double[]>(); 
+			for(double[] x : testing_map.get(placemark)) {
+				SimpleRegression sr = getPiecewiseLR(training_map,x[0]);
+				double est = Math.max(0, sr.predict(x[0]));
+				double gt = x[1];
+				list_est.add(new double[]{est,gt});
+			}
+			scaled.put(placemark, list_est);
+		}
+		return scaled;
+	}
+	
+	
+	
+	
 	
 	
 	public static DescriptiveStatistics[] computeErrorStats(Map<String,List<double[]>> scaled) {
@@ -214,6 +179,29 @@ public class ResultEvaluator {
 	}	
 	
 	
+	public static int SIZE = 6;
+	public static SimpleRegression getPiecewiseLR(Map<String,List<double[]>> training, final double x) {
+		
+		// create a single list
+		List<double[]> all = new ArrayList<double[]>();
+		for(List<double[]> l: training.values())
+			all.addAll(l);
+		
+		Collections.sort(all, new Comparator<double[]>(){
+			public int compare(double[] a, double[] b) {
+				if(Math.abs(a[0]-x) > Math.abs(b[0]-x)) return 1;
+				if(Math.abs(a[0]-x) < Math.abs(b[0]-x)) return -1;
+				return 0;
+			}
+		});
+		
+		SimpleRegression r = new SimpleRegression(INTERCEPT);
+		
+		for(int i=0; i<all.size() && i<SIZE; i++) 
+			r.addData(all.get(i)[0], all.get(i)[1]);
+
+		return r;
+	}
 	
 	
 	
