@@ -99,6 +99,7 @@ public class PlacemarkRadiusExtractor {
 					//double[][] vxr = valXradius.get(i);
 					double[][] vxr = diff.get(i);
 					double bestr = getWeightedAverage(vxr);
+					//double bestr = getUpToPercentage(vxr,0.7);
 					//double bestr = getMaxZDrop(vxr,le.get(i).toString());
 					out.println(le.get(i).toString()+","+bestr);
 					Logger.logln(le.get(i).toString()+","+bestr);
@@ -171,6 +172,24 @@ public class PlacemarkRadiusExtractor {
 		if(cont == 0) return -200;
 		else return round(avg_r / cont);
 	}
+	
+	
+	public static double getUpToPercentage(double[][] valXradius, double percent) {
+		double sum = 0;
+		for(int i=0; i<valXradius.length;i++) 
+			sum = sum + valXradius[i][1];
+		
+		double cum = 0;
+		for(int i=0; i<valXradius.length;i++) {
+			cum = cum + valXradius[i][1]/sum;
+			if(cum > (1-percent))
+				return  valXradius[i-1][0];
+		}
+		
+		System.err.println("problem");
+		return 0;
+	}
+	
 	
 	
 	public static double getMaxZDrop(double[][] valXradius, String title) {
@@ -405,9 +424,11 @@ public class PlacemarkRadiusExtractor {
 	static void plot(String title, double[][] valXradius, double[][] valXring, double[][] diff, String save_file) {
 		Logger.logln(title+" *******************************");
 		String[] domain = new String[valXradius.length];
+		
 		double[] data1 = new double[valXradius.length];
 		double[] data2 = new double[valXradius.length];
 		double[] data3 = new double[valXradius.length];
+	
 		for(int i=0; i<domain.length;i++) {
 			domain[i] = ""+valXradius[i][0];
 			data1[i] = valXradius[i][1];
@@ -415,11 +436,25 @@ public class PlacemarkRadiusExtractor {
 			if(diff!=null) data3[i] = diff[i][1];
 		}
 		
+		data1 = norm(data1);
+		data2 = norm(data2);
+		data3 = norm(data3);
+		
 		GraphPlotter g = GraphPlotter.drawGraph(title, title, "area", "radius", "z", domain, data1);
 		if(valXring!=null) 	g.addData("ring", data2);
 		if(diff!=null)	g.addData("diff", data3);
 		if(save_file != null)
 			g.save(save_file);
+	}
+	
+	static double[] norm(double[] x) {
+		double[] y = new double[x.length];
+		double sum = 0;
+		for(int i=0; i<x.length; i++)
+			sum = sum + x[i];
+		for(int i=0; i<x.length; i++)
+			y[i] = x[i] / sum;
+		return y;
 	}
 	
 	

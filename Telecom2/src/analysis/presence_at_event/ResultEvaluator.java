@@ -17,8 +17,8 @@ import visual.java.GraphScatterPlotter;
 public class ResultEvaluator {
 	
 	
-	public static final boolean INTERCEPT = true;
-	public static final boolean LOG = false;
+	public static final boolean INTERCEPT = false;
+	public static final boolean LOG = true;
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -28,7 +28,7 @@ public class ResultEvaluator {
 		String piem2013 = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv";
 		
 
-		String[] training = new String[]{piem2013};
+		String[] training = new String[]{piem2012,lomb};
 		String[] testing = new String[]{piem2013};
 		
 		run(training,testing);
@@ -51,7 +51,8 @@ public class ResultEvaluator {
 		
 		// scale testing data according to training regression
 		Map<String,List<double[]>> scaled = scale(testing_map,training_sr);
-		draw("Result",scaled);
+		draw("Testing",testing_map);
+		draw("Result after scaling",scaled);
 		
 		// compute error
 		DescriptiveStatistics[] abs_perc_errors = computeErrorStats(scaled);
