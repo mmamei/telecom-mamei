@@ -42,10 +42,10 @@ public class PLSBehaviorInAnArea {
 		//"Stadio Atleti Azzurri d'Italia (BG)",
 		//"Stadio Mario Rigamonti (BS)",
 		//"Stadio Franco Ossola (VA)",
-		"Piazza San Carlo (TO)",
+		//"Piazza San Carlo (TO)",
 		//"Piazza Castello (TO)",
 		//"Piazza Vittorio (TO)",
-		//"Parco Dora (TO)"
+		"Parco Dora (TO)"
 		
 	};
 	
@@ -56,7 +56,7 @@ public class PLSBehaviorInAnArea {
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
 			//double bestr = bestRadiusIE.get(pn);
-			double bestr = 300;
+			double bestr = -200;
 			System.out.println("BEST RADIUS = "+bestr);
 			p.changeRadius(bestr);
 			process(p);

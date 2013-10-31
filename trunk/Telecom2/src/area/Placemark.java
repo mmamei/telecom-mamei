@@ -96,6 +96,25 @@ public class Placemark {
 		return a;
 	}
 	
+	public double getMaxDist() {
+		double min_dist = Double.MAX_VALUE;
+		double max_dist = 0;
+		
+		for(String c: cellsAround) {
+			NetworkCell nc = NM.get(Long.parseLong(c));
+			double d = LatLonUtils.getHaversineDistance(nc.getPoint(),center_point);
+			
+			max_dist = Math.max(max_dist, d + nc.getRadius());
+			
+			d = d - nc.getRadius();
+			if(d < 0) d = 0;
+			min_dist = Math.min(min_dist, d);
+		}
+		
+		if(ring) return 1500 - min_dist >= 0 ? 1500 - min_dist : 0;
+		else return max_dist;
+	}
+	
 	
 	public double getNumCells() {
 		return cellsAround.size();
@@ -219,8 +238,22 @@ public class Placemark {
 	} 
 	
 	
-	
+	public static final int MAX_R = 1500;
+	public static final int MIN_R = -500;
+	public static final int STEP = 100;
 	public static void main(String[] args) throws Exception {
+		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
+		initPlacemaks();
+		Placemark p = PLACEMARKS.get("Juventus Stadium (TO)");
+		for(int r = MAX_R; r >= MIN_R; r = r - STEP) {
+			p.changeRadiusRing(r);
+			System.out.println(r+" --> "+p.getMaxDist()+", "+p.getNumCells());
+		}
+		Logger.logln("Done!");
+	}
+	
+	
+	public static void main2(String[] args) throws Exception {
 		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
 		initPlacemaks();
 		for(String name: PLACEMARKS.keySet()) {
