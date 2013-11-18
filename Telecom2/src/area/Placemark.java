@@ -22,6 +22,11 @@ import utils.Config;
 import utils.Logger;
 import visual.kml.KML;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.util.GeometricShapeFactory;
+
 
 
 public class Placemark {
@@ -79,13 +84,26 @@ public class Placemark {
 	
 	
 	public double getArea() {
-		double a = 0;
+		Geometry u = null;
 		for(String c: cellsAround) {
-			double r = NM.get(Long.parseLong(c)).getRadius();
-			a = a + (Math.pow(r, 2) * Math.PI);
+			NetworkCell nc = NM.get(Long.parseLong(c));
+			Polygon p = getCircle(nc.getBarycentreLongitude(),nc.getBarycentreLatitude(),nc.getRadius());
+			if(u == null) u = p;
+			else u = u.union(p);
 		}
-		return a;
+		double area = u == null ? 0 : u.getArea();
+		return area;
 	}
+	
+	
+	private Polygon getCircle(double x, double y, double r) {
+		GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
+		shapeFactory.setNumPoints(100);
+		shapeFactory.setCentre(new Coordinate(x,y));
+		shapeFactory.setSize(r * 2);
+		return shapeFactory.createCircle();
+	}
+	
 	
 	public double getSumRadii() {
 		double a = 0;
@@ -246,8 +264,9 @@ public class Placemark {
 		initPlacemaks();
 		Placemark p = PLACEMARKS.get("Juventus Stadium (TO)");
 		for(int r = MAX_R; r >= MIN_R; r = r - STEP) {
-			p.changeRadiusRing(r);
-			System.out.println(r+" --> "+p.getMaxDist()+", "+p.getNumCells());
+			//p.changeRadiusRing(r);
+			p.changeRadius(r);
+			System.out.println(r+" --> "+p.getArea());
 		}
 		Logger.logln("Done!");
 	}

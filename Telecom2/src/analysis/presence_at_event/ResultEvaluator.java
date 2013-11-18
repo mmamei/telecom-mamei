@@ -18,7 +18,7 @@ import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluator {
 	
-	public static boolean PIECEWISE = true;
+	public static boolean PIECEWISE = false;
 	public static final boolean INTERCEPT = true;
 	public static final boolean LOG = false;
 	
@@ -30,8 +30,8 @@ public class ResultEvaluator {
 		String piem2013 = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv";
 		
 
-		String[] training = new String[]{lomb,piem2012};
-		String[] testing = new String[]{piem2013};
+		String[] training = new String[]{lomb,piem2012,piem2013};
+		String[] testing = new String[]{lomb,piem2012,piem2013};
 		
 		run(training,testing);
 		
@@ -72,6 +72,9 @@ public class ResultEvaluator {
 	
 	public static Map<String,List<double[]>> scale(Map<String,List<double[]>> testing_map, Map<String,List<double[]>> training_map) {
 		SimpleRegression training_sr = getRegression(training_map);
+		
+		printInfo("INFO: ",training_sr);
+		
 		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
 		for(String placemark: testing_map.keySet()) {
 			Logger.logln(placemark);
@@ -129,7 +132,7 @@ public class ResultEvaluator {
 		return new DescriptiveStatistics[]{abs_err_stat,perc_err_stat};
 	}
 	
-	public static void printInfo(String title, SimpleRegression sr) throws Exception {
+	public static void printInfo(String title, SimpleRegression sr) {
 		Logger.logln(title+": r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
 		double s = sr.getSlope();
@@ -207,6 +210,7 @@ public class ResultEvaluator {
 	
 	public static void draw(String title, Map<String,List<double[]>> map) {
 		
+		Logger.logln(title+" ***************************************");
 
 		for(String placemark: map.keySet()) {
 			for(double[] x : map.get(placemark)) {

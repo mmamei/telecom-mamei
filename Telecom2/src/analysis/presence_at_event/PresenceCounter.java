@@ -32,7 +32,6 @@ public class PresenceCounter {
 	
 	
 	public static void main(String[] args) throws Exception {	
-		System.gc();
 		double o_radius = 0;
 		int days = 3;
 		process(o_radius,days);
@@ -175,7 +174,7 @@ public class PresenceCounter {
 	
 	public static String getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";
+		String file = "G:/BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -193,14 +192,16 @@ public class PresenceCounter {
 		while((line = in.readLine()) != null){
 			String[] splitted = line.split(",");
 			if(splitted.length == 5) {
+				try {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
+				} catch(NumberFormatException e) {
+					System.err.println(line);
+					continue;
+				}
 				if(start.before(cal) && end.after(cal)) {
 					if(start_exclude == null || end_exclude ==null)
 						users.add(splitted[0]);
 					else if(cal.before(start_exclude) || cal.after(end_exclude)) {
-						if(splitted[0].equals("d66b2019ce10a2927f19aad6a3242bf85f5bdfa487a4dd1c82966451d6221732")) {
-							//System.err.println(line+" --> "+cal.getTime());
-						}
 						users.add(splitted[0]);
 					}
 				}
@@ -222,7 +223,12 @@ public class PresenceCounter {
 		while((line = in.readLine()) != null){
 			String[] splitted = line.split(",");
 			List<PlsEvent> list = usr_pls.get(splitted[0]);
+			try{
 			if(list!=null) list.add(new PlsEvent(splitted[0],"imsi",Long.parseLong(splitted[3]),splitted[1]));
+			}catch(NumberFormatException e) {
+				System.err.println(line);
+				continue;
+			}
 		}
 		in.close();
 		return usr_pls;

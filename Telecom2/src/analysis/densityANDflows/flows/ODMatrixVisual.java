@@ -16,7 +16,7 @@ import utils.Logger;
 import visual.html.ArrowsGoogleMaps;
 import visual.kml.KML;
 import visual.kml.KMLArrow;
-
+ 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -29,6 +29,30 @@ public class ODMatrixVisual {
 	private static final String ghLoc = "C:/DATASET/graph_hopper";
     private static final String testOsm = "C:/DATASET/graph_hopper/piemonte.pbf";
 	
+    
+    // main for testing purposes
+    public static void main(String[] args) throws Exception {
+    	GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager("CAR")).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
+		gh.setPreciseIndexResolution(10000); // to be set about the grid size
+		gh.importOrLoad();
+		
+		double start_lat = 45.077157;
+		double start_lon = 7.629951;
+		
+		double end_lat = 44.968199;
+		double end_lon = 7.621368;
+		
+		GHResponse ph = gh.route(new GHRequest(start_lat,start_lon,end_lat,end_lon));
+        
+		if(ph.isFound()) {
+	        PointList list = ph.getPoints();
+	        for(int i=0; i<list.getSize();i++) {
+	        	double lat = list.getLatitude(i);
+	        	double lon = list.getLongitude(i);
+	        	System.out.println(lat+","+lon);
+	        }
+		}
+    }
     
     
     
