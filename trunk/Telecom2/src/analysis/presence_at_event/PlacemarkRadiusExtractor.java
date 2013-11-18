@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,20 +34,32 @@ import area.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	
-	public static final boolean PLOT = true;
+	public static final boolean PLOT = false;
+	public static final boolean CALL_PRESENCE_COUNTER_AFTERWARDS = !PLOT;
+	public static final boolean NORMALIZE_SPATIALLY = true;
+	public static final boolean DIFF = false;
 	
 	public static final int MAX_R = 1500;
 	public static final int MIN_R = -500;
 	public static final int STEP = 100;
 	
+	
+	public static final int W_AVG = 0;
+	public static final int UP_TO_PERCENT = 1;
+	public static final int MAX_DROP = 2;
+	public static final int MODE = W_AVG;
+	
+	// if MAX = true we compute the zXradius as the max of the z within the event time interval
+	// if MAX = false we compute the zXradius as the sum of the z within the event time interval
+	public static final boolean MAX = false;
+	
+	
 	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir();
 	
 	
-	public static final boolean INDIVIDUAL = true;
-	
 	public static void main(String[] args) throws Exception { 
 		
-		String file = INDIVIDUAL ? "result_individual.csv" : "result.csv";
+		String file = "result_individual.csv";
 		
 		new File(ODIR).mkdirs();
 		File f = new File(ODIR+"/"+file);
@@ -75,10 +88,12 @@ public class PlacemarkRadiusExtractor {
 			List<double[][]> valXradius = createOrLoadValueRadiusDistrib(le,false);
 			List<double[][]> valXring = createOrLoadValueRadiusDistrib(le,true);
 			
-			Placemark x = le.get(0).spot.clone();
-			normalizeByArea(valXradius,x);
-			x.ring = true;
-			normalizeByArea(valXring,x);
+			if(NORMALIZE_SPATIALLY) {
+				Placemark x = le.get(0).spot.clone();
+				normalizeByArea(valXradius,x);
+				x.ring = true;
+				normalizeByArea(valXring,x);
+			}
 			
 			List<double[][]> diff = diff(valXradius,valXring);
 			
@@ -91,29 +106,37 @@ public class PlacemarkRadiusExtractor {
 					double[][] data2 = valXring.get(i);
 					double[][] data3 = diff.get(i);
 					
+					
+					double durationH = le.get(i).durationH();
+					for(int r=0; r<data1.length;r++) {
+						data1[r][1] = data1[r][1] / durationH;
+						if(data2 != null) data2[r][1] = data2[r][1] / durationH;
+						if(data3 != null) data3[r][1] = data3[r][1] / durationH;
+					}
+						
+					
+					
+					
 					plot(le.get(i).toString(),data1,data2,data3,ODIR+"/"+le.get(i)+"_val_r_distrib.png");
 				}
 			
-			if(INDIVIDUAL) {
-				for(int i=0; i<valXradius.size(); i++) {
-					//double[][] vxr = valXradius.get(i);
-					double[][] vxr = diff.get(i);
-					double bestr = getWeightedAverage(vxr);
-					//double bestr = getUpToPercentage(vxr,0.7);
-					//double bestr = getMaxZDrop(vxr,le.get(i).toString());
-					out.println(le.get(i).toString()+","+bestr);
-					Logger.logln(le.get(i).toString()+","+bestr);
-				}
-			}
-			else {
-				double bestr = getWeightedAverage(group(valXradius));	
-				out.println(p+","+bestr);
-				Logger.logln(p+","+bestr);
+			for(int i=0; i<valXradius.size(); i++) {
+
+				double[][] vxr = DIFF ? diff.get(i) : valXradius.get(i);
+				double bestr = 0;
+				if(MODE == W_AVG) bestr = getWeightedAverage(vxr);
+				else if(MODE == UP_TO_PERCENT) bestr = getUpToPercentage(vxr,0.1);
+				else if(MODE == MAX_DROP) bestr = getMaxZDrop(vxr,le.get(i).toString());
+				out.println(le.get(i).toString()+","+bestr);
+				Logger.logln(le.get(i).toString()+","+bestr);
 			}
 		} 
 		
 		out.close();
 		Logger.logln("Done");
+		
+		if(CALL_PRESENCE_COUNTER_AFTERWARDS) PresenceCounter.main(null);
+		
 	}
 	
 	public static void normalizeByArea(List<double[][]> valXradius, Placemark p) {
@@ -121,7 +144,7 @@ public class PlacemarkRadiusExtractor {
 			for(int i=0;i<vxr.length;i++) {
 				if(p.ring) p.changeRadiusRing(vxr[i][0]);
 				else p.changeRadius(vxr[i][0]);
-				double a = p.getSumRadii();//p.getArea();
+				double a = p.getSumRadii();
 				vxr[i][1] = a == 0 ? 0 : vxr[i][1] / a;
 			}
 		}
@@ -151,7 +174,11 @@ public class PlacemarkRadiusExtractor {
 		
 		String n = le.get(0).spot.name;
 		if(ring) n = "ring_"+n;
-		File f = new File(ODIR+"/"+n+"_zXradius.ser");
+		
+		
+		
+		
+		File f = MAX ? new File(ODIR+"/zXr_ser_computed_with_max/"+n+"_zXradius.ser") : new File(ODIR+"/"+n+"_zXradius.ser");
 		if(f.exists()) list_valueRadiusDistrib = (List<double[][]>)CopyAndSerializationUtils.restore(f);
 		else {
 			list_valueRadiusDistrib = computeZXRadius(le,ring); 
@@ -312,7 +339,7 @@ public class PlacemarkRadiusExtractor {
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt";
+		String file = "G:/BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -346,7 +373,7 @@ public class PlacemarkRadiusExtractor {
 			DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
 			double[] z_usr_data =  PLSBehaviorInAnArea.getZ2(stats[1],plsmap.startTime);
 			
-			PLSBehaviorInAnArea.drawGraph(p.name+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevantEvents);
+			if (PLOT) PLSBehaviorInAnArea.drawGraph(p.name+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevantEvents);
 			Calendar cal = (Calendar)plsmap.startTime.clone();
 			
 			int h = 0;
@@ -362,7 +389,7 @@ public class PlacemarkRadiusExtractor {
 					boolean after_event = cal.after(e.et);
 					
 					if(e.st.before(cal) && e.et.after(cal)) 
-						zXradius.get(i)[index][1] = Math.max(zXradius.get(i)[index][1], z_usr_data[h]);				
+						zXradius.get(i)[index][1] = zXradius.get(i)[index][1] + z_usr_data[h]; // Math.max(zXradius.get(i)[index][1], z_usr_data[h]);				
 					cal.add(Calendar.HOUR_OF_DAY, 1);
 					
 					if(after_event) {
@@ -374,15 +401,6 @@ public class PlacemarkRadiusExtractor {
 			index++;
 		}
 		
-		/*
-		// spatial normalization
-		if(zXradius[0][1]==0) zXradius[0][1]=0.0001; // laplace smoothing
-		double zarea =  zXradius[0][1];
-		for(int i=0; i<zXradius.length;i++) {
-			zXradius[i][1] = zXradius[i][1] - zarea;
-			if(zXradius[i][1] < 0) zXradius[i][1] = 0;
-		}
-		*/
 		return zXradius;		
 	}
 	
@@ -435,11 +453,11 @@ public class PlacemarkRadiusExtractor {
 			if(valXring!=null) data2[i] = valXring[i][1];
 			if(diff!=null) data3[i] = diff[i][1];
 		}
-		
+		/*
 		data1 = norm(data1);
 		data2 = norm(data2);
 		data3 = norm(data3);
-		
+		*/
 		GraphPlotter g = GraphPlotter.drawGraph(title, title, "area", "radius", "z", domain, data1);
 		if(valXring!=null) 	g.addData("ring", data2);
 		if(diff!=null)	g.addData("diff", data3);
@@ -460,7 +478,7 @@ public class PlacemarkRadiusExtractor {
 	
 	
 	
-	static PLSMap getPLSMap(String file, Placemark p) throws Exception {
+	static PLSMap getPLSMap(String file, Placemark p) {
 			
 		String dir = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()+"/saved_plsmaps";
 		new File(dir).mkdirs();
@@ -474,35 +492,46 @@ public class PlacemarkRadiusExtractor {
 		String[] splitted;
 		String line;
 		Calendar cal = new GregorianCalendar();
-		BufferedReader in = new BufferedReader(new FileReader(file));
-		while((line = in.readLine()) != null){
-			line = line.trim();
-			if(line.length() < 1) continue; // extra line at the end of file
-			splitted = line.split(",");
-			if(splitted.length == 5 && !splitted[3].equals("null")) {
-				
-				String username = splitted[0];
-				try{
-					cal.setTimeInMillis(Long.parseLong(splitted[1]));
-					String key = PLSBehaviorInAnArea.getKey(cal);
-					String celllac = splitted[3]; 
-					if(p.contains(celllac)) {
-						if(plsmap.startTime == null || plsmap.startTime.after(cal)) plsmap.startTime = (Calendar)cal.clone();
-						if(plsmap.endTime == null || plsmap.endTime.before(cal)) plsmap.endTime = (Calendar)cal.clone();
-						Set<String> users = plsmap.usr_counter.get(key);
-						if(users == null) users = new TreeSet<String>();
-						users.add(username);
-						plsmap.usr_counter.put(key, users);
-						Integer count = plsmap.pls_counter.get(key);
-						plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new FileReader(file));			
+			while((line = in.readLine()) != null){
+				line = line.trim();
+				if(line.length() < 1) continue; // extra line at the end of file
+				splitted = line.split(",");
+				if(splitted.length == 5 && !splitted[3].equals("null")) {
+					
+					String username = splitted[0];
+					try{
+						cal.setTimeInMillis(Long.parseLong(splitted[1]));
+						String key = PLSBehaviorInAnArea.getKey(cal);
+						String celllac = splitted[3]; 
+						if(p.contains(celllac)) {
+							if(plsmap.startTime == null || plsmap.startTime.after(cal)) plsmap.startTime = (Calendar)cal.clone();
+							if(plsmap.endTime == null || plsmap.endTime.before(cal)) plsmap.endTime = (Calendar)cal.clone();
+							Set<String> users = plsmap.usr_counter.get(key);
+							if(users == null) users = new TreeSet<String>();
+							users.add(username);
+							plsmap.usr_counter.put(key, users);
+							Integer count = plsmap.pls_counter.get(key);
+							plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
+						}
+					}catch(Exception e) {
+						//System.err.println("bad read: "+line);
+						continue;
 					}
-				}catch(Exception e) {
-					System.err.println("bad read: "+line);
-					continue;
 				}
 			}
+			in.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		in.close();
 		
 		CopyAndSerializationUtils.save(f, plsmap);
 		return plsmap;

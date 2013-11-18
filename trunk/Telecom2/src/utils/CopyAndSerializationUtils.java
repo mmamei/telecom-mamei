@@ -38,19 +38,27 @@ public class CopyAndSerializationUtils {
 			ois.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				ois.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		
+		
 		return o;
 	}
 	
 	public static void save(File file, Object o) {
 		ObjectOutputStream oos = null;
 		try {
-		oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-		oos.writeObject(o);
-		
+			oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+			oos.writeObject(o);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 		try {
 			oos.close();
 		} catch (Exception e) {
