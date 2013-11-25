@@ -6,7 +6,7 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import area.CityEvent;
-
+import area.Placemark;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -14,23 +14,25 @@ import utils.Logger;
 public class CreatorRegionMapGrid {
 	
 	public static void main(String[] args) throws Exception {
-		
-		int size = 5;
-		
-		//String name = "TorinoGrid"+size;
-		//double[][] bbox = new double[][]{{7.494789211677311, 44.97591738081519},{7.878659418860384, 45.16510171374535}};
-		
-		
-		//CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
-		//ce = CityEvent.expand(ce, 1, 40000);
 	
+		
+		Placemark p = Placemark.getPlacemark("Venezia");
+		p.changeRadius(p.getR()+1000);
+		run(p.name,p.getBBox(),10);
+		
+		/*
 		CityEvent ce = CityEvent.getEvent("Juventus Stadium (TO),20/03/2012");
 		ce = CityEvent.expand(ce, 1, 10000);
-		
 		String name = ce.spot.name;
 		double[][] bbox = ce.spot.getBBox();
+		run(name,bbox,5);
+		*/
+	}
 		
-		String output_obj_file=Config.getInstance().base_dir+"/cache/"+name+".ser";
+		
+	public static void run(String name, double[][] bbox, int size) throws Exception {
+		
+		String output_obj_file=Config.getInstance().base_dir+"/RegionMap/"+name+".ser";
 		
 		SpaceGrid sg = new SpaceGrid(bbox[0][0],bbox[0][1],bbox[1][0],bbox[1][1],size,size);
 		

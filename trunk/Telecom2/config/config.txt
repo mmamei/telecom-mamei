@@ -17,7 +17,7 @@ pls_start_time = 01/04/2011 00:00
 pls_end_time = 30/04/2014 00:00
 
 // Base dir where the program save files and results
-base_dir = C:/BASE
+base_dir = /BASE
 
 // File with the placemarks
 placemarks_file = config/placemarks.csv

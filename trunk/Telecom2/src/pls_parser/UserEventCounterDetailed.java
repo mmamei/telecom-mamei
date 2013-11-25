@@ -26,12 +26,9 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 		String dir = Config.getInstance().base_dir+"/UserEventCounterDetailed";
 		File fd = new File(dir);
 		if(!fd.exists()) fd.mkdirs();
-		String f = Config.getInstance().pls_folder;
-		f = f.substring(f.lastIndexOf("/")+1);
-		hashmap_outputfile = dir+"/"+f+".csv";
+		hashmap_outputfile = dir+"/"+placemark.name+".csv";
 	}
 
-	
 	/*
 	<HASH_MSISDN> - identifica in modo univoco l’utente;
 	<prefisso_IMSI> - contiene MCC (prime tre cifre del campo) e MNC (ultime due cifre del campo);

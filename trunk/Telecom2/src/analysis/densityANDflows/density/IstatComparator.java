@@ -20,20 +20,23 @@ import area.region.RegionMap;
 public class IstatComparator {
 	
 	
+	public static boolean LOG = false;
+	public static boolean INTERCEPT = true;
+	
 	public static void main(String[] args) throws Exception {
 		
 		String region = "Piemonte";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
 		
-		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+region+".ser");
+		File input_obj_file = new File("G:/BASE/cache/"+region+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
 			System.exit(0);
 		}
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
-		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_dir+"/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
+		Map<String,UserPlaces> up = UserPlaces.readUserPlaces("G:/BASE/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
 		
 		
 		Map<String,Double> density = PopulationDensity.process(rm,up,kind_of_place,exclude_kind_of_place);
@@ -71,10 +74,9 @@ public class IstatComparator {
 			Integer groundtruth = istat.get(r);
 			if(groundtruth != null && estimated>0 && groundtruth>0) {
 				out.println(estimated+";"+groundtruth);
-				
-				if(estimated>10){
-					result[i][0] = Math.log10(estimated);
-					result[i][1] = Math.log10(groundtruth);
+				if(estimated > 10){
+					result[i][0] = LOG? Math.log10(estimated) : estimated;
+					result[i][1] = LOG? Math.log10(groundtruth): groundtruth;
 					i++;
 				}
 				
@@ -84,9 +86,9 @@ public class IstatComparator {
 		
 		out.close();
 		
-		SimpleRegression sr = new SimpleRegression();
+		SimpleRegression sr = new SimpleRegression(INTERCEPT);
 		sr.addData(result);
-		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
+		printInfo(sr);
 		
 		List<double[][]> ldata = new ArrayList<double[][]>();
 		ldata.add(result);
@@ -94,5 +96,20 @@ public class IstatComparator {
 		labels.add("population density");
 		
 		new GraphScatterPlotter("Result: "+region,"Estimated (log10)","GroundTruth (log10)",ldata,labels);
+	}
+	
+	public static void printInfo(SimpleRegression sr) {
+		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
+		
+		double s = sr.getSlope();
+		double sconf = sr.getSlopeConfidenceInterval(); 
+		
+		double i = sr.getIntercept();
+		double iconf = sr.getInterceptStdErr();
+		
+		Logger.logln("Y = "+s+" * X + "+i);
+		Logger.logln("SLOPE CONF INTERVAL =  ["+(s-sconf)+","+(s+sconf)+"]");
+		Logger.logln("INTERCEPT CONNF INTERVAL =  ["+(i-iconf)+","+(i+iconf)+"]");
+		
 	}
 }

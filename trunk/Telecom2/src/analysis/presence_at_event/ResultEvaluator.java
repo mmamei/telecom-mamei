@@ -39,8 +39,6 @@ public class ResultEvaluator {
 	}
 	
 	
-	
-	
 	public static void run(String[] training_files, String[] testing_files) throws Exception {
 		Map<String,List<double[]>> training_map = read(training_files);
 		Map<String,List<double[]>> testing_map = read(testing_files);
@@ -58,11 +56,15 @@ public class ResultEvaluator {
 		DescriptiveStatistics abs_err_stat = abs_perc_errors[0];
 		DescriptiveStatistics perc_err_stat = abs_perc_errors[1];
 		
+		
+		
+		
 		Logger.logln("MEAN ABS ERROR = "+(int)abs_err_stat.getMean());
 		Logger.logln("MEDIAN ABS ERROR = "+(int)abs_err_stat.getPercentile(50));
-		
+		Logger.logln("SKEWNESS ABS ERROR ="+abs_err_stat.getSkewness());
 		Logger.logln("MEAN % ERROR = "+(int)perc_err_stat.getMean()+"%");
 		Logger.logln("MEDIAN % ERROR = "+(int)perc_err_stat.getPercentile(50)+"%");
+		Logger.logln("SKEWNESS % ERROR ="+perc_err_stat.getSkewness());
 	}
 	
 	
@@ -93,17 +95,25 @@ public class ResultEvaluator {
 	public static Map<String,List<double[]>> scalePiecewise(Map<String,List<double[]>> testing_map, Map<String,List<double[]>> training_map) {
 		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
 		
+		
+		DescriptiveStatistics ds = new DescriptiveStatistics();
+		
 		for(String placemark: testing_map.keySet()) {
 			Logger.logln(placemark);
 			List<double[]> list_est = new ArrayList<double[]>(); 
 			for(double[] x : testing_map.get(placemark)) {
 				SimpleRegression sr = getPiecewiseLR(training_map,x[0]);
+				ds.addValue(sr.getR());
 				double est = Math.max(0, sr.predict(x[0]));
 				double gt = x[1];
 				list_est.add(new double[]{est,gt});
 			}
 			scaled.put(placemark, list_est);
 		}
+		
+		System.err.println(ds.getMean());
+		
+		
 		return scaled;
 	}
 	
