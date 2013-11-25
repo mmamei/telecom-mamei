@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 import area.Placemark;
 
@@ -23,10 +24,13 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 	public UserEventCounterDetailed(Placemark placemark) {
 		this.placemark = placemark;
 		users_info = new HashMap<String,UserInfo>();
-		String dir = Config.getInstance().base_dir+"/UserEventCounterDetailed";
-		File fd = new File(dir);
-		if(!fd.exists()) fd.mkdirs();
-		hashmap_outputfile = dir+"/"+placemark.name+".csv";
+		
+		File fd = FileUtils.getFile("UserEventCounterDetailed");
+		if(fd == null) {
+			fd = new File("C:"+Config.getInstance().base_dir+"/UserEventCounterDetailed");
+			fd.mkdirs();
+		}
+		hashmap_outputfile = fd.getAbsolutePath()+"/"+placemark.name+".csv";
 	}
 
 	/*
@@ -78,7 +82,7 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Placemark p = Placemark.getPlacemark("Asti");
+		Placemark p = Placemark.getPlacemark("Venezia");
 		UserEventCounterDetailed ba = new UserEventCounterDetailed(p);
 		if(!new File(ba.hashmap_outputfile).exists()) {
 			PLSParser.parse(ba);
@@ -86,18 +90,19 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 			Logger.logln("Done");
 		}
 		else Logger.logln("file already exists!");
+		trim(p,3);
 	}
 	
 	/*
 	 * This main is places here for convenience. It just read the file and remove all the users producing few events
 	 */
-	public static void main2(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/UserEventCounterDetailed/file_pls_fi.csv")));
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(Config.getInstance().base_dir+"/UserEventCounterDetailed/file_pls_fi5.csv"))));
+	public static void trim(Placemark p, int min_size) throws Exception {
+		BufferedReader br = FileUtils.getBR("UserEventCounterDetailed/"+p.name+".csv");
+		PrintWriter out = FileUtils.getPW("UserEventCounterDetailed", p.name+"_trim"+min_size+".csv");
 		String line;
 		while((line = br.readLine()) != null) {
 			int num_pls = Integer.parseInt(line.split(",")[2]);
-			if(num_pls >= 3)
+			if(num_pls >= min_size)
 				out.println(line);
 		}
 		br.close();
