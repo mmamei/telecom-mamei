@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 
 public class NetworkMapFactory {
@@ -38,11 +39,13 @@ public class NetworkMapFactory {
 		
 		String best_file = null;
 		
+		File dir = FileUtils.getFile("NetworkMapParser");
+		
 		try {
 			Calendar target_cal = Calendar.getInstance();
 			target_cal.setTime(F.parse(target_cal_string));
 			
-			File dir = new File(Config.getInstance().base_dir+"/NetworkMapParser");
+			
 			String[] files = dir.list();
 			
 			best_file = files[0];
@@ -58,11 +61,9 @@ public class NetworkMapFactory {
 			e.printStackTrace();
 		}
 		
-		return Config.getInstance().base_dir+"/NetworkMapParser/"+best_file;
+		return dir.getAbsolutePath()+"/"+best_file;
 	}
-	
-	
-	
+
 	
 	public static NetworkMap getNetworkMap() {
 		String pls = getPLS(Config.getInstance().pls_folder);
