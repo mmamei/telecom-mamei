@@ -12,6 +12,7 @@ import java.util.Map;
 import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
+import utils.FileUtils;
 import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
 import visual.kml.KML;
@@ -37,19 +38,19 @@ public class PopulationDensity {
 		
 		
 		Map<String,Double> density = process(rm,up,kind_of_place,exclude_kind_of_place);
-		
-		
-		
-		String dir = Config.getInstance().base_dir+"/PopulationDensity";
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
-		
-		
 		String title = rm.getName()+"-"+kind_of_place+"-"+exclude_kind_of_place;
-		String kmlfile = dir+"/"+title+".kml";
-		String htmlfile = dir+"/"+title+".html";
 		
+	}
 		
+	public static void plot(String title, Map<String,Double> density, RegionMap rm) throws Exception {
+	 
+		File d = FileUtils.getFile("PopulationDensity");
+		if(d == null) d = FileUtils.create("PopulationDensity");
+		
+		String kmlfile = d.getAbsolutePath()+"/"+title+".kml";
+		String htmlfile = d.getAbsolutePath()+"/"+title+".html";
+		
+
 		printKML(kmlfile,density,rm,title,false);
 		
 		
@@ -69,8 +70,7 @@ public class PopulationDensity {
 		
 		HeatMapGoogleMaps.draw(htmlfile, title, points, weights);
 		
-		
-	
+
 		Logger.logln("Done!");
 	}
 	
