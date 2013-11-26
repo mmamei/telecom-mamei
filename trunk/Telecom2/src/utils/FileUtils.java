@@ -22,6 +22,12 @@ public class FileUtils {
 		return null;
 	}
 	
+	public static File create(String path) {
+		File f = new File(DISKS[0]+Config.getInstance().base_dir+"/"+path);
+		f.mkdirs();
+		return f;
+	}
+	
 	public static BufferedReader getBR(String fpath) {
 		File f = getFile(fpath);
 		try {
@@ -34,7 +40,7 @@ public class FileUtils {
 	public static PrintWriter getPW(String dir, String file) {
 		File d = getFile(dir);
 		if(d == null) {
-			d = new File(DISKS[0]+dir);
+			d = new File(DISKS[0]+Config.getInstance().base_dir+"/"+dir);
 			d.mkdirs();
 		}
 		try {

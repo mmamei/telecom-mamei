@@ -2,6 +2,7 @@ package area.region;
 
 import java.io.Serializable;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 
@@ -26,8 +27,35 @@ public class Region implements Serializable {
 			sb.append(ll[0]+","+ll[1]+",0 ");
 		}
 		this.kmlcoordinates = sb.toString();
-		System.out.println(kmlcoordinates);
 		process();
+	}
+	
+	public Region(String name, Geometry g) {
+		this.name = name.replaceAll("\\\\", "");
+		Coordinate[] cs = g.getCoordinates();
+		StringBuffer sb = new StringBuffer();
+		for(Coordinate c: cs) 
+			sb.append(c.x+","+c.y+",0 ");
+		this.kmlcoordinates = sb.toString();
+		
+		
+		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
+		String x = kmlToOpenGISCoordinates();
+		if(x.equals("")) return;
+		String[] coord = x.split(",");
+		for(String c: coord) {
+			double lon = Double.parseDouble(c.substring(0,c.indexOf(" ")));
+			double lat = Double.parseDouble(c.substring(c.indexOf(" ")+1));
+			minlon = Math.min(minlon, lon);
+			minlat = Math.min(minlat, lat);
+			maxlon = Math.max(maxlon, lon);
+			maxlat = Math.max(maxlat, lat);
+		}
+		
+		bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
+		center = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
+		
+		this.g = g;
 	}
 	
 	

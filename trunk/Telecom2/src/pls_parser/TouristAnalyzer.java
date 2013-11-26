@@ -101,7 +101,7 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 		String k = getTimeKey(timestamp);
 		Double x = time_density.get(k);
 		if(x == null) x = 0.0;
-		space_density.put(k, x+1);
+		time_density.put(k, x+1);
 	}
 	
 	
@@ -121,9 +121,9 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		TouristAnalyzer ba = new TouristAnalyzer("UserEventCounterDetailed/Venezia_trim3.csv","RegionMap/Venezia.ser",Placemark.getPlacemark("Venezia"),7,ROAMING);
+		TouristAnalyzer ba = new TouristAnalyzer("UserEventCounterDetailed/Venezia_trim3.csv","RegionMap/Venezia.ser",Placemark.getPlacemark("Venezia"),7,TIM);
 	    PLSParser.parse(ba);
-		ba.finish();
+	    ba.finish();
 		Logger.logln("Done");
 	}
 }
