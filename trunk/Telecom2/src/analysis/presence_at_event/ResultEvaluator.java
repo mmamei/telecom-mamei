@@ -13,6 +13,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 
@@ -25,9 +26,9 @@ public class ResultEvaluator {
 	public static void main(String[] args) throws Exception {
 		
 		
-		String lomb = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_individual_0.0_3.csv";
-		String piem2012 = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_individual_0.0_3.csv";
-		String piem2013 = Config.getInstance().base_dir +"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv";
+		String lomb = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_individual_0.0_3.csv");
+		String piem2012 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_individual_0.0_3.csv");
+		String piem2013 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv");
 		
 
 		String[] training = new String[]{lomb,piem2012,piem2013};

@@ -19,13 +19,12 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import utils.Config;
+import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 
 
@@ -87,7 +86,7 @@ public class Placemark {
 		Geometry u = null;
 		for(String c: cellsAround) {
 			NetworkCell nc = NM.get(Long.parseLong(c));
-			Polygon p = getCircle(nc.getBarycentreLongitude(),nc.getBarycentreLatitude(),nc.getRadius());
+			Polygon p = GeomUtils.getCircle(nc.getBarycentreLongitude(),nc.getBarycentreLatitude(),nc.getRadius());
 			if(u == null) u = p;
 			else u = u.union(p);
 		}
@@ -96,13 +95,7 @@ public class Placemark {
 	}
 	
 	
-	private Polygon getCircle(double x, double y, double r) {
-		GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
-		shapeFactory.setNumPoints(100);
-		shapeFactory.setCentre(new Coordinate(x,y));
-		shapeFactory.setSize(r * 2);
-		return shapeFactory.createCircle();
-	}
+	
 	
 	
 	public double getSumRadii() {

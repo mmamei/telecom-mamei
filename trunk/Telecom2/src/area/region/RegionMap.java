@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -63,6 +64,7 @@ public class RegionMap implements Serializable {
 	public static final double deg_radius = Math.toDegrees(search_radius/earth_radius);
 	
 	public Region get(double lon, double lat) {
+		
 		Geometry p = new GeometryFactory().createPoint(new Coordinate(lon, lat));
 		
 		Point<Double> lower_point = new GenericPoint<Double>(lon-deg_radius,lat-deg_radius);
@@ -82,6 +84,17 @@ public class RegionMap implements Serializable {
 		
 		return null;		
 	}
+	
+	public List<Region> getOverlappingRegions(Geometry g) {
+		List<Region> overlapping_regions = new ArrayList<Region>();
+		for(Region r: rm.values()) {
+			if(r.getGeom().intersects(g))
+				overlapping_regions.add(r);
+		}
+		return overlapping_regions;
+	}
+	
+	
 	
 	
 	public void printKML() throws Exception  {

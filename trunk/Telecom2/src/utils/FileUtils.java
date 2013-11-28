@@ -14,6 +14,9 @@ public class FileUtils {
 	
 	public static final String[] DISKS = new String[]{"C:","G:"};
 	
+	
+	
+	
 	public static File getFile(String fpath) {
 		for(String d: DISKS) {
 			File f = new File(d+Config.getInstance().base_dir+"/"+fpath);
@@ -21,6 +24,13 @@ public class FileUtils {
 		}
 		return null;
 	}
+	
+	public static String getFileS(String fpath) {
+		File f = getFile(fpath);
+		return f.getAbsolutePath();
+	}
+	
+	
 	
 	public static File create(String path) {
 		File f = new File(DISKS[0]+Config.getInstance().base_dir+"/"+path);

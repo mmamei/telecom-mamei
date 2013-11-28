@@ -2,6 +2,8 @@ package area.region;
 
 import java.io.Serializable;
 
+import utils.GeomUtils;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
@@ -40,7 +42,7 @@ public class Region implements Serializable {
 		
 		
 		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
-		String x = kmlToOpenGISCoordinates();
+		String x = GeomUtils.kmlToOpenGISCoordinates(kmlcoordinates);
 		if(x.equals("")) return;
 		String[] coord = x.split(",");
 		for(String c: coord) {
@@ -77,7 +79,7 @@ public class Region implements Serializable {
 	
 	private void process() {
 		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
-		String x = kmlToOpenGISCoordinates();
+		String x = GeomUtils.kmlToOpenGISCoordinates(kmlcoordinates);
 		if(x.equals("")) return;
 		String[] coord = x.split(",");
 		for(String c: coord) {
@@ -94,20 +96,13 @@ public class Region implements Serializable {
 		
 		
 		try {
-			g = new WKTReader().read("POLYGON (("+kmlToOpenGISCoordinates()+"))");
+			g = new WKTReader().read("POLYGON (("+x+"))");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public String kmlToOpenGISCoordinates() {
-		if(kmlcoordinates.equals("")) return "";
-		String openGIScoordinates = kmlcoordinates.replaceAll(",", ";");
-		openGIScoordinates = openGIScoordinates.replaceAll(";0 ", ",");
-		openGIScoordinates = openGIScoordinates.replaceAll(";", " ");
-		openGIScoordinates = openGIScoordinates.substring(0, openGIScoordinates.length()-1);
-		return openGIScoordinates;
-	}
+	
 
 	public String toKml(String color) {
 		return toKml(color,color,"");
