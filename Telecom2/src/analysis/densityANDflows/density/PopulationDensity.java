@@ -42,7 +42,7 @@ public class PopulationDensity {
 		
 	}
 		
-	public static void plot(String title, Map<String,Double> density, RegionMap rm) throws Exception {
+	public static void plot(String title, Map<String,Double> density, RegionMap rm, double threshold) throws Exception {
 	 
 		File d = FileUtils.getFile("PopulationDensity");
 		if(d == null) d = FileUtils.create("PopulationDensity");
@@ -61,7 +61,7 @@ public class PopulationDensity {
 		
 		for(Region r: rm.getRegions()) {
 			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
-			if(val > 1) {
+			if(val > threshold) {
 				points.add(new double[]{r.getCenterLat(),r.getCenterLon()});
 				weights.add(val);
 			}

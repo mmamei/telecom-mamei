@@ -25,6 +25,7 @@ import org.gps.utils.LatLonUtils;
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
+import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphPlotter;
 import analysis.PLSBehaviorInAnArea;
@@ -54,8 +55,7 @@ public class PlacemarkRadiusExtractor {
 	public static final boolean MAX = false;
 	
 	
-	public static final String ODIR = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir();
-	
+	public static final String ODIR = FileUtils.getFileS("PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir());
 	
 	public static void main(String[] args) throws Exception { 
 		
@@ -339,7 +339,7 @@ public class PlacemarkRadiusExtractor {
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		
-		String file = "G:/BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt";
+		String file = FileUtils.getFileS("PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt");
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -475,12 +475,9 @@ public class PlacemarkRadiusExtractor {
 		return y;
 	}
 	
-	
-	
-	
 	static PLSMap getPLSMap(String file, Placemark p) {
 			
-		String dir = Config.getInstance().base_dir+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()+"/saved_plsmaps";
+		String dir = FileUtils.getFileS("PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()+"/saved_plsmaps");
 		new File(dir).mkdirs();
 		File f = new File(dir+"/PLSMap_"+p.toString()+".ser");
 		if(f.exists()) {
