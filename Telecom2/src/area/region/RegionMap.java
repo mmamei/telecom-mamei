@@ -24,6 +24,7 @@ import utils.kdtree.RangeSearchTree;
 import visual.kml.KML;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
@@ -85,6 +86,16 @@ public class RegionMap implements Serializable {
 		return null;		
 	}
 	
+	
+	public Envelope getEnvelope() {
+		Envelope e = new Envelope();
+		for(Region r: getRegions()) {
+			e.expandToInclude(r.getGeom().getEnvelopeInternal());
+		}
+		return e;
+	}
+	
+	
 	public List<Region> getOverlappingRegions(Geometry g) {
 		List<Region> overlapping_regions = new ArrayList<Region>();
 		for(Region r: rm.values()) {
@@ -116,7 +127,12 @@ public class RegionMap implements Serializable {
 	
 	
 	public static void main(String[] args) throws Exception {
-		String region = "Venezia";
+		process("Firenze");
+		Logger.logln("Done!");
+	}
+	
+	public static void process(String region) throws Exception {
+		
 		File input_obj_file = FileUtils.getFile("RegionMap/"+region+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
@@ -131,9 +147,7 @@ public class RegionMap implements Serializable {
 		System.out.println(rm.get(7.547977490302962,44.60851381725961).getName()); // should be MANTA
 		System.out.println(rm.get(7.777669845628534,45.2910107499951).getName()); // should be SAN GIORGIO CANAVESE
 		System.out.println(rm.get(7.777542202427386,45.29121254507205).getName()); // should be LUSIGLIè
-		*/
-		Logger.logln("Done!");
-		
+		*/		
 	}
 	
 }

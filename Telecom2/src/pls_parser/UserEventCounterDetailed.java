@@ -82,7 +82,7 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Placemark p = Placemark.getPlacemark("Venezia");
+		Placemark p = Placemark.getPlacemark("Firenze");
 		UserEventCounterDetailed ba = new UserEventCounterDetailed(p);
 		if(!new File(ba.hashmap_outputfile).exists()) {
 			PLSParser.parse(ba);
@@ -113,6 +113,7 @@ public class UserEventCounterDetailed extends BufferAnalyzer {
 
 
 class UserInfo {
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	String imsi;
 	long time_of_first_pls = Long.MAX_VALUE;
 	long time_of_last_pls = 0;
@@ -126,8 +127,17 @@ class UserInfo {
 		Calendar last = Calendar.getInstance();
 		last.setTimeInMillis(time_of_last_pls);
 		
+		int dt = (int)((time_of_last_pls - time_of_first_pls)/(1000*3600*24));
+		
+		int sday =  first.get(Calendar.DAY_OF_MONTH);
+		int smonth = first.get(Calendar.MONTH);
+		int syear = first.get(Calendar.YEAR);
+		
+		int eday =  last.get(Calendar.DAY_OF_MONTH);
+		int emonth = last.get(Calendar.MONTH);
+		int eyear = last.get(Calendar.YEAR);
 		
 		
-		return imsi+","+num_pls+","+time_of_first_pls+","+time_of_last_pls+","+first.getTime()+","+last.getTime();
+		return imsi+","+num_pls+","+dt+","+sday+"-"+MONTHS[smonth]+"-"+syear+","+eday+"-"+MONTHS[emonth]+"-"+eyear;
 	}
 }
