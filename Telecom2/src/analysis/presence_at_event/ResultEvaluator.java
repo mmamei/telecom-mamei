@@ -28,7 +28,6 @@ public class ResultEvaluator {
 	
 	
 	public static final boolean INTERCEPT = true;
-	public static final boolean LOG = false;
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -195,7 +194,6 @@ public class ResultEvaluator {
 				String[] e = line.split(",");
 				String placemark = e[0].substring(0,e[0].indexOf("-"));
 				double estimated = Double.parseDouble(e[1]);
-				if(LOG) estimated = Math.log(estimated);
 				double groundtruth = Double.parseDouble(e[2]);
 				List<double[]> p = map.get(placemark);
 				if(p==null) {
