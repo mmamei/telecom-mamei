@@ -2,6 +2,7 @@ package pls_parser;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
+import analysis.tourist.TouristActivity;
 import area.Placemark;
 import area.region.Region;
 import area.region.RegionMap;
@@ -31,6 +33,9 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 	public static final int ALL = 2;
 	public static final String[] U_SEGMENT = new String[]{"TIM","ROAMING","ALL"};
 	
+	public static final boolean TIME_DETAIL = false;
+	
+	
 	private Set<String> user_set;
 	private RegionMap map;
 	
@@ -40,6 +45,7 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 	Placemark p;
 	int min_days, max_days;
 	int user_segment;
+	
 	
 	public TouristAnalyzer(String user_file, String region_map, Placemark p, int min_days, int max_days, int user_segment) throws Exception {
 		this.p = p;
@@ -57,9 +63,7 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 			String[] e = line.split(",");
 			if(user_segment == TIM && !e[1].equals("22201")) continue;
 			if(user_segment == ROAMING && e[1].equals("22201")) continue;
-			Long st = Double.valueOf(e[3]).longValue();
-			Long et = Double.valueOf(e[4]).longValue();
-			int days = (int)((et - st) / (1000*3600*24));
+			int days = Integer.parseInt(e[3]);
 			if(min_days > days || days > max_days) continue;
 			
 			user_set.add(e[0]);
@@ -69,6 +73,7 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 		space_density = new HashMap<String,Double>();
 		time_density = new HashMap<String,Double>();
 	}
+
 
 	String[] fields;
 	String username;
@@ -138,21 +143,40 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 	}
 	
 	
-
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	public void finish() {
+		
+		String time_suffix = "";
+		if(TIME_DETAIL) {
+			int sday =  getStartTime().get(Calendar.DAY_OF_MONTH);
+			int smonth = getStartTime().get(Calendar.MONTH);
+			int syear = getStartTime().get(Calendar.YEAR);
+			
+			int eday =  getEndTime().get(Calendar.DAY_OF_MONTH);
+			int emonth = getEndTime().get(Calendar.MONTH);
+			int eyear = getEndTime().get(Calendar.YEAR);
+			
+			time_suffix = "["+sday+"-"+MONTHS[smonth]+"-"+syear+"_"+eday+"-"+MONTHS[emonth]+"-"+eyear+"]";
+		}
+		
+		
 		String dir = "C:"+Config.getInstance().base_dir+"/TouristAnalyzer";
 		new File(dir).mkdirs();
-		CopyAndSerializationUtils.save(new File(dir+"/"+p.name+"_"+min_days+"_"+max_days+"_"+U_SEGMENT[user_segment]+"_space.ser"), space_density);
-		CopyAndSerializationUtils.save(new File(dir+"/"+p.name+"_"+min_days+"_"+max_days+"_"+U_SEGMENT[user_segment]+"_time.ser"), time_density);
+		CopyAndSerializationUtils.save(new File(dir+"/"+p.name+"_"+min_days+"_"+max_days+"_"+U_SEGMENT[user_segment]+time_suffix+"_space.ser"), space_density);
+		CopyAndSerializationUtils.save(new File(dir+"/"+p.name+"_"+min_days+"_"+max_days+"_"+U_SEGMENT[user_segment]+time_suffix+"_time.ser"), time_density);
 	}
 	
 	public static void main(String[] args) throws Exception {
+		Placemark p = Placemark.getPlacemark("Firenze");
 		int us = ROAMING;
 		int min_days = 1;
 		int max_days = 5;
-		TouristAnalyzer ba = new TouristAnalyzer("UserEventCounterDetailed/Venezia_trim3.csv","RegionMap/Venezia.ser",Placemark.getPlacemark("Venezia"),min_days, max_days,us);
+		TouristAnalyzer ba = new TouristAnalyzer("UserEventCounterDetailed/"+p.name+"_trim3.csv","RegionMap/"+p.name+".ser",p,min_days, max_days,us);
 	    PLSParser.parse(ba);
 	    ba.finish();
+	    
+	    TouristActivity.process(p.name, 1, 5, ROAMING);
+	    
 		Logger.logln("Done");
 	}
 }

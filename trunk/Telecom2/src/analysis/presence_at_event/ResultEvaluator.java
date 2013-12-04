@@ -19,7 +19,14 @@ import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluator {
 	
+	public static final boolean VERBOSE = false;
+	
+	
 	public static boolean PIECEWISE = false;
+	public static boolean RANGE = true;
+	public static int RANGE_TH = 15000;
+	
+	
 	public static final boolean INTERCEPT = true;
 	public static final boolean LOG = false;
 	
@@ -43,22 +50,31 @@ public class ResultEvaluator {
 	public static void run(String[] training_files, String[] testing_files) throws Exception {
 		Map<String,List<double[]>> training_map = read(training_files);
 		Map<String,List<double[]>> testing_map = read(testing_files);
+		if(RANGE) {
+			Map<String,List<double[]>>[] tra = divide(training_map,RANGE_TH);
+			Map<String,List<double[]>>[] tst = divide(training_map,RANGE_TH);
+			Logger.logln("RESULTS FOR EVENTS BELOW "+RANGE_TH);
+			run(tra[0],tst[0]);
+			Logger.logln("\nRESULTS FOR EVENTS ABOVE "+RANGE_TH);
+			run(tra[1],tst[1]);
+		}
+		else run(training_map,testing_map);
 		
+	}
 		
 		// scale testing data according to training regression
 		
-		Map<String,List<double[]>> scaled = PIECEWISE? scalePiecewise(testing_map,training_map) : scale(testing_map,training_map);
+	public static void run(Map<String,List<double[]>> training_map, Map<String,List<double[]>> testing_map) throws Exception {
 		
+		Map<String,List<double[]>> scaled = PIECEWISE ? scalePiecewise(testing_map,training_map) : scale(testing_map,training_map);
 		draw("Testing",testing_map);
 		draw("Result after scaling",scaled);
 		
 		// compute error
+		
 		DescriptiveStatistics[] abs_perc_errors = computeErrorStats(scaled);
 		DescriptiveStatistics abs_err_stat = abs_perc_errors[0];
 		DescriptiveStatistics perc_err_stat = abs_perc_errors[1];
-		
-		
-		
 		
 		Logger.logln("MEAN ABS ERROR = "+(int)abs_err_stat.getMean());
 		Logger.logln("MEDIAN ABS ERROR = "+(int)abs_err_stat.getPercentile(50));
@@ -69,8 +85,31 @@ public class ResultEvaluator {
 	}
 	
 	
+	public static Map<String,List<double[]>>[] divide(Map<String,List<double[]>> x, double threshold) {
+		Map<String,List<double[]>>[] ba = (Map<String,List<double[]>>[])new Map[2]; // ba = bottom - above
+		ba[0] = new HashMap<String,List<double[]>>();
+		ba[1] = new HashMap<String,List<double[]>>();
+		for(String k: x.keySet()) {
+			List<double[]> l = x.get(k);
+			for(double[] v: l) {
+				if(v[1] <= threshold) add(ba[0],k,v);
+				else add(ba[1],k,v);
+			}
+		}
+		return ba;
+		
+	}
 	
+	private static void add(Map<String,List<double[]>> map, String k, double[] v) {
+		List<double[]> l = map.get(k);
+		if(l == null) {
+			l = new ArrayList<double[]>();
+			map.put(k, l);
+		}
+		l.add(v);
+	}
 	
+
 	
 	
 	public static Map<String,List<double[]>> scale(Map<String,List<double[]>> testing_map, Map<String,List<double[]>> training_map) {
@@ -80,7 +119,7 @@ public class ResultEvaluator {
 		
 		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
 		for(String placemark: testing_map.keySet()) {
-			Logger.logln(placemark);
+			//Logger.logln(placemark);
 			List<double[]> list_est = new ArrayList<double[]>(); 
 			for(double[] x : testing_map.get(placemark)) {
 				double est = Math.max(0, training_sr.predict(x[0]));
@@ -94,33 +133,20 @@ public class ResultEvaluator {
 	
 	
 	public static Map<String,List<double[]>> scalePiecewise(Map<String,List<double[]>> testing_map, Map<String,List<double[]>> training_map) {
-		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
-		
-		
-		DescriptiveStatistics ds = new DescriptiveStatistics();
-		
+		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();		
 		for(String placemark: testing_map.keySet()) {
 			Logger.logln(placemark);
 			List<double[]> list_est = new ArrayList<double[]>(); 
 			for(double[] x : testing_map.get(placemark)) {
 				SimpleRegression sr = getPiecewiseLR(training_map,x[0]);
-				ds.addValue(sr.getR());
 				double est = Math.max(0, sr.predict(x[0]));
 				double gt = x[1];
 				list_est.add(new double[]{est,gt});
 			}
 			scaled.put(placemark, list_est);
 		}
-		
-		System.err.println(ds.getMean());
-		
-		
 		return scaled;
 	}
-	
-	
-	
-	
 	
 	
 	public static DescriptiveStatistics[] computeErrorStats(Map<String,List<double[]>> scaled) {
@@ -136,8 +162,8 @@ public class ResultEvaluator {
 					
 				double perc = 100*(abserr/gt);
 				perc_err_stat.addValue(perc);
-					
-				Logger.logln(p+" GT = "+(int)gt+" EST = "+(int)est+" ABS_ERR = "+(int)abserr+" %ERR = "+(int)perc+"%");	
+				
+				if(VERBOSE) Logger.logln(p+" GT = "+(int)gt+" EST = "+(int)est+" ABS_ERR = "+(int)abserr+" %ERR = "+(int)perc+"%");	
 			}
 		}
 		return new DescriptiveStatistics[]{abs_err_stat,perc_err_stat};
@@ -152,7 +178,7 @@ public class ResultEvaluator {
 		double i = sr.getIntercept();
 		double iconf = sr.getInterceptStdErr();
 		
-		Logger.logln(title+"Y = "+s+" * X + "+i);
+		Logger.logln(title+": Y = "+s+" * X + "+i);
 		Logger.logln(title+": SLOPE CONF INTERVAL =  ["+(s-sconf)+","+(s+sconf)+"]");
 		Logger.logln(title+": INTERCEPT CONNF INTERVAL =  ["+(i-iconf)+","+(i+iconf)+"]");
 		
@@ -221,16 +247,17 @@ public class ResultEvaluator {
 	
 	public static void draw(String title, Map<String,List<double[]>> map) {
 		
-		Logger.logln(title+" ***************************************");
-
-		for(String placemark: map.keySet()) {
-			for(double[] x : map.get(placemark)) {
-				double est = x[0];
-				double gt = x[1];
-				Logger.logln(placemark+";"+(int)est+";"+(int)gt);
+		if(VERBOSE) {
+			Logger.logln(title+" ***************************************");
+	
+			for(String placemark: map.keySet()) {
+				for(double[] x : map.get(placemark)) {
+					double est = x[0];
+					double gt = x[1];
+					Logger.logln(placemark+";"+(int)est+";"+(int)gt);
+				}
 			}
 		}
-		
 		
 		List<String> labels = new ArrayList<String>();
 		List<double[][]> data = new ArrayList<double[][]>();

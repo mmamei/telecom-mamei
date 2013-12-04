@@ -25,14 +25,22 @@ import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 
 
-public class CreatorRegionMapVenezia {
+public class CreatorRegionMapCity {
 	
 	
 	public static void main(String[] args) throws Exception {
+		String city = "Venezia";
+		process(city);
+		RegionMap.process(city);
+		Logger.logln("Done!");
+	}
+	
+	
+	public static void process(String city) throws Exception {
 		
-		RegionMap base = new RegionMap("VeneziaBase");
+		RegionMap base = new RegionMap(city+"Base");
 		
-		BufferedReader br = new BufferedReader(new FileReader(new File("C:/DATASET/GEO/venezia.txt")));
+		BufferedReader br = new BufferedReader(new FileReader(new File("C:/DATASET/GEO/"+city+"/areas.txt")));
 		String line;
 		while((line = br.readLine()) != null) {
 			String coordinates = br.readLine();	
@@ -44,7 +52,7 @@ public class CreatorRegionMapVenezia {
 		List<String> names = new ArrayList<String>();
 		List<double[]> coordinates = new ArrayList<double[]>();
 		
-		br = new BufferedReader(new FileReader(new File("C:/DATASET/GEO/venezia2.txt")));
+		br = new BufferedReader(new FileReader(new File("C:/DATASET/GEO/"+city+"/placemarks.txt")));
 		while((line = br.readLine()) != null) {
 			names.add(line);
 			String[] e = br.readLine().split(",");	
@@ -56,6 +64,7 @@ public class CreatorRegionMapVenezia {
 		
 		VoronoiDiagramBuilder v = new VoronoiDiagramBuilder();
 		
+		v.setClipEnvelope(base.getEnvelope());
 		GeometryFactory fact = new GeometryFactory();
 		
 		Coordinate[] coord = new Coordinate[coordinates.size()];
@@ -71,31 +80,43 @@ public class CreatorRegionMapVenezia {
 		
 		Geometry voronoi = v.getDiagram(fact);
 		
-		RegionMap rm = new RegionMap("Venezia");
+		RegionMap rm = new RegionMap(city);
 		
 		for(int i=0; i<voronoi.getNumGeometries();i++) {
 			Geometry x = voronoi.getGeometryN(i);
+			
+			Geometry point = null;
 			String name = "";
 			// get the name
 			for(int k=0; k<mpt.getNumPoints();k++)
 				if(x.contains(mpt.getGeometryN(k))) {
+						point = mpt.getGeometryN(k);
 						name = names.get(k);
 						break;
 				}
 			//out.println(Voronoi.geom2Kml(name,(Polygon)x,Colors.RANDOM_COLORS[i % Colors.RANDOM_COLORS.length]));
+			//rm.add(new Region(name,x));
 			
 			for(Region r : base.getRegions()) {
 				if(x.intersects(r.getGeom())) {
+				//if(r.getGeom().contains(point)) {
 					Geometry y  = x.intersection(r.getGeom());
 					rm.add(new Region(r.getName()+"_"+name,y));
 				}
 			}
 		}
 		
+		for(Region b: base.getRegions()) {
+			boolean found = false;
+			for(int k=0; k<mpt.getNumPoints();k++) {
+				Geometry point = mpt.getGeometryN(k);
+				if(b.getGeom().contains(point)) {found = true; break;}
+			}
+			if(!found) rm.add(b);
+		}
 		
 
 		File f = FileUtils.getFile("RegionMap");
-		CopyAndSerializationUtils.save(new File(f.getAbsolutePath()+"/Venezia.ser"), rm);
-		Logger.logln("Done!");
+		CopyAndSerializationUtils.save(new File(f.getAbsolutePath()+"/"+city+".ser"), rm);
 	}
 }

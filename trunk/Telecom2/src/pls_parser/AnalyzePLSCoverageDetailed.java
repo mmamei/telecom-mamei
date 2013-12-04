@@ -9,9 +9,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 
+
+
+
 public class AnalyzePLSCoverageDetailed {
+	
+	
+	public static final boolean TIME_DETAIL = true;
 	
 	/*
 	 * This creates a csv file representing a matrix.
@@ -19,7 +26,10 @@ public class AnalyzePLSCoverageDetailed {
 	 * Each row has 24 columns associated with hours
 	 * Each cell contains the total file size of the pls files for that day on that hour
 	 */
-		
+	
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+	static final String[] DAY_WEEK = new String[]{"0","Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+	
 	public static void main(String[] args) throws Exception {
 		String dir = Config.getInstance().pls_folder;
 		Map<String,long[]> allDays = new TreeMap<String,long[]>();
@@ -29,8 +39,22 @@ public class AnalyzePLSCoverageDetailed {
 			e.printStackTrace();
 		}
 		
-		String odir = Config.getInstance().base_dir+"/AnalyzePLSCoverageDetailed";
-		PrintWriter out = new PrintWriter(new FileWriter(odir+"/"+dir.substring(dir.lastIndexOf("/")+1)+".csv"));
+		String odir = FileUtils.getFileS("AnalyzePLSCoverageDetailed");
+		
+		String time_suffix = "";
+		if(TIME_DETAIL) {
+			int sday =  Config.getInstance().pls_start_time.get(Calendar.DAY_OF_MONTH);
+			int smonth = Config.getInstance().pls_start_time.get(Calendar.MONTH);
+			int syear = Config.getInstance().pls_start_time.get(Calendar.YEAR);
+			
+			int eday =  Config.getInstance().pls_end_time.get(Calendar.DAY_OF_MONTH);
+			int emonth = Config.getInstance().pls_end_time.get(Calendar.MONTH);
+			int eyear = Config.getInstance().pls_end_time.get(Calendar.YEAR);
+			
+			time_suffix = "["+sday+"-"+MONTHS[smonth]+"-"+syear+"_"+eday+"-"+MONTHS[emonth]+"-"+eyear+"]";
+		}
+		
+		PrintWriter out = new PrintWriter(new FileWriter(odir+"/"+dir.substring(dir.lastIndexOf("/")+1)+time_suffix+".csv"));
 		for(String d : allDays.keySet()) {
 			long[] data = allDays.get(d);
 			out.print(d+",");
@@ -42,8 +66,6 @@ public class AnalyzePLSCoverageDetailed {
 		Logger.logln("Done");
 	}
 	
-	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	static final String[] DAY_WEEK = new String[]{"0","Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 	private static void analyzeDirectory(File directory, Map<String,long[]> allDays) throws Exception{
 		File[] items = directory.listFiles();
 		for(int i=0; i<items.length;i++){

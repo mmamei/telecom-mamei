@@ -24,25 +24,31 @@ import area.region.RegionMap;
 public class TouristActivity {
 	
 	public static void main(String[] args) throws Exception {
-		
-		int min_days = 1;
-		int max_days = 5;
+		String city = "Firenze";
+		int min_days = 0;
+		int max_days = 3;
 		int u_seg =TouristAnalyzer.ROAMING;
+		process(city,min_days,max_days,u_seg);
+		Logger.logln("Done!");
+	}
 		
-		File space = FileUtils.getFile("TouristAnalyzer/Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_space.ser");
-		File time = FileUtils.getFile("TouristAnalyzer/Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_time.ser");
+	
+	public static void process(String city, int min_days, int max_days, int u_seg) throws Exception {
+		
+		File space = FileUtils.getFile("TouristAnalyzer/"+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_space.ser");
+		File time = FileUtils.getFile("TouristAnalyzer/"+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_time.ser");
 		
 		if(time == null || space == null) {
-			TouristAnalyzer ba = new TouristAnalyzer("UserEventCounterDetailed/Venezia_trim3.csv","RegionMap/Venezia.ser",Placemark.getPlacemark("Venezia"),min_days, max_days,u_seg);
+			TouristAnalyzer ba = new TouristAnalyzer("UserEventCounterDetailed/"+city+"_trim3.csv","RegionMap/"+city+".ser",Placemark.getPlacemark(city),min_days, max_days,u_seg);
 		    PLSParser.parse(ba);
 		    ba.finish();
-		    space = FileUtils.getFile("TouristAnalyzer/Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_space.ser");
-			time = FileUtils.getFile("TouristAnalyzer/Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_time.ser");
+		    space = FileUtils.getFile("TouristAnalyzer/"+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_space.ser");
+			time = FileUtils.getFile("TouristAnalyzer/"+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_time.ser");
 		}
 		
 		Map<String,Double> space_density = (Map<String,Double>)CopyAndSerializationUtils.restore(space);
 		Map<String,Double> time_density = (Map<String,Double>)CopyAndSerializationUtils.restore(time);
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/Venezia.ser"));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		
 		for(String k : space_density.keySet()) {
 			double val = space_density.get(k);
@@ -50,7 +56,7 @@ public class TouristActivity {
 			space_density.put(k, val/area);
 		}
 		
-		PopulationDensity.plot("Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], space_density, rm,0);
+		PopulationDensity.plot(city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], space_density, rm,0);
 		
 		
 
@@ -70,7 +76,9 @@ public class TouristActivity {
 			System.out.println(h+","+x);
 			val[h] += x;
 		}
-		GraphPlotter.drawGraph("Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], "Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], "", "hour", "num pls", domain, val);
+		
+		GraphPlotter gp = GraphPlotter.drawGraph(""+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], ""+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], "", "hour", "num pls", domain, val);
+		gp.save(FileUtils.getFileS("TouristAnalyzer")+"/"+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_day.png");
 		
 		double[] hmeans = new double[24];
 		double[] hsigmas = new double[24];
@@ -125,10 +133,8 @@ public class TouristActivity {
 		
 		
 		
-		GraphPlotter.drawGraph("Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], "Venezia_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], "", "time", "z_num pls", domain, val);	
-		
-		Logger.logln("Done!");
-		
+		gp = GraphPlotter.drawGraph(""+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], ""+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg], "", "time", "z_num pls", domain, val);			
+		gp.save(FileUtils.getFileS("TouristAnalyzer")+"/"+city+"_"+min_days+"_"+max_days+"_"+TouristAnalyzer.U_SEGMENT[u_seg]+"_z_day.png");
 	}
 	
 }
