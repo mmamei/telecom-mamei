@@ -1,0 +1,145 @@
+package pls_parser;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import utils.Config;
+import utils.FileUtils;
+import utils.Logger;
+import area.Placemark;
+
+public class UserEventCounterCellacXHour extends BufferAnalyzer {
+	
+	private Placemark placemark;
+	private String hashmap_outputfile;
+	private Map<String,UserInfo> users_info;
+	
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+	
+	public UserEventCounterCellacXHour(Placemark placemark) {
+		this.placemark = placemark;
+		users_info = new HashMap<String,UserInfo>();
+		
+		File fd = FileUtils.getFile("UserEventCounter");
+		if(fd == null) {
+			fd = FileUtils.create("UserEventCounter");
+			fd.mkdirs();
+		}
+		hashmap_outputfile = fd.getAbsolutePath()+"/"+placemark.name+"_cellacXhour.csv";
+	}
+
+	/*
+	<HASH_MSISDN> - identifica in modo univoco l’utente;
+	<prefisso_IMSI> - contiene MCC (prime tre cifre del campo) e MNC (ultime due cifre del campo);
+	<CELLLAC> - individua la posizione dell’utente e si ottiene combinando il CELLID e il LACID con la seguente formula:
+	<TIMESTAMP> - è lo UNIX timestamp relativo all’istante esatto in cui è stata effettuata l’attività dall’utente.
+	*/
+	
+	String[] fields;
+	String username;
+	String imsi;
+	String celllac;
+	long timestamp;
+	Calendar cal = new GregorianCalendar();
+	public void analyze(String line) {
+		try {
+			fields = line.split("\t");
+			username = fields[0];
+			imsi = fields[1];
+			celllac = fields[2];
+			timestamp = Long.parseLong(fields[3]);
+			cal.setTimeInMillis(timestamp);
+			if(placemark.contains(celllac)){
+				UserInfo info = users_info.get(username);
+				if(info == null) {
+					info = new UserInfo();
+					info.imsi = imsi;
+					users_info.put(username, info);
+				}
+				info.num_pls++;
+				info.add(cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH),cal.get(Calendar.HOUR_OF_DAY),celllac);
+			}
+		} catch(Exception e) {
+			System.err.println("Problems... "+line);
+		}
+	}
+	
+	
+	public void finish() {
+		try {
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(hashmap_outputfile))));
+		for(String user: users_info.keySet())
+			out.println(user+","+users_info.get(user));
+		out.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void main(String[] args) throws Exception {
+		Placemark p = Placemark.getPlacemark("Venezia");
+		UserEventCounterCellacXHour ba = new UserEventCounterCellacXHour(p);
+		if(!new File(ba.hashmap_outputfile).exists()) {
+			PLSParser.parse(ba);
+			ba.finish();
+			Logger.logln("Done");
+		}
+		else Logger.logln("file already exists!");
+		trim(p,3);
+	}
+	
+	/*
+	 * This main is places here for convenience. It just read the file and remove all the users producing few events
+	 */
+	public static void trim(Placemark p, int min_size) throws Exception {
+		BufferedReader br = FileUtils.getBR("UserEventCounter/"+p.name+"_cellacXhour.csv");
+		PrintWriter out = FileUtils.getPW("UserEventCounter", p.name+"_cellacXhour_trim"+min_size+".csv");
+		String line;
+		while((line = br.readLine()) != null) {
+			int num_pls = Integer.parseInt(line.split(",")[2]);
+			if(num_pls >= min_size)
+				out.println(line);
+		}
+		br.close();
+		out.close();
+		Logger.logln("Done!");
+	}
+	
+	/***********************************************************************************************************************/
+	/* USER INFO INNER CLASS */
+	
+	private class UserInfo {
+		
+		String imsi;
+		int num_pls = 0;
+		Set<String> pls = new HashSet<String>();
+		
+		public void add(String day, int h, String cellac) {
+			pls.add(day+":"+h+":"+celllac);
+		}
+		
+		public int getNumDays() {
+			Set<String> days = new HashSet<String>();
+			for(String p:pls) 
+				days.add(p.substring(0, p.indexOf(":")));
+			return days.size();
+		}
+		
+		public String toString() {			
+			StringBuffer sb = new StringBuffer();
+			for(String p:pls) 
+				sb.append(p+",");
+			return imsi+","+num_pls+","+getNumDays()+","+sb.toString();
+		}
+	}
+
+}
