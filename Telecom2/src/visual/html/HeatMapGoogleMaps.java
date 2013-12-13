@@ -4,9 +4,12 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import utils.Config;
 import utils.Logger;
+import area.region.Region;
+import area.region.RegionMap;
 
 public class HeatMapGoogleMaps {
 	
@@ -14,8 +17,25 @@ public class HeatMapGoogleMaps {
 	static double opacity = 0.6;
 	static int zoom = 13;
 	
-	public static void draw(String file, String title, List<double[]> points, List<Double> weights) throws Exception {
+	
+	public static void draw(String file, String title, Map<String,Double> density, RegionMap rm, double threshold) throws Exception {
 		
+		List<double[]> points = new ArrayList<double[]>();
+		List<Double> weights = new ArrayList<Double>();
+		
+		for(Region r: rm.getRegions()) {
+			Double val = density.get(r.getName());
+			System.out.println(r.getName()+" = "+val);
+			if(val != null && val > threshold) {
+				points.add(new double[]{r.getCenterLat(),r.getCenterLon()}); // nota qui si potrebbe mettere un po' di scattering e modulare i pesi opportunamente.
+				weights.add(val);
+			}
+		}
+		draw(file, title, points, weights);
+	}
+	
+	
+	public static void draw(String file, String title, List<double[]> points, List<Double> weights) throws Exception {
 		
 		// compute center point
 		double[] cp = new double[2];

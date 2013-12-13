@@ -38,8 +38,8 @@ public class PlacemarkRadiusExtractor {
 	public static final boolean PLOT = false;
 	public static final boolean CALL_PRESENCE_COUNTER_AFTERWARDS = !PLOT;
 	public static final boolean NORMALIZE_SPATIALLY = true;
-	public static final boolean DIFF = false;
-	
+	public static final boolean DIFF = true;
+	public static final boolean USE_INDIVIDUAL_EVENT = true;
 	public static final int MAX_R = 1500;
 	public static final int MIN_R = -500;
 	public static final int STEP = 100;
@@ -59,7 +59,7 @@ public class PlacemarkRadiusExtractor {
 	
 	public static void main(String[] args) throws Exception { 
 		
-		String file = "result_individual.csv";
+		String file = DIFF ? "result_individual_diff.csv" :  "result_individual.csv";
 		
 		new File(ODIR).mkdirs();
 		File f = new File(ODIR+"/"+file);
@@ -121,7 +121,6 @@ public class PlacemarkRadiusExtractor {
 				}
 			
 			for(int i=0; i<valXradius.size(); i++) {
-
 				double[][] vxr = DIFF ? diff.get(i) : valXradius.get(i);
 				double bestr = 0;
 				if(MODE == W_AVG) bestr = getWeightedAverage(vxr);
@@ -406,11 +405,10 @@ public class PlacemarkRadiusExtractor {
 	
 	
 	
-	public static Map<String,Double> readBestR(boolean individual) throws Exception {
-		if(individual)
-			return readBestR(ODIR+"/result_individual.csv");
-		else
-			return readBestR(ODIR+"/result.csv");
+	public static Map<String,Double> readBestR(boolean individual,boolean diff) throws Exception {
+		String im = individual ? "individual" : "multiple";
+		String sdiff = diff ? "_diff" : "";
+		return readBestR(ODIR+"/result_"+im+sdiff+".csv");
 	}
 
 	

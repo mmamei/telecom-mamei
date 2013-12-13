@@ -16,6 +16,7 @@ import utils.FileUtils;
 import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
 import visual.kml.KML;
+import visual.kml.KMLHeatMap;
 import area.region.Region;
 import area.region.RegionMap;
 
@@ -40,38 +41,6 @@ public class PopulationDensity {
 		Map<String,Double> density = process(rm,up,kind_of_place,exclude_kind_of_place);
 		String title = rm.getName()+"-"+kind_of_place+"-"+exclude_kind_of_place;
 		
-	}
-		
-	public static void plot(String title, Map<String,Double> density, RegionMap rm, double threshold) throws Exception {
-	 
-		File d = FileUtils.getFile("PopulationDensity");
-		if(d == null) d = FileUtils.create("PopulationDensity");
-		
-		String kmlfile = d.getAbsolutePath()+"/"+title+".kml";
-		String htmlfile = d.getAbsolutePath()+"/"+title+".html";
-		
-
-		printKML(kmlfile,density,rm,title,false);
-		
-		
-	
-		List<double[]> points = new ArrayList<double[]>();
-		List<Double> weights = new ArrayList<Double>();
-		
-		
-		for(Region r: rm.getRegions()) {
-			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
-			if(val > threshold) {
-				points.add(new double[]{r.getCenterLat(),r.getCenterLon()});
-				weights.add(val);
-			}
-		}
-		
-		
-		HeatMapGoogleMaps.draw(htmlfile, title, points, weights);
-		
-
-		Logger.logln("Done!");
 	}
 	
 	
@@ -116,40 +85,5 @@ public class PopulationDensity {
 		return r;
 	}
 	
-	public static void printKML(String file, Map<String,Double> den, RegionMap rm , String desc, boolean logscale) throws Exception {
-		
-		
-		Map<String,Double> density = new HashMap<String,Double>();
-		for(String r: den.keySet())
-			density.put(r, den.get(r).doubleValue());
-		
-		// convert to the log scale,
-		if(logscale) 
-			for(String name: density.keySet()) 
-				density.put(name, Math.max(0, Math.log10(density.get(name))));	
-		
-		
-		//compute the maximum value in density
-		double max = 0;
-		for(double v: density.values()) 
-			max = Math.max(max, v);
-		
-		
-		
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-		KML kml = new KML();
-		kml.printHeaderFolder(out, rm.getName());
-		
-		for(Region r: rm.getRegions()) {
-			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
-			String description = desc+" DENSITY = "+(logscale ? Math.pow(10, val) : val);
-			out.println(r.toKml(Colors.val01_to_color(val/max),"44aaaaaa",description));
-		}
 	
-		
-		kml.printFooterFolder(out);
-		out.close();
-		
-		Logger.logln("Done");
-	}
 }

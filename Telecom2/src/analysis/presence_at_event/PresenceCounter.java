@@ -19,6 +19,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 import analysis.PlsEvent;
@@ -44,7 +45,7 @@ public class PresenceCounter {
 		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
 		
 		
-		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(USE_INDIVIDUAL_EVENT);	
+		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(USE_INDIVIDUAL_EVENT,PlacemarkRadiusExtractor.DIFF);	
 		
 		List<CityEvent> events = CityEvent.getEventsInData();
 		
@@ -97,11 +98,17 @@ public class PresenceCounter {
 		
 		new GraphScatterPlotter("PC Result: o_radius = "+o_radius+",days = "+days+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir();
+		
+		
+		
+		String dir = FileUtils.getFileS("PresenceCounter/"+Config.getInstance().get_pls_subdir());
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
-		String file = USE_INDIVIDUAL_EVENT ? "result_individual_"+o_radius+"_"+days+".csv" : "result_"+o_radius+"_"+days+".csv";
+		String im = PlacemarkRadiusExtractor.USE_INDIVIDUAL_EVENT? "individual" : "multiple";
+		String sdiff = PlacemarkRadiusExtractor.DIFF ? "_diff" : "";
+		
+		String file = "result_"+im+"_"+o_radius+"_"+days+sdiff+".csv";
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+file));
 		out.println("event,estimated,groundtruth");
 		
@@ -124,7 +131,9 @@ public class PresenceCounter {
 	
 	public static double count(CityEvent event, double o_radius, int days) throws Exception {	
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir()+"/ProbScores";
+		String suffix = USE_INDIVIDUAL_EVENT ? "" : "Multi";
+		
+		String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir()+"/ProbScores"+suffix;
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+event.toFileName()));
