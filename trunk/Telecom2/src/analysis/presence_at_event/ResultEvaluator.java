@@ -2,43 +2,50 @@ package analysis.presence_at_event;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
-import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 
 public class ResultEvaluator {
 	
+	
+	public static boolean USE_INDIVIDUAL_EVENT = false;
+	public static boolean DIFF = false;
+
+	public static boolean LEAVE_ONE_OUT = true;
+	public static boolean PIECEWISE = true;
+	public static int PIECE_SIZE = 6000;
+	
+	public static boolean RANGE = false;
+	public static int RANGE_TH = 10000;
+	
+	
+	public static boolean INTERCEPT = true;
 	public static final boolean VERBOSE = false;
-	
-	
-	public static boolean PIECEWISE = false;
-	public static boolean RANGE = true;
-	public static int RANGE_TH = 15000;
-	
-	
-	public static final boolean INTERCEPT = true;
-	
 	public static void main(String[] args) throws Exception {
 		
-		
-		String lomb = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_individual_0.0_3.csv");
-		String piem2012 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_individual_0.0_3.csv");
-		String piem2013 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_individual_0.0_3.csv");
-		
+		String type = USE_INDIVIDUAL_EVENT ? "individual" : "multiple";
+		String sdiff = DIFF ? "_diff" : "";
+		String lomb = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_"+type+"_0.0_3"+sdiff+".csv");
+		String piem2012 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
+		String piem2013 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
+		//String piem2013_openair = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_openair_"+type+"_0.0_3"+sdiff+".csv");
 
-		String[] training = new String[]{lomb,piem2012,piem2013};
-		String[] testing = new String[]{lomb,piem2012,piem2013};
+		String[] training = new String[]{lomb,piem2012};
+		String[] testing = new String[]{lomb,piem2012};
 		
 		run(training,testing);
 		
@@ -51,10 +58,14 @@ public class ResultEvaluator {
 		Map<String,List<double[]>> testing_map = read(testing_files);
 		if(RANGE) {
 			Map<String,List<double[]>>[] tra = divide(training_map,RANGE_TH);
-			Map<String,List<double[]>>[] tst = divide(training_map,RANGE_TH);
+			Map<String,List<double[]>>[] tst = divide(testing_map,RANGE_TH);
+			
 			Logger.logln("RESULTS FOR EVENTS BELOW "+RANGE_TH);
+			INTERCEPT = false;
 			run(tra[0],tst[0]);
+			
 			Logger.logln("\nRESULTS FOR EVENTS ABOVE "+RANGE_TH);
+			INTERCEPT = true;
 			run(tra[1],tst[1]);
 		}
 		else run(training_map,testing_map);
@@ -74,6 +85,7 @@ public class ResultEvaluator {
 		DescriptiveStatistics[] abs_perc_errors = computeErrorStats(scaled);
 		DescriptiveStatistics abs_err_stat = abs_perc_errors[0];
 		DescriptiveStatistics perc_err_stat = abs_perc_errors[1];
+		
 		
 		Logger.logln("MEAN ABS ERROR = "+(int)abs_err_stat.getMean());
 		Logger.logln("MEDIAN ABS ERROR = "+(int)abs_err_stat.getPercentile(50));
@@ -121,7 +133,7 @@ public class ResultEvaluator {
 			//Logger.logln(placemark);
 			List<double[]> list_est = new ArrayList<double[]>(); 
 			for(double[] x : testing_map.get(placemark)) {
-				double est = Math.max(0, training_sr.predict(x[0]));
+				double est = constrain(training_sr.predict(x[0]));
 				double gt = x[1];
 				list_est.add(new double[]{est,gt});
 			}
@@ -134,17 +146,23 @@ public class ResultEvaluator {
 	public static Map<String,List<double[]>> scalePiecewise(Map<String,List<double[]>> testing_map, Map<String,List<double[]>> training_map) {
 		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();		
 		for(String placemark: testing_map.keySet()) {
-			Logger.logln(placemark);
+			//Logger.logln(placemark);
 			List<double[]> list_est = new ArrayList<double[]>(); 
 			for(double[] x : testing_map.get(placemark)) {
 				SimpleRegression sr = getPiecewiseLR(training_map,x[0]);
-				double est = Math.max(0, sr.predict(x[0]));
+				double est = constrain(sr.predict(x[0]));
 				double gt = x[1];
 				list_est.add(new double[]{est,gt});
 			}
 			scaled.put(placemark, list_est);
 		}
 		return scaled;
+	}
+	
+	public static double constrain(double est) {
+		if(est < 0) return 0;
+		if(est > 80000) return 80000;
+		return est;
 	}
 	
 	
@@ -168,19 +186,19 @@ public class ResultEvaluator {
 		return new DescriptiveStatistics[]{abs_err_stat,perc_err_stat};
 	}
 	
+	static final DecimalFormat F = new DecimalFormat("##.##",new DecimalFormatSymbols(Locale.US));
 	public static void printInfo(String title, SimpleRegression sr) {
-		Logger.logln(title+": r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
-		
 		double s = sr.getSlope();
 		double sconf = sr.getSlopeConfidenceInterval(); 
 		
 		double i = sr.getIntercept();
 		double iconf = sr.getInterceptStdErr();
 		
-		Logger.logln(title+": Y = "+s+" * X + "+i);
-		Logger.logln(title+": SLOPE CONF INTERVAL =  ["+(s-sconf)+","+(s+sconf)+"]");
-		Logger.logln(title+": INTERCEPT CONNF INTERVAL =  ["+(i-iconf)+","+(i+iconf)+"]");
-		
+		if(INTERCEPT) Logger.logln(title+": Y = "+F.format(s)+" * X + "+(int)(i));
+		else  Logger.logln(title+": Y = "+F.format(s)+" * X");
+		Logger.logln(title+": SLOPE CONF INTERVAL =  ["+F.format(s-sconf)+","+F.format(s+sconf)+"]");
+		if(INTERCEPT) Logger.logln(title+": INTERCEPT CONNF INTERVAL =  ["+F.format(i-iconf)+","+F.format(i+iconf)+"]");
+		Logger.logln(title+": r="+F.format(sr.getR()));//+", r^2="+Fsr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 	}
 	
 	public static Map<String,List<double[]>> read(String[] files) throws Exception {
@@ -217,7 +235,7 @@ public class ResultEvaluator {
 	}	
 	
 	
-	public static int SIZE = 6;
+	
 	public static SimpleRegression getPiecewiseLR(Map<String,List<double[]>> training, final double x) {
 		
 		// create a single list
@@ -235,8 +253,17 @@ public class ResultEvaluator {
 		
 		SimpleRegression r = new SimpleRegression(INTERCEPT);
 		
-		for(int i=0; i<all.size() && i<SIZE; i++) 
+		//int start = LEAVE_ONE_OUT ? 1 : 0;
+		
+		for(int i=0; i<all.size() && i<PIECE_SIZE; i++) {
+			
+			if(LEAVE_ONE_OUT && i==0 && Math.abs(x-all.get(i)[0]) < 0.0000001) {
+				PIECE_SIZE ++;
+				System.out.println("-------------------------------------------------------------leave one out effective!");
+				continue;
+			}
 			r.addData(all.get(i)[0], all.get(i)[1]);
+		}
 
 		return r;
 	}

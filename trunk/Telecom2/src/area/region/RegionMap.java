@@ -32,18 +32,26 @@ public class RegionMap implements Serializable {
 		
 	private String name;
 	private Map<String,Region> rm;
+	
+	private Map<Integer,Region> rm_int;
+	private int rm_int_cont = 0;
+	
 	private KDTree<Double,Point<Double>,Region> kdtree;
 	private RangeSearchTree<Double,Point<Double>,Region> rangetree;
 	
 	public RegionMap(String name) {
 		this.name = name;
 		rm = new HashMap<String,Region>();
+		rm_int = new HashMap<Integer,Region>();
 		kdtree = new KDTree<Double,Point<Double>,Region>(2);
 		rangetree = (RangeSearchTree<Double,Point<Double>,Region>)kdtree;
 	}
 	
 	public void add(Region r) {
 		rm.put(r.getName(), r);
+		rm_int.put(rm_int_cont,r);
+		rm_int_cont ++;
+		
 		Point<Double> cellPoint = new GenericPoint<Double>(r.getCenterLon(),r.getCenterLat());
 		kdtree.put(cellPoint, r);
 	}
@@ -52,8 +60,16 @@ public class RegionMap implements Serializable {
 		return name;
 	}
 	
+	public int getNumRegions() {
+		return rm.size();
+	}
+	
 	public Region getRegion(String name) {
 		return rm.get(name);
+	}
+	
+	public Region getRegion(int i) {
+		return rm_int.get(i);
 	}
 	
 	public Collection<Region> getRegions(){
@@ -127,7 +143,7 @@ public class RegionMap implements Serializable {
 	
 	
 	public static void main(String[] args) throws Exception {
-		process("Firenze");
+		process("Venezia");
 		Logger.logln("Done!");
 	}
 	
@@ -140,6 +156,7 @@ public class RegionMap implements Serializable {
 		}
 			
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
+		Logger.logln(region+" has "+rm.getNumRegions()+" regions");
 		rm.printKML();
 		/*
 		System.out.println(rm.get(8.46050279447007,44.67433775848695).getName()); // should be ACQUI TERME

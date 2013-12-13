@@ -24,6 +24,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzer {
 	private Map<String,UserInfo> users_info;
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+	static final String[] DAY_WEEK = new String[]{"0","Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 	
 	public UserEventCounterCellacXHour(Placemark placemark) {
 		this.placemark = placemark;
@@ -66,7 +67,9 @@ public class UserEventCounterCellacXHour extends BufferAnalyzer {
 					users_info.put(username, info);
 				}
 				info.num_pls++;
-				info.add(cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH),cal.get(Calendar.HOUR_OF_DAY),celllac);
+				String day = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH);
+				String dayw = DAY_WEEK[cal.get(Calendar.DAY_OF_WEEK)];
+				info.add(day,dayw,cal.get(Calendar.HOUR_OF_DAY),celllac);
 			}
 		} catch(Exception e) {
 			System.err.println("Problems... "+line);
@@ -86,12 +89,16 @@ public class UserEventCounterCellacXHour extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Placemark p = Placemark.getPlacemark("Venezia");
+		process("Firenze");
+		Logger.logln("Done");
+	}	
+		
+	public static void process(String city) throws Exception {
+		Placemark p = Placemark.getPlacemark(city);
 		UserEventCounterCellacXHour ba = new UserEventCounterCellacXHour(p);
 		if(!new File(ba.hashmap_outputfile).exists()) {
 			PLSParser.parse(ba);
 			ba.finish();
-			Logger.logln("Done");
 		}
 		else Logger.logln("file already exists!");
 		trim(p,3);
@@ -123,8 +130,8 @@ public class UserEventCounterCellacXHour extends BufferAnalyzer {
 		int num_pls = 0;
 		Set<String> pls = new HashSet<String>();
 		
-		public void add(String day, int h, String cellac) {
-			pls.add(day+":"+h+":"+celllac);
+		public void add(String day, String dayw, int h, String cellac) {
+			pls.add(day+":"+dayw+":"+h+":"+celllac);
 		}
 		
 		public int getNumDays() {

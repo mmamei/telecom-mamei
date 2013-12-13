@@ -51,7 +51,7 @@ public class PLSBehaviorInAnArea {
 	
 	public static void main(String[] args) throws Exception { 
 		
-		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
+		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true,true);	
 		
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);

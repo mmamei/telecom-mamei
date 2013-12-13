@@ -26,14 +26,21 @@ import area.region.RegionMap;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class  TouristAnalyzer extends BufferAnalyzer {
+
+/*
+ * 
+ PRE DELETE. THIS CLASS IN NOW USELESS
+ * 
+ */
+
+public class  TouristAnalyzer2 extends BufferAnalyzer {
 	
-	public static final int TIM = 0;
-	public static final int ROAMING = 1;
-	public static final int ALL = 2;
-	public static final String[] U_SEGMENT = new String[]{"TIM","ROAMING","ALL"};
+	private static final int TIM = 0;
+	private static final int ROAMING = 1;
+	private static final int ALL = 2;
+	private static final String[] U_SEGMENT = new String[]{"TIM","ROAMING","ALL"};
 	
-	public static final boolean TIME_DETAIL = false;
+	private static final boolean TIME_DETAIL = false;
 	
 	
 	private Set<String> user_set;
@@ -47,7 +54,7 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 	int user_segment;
 	
 	
-	public TouristAnalyzer(String user_file, String region_map, Placemark p, int min_days, int max_days, int user_segment) throws Exception {
+	public TouristAnalyzer2(String user_file, String region_map, Placemark p, int min_days, int max_days, int user_segment) throws Exception {
 		this.p = p;
 		this.min_days = min_days;
 		this.max_days = max_days;
@@ -63,7 +70,7 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 			String[] e = line.split(",");
 			if(user_segment == TIM && !e[1].equals("22201")) continue;
 			if(user_segment == ROAMING && e[1].equals("22201")) continue;
-			int days = Integer.parseInt(e[3]);
+			int days = Integer.parseInt(e[4]);
 			if(min_days > days || days > max_days) continue;
 			
 			user_set.add(e[0]);
@@ -167,15 +174,15 @@ public class  TouristAnalyzer extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Placemark p = Placemark.getPlacemark("Firenze");
+		Placemark p = Placemark.getPlacemark("Venezia");
 		int us = ROAMING;
 		int min_days = 1;
-		int max_days = 5;
-		TouristAnalyzer ba = new TouristAnalyzer("UserEventCounterDetailed/"+p.name+"_trim3.csv","RegionMap/"+p.name+".ser",p,min_days, max_days,us);
+		int max_days = 3;
+		TouristAnalyzer2 ba = new TouristAnalyzer2("UserEventCounter/"+p.name+"_day.csv","RegionMap/"+p.name+".ser",p,min_days, max_days,us);
 	    PLSParser.parse(ba);
 	    ba.finish();
 	    
-	    TouristActivity.process(p.name, 1, 5, ROAMING);
+	    //TouristActivity.process(p.name, 1, 5, ROAMING);
 	    
 		Logger.logln("Done");
 	}
