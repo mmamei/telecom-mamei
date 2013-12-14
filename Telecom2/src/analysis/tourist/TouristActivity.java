@@ -14,8 +14,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import pls_parser.PLSParser;
-import pls_parser.TouristAnalyzer2;
 import pls_parser.UserEventCounterCellacXHour;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
@@ -23,7 +21,6 @@ import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
 import visual.java.GraphPlotter;
 import visual.kml.KMLHeatMap;
-import area.Placemark;
 import area.region.Region;
 import area.region.RegionMap;
 
@@ -48,36 +45,11 @@ public class TouristActivity {
 	public static void process(String city) throws Exception {
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		
-		
-		File space = FileUtils.getFile("TouristAnalyzer/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_space.ser");
-		File time = FileUtils.getFile("TouristAnalyzer/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_time.ser");
-		
-		if(time == null || space == null) {
-			TouristAnalyzer2 ba = new TouristAnalyzer2("UserEventCounterDetailed/"+city+"_trim3.csv","RegionMap/"+city+".ser",Placemark.getPlacemark(city));
-		    PLSParser.parse(ba);
-		    ba.finish();
-		    space = FileUtils.getFile("TouristAnalyzer/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_space.ser");
-			time = FileUtils.getFile("TouristAnalyzer/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_time.ser");
-		}
-		
-		Map<String,Double> space_density = (Map<String,Double>)CopyAndSerializationUtils.restore(space);
-		Map<String,Double> time_density = (Map<String,Double>)CopyAndSerializationUtils.restore(time);
-		
-		for(String k : space_density.keySet()) {
-			double val = space_density.get(k);
-			double area = rm.getRegion(k).getGeom().getArea();
-			space_density.put(k, val/area);
-		}
+		Map<String,Double> space_density = computeSpaceDensity(rm);
 		plotSpaceDensity(city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], space_density, rm,0);
 		
-		System.out.println("****************************************************");
-		
-		Map<String,Double> space_density2 = computeSpaceDensity(rm);
-		
-		plotSpaceDensity(city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], space_density2, rm,0);
-		
-		//Map<String,Double> time_density = computeTimeDensity(rm);
-		//plotTimeDensity(city,time_density);
+		Map<String,Double> time_density = computeTimeDensity(rm);
+		plotTimeDensity(city,time_density);
 	}
 	
 	public static void plotSpaceDensity(String city, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
