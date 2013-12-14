@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -47,12 +48,12 @@ public class TouristActivity {
 	public static void process(String city) throws Exception {
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		
-		/*
+		
 		File space = FileUtils.getFile("TouristAnalyzer/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_space.ser");
 		File time = FileUtils.getFile("TouristAnalyzer/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_time.ser");
 		
 		if(time == null || space == null) {
-			TouristAnalyzer2 ba = new TouristAnalyzer2("UserEventCounterDetailed/"+city+"_trim3.csv","RegionMap/"+city+".ser",Placemark.getPlacemark(city),MIN_DAYS, MAX_DAYS,U_SEG);
+			TouristAnalyzer2 ba = new TouristAnalyzer2("UserEventCounterDetailed/"+city+"_trim3.csv","RegionMap/"+city+".ser",Placemark.getPlacemark(city));
 		    PLSParser.parse(ba);
 		    ba.finish();
 		    space = FileUtils.getFile("TouristAnalyzer/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_space.ser");
@@ -67,11 +68,13 @@ public class TouristActivity {
 			double area = rm.getRegion(k).getGeom().getArea();
 			space_density.put(k, val/area);
 		}
-		*/
-		
-		Map<String,Double> space_density = computeSpaceDensity(rm);
-		
 		plotSpaceDensity(city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], space_density, rm,0);
+		
+		System.out.println("****************************************************");
+		
+		Map<String,Double> space_density2 = computeSpaceDensity(rm);
+		
+		plotSpaceDensity(city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], space_density2, rm,0);
 		
 		//Map<String,Double> time_density = computeTimeDensity(rm);
 		//plotTimeDensity(city,time_density);
@@ -170,10 +173,9 @@ public class TouristActivity {
 			br = FileUtils.getBR("TouristData/"+city+".csv");
 		}
 		
-		Map<String,Double> sd = new TreeMap<String,Double>();
+		Map<String,Double> sd = new HashMap<String,Double>();
 		for(Region r: rm.getRegions())
 			sd.put(r.getName(), 0.0);
-		
 		
 		String line;
 		while((line=br.readLine())!=null) {
@@ -182,12 +184,18 @@ public class TouristActivity {
 			for(int i=4;i<p.length;i++) {
 				String[] x = p[i].split(":");
 				String rname = rm.getRegion(Integer.parseInt(x[2])).getName();
-				float v = Float.parseFloat(x[3]);
+				double v = Double.parseDouble(x[3]);	
 				sd.put(rname,sd.get(rname)+v);
 			}
 		}
-		
 		br.close();
+		
+		for(String k : sd.keySet()) {
+			double val = sd.get(k);
+			double area = rm.getRegion(k).getGeom().getArea();
+			sd.put(k, val/area);
+		}
+		
 		return sd;
 	}
 	
