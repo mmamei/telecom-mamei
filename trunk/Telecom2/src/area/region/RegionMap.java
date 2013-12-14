@@ -33,25 +33,18 @@ public class RegionMap implements Serializable {
 	private String name;
 	private Map<String,Region> rm;
 	
-	private Map<Integer,Region> rm_int;
-	private int rm_int_cont = 0;
-	
 	private KDTree<Double,Point<Double>,Region> kdtree;
 	private RangeSearchTree<Double,Point<Double>,Region> rangetree;
 	
 	public RegionMap(String name) {
 		this.name = name;
 		rm = new HashMap<String,Region>();
-		rm_int = new HashMap<Integer,Region>();
 		kdtree = new KDTree<Double,Point<Double>,Region>(2);
 		rangetree = (RangeSearchTree<Double,Point<Double>,Region>)kdtree;
 	}
 	
 	public void add(Region r) {
 		rm.put(r.getName(), r);
-		rm_int.put(rm_int_cont,r);
-		rm_int_cont ++;
-		
 		Point<Double> cellPoint = new GenericPoint<Double>(r.getCenterLon(),r.getCenterLat());
 		kdtree.put(cellPoint, r);
 	}
@@ -68,8 +61,17 @@ public class RegionMap implements Serializable {
 		return rm.get(name);
 	}
 	
+	private transient Map<Integer,Region> int2region = null;
 	public Region getRegion(int i) {
-		return rm_int.get(i);
+		if(int2region == null) {
+			int2region = new HashMap<Integer,Region>();
+			int k=0;
+			for(Region r: rm.values()) {
+				int2region.put(k, r);
+				k++;
+			}	
+		}
+		return int2region.get(i);
 	}
 	
 	public Collection<Region> getRegions(){

@@ -94,11 +94,12 @@ public class TouristData implements Serializable {
 	    for(int k=0; k<plsMatrix[0][0].length;k++)
 	    	if(plsMatrix[i][j][k] > 0)
 	    		sb.append(","+i+":"+j+":"+k+":"+plsMatrix[i][j][k]);
+		
 		return user_id+","+mnt+","+num_pls+","+num_days+sb.toString();
 	}
 	
 	
-	private float[] computeAreaIntersection(String celllac, RegionMap map) {
+	public static float[] computeAreaIntersection(String celllac, RegionMap map) {
 		float[] area_intersection = new float[map.getNumRegions()];
 		NetworkCell nc = nm.get(Long.parseLong(celllac));
 		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
@@ -125,7 +126,7 @@ public class TouristData implements Serializable {
 	
 	public static void process(String city) throws Exception {
 		
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".csv"));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		if(br == null) {
 			UserEventCounterCellacXHour.process(city);
