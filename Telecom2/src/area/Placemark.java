@@ -90,7 +90,7 @@ public class Placemark {
 			if(u == null) u = p;
 			else u = u.union(p);
 		}
-		double area = u == null ? 0 : u.getArea();
+		double area = u == null ? 0 : GeomUtils.geoArea(u);
 		return area;
 	}
 	
