@@ -106,13 +106,19 @@ public class TouristData implements Serializable {
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
 		int i=0;
 		for(Region r: map.getRegions()) {
-			boolean overlaps = r.getGeom().overlaps(circle);
-			if(overlaps) {
-				Geometry a = r.getGeom().intersection(circle);
-				area_intersection[i] = (float)(a.getArea()/ca);
-			}
+			Geometry a = r.getGeom().intersection(circle);
+			area_intersection[i] = (float)(GeomUtils.geoArea(a)/ca);
 			i++;
 		}
+		
+		// normailze to 1
+		float sum = 0;
+		for(float f: area_intersection)
+			sum += f;
+		for(i=0; i<area_intersection.length;i++)
+			area_intersection[i] = area_intersection[i] / sum;
+		
+		
 		return area_intersection;
 	}
 	
