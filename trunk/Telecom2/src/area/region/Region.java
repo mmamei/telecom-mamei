@@ -42,7 +42,7 @@ public class Region implements Serializable {
 		
 		
 		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
-		String x = GeomUtils.kmlToOpenGISCoordinates(kmlcoordinates);
+		String x = GeomUtils.kml2OpenGis(kmlcoordinates);
 		if(x.equals("")) return;
 		String[] coord = x.split(",");
 		for(String c: coord) {
@@ -79,7 +79,7 @@ public class Region implements Serializable {
 	
 	private void process() {
 		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
-		String x = GeomUtils.kmlToOpenGISCoordinates(kmlcoordinates);
+		String x = GeomUtils.kml2OpenGis(kmlcoordinates);
 		if(x.equals("")) return;
 		String[] coord = x.split(",");
 		for(String c: coord) {
