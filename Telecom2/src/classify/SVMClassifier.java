@@ -73,7 +73,7 @@ public class SVMClassifier {
 					cross[c] = classify(data[c]);
 				
 				// run cross validation 
-				//svm.svm_cross_validation(problem, param, 5, cross);
+				svm.svm_cross_validation(problem, param, 5, cross);
 				
 				double correct = 0;
 				for(int e=0; e<problem.l;e++)
