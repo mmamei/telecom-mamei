@@ -23,13 +23,11 @@ public class MNISTReader {
 		int[] labels = readLabels("G:/DATASET/MNIST/train-labels.idx1-ubyte");
 		List<int[]> imgs = readImages("G:/DATASET/MNIST/train-images.idx3-ubyte");
 				
-		createImg(imgs.subList(5, 15));
-		
-		System.out.println("LABELS:");
+		String l = "";
 		for(int i=5;i<15;i++)
-			System.out.print(labels[i]+" ");
-		System.out.println();
-		
+			l = l + labels[i] + ",";
+		createImg(l,imgs.subList(5, 15));
+			
 		System.out.println("Done!");
 	}
 		
@@ -71,7 +69,7 @@ public class MNISTReader {
 		return imgs;
 	}
 	
-	public static void createImg(List<int[]> imgs) throws Exception {	
+	public static void createImg(String title, List<int[]> imgs) throws Exception {	
 		
 		JFrame frame = new JFrame();
 		frame.getContentPane().setLayout(new FlowLayout());
@@ -85,6 +83,7 @@ public class MNISTReader {
 			bi.setRGB(0, 0, width, height, rgb, 0, width);
 			frame.getContentPane().add(new JLabel(new ImageIcon(bi)));
 		}
+		frame.setTitle(title);
 		frame.pack();
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
