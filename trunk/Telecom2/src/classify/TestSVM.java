@@ -11,9 +11,9 @@ public class TestSVM {
 		List<int[]> imgs = MNISTReader.readImages("G:/DATASET/MNIST/train-images.idx3-ubyte");
 		
 		
-		int[] train_range = new int[]{0,200};
+		int[] train_range = new int[]{0,50};
 		int train_size = train_range[1] - train_range[0];
-		int[] test_range = new int[]{201,300};
+		int[] test_range = new int[]{51,100};
 		int test_size = test_range[1] - test_range[0];
 		
 		
