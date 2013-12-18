@@ -12,7 +12,7 @@ public class SVMClassifier {
 	private svm_model model;
 	private int trainset_size = 0;
 	
-	public static boolean VERBOSE = true;
+	public static boolean VERBOSE = false;
 	
 	
 	public SVMClassifier() {
@@ -21,9 +21,8 @@ public class SVMClassifier {
 		// default values
 		param.svm_type = svm_parameter.C_SVC;
 		param.kernel_type = svm_parameter.RBF;
-		
 		param.degree = 3;
-		param.gamma = 0;
+		param.gamma = 0.5;
 		param.coef0 = 0;
 		param.nu = 0.5;
 		param.cache_size = 40;
@@ -55,30 +54,39 @@ public class SVMClassifier {
 	
 	
 	public void optimizeParams(double[][] data, double[] labels) {
-		double best, bestC=0, bestGamma=0;
+		double best, bestC = 0, bestGamma = 0;
 		best = Double.MIN_VALUE;
 		double cont = 0;
 		for(int i=-10;i<11;i++) {
 			cont ++;
 			for(int j=-10;j<11;j++) {
+				
 				double C = Math.pow(2, i);
 				double gamma = Math.pow(2, j);
 				this.setParam(C, gamma);
 				trainSVM(data,labels);
-				// run 10 fold cross validation 
-				double[] cross = crossValidation(10);
-				double errors = 0;
-				for(int e=0; e<cross.length;e++)
-					if(cross[e]!=labels[e])
-						errors++;
-				double accuracy = 1 - errors/cross.length;
+				
+				
+				double[] cross = new double[labels.length];
+				
+				for(int c=0; c<cross.length;c++)
+					cross[c] = classify(data[c]);
+				
+				// run cross validation 
+				//svm.svm_cross_validation(problem, param, 5, cross);
+				
+				double correct = 0;
+				for(int e=0; e<problem.l;e++)
+					if(cross[e] == problem.y[e])
+						correct++;
+				double accuracy = correct/cross.length;
 				if(accuracy > best) {
 					best = accuracy;
 					bestC = C;
 					bestGamma = gamma;
 				}
 			}
-			System.out.println((int)(100.0*cont/21.0)+"% completed....");
+			System.out.println((int)(100.0*cont/21.0)+"% completed.... best accuracy so far = "+best);
 		}
 		
 		System.out.println("Best Accuracy = "+best);
@@ -107,16 +115,8 @@ public class SVMClassifier {
 		try {
 			svm.svm_save_model(file, model);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	
-	public double[] crossValidation(int split) {
-		double[] result = new double[trainset_size];
-		svm.svm_cross_validation(problem, param, split, result);
-		return result;
 	}
 	
 	
@@ -138,10 +138,25 @@ public class SVMClassifier {
 	}
 	
 	public static void main(String[] args) {
-		double[] labels = new double[]{1,-1,1,-1};
-		double[][] data = new double[][]{{1,0,1},{-1,0,-1},{1,1,1},{-1,-1,-1}};
+		//double[] labels = new double[]{1,-1,1,-1};
+		//double[][] data = new double[][]{{1,0,1},{-1,0,-1},{1,1,1},{-1,-1,-1}};
+		
+		
+		double[] labels = new double[]{1,2,3,4,5,6,7,8,9};
+		double[][] data = new double[][]{ {1,0,0,0,0,0,0,0,0},
+									   {0,1,0,0,0,0,0,0,0},
+									   {0,0,1,0,0,0,0,0,0},
+									   {0,0,0,1,0,0,0,0,0},
+									   {0,0,0,0,1,0,0,0,0},
+									   {0,0,0,0,0,1,0,0,0},
+									   {0,0,0,0,0,0,1,0,0},
+									   {0,0,0,0,0,0,0,1,0},
+									   {0,0,0,0,0,0,0,0,1}
+		};
+		
+		
 		SVMClassifier test = new SVMClassifier();
-		test.optimizeParams(data, labels);
+		//test.optimizeParams(data, labels);
 		test.trainSVM(data, labels);
 		
 		/*
@@ -151,7 +166,7 @@ public class SVMClassifier {
 		*/
 		
 		
-		double clazz = test.classify(new double[]{1,1,1});
+		double clazz = test.classify(new double[]{0,0,0,0,0,0,1,0,0});
 		System.out.println(clazz);
 	}
 }
