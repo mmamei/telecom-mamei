@@ -10,8 +10,8 @@ public class SVMClassifier {
 	private svm_parameter param;
 	private svm_problem problem;
 	private svm_model model;
-	private int trainset_size = 0;
 	
+	public static boolean FAST = false;
 	public static boolean VERBOSE = false;
 	
 	
@@ -49,6 +49,7 @@ public class SVMClassifier {
 	
 	
 	public SVMClassifier(String file) throws Exception {
+		this();
 		model = svm.svm_load_model(file);
 	}
 	
@@ -57,9 +58,9 @@ public class SVMClassifier {
 		double best, bestC = 0, bestGamma = 0;
 		best = Double.MIN_VALUE;
 		double cont = 0;
-		for(int i=-10;i<11;i++) {
+		for(int i=-5;i<=5;i++) {
 			cont ++;
-			for(int j=-10;j<11;j++) {
+			for(int j=-5;j<=5;j++) {
 				
 				double C = Math.pow(2, i);
 				double gamma = Math.pow(2, j);
@@ -68,12 +69,11 @@ public class SVMClassifier {
 				
 				
 				double[] cross = new double[labels.length];
-				
-				for(int c=0; c<cross.length;c++)
-					cross[c] = classify(data[c]);
-				
-				// run cross validation 
-				svm.svm_cross_validation(problem, param, 5, cross);
+				if(FAST)
+					for(int c=0; c<cross.length;c++)
+						cross[c] = classify(data[c]);
+				else
+					svm.svm_cross_validation(problem, param, 5, cross);
 				
 				double correct = 0;
 				for(int e=0; e<problem.l;e++)
@@ -86,7 +86,7 @@ public class SVMClassifier {
 					bestGamma = gamma;
 				}
 			}
-			System.out.println((int)(100.0*cont/21.0)+"% completed.... best accuracy so far = "+best);
+			System.out.println((int)(100.0*cont/11.0)+"% completed.... best accuracy so far = "+best);
 		}
 		
 		System.out.println("Best Accuracy = "+best);
@@ -99,7 +99,6 @@ public class SVMClassifier {
 	
 	public void trainSVM(double[][] data, double[] labels) {
 		// build problem
-		trainset_size = labels.length;
 		problem = new svm_problem();
 		problem.l = labels.length;
 		problem.y = labels;
@@ -137,36 +136,24 @@ public class SVMClassifier {
 		return y;
 	}
 	
-	public static void main(String[] args) {
-		//double[] labels = new double[]{1,-1,1,-1};
-		//double[][] data = new double[][]{{1,0,1},{-1,0,-1},{1,1,1},{-1,-1,-1}};
+	
+	public static void scale(double[][] x,double lower,double upper) {
+		double[] vmin = new double[x[0].length];
+		double[] vmax = new double[x[0].length];
+		for(int i=0; i<vmin.length;i++) {
+			vmin[i] = Double.MAX_VALUE;
+			vmax[i] = -Double.MAX_VALUE;
+		}
 		
+		for(int i=0; i<x.length;i++) {
+			for(int j=0; j<x[i].length;j++) {
+				vmin[j] = Math.min(vmin[j],x[i][j]);
+				vmax[j] = Math.max(vmax[j],x[i][j]);
+			}
+		}
 		
-		double[] labels = new double[]{1,2,3,4,5,6,7,8,9};
-		double[][] data = new double[][]{ {1,0,0,0,0,0,0,0,0},
-									   {0,1,0,0,0,0,0,0,0},
-									   {0,0,1,0,0,0,0,0,0},
-									   {0,0,0,1,0,0,0,0,0},
-									   {0,0,0,0,1,0,0,0,0},
-									   {0,0,0,0,0,1,0,0,0},
-									   {0,0,0,0,0,0,1,0,0},
-									   {0,0,0,0,0,0,0,1,0},
-									   {0,0,0,0,0,0,0,0,1}
-		};
-		
-		
-		SVMClassifier test = new SVMClassifier();
-		//test.optimizeParams(data, labels);
-		test.trainSVM(data, labels);
-		
-		/*
-		double[] cross = test.crossValidation(3);
-		for(int i=0;i<cross.length;i++)
-			System.out.println(cross[i]);
-		*/
-		
-		
-		double clazz = test.classify(new double[]{0,0,0,0,0,0,1,0,0});
-		System.out.println(clazz);
+		for(int i=0; i<x.length;i++) 
+		for(int j=0; j<x[i].length;j++) 
+			x[i][j] = lower + (upper-lower) * (x[i][j]-vmin[j]) / (vmax[j]-vmin[j]);
 	}
 }

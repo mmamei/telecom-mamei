@@ -15,13 +15,18 @@ import javax.swing.JLabel;
 
 public class MNISTReader {
 	
+	
+	public static final String labels_f = "G:/DATASET/SVM/MNIST/train-labels.idx1-ubyte";
+	public static final String img_f = "G:/DATASET/SVM/MNIST/train-images.idx3-ubyte";
+	
 	public static int width = 0;
 	public static int height = 0;
 	
+
 	public static void main(String[] args) throws Exception {
 		
-		int[] labels = readLabels("G:/DATASET/MNIST/train-labels.idx1-ubyte");
-		List<int[]> imgs = readImages("G:/DATASET/MNIST/train-images.idx3-ubyte");
+		int[] labels = readLabels(labels_f);
+		List<int[]> imgs = readImages(img_f);
 				
 		String l = "";
 		for(int i=5;i<15;i++)
