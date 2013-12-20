@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class TouristData implements Serializable {
 	
+	public static final String TIM_MNT = "22201";
 	
 	static transient Map<String,Integer> DM = new HashMap<String,Integer>();
 	static {
@@ -47,11 +48,11 @@ public class TouristData implements Serializable {
 	static transient NetworkMap nm = NetworkMapFactory.getNetworkMap();
 	
 	
-	private String user_id;
-	private String mnt;
-	private int num_pls;
-	private int num_days;
-	private float[][][] plsMatrix;
+	String user_id;
+	String mnt;
+	int num_pls;
+	int num_days;
+	float[][][] plsMatrix;
 	
 	/* String events is in the form:
 	 * user_id, mnt, num_pls, num,_days, 2013-5-23:Sun:cellac,....
@@ -87,15 +88,34 @@ public class TouristData implements Serializable {
 		
 	}
 	
+	
+	public boolean roaming() {
+		return !mnt.equals(TIM_MNT);
+	}
+	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		for(int i=0; i<plsMatrix.length;i++)
 		for(int j=0; j<plsMatrix[0].length;j++)
 	    for(int k=0; k<plsMatrix[0][0].length;k++)
 	    	if(plsMatrix[i][j][k] > 0)
-	    		sb.append(","+i+":"+j+":"+k+":"+plsMatrix[i][j][k]);
-		
+	    		sb.append(","+i+":"+j+":"+k+":"+plsMatrix[i][j][k]);		
 		return user_id+","+mnt+","+num_pls+","+num_days+sb.toString();
+	}
+	
+	
+	public String toSVMString(int clazz) {
+		StringBuffer sb = new StringBuffer();
+		int fcont = 4;
+		for(int i=0; i<plsMatrix.length;i++)
+		for(int j=0; j<plsMatrix[0].length;j++)
+	    for(int k=0; k<plsMatrix[0][0].length;k++) {
+	    	if(plsMatrix[i][j][k] > 0)
+	    		sb.append(" "+fcont+":"+plsMatrix[i][j][k]);
+	    	fcont++;
+	    }
+		int roaming = roaming()? 0 : 1;
+		return clazz+" 1:"+roaming+" 2:"+num_pls+" 3:"+num_days+sb.toString();
 	}
 	
 	
@@ -139,7 +159,7 @@ public class TouristData implements Serializable {
 			br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		}
 		
-		File f = new File(FileUtils.create("TouristData")+"/"+city+".ser");
+		File f = new File(FileUtils.create("TouristData")+"/"+city+".txt");
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
 		
 		int i=0;
