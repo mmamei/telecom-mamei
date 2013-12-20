@@ -11,7 +11,7 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-class svm_scale
+public class svm_scale
 {
 	private String line = null;
 	private double lower = -1.0;

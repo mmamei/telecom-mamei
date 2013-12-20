@@ -167,14 +167,8 @@ public class GeomUtils {
 	}
 	
 	
-	
-	public static double geoArea(Geometry g) {
-		return geoArea((Polygon)g);
-	}
-	
-	
 	public static final double EARTH_RADIUS_METERS = 6371000;
-	public static double geoArea(Polygon p) {
+	public static double geoArea(Geometry p) {
 		
 		Coordinate[] cs = p.getCoordinates();
 		double[] lat = new double[cs.length];
