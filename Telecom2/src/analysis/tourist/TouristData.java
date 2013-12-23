@@ -119,6 +119,53 @@ public class TouristData implements Serializable {
 	}
 	
 	
+	
+	// d_periods = {0,0,0,0,0,1,1}
+	// mapping weekdays in 0
+	// mapping weekends in 1
+	// h_periods = {3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3}
+	// mapping [7-13] in 0 (morning), [14,18] in 1 (afternoon), [19-22] in 2 (evening), [23-6] in 3 (night)
+	
+	
+	public void compactTime(int[] d_periods, int[] h_periods) {
+		if(d_periods!=null) compact(d_periods,0);
+		if(h_periods!=null) compact(h_periods,1);
+	}
+	
+	
+	/*
+	 * This code is rather tricky. To have just one method, I pass the index cindex that has to be reduced.
+	 * Then I refer to the matrix by means of an array of indices (or lenghts) so that I can then address the specific index cindex, without if-statements
+	 */
+	
+	
+	private void compact(int[] frames, int cindex) {
+		
+		int[] sizes = new int[3];
+		sizes[0] = plsMatrix.length;
+		sizes[1] = plsMatrix[0].length;
+		sizes[2] = plsMatrix[0][0].length;
+		sizes[cindex] = frames.length; // overwrite with the new size
+		
+		float[][][] compactPlsMatrix = new float[sizes[0]][sizes[1]][sizes[2]];
+		
+		int[] i = new int[3];
+		int[] ci = new int[3];
+		for(; i[0]<plsMatrix.length;i[0]++)
+		for(; i[1]<plsMatrix[0].length;i[1]++)
+		for(; i[2]<plsMatrix[0][0].length;i[2]++) {
+			
+			System.arraycopy(i, 0, ci, 0, i.length);
+			ci[cindex] = frames[ci[cindex]];
+			compactPlsMatrix[i[0]][i[1]][i[2]] += plsMatrix[i[0]][i[1]][i[2]];
+		}
+		
+		plsMatrix = compactPlsMatrix;
+	}
+	
+
+	
+	
 	public static float[] computeAreaIntersection(String celllac, RegionMap map) {
 		float[] area_intersection = new float[map.getNumRegions()];
 		NetworkCell nc = nm.get(Long.parseLong(celllac));
@@ -144,13 +191,22 @@ public class TouristData implements Serializable {
 	
 	
 	
+	// d_periods = {0,0,0,0,0,1,1}
+	// mapping weekdays in 0
+	// mapping weekends in 1
+	// h_periods = {3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3}
+	// mapping [7-13] in 0 (morning), [14,18] in 1 (afternoon), [19-22] in 2 (evening), [23-6] in 3 (night)
+		
+	
 	public static void main(String[] args) throws Exception {
 		String city = "Venezia";
-		process(city);
+		int[] d_periods = null;
+		int[] h_periods = null;
+		process(city,d_periods,h_periods);
 		Logger.logln("Done");
 	}
 	
-	public static void process(String city) throws Exception {
+	public static void process(String city, int[] d_periods, int[] h_periods) throws Exception {
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
@@ -164,8 +220,11 @@ public class TouristData implements Serializable {
 		
 		int i=0;
 		String line;
+		TouristData td;
 		while((line=br.readLine())!=null) {
-			out.println(new TouristData(line,rm));
+			td = new TouristData(line,rm);
+			td.compactTime(d_periods, h_periods);
+			out.println(td);
 			i++;
 			if(i % 10000 == 0) {
 				Logger.logln("Processed "+i+" users...");

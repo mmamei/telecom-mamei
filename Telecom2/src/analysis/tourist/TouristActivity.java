@@ -141,7 +141,7 @@ public class TouristActivity {
 		String city = rm.getName();
 		BufferedReader br = FileUtils.getBR("TouristData/"+city+".csv");
 		if(br == null) {
-			TouristData.process(city);
+			TouristData.process(city,null,null);
 			br = FileUtils.getBR("TouristData/"+city+".csv");
 		}
 		
