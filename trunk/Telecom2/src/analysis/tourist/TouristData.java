@@ -62,6 +62,9 @@ public class TouristData implements Serializable {
 	
 
 	public TouristData(String events, RegionMap map) {
+		
+		if(events == null) return; // need for a null construcutor for testing
+		
 		String[] p = events.split(",");
 		user_id = p[0];
 		mnt = p[1];
@@ -141,23 +144,29 @@ public class TouristData implements Serializable {
 	
 	private void compact(int[] frames, int cindex) {
 		
+		
+		// compute size of the reduced dimenstion
+		int flength = 0;
+		for(int x: frames) 
+			flength = (int)Math.max(flength, x+1);
+		
 		int[] sizes = new int[3];
 		sizes[0] = plsMatrix.length;
 		sizes[1] = plsMatrix[0].length;
 		sizes[2] = plsMatrix[0][0].length;
-		sizes[cindex] = frames.length; // overwrite with the new size
+		
+		sizes[cindex] = flength; // overwrite with the new size
 		
 		float[][][] compactPlsMatrix = new float[sizes[0]][sizes[1]][sizes[2]];
 		
 		int[] i = new int[3];
 		int[] ci = new int[3];
-		for(; i[0]<plsMatrix.length;i[0]++)
-		for(; i[1]<plsMatrix[0].length;i[1]++)
-		for(; i[2]<plsMatrix[0][0].length;i[2]++) {
-			
+		for(i[0] = 0; i[0]<plsMatrix.length;i[0]++)
+		for(i[1] = 0; i[1]<plsMatrix[0].length;i[1]++)
+		for(i[2] = 0; i[2]<plsMatrix[0][0].length;i[2]++) {
 			System.arraycopy(i, 0, ci, 0, i.length);
 			ci[cindex] = frames[ci[cindex]];
-			compactPlsMatrix[i[0]][i[1]][i[2]] += plsMatrix[i[0]][i[1]][i[2]];
+			compactPlsMatrix[ci[0]][ci[1]][ci[2]] += plsMatrix[i[0]][i[1]][i[2]];
 		}
 		
 		plsMatrix = compactPlsMatrix;
@@ -199,12 +208,47 @@ public class TouristData implements Serializable {
 		
 	
 	public static void main(String[] args) throws Exception {
+		/*
 		String city = "Venezia";
 		int[] d_periods = null;
 		int[] h_periods = null;
 		process(city,d_periods,h_periods);
 		Logger.logln("Done");
+		*/
+		
+		
+		int[] frames = new int[]{0,1,1,2};
+		int cindex = 1;
+		
+		TouristData td = new TouristData(null,null);
+		td.plsMatrix = new float[3][4][4];
+		init(td.plsMatrix,1);
+		
+		print(td.plsMatrix);
+		td.compact(frames, cindex);
+		print(td.plsMatrix);
 	}
+	
+	
+	private static void init(float[][][] plsMatrix,float v) {
+		for(int i=0; i<plsMatrix.length;i++) 
+		for(int j=0; j<plsMatrix[0].length;j++) 
+		for(int k=0; k<plsMatrix[0][0].length;k++) 
+			plsMatrix[i][j][k] = v;
+	}
+	
+	
+	private static void print(float[][][] plsMatrix) {
+		for(int i=0; i<plsMatrix.length;i++) {
+			System.out.println("--------- "+i+":");
+			for(int j=0; j<plsMatrix[0].length;j++) {
+			for(int k=0; k<plsMatrix[0][0].length;k++) 
+				System.out.print((int)plsMatrix[i][j][k]+"\t");
+			System.out.println();
+			}
+		} 
+	}
+	
 	
 	public static void process(String city, int[] d_periods, int[] h_periods) throws Exception {
 		
