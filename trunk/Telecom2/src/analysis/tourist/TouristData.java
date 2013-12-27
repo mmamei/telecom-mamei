@@ -208,15 +208,15 @@ public class TouristData implements Serializable {
 		
 	
 	public static void main(String[] args) throws Exception {
-		/*
+		
 		String city = "Venezia";
 		int[] d_periods = null;
 		int[] h_periods = null;
 		process(city,d_periods,h_periods);
 		Logger.logln("Done");
-		*/
 		
 		
+		/* test
 		int[] frames = new int[]{0,1,1,2};
 		int cindex = 1;
 		
@@ -227,9 +227,10 @@ public class TouristData implements Serializable {
 		print(td.plsMatrix);
 		td.compact(frames, cindex);
 		print(td.plsMatrix);
+		*/
 	}
 	
-	
+	/*
 	private static void init(float[][][] plsMatrix,float v) {
 		for(int i=0; i<plsMatrix.length;i++) 
 		for(int j=0; j<plsMatrix[0].length;j++) 
@@ -248,7 +249,7 @@ public class TouristData implements Serializable {
 			}
 		} 
 	}
-	
+	*/
 	
 	public static void process(String city, int[] d_periods, int[] h_periods) throws Exception {
 		
