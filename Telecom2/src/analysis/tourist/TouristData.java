@@ -120,7 +120,7 @@ public class TouristData implements Serializable {
 	
 	public String toSVMString(int clazz) {
 		StringBuffer sb = new StringBuffer();
-		int fcont = 4;
+		int fcont = 5;
 		for(int i=0; i<plsMatrix.length;i++)
 		for(int j=0; j<plsMatrix[0].length;j++)
 	    for(int k=0; k<plsMatrix[0][0].length;k++) {

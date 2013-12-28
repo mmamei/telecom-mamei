@@ -1,4 +1,4 @@
-package analysis.tourist;
+package test;
 
 import java.io.PrintWriter;
 
