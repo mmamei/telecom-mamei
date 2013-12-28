@@ -17,6 +17,8 @@ import classify.svm_train;
 
 public class TouristClassify {
 	
+
+	
 	static String city = "Venezia";
 	static int[] test_bounds = new int[]{0,1000};
 	static int[] train_bounds = new int[]{1000,2000}; // it is always better to have testing indices first!
@@ -60,8 +62,7 @@ public class TouristClassify {
 			br.readLine();
 			
 		while((line=br.readLine())!=null) {
-			td = new TouristData(line,rm);
-			
+			td = new TouristData(line,rm,TouristData.d_periods, TouristData.h_periods);
 			boolean oktraining1 = td.roaming() && td.num_days < 4 && td.num_pls > 1;
 			boolean oktraining2 = !td.roaming() && td.num_days > 14;
 			
@@ -109,7 +110,7 @@ public class TouristClassify {
 		
 		for(int k=0; k<num;k++) {
 			line=br.readLine();
-			td = new TouristData(line,rm);
+			td = new TouristData(line,rm,TouristData.d_periods, TouristData.h_periods);
 			int supposed_class = td.num_days < 4 ? 1 : 0;
 			out.println(td.toSVMString(supposed_class));
 		}

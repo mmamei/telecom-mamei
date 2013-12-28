@@ -32,7 +32,16 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class TouristData implements Serializable {
 	
-	public static final String TIM_MNT = "22201";
+	public static transient final String TIM_MNT = "22201";
+	
+	
+	// d_periods = {0,0,0,0,0,1,1}
+	// mapping weekdays in 0
+	// mapping weekends in 1
+	// h_periods = {3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3}
+	public static transient final int[] d_periods = new int[]{0,0,0,0,0,1,1};
+	public static transient final int[] h_periods = new int[]{3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3};
+	
 	
 	static transient Map<String,Integer> DM = new HashMap<String,Integer>();
 	static {
@@ -52,6 +61,7 @@ public class TouristData implements Serializable {
 	String mnt;
 	int num_pls;
 	int num_days;
+	int days_interval;
 	float[][][] plsMatrix;
 	
 	/* String events is in the form:
@@ -61,7 +71,7 @@ public class TouristData implements Serializable {
 	*/
 	
 
-	public TouristData(String events, RegionMap map) {
+	public TouristData(String events, RegionMap map,int[] d_periods, int[] h_periods) {
 		
 		if(events == null) return; // need for a null construcutor for testing
 		
@@ -70,10 +80,10 @@ public class TouristData implements Serializable {
 		mnt = p[1];
 		num_pls = Integer.parseInt(p[2]);
 		num_days = Integer.parseInt(p[3]);
-		
+		days_interval = Integer.parseInt(p[4]);
 		plsMatrix = new float[7][24][map.getNumRegions()];
 		
-		for(int i=4;i<p.length;i++) {
+		for(int i=5;i<p.length;i++) {
 			// 2013-5-23:Sun:13:4018542484
 			String[] x = p[i].split(":");
 			int day = DM.get(x[1]);
@@ -89,6 +99,7 @@ public class TouristData implements Serializable {
 				plsMatrix[day][h][k] += ai[k];
 		}
 		
+		compactTime(d_periods,h_periods);
 	}
 	
 	
@@ -103,7 +114,7 @@ public class TouristData implements Serializable {
 	    for(int k=0; k<plsMatrix[0][0].length;k++)
 	    	if(plsMatrix[i][j][k] > 0)
 	    		sb.append(","+i+":"+j+":"+k+":"+plsMatrix[i][j][k]);		
-		return user_id+","+mnt+","+num_pls+","+num_days+sb.toString();
+		return user_id+","+mnt+","+num_pls+","+num_days+","+days_interval+sb.toString();
 	}
 	
 	
@@ -118,7 +129,7 @@ public class TouristData implements Serializable {
 	    	fcont++;
 	    }
 		int roaming = roaming()? 0 : 1;
-		return clazz+" 1:"+roaming+" 2:"+num_pls+" 3:"+num_days+sb.toString();
+		return clazz+" 1:"+roaming+" 2:"+num_pls+" 3:"+num_days+" 4:"+days_interval+sb.toString();
 	}
 	
 	
@@ -130,7 +141,7 @@ public class TouristData implements Serializable {
 	// mapping [7-13] in 0 (morning), [14,18] in 1 (afternoon), [19-22] in 2 (evening), [23-6] in 3 (night)
 	
 	
-	public void compactTime(int[] d_periods, int[] h_periods) {
+	private void compactTime(int[] d_periods, int[] h_periods) {
 		if(d_periods!=null) compact(d_periods,0);
 		if(h_periods!=null) compact(h_periods,1);
 	}
@@ -210,46 +221,9 @@ public class TouristData implements Serializable {
 	public static void main(String[] args) throws Exception {
 		
 		String city = "Venezia";
-		int[] d_periods = null;
-		int[] h_periods = null;
 		process(city,d_periods,h_periods);
 		Logger.logln("Done");
-		
-		
-		/* test
-		int[] frames = new int[]{0,1,1,2};
-		int cindex = 1;
-		
-		TouristData td = new TouristData(null,null);
-		td.plsMatrix = new float[3][4][4];
-		init(td.plsMatrix,1);
-		
-		print(td.plsMatrix);
-		td.compact(frames, cindex);
-		print(td.plsMatrix);
-		*/
 	}
-	
-	/*
-	private static void init(float[][][] plsMatrix,float v) {
-		for(int i=0; i<plsMatrix.length;i++) 
-		for(int j=0; j<plsMatrix[0].length;j++) 
-		for(int k=0; k<plsMatrix[0][0].length;k++) 
-			plsMatrix[i][j][k] = v;
-	}
-	
-	
-	private static void print(float[][][] plsMatrix) {
-		for(int i=0; i<plsMatrix.length;i++) {
-			System.out.println("--------- "+i+":");
-			for(int j=0; j<plsMatrix[0].length;j++) {
-			for(int k=0; k<plsMatrix[0][0].length;k++) 
-				System.out.print((int)plsMatrix[i][j][k]+"\t");
-			System.out.println();
-			}
-		} 
-	}
-	*/
 	
 	public static void process(String city, int[] d_periods, int[] h_periods) throws Exception {
 		
@@ -267,8 +241,7 @@ public class TouristData implements Serializable {
 		String line;
 		TouristData td;
 		while((line=br.readLine())!=null) {
-			td = new TouristData(line,rm);
-			td.compactTime(d_periods, h_periods);
+			td = new TouristData(line,rm,d_periods, h_periods);
 			out.println(td);
 			i++;
 			if(i % 10000 == 0) {
