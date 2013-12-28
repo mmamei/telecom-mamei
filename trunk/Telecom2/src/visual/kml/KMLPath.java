@@ -36,7 +36,7 @@ public class KMLPath {
 	
 	public static void print(String username, List<PlsEvent> plsEvents) {
 		kml.printFolder(out, username);
-		List<PlsEvent> s = FilterAndCounterUtils.smooth(plsEvents);
+		List<PlsEvent> s = plsEvents;//FilterAndCounterUtils.smooth(plsEvents);
 		Map<String,List<PlsEvent>> evPerDay = splitByDay(s);
 		
 		
