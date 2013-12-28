@@ -16,6 +16,24 @@ public class GeomUtils {
 	
 	
 	public static void main(String[] args) throws Exception {
+		double radius = 100;
+		Polygon c1 = getCircle(10.39,45.335,radius);
+		Polygon c2 = getCircle(10.39,45.335,50);
+		Geometry c = c1.intersection(c1.difference(c2));
+		System.out.println(geoArea(c1));
+		System.out.println(geoArea(c2));
+		System.out.println(geoArea(c1) - geoArea(c2));
+		System.out.println(geoArea(c));
+		PrintWriter out = new PrintWriter(new FileWriter(new File("test_geom.kml")));
+		KML kml = new KML();
+		kml.printHeaderDocument(out, "test_geom");
+		out.println(jtsGeometry2KML(c,"990000ff"));
+		kml.printFooterDocument(out);
+		out.close();	
+		
+	}
+	
+	public static void main2(String[] args) throws Exception {
 		double radius = 500;
 		Polygon circle = getCircle(10.39,45.335,radius);
 		
@@ -53,17 +71,16 @@ public class GeomUtils {
 		PrintWriter out = new PrintWriter(new FileWriter(new File("test_geom.kml")));
 		KML kml = new KML();
 		kml.printHeaderDocument(out, "test_geom");
-		out.println(jtsPolygon2KML(circle,"990000ff"));
-		out.println(jtsPolygon2KML(a[0],"9900ff00"));
-		out.println(jtsPolygon2KML(a[1],"99ff0000"));
+		out.println(jtsGeometry2KML(circle,"990000ff"));
+		out.println(jtsGeometry2KML(a[0],"9900ff00"));
+		out.println(jtsGeometry2KML(a[1],"99ff0000"));
 		kml.printFooterDocument(out);
-		out.close();
-		
+		out.close();	
 	}
 	
 	
 	public static Polygon getCircle(double lon, double lat, double r) {
-		String coord = kml2OpenGis(createPolygon(lon,lat,r,10,0,360));
+		String coord = kml2OpenGis(createPolygon(lon,lat,r,11,0,360));
 		Polygon circle = null;
 		try {
 			circle = (Polygon) new WKTReader().read("POLYGON (("+coord+"))");
@@ -86,8 +103,11 @@ public class GeomUtils {
 	
 	
 	public static String openGis2Kml(String opengis) {
+		//System.out.println(opengis);
 		//POLYGON ((10.41 45.32, 10.41 45.35, 10.37 45.35, 10.37 45.32, 10.41 45.32))
 		String kml = opengis.substring(opengis.indexOf("((")+2,opengis.indexOf("))"));
+		kml = kml.replaceAll("\\(", "");
+		kml = kml.replaceAll("\\)", "");
 		kml = kml.replaceAll(", ", ",0;");
 		kml = kml.replaceAll(" ", ",");
 		kml = kml.replaceAll(";", " ");
@@ -141,7 +161,7 @@ public class GeomUtils {
 	}
 	
 	
-	public static String jtsPolygon2KML(Polygon p, String color) {
+	public static String jtsGeometry2KML(Geometry g, String color) {
 		StringBuffer sb = new StringBuffer();
 		
 		sb.append("<Style id=\""+color+"\">");
@@ -157,7 +177,7 @@ public class GeomUtils {
 		sb.append("<outerBoundaryIs>");
 		sb.append("<LinearRing>");
 		sb.append("<coordinates>");
-		sb.append(openGis2Kml(p.toString()));
+		sb.append(openGis2Kml(g.toString()));
 		sb.append("</coordinates>");
 		sb.append("</LinearRing>");
 		sb.append("</outerBoundaryIs>");
@@ -169,7 +189,6 @@ public class GeomUtils {
 	
 	public static final double EARTH_RADIUS_METERS = 6371000;
 	public static double geoArea(Geometry p) {
-		
 		Coordinate[] cs = p.getCoordinates();
 		double[] lat = new double[cs.length];
 		double[] lon = new double[cs.length];

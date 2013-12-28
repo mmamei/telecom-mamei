@@ -4,23 +4,20 @@ package area.region;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.Colors;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
 import visual.kml.KML;
-import analysis.tourist.Voronoi;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 
@@ -29,7 +26,7 @@ public class CreatorRegionMapCity {
 	
 	
 	public static void main(String[] args) throws Exception {
-		String city = "Venezia";
+		String city = "Firenze";
 		process(city);
 		RegionMap.process(city);
 		Logger.logln("Done!");
@@ -61,6 +58,23 @@ public class CreatorRegionMapCity {
 		br.close();
 		
 	
+		
+		// print the kml placemarks in kml
+		PrintWriter out = new PrintWriter(new FileWriter(FileUtils.getFileS("RegionMap")+"/"+city+"_places.kml"));
+		KML kml = new KML();
+		kml.printHeaderDocument(out, city+"_places");
+		for(int i=0; i<names.size();i++) {
+			out.println("<Placemark>" +
+				    "<name>"+names.get(i)+"</name>" +
+				    "<description></description>" +
+				    "<Point>" +	
+				    "<coordinates>"+coordinates.get(i)[0]+","+coordinates.get(i)[1]+",0</coordinates>" +
+				    "</Point>" +
+				    "</Placemark>");
+		}
+		kml.printFooterDocument(out);
+		out.close();
+		
 		
 		VoronoiDiagramBuilder v = new VoronoiDiagramBuilder();
 		
