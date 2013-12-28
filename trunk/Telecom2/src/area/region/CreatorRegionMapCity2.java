@@ -21,7 +21,7 @@ public class CreatorRegionMapCity2 {
 	
 	
 	public static void main(String[] args) throws Exception {
-		String city = "Venezia";
+		String city = "Firenze";
 		process(city);
 		RegionMap.process(city);
 		Logger.logln("Done!");
@@ -41,9 +41,9 @@ public class CreatorRegionMapCity2 {
 		br.close();
 		
 		
-		Placemark p = Placemark.getPlacemark("Venezia");
+		Placemark p = Placemark.getPlacemark(city);
 		p.changeRadius(p.getR()+1000);
-		int size = 10;
+		int size = 5;
 		double[][] bbox = p.getBBox();
 		
 		SpaceGrid sg = new SpaceGrid(bbox[0][0],bbox[0][1],bbox[1][0],bbox[1][1],size,size);

@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import area.Placemark;
@@ -66,7 +65,6 @@ public class UserEventCounterCellacXHour extends BufferAnalyzer {
 					info.imsi = imsi;
 					users_info.put(username, info);
 				}
-				info.num_pls++;
 				String day = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH);
 				String dayw = DAY_WEEK[cal.get(Calendar.DAY_OF_WEEK)];
 				info.add(day,dayw,cal.get(Calendar.HOUR_OF_DAY),celllac);
@@ -127,7 +125,6 @@ public class UserEventCounterCellacXHour extends BufferAnalyzer {
 	private class UserInfo {
 		
 		String imsi;
-		int num_pls = 0;
 		Set<String> pls = new HashSet<String>();
 		
 		public void add(String day, String dayw, int h, String cellac) {
@@ -141,11 +138,27 @@ public class UserEventCounterCellacXHour extends BufferAnalyzer {
 			return days.size();
 		}
 		
+		public int getDaysInterval() {
+			
+			Calendar min = null;
+			Calendar max = null;
+			for(String p:pls) {
+				String[] day = p.substring(0, p.indexOf(":")).split("-"); // cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH);
+				int year = Integer.parseInt(day[0]);
+				int month = Integer.parseInt(day[1]);
+				int d = Integer.parseInt(day[2]);
+				Calendar c = new GregorianCalendar(year,month,d);
+				if(min == null || c.before(min)) min = c;
+				if(max == null || c.after(max)) max = c;
+			}
+			return 1+(int)Math.floor((max.getTimeInMillis() - min.getTimeInMillis())/(1000*3600*24));
+		}
+		
 		public String toString() {			
 			StringBuffer sb = new StringBuffer();
 			for(String p:pls) 
 				sb.append(p+",");
-			return imsi+","+num_pls+","+getNumDays()+","+sb.toString();
+			return imsi+","+pls.size()+","+getNumDays()+","+getDaysInterval()+","+sb.toString();
 		}
 	}
 
