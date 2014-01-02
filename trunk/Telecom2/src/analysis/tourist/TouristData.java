@@ -39,8 +39,20 @@ public class TouristData implements Serializable {
 	// mapping weekdays in 0
 	// mapping weekends in 1
 	// h_periods = {3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3}
-	public static transient final int[] d_periods = new int[]{0,0,0,0,0,1,1};
-	public static transient final int[] h_periods = new int[]{3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3};
+	public static transient final String[] DP = new String[]{"W","W","W","W","W","WE","WE"};
+	public static transient final String[] HP = new String[]{"N","N","N","N","N","N","N","M",
+															 "M","M","M","M","M","M","A","A",
+															 "A","A","A","E","E","E","E","N"};
+	
+	// these will be overwritten in case of a compact operation
+	public static transient String[] DP_LABELS = new String[]{"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+	public static transient String[] HP_LABELS = new String[]{"0","1","2","3","4","5","6","7",
+		 													  "8","9","10","11","12","13","14","15",
+		 													  "16","17","18","19","20","21","22","23"};
+	
+	
+	
+	public static transient String[] MAP_LABELS;
 	
 	
 	static transient Map<String,Integer> DM = new HashMap<String,Integer>();
@@ -71,9 +83,19 @@ public class TouristData implements Serializable {
 	*/
 	
 
-	public TouristData(String events, RegionMap map,int[] d_periods, int[] h_periods) {
+	public TouristData(String events, RegionMap map,String[] d_periods, String[] h_periods) {
 		
 		if(events == null) return; // need for a null construcutor for testing
+		
+		
+		
+		MAP_LABELS = new String[map.getNumRegions()];
+		int c = 0;
+		for(Region r: map.getRegions()) {
+			MAP_LABELS[c] = r.getName().replaceAll(" ", "_");
+			c++;
+		}
+		
 		
 		String[] p = events.split(",");
 		user_id = p[0];
@@ -101,6 +123,8 @@ public class TouristData implements Serializable {
 		
 		compactTime(d_periods,h_periods);
 	}
+	
+	
 	
 	
 	public boolean roaming() {
@@ -134,6 +158,58 @@ public class TouristData implements Serializable {
 	
 	
 	
+	/*
+	 * @RELATION iris
+	 * @ATTRIBUTE sepallength  NUMERIC
+	 * @ATTRIBUTE sepalwidth   NUMERIC
+	 * @ATTRIBUTE class        {Iris-setosa,Iris-versicolor,Iris-virginica}
+	 */
+	
+	public String wekaHeader(String title) {
+		
+		
+		
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("@RELATION "+title+"\n");
+		sb.append("@ATTRIBUTE roaming {0,1}\n");
+		sb.append("@ATTRIBUTE num_pls NUMERIC\n");
+		sb.append("@ATTRIBUTE num_days NUMERIC\n");
+		sb.append("@ATTRIBUTE days_interval NUMERIC\n");
+		for(int i=0; i<plsMatrix.length;i++)
+		for(int j=0; j<plsMatrix[0].length;j++)
+		for(int k=0; k<plsMatrix[0][0].length;k++) {
+			sb.append("@ATTRIBUTE "+DP_LABELS[i]+"_"+HP_LABELS[j]+"_"+MAP_LABELS[k]+" NUMERIC\n");
+		}
+		sb.append("@ATTRIBUTE class {0,1}\n");
+		sb.append("@DATA\n");
+		return sb.toString();
+	}
+	
+	
+	
+	/*
+	 *     @data
+	 *     {1 X, 3 Y, 4 "class A"}
+	 *     {2 W, 4 "class B"}
+	 *     Each instance is surrounded by curly braces, and the format for each entry is: <index> <space> <value> where index is the attribute index (starting from 0).
+	 */
+	public String toWEKAString(int clazz) {
+		StringBuffer sb = new StringBuffer();
+		int fcont = 4;
+		for(int i=0; i<plsMatrix.length;i++)
+		for(int j=0; j<plsMatrix[0].length;j++)
+	    for(int k=0; k<plsMatrix[0][0].length;k++) {
+	    	if(plsMatrix[i][j][k] > 0)
+	    		sb.append(","+fcont+" "+plsMatrix[i][j][k]);
+	    	fcont++;
+	    }
+		int roaming = roaming()? 0 : 1;
+		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+days_interval+sb.toString()+", "+fcont+" "+clazz+"}";
+	}
+	
+	
+	
 	// d_periods = {0,0,0,0,0,1,1}
 	// mapping weekdays in 0
 	// mapping weekends in 1
@@ -141,10 +217,40 @@ public class TouristData implements Serializable {
 	// mapping [7-13] in 0 (morning), [14,18] in 1 (afternoon), [19-22] in 2 (evening), [23-6] in 3 (night)
 	
 	
-	private void compactTime(int[] d_periods, int[] h_periods) {
-		if(d_periods!=null) compact(d_periods,0);
-		if(h_periods!=null) compact(h_periods,1);
+	private void compactTime(String[] d_periods, String[] h_periods) {
+		if(d_periods!=null) compact(toNum(d_periods,DP_LABELS),0);
+		if(h_periods!=null) compact(toNum(h_periods,HP_LABELS),1);
 	}
+	
+	
+	
+	
+	private int[] toNum(String[] l,String[] labels) {
+		int[] x = new int[l.length];
+		
+		Map<String,Integer> map = new HashMap<String,Integer>();
+		int cont = 0;
+		for(int i=0; i<x.length;i++) {
+			Integer n = map.get(l[i]);
+			if(n==null) { 
+				n = cont;
+				map.put(l[i], n);
+				cont++;
+			}
+			x[i] = n;
+		}
+		
+		
+		labels = new String[map.size()];
+		for(String u: map.keySet()) {
+			labels[map.get(u)] = u;
+		}
+		
+		
+		
+		return x;
+	}
+	
 	
 	
 	/*
@@ -221,11 +327,11 @@ public class TouristData implements Serializable {
 	public static void main(String[] args) throws Exception {
 		
 		String city = "Venezia";
-		process(city,d_periods,h_periods);
+		process(city,DP,HP);
 		Logger.logln("Done");
 	}
 	
-	public static void process(String city, int[] d_periods, int[] h_periods) throws Exception {
+	public static void process(String city, String[] d_periods, String[] h_periods) throws Exception {
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");

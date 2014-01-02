@@ -17,16 +17,25 @@ import classify.svm_train;
 
 public class TouristClassify {
 	
-
+	public static final String[] MODE = new String[]{"svm","weka"};
+	public static final String[] EXTENSION = new String[]{".txt",".arff"};
+	public static final int SVM = 0;
+	public static final int WEKA = 1;
+	
+	public static final int USE = WEKA;
 	
 	static String city = "Venezia";
-	static int[] test_bounds = new int[]{0,1000};
-	static int[] train_bounds = new int[]{1000,2000}; // it is always better to have testing indices first!
+	static int[] test_bounds = new int[]{0,100};
+	static int[] train_bounds = new int[]{100,200}; // it is always better to have testing indices first!
 	
 	public static void main(String[] args) throws Exception {
 		
 		createSVMTestingSet(city, test_bounds[0], test_bounds[1]);
-		createSVMTrainingSet(city, train_bounds[0], train_bounds[1]);
+		createTrainingSet(city, train_bounds[0], train_bounds[1]);
+		
+		
+		if(USE == WEKA) return;
+		
 		String d = FileUtils.getFileS("TouristData");
 		String testf = d+"/svm_test_"+city+"_"+test_bounds[0]+"_"+test_bounds[1]+".txt";
 		String trainf = d+"/svm_train_"+city+"_"+train_bounds[0]+"_"+train_bounds[1]+".txt";
@@ -42,7 +51,7 @@ public class TouristClassify {
 	}
 	
 	
-	public static void createSVMTrainingSet(String city, int skip, int max_num_per_class) throws Exception {
+	public static void createTrainingSet(String city, int skip, int max_num_per_class) throws Exception {
 		int[] how_many_samples_per_class = new int[2];
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
@@ -51,7 +60,7 @@ public class TouristClassify {
 			br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		}
 		
-		File f = new File(FileUtils.create("TouristData")+"/svm_train_"+city+"_"+skip+"_"+max_num_per_class+".txt");
+		File f = new File(FileUtils.create("TouristData")+"/"+MODE[USE]+"_train_"+city+"_"+skip+"_"+max_num_per_class+EXTENSION[USE]);
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
 		
 		int i=0;
@@ -60,18 +69,25 @@ public class TouristClassify {
 		
 		for(int k=0; k<skip;k++)
 			br.readLine();
-			
+		
+		boolean header = false;
+		
 		while((line=br.readLine())!=null) {
-			td = new TouristData(line,rm,TouristData.d_periods, TouristData.h_periods);
+			td = new TouristData(line,rm,TouristData.DP, TouristData.HP);
+			
+			if(USE==WEKA && !header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
+			
 			boolean oktraining1 = td.roaming() && td.num_days < 4 && td.num_pls > 1;
 			boolean oktraining2 = !td.roaming() && td.num_days > 14;
 			
 			if(how_many_samples_per_class[1] < max_num_per_class && oktraining1) {
-				out.println(td.toSVMString(1));
+				if(USE == WEKA)	out.println(td.toWEKAString(1));
+				if(USE == SVM)	out.println(td.toSVMString(1));
 				how_many_samples_per_class[1]++;
 			}
 			else if(how_many_samples_per_class[0] < max_num_per_class && oktraining2){
-				out.println(td.toSVMString(0));
+				if(USE == WEKA)	out.println(td.toWEKAString(0));
+				if(USE == SVM)	out.println(td.toSVMString(0));
 				how_many_samples_per_class[0]++;
 			}
 			
@@ -99,20 +115,26 @@ public class TouristClassify {
 			br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		}
 		
-		File f = new File(FileUtils.create("TouristData")+"/svm_test_"+city+"_"+skip+"_"+num+".txt");
+		File f = new File(FileUtils.create("TouristData")+"/"+MODE[USE]+"_test_"+city+"_"+skip+"_"+num+EXTENSION[USE]);
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
-	
+		
 		String line;
 		TouristData td = null;
 		
 		for(int k=0; k<skip;k++)
 			br.readLine();
 		
+		boolean header = false;
 		for(int k=0; k<num;k++) {
 			line=br.readLine();
-			td = new TouristData(line,rm,TouristData.d_periods, TouristData.h_periods);
+			td = new TouristData(line,rm,TouristData.DP, TouristData.HP);
+			
+			if(USE==WEKA && !header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
+			
+			
 			int supposed_class = td.num_days < 4 ? 1 : 0;
-			out.println(td.toSVMString(supposed_class));
+			if(USE == WEKA)	out.println(td.toWEKAString(supposed_class));
+			if(USE == SVM)	out.println(td.toSVMString(supposed_class));
 		}
 		br.close();
 		out.close();
