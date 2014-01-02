@@ -30,7 +30,7 @@ public class TouristClassify {
 	
 	public static void main(String[] args) throws Exception {
 		
-		createSVMTestingSet(city, test_bounds[0], test_bounds[1]);
+		createTestingSet(city, test_bounds[0], test_bounds[1]);
 		createTrainingSet(city, train_bounds[0], train_bounds[1]);
 		
 		
@@ -106,7 +106,7 @@ public class TouristClassify {
 		
 	}
 	
-	public static void createSVMTestingSet(String city, int skip, int num) throws Exception {
+	public static void createTestingSet(String city, int skip, int num) throws Exception {
 			
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
