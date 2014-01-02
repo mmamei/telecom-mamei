@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import network.NetworkCell;
 import network.NetworkMap;
@@ -50,9 +52,26 @@ public class TouristData implements Serializable {
 		 													  "8","9","10","11","12","13","14","15",
 		 													  "16","17","18","19","20","21","22","23"};
 	
+	static {
+		
+		if(DP != null) DP_LABELS = changePeriodLables(DP);
+		
+		if(HP != null) HP_LABELS = changePeriodLables(HP);
+		
+	}
+	
+	private static String[] changePeriodLables(String[] p) {
+		Set<String> l = new TreeSet<String>();
+		for(String x: p)
+			l.add(x);
+		String[] labels = new String[l.size()];
+		return l.toArray(labels);
+	}
 	
 	
-	public static transient String[] MAP_LABELS;
+	
+	
+	public static transient String[] MAP_LABELS = null;
 	
 	
 	static transient Map<String,Integer> DM = new HashMap<String,Integer>();
@@ -87,15 +106,14 @@ public class TouristData implements Serializable {
 		
 		if(events == null) return; // need for a null construcutor for testing
 		
-		
-		
-		MAP_LABELS = new String[map.getNumRegions()];
-		int c = 0;
-		for(Region r: map.getRegions()) {
-			MAP_LABELS[c] = r.getName().replaceAll(" ", "_");
-			c++;
+		if(MAP_LABELS == null) {
+			MAP_LABELS = new String[map.getNumRegions()];
+			int c = 0;
+			for(Region r: map.getRegions()) {
+				MAP_LABELS[c] = r.getName().replaceAll(",", "_");
+				c++;
+			}
 		}
-		
 		
 		String[] p = events.split(",");
 		user_id = p[0];
@@ -166,10 +184,6 @@ public class TouristData implements Serializable {
 	 */
 	
 	public String wekaHeader(String title) {
-		
-		
-		
-		
 		StringBuffer sb = new StringBuffer();
 		sb.append("@RELATION "+title+"\n");
 		sb.append("@ATTRIBUTE roaming {0,1}\n");
@@ -218,6 +232,7 @@ public class TouristData implements Serializable {
 	
 	
 	private void compactTime(String[] d_periods, String[] h_periods) {
+	
 		if(d_periods!=null) compact(toNum(d_periods,DP_LABELS),0);
 		if(h_periods!=null) compact(toNum(h_periods,HP_LABELS),1);
 	}
@@ -239,14 +254,6 @@ public class TouristData implements Serializable {
 			}
 			x[i] = n;
 		}
-		
-		
-		labels = new String[map.size()];
-		for(String u: map.keySet()) {
-			labels[map.get(u)] = u;
-		}
-		
-		
 		
 		return x;
 	}
@@ -325,7 +332,6 @@ public class TouristData implements Serializable {
 		
 	
 	public static void main(String[] args) throws Exception {
-		
 		String city = "Venezia";
 		process(city,DP,HP);
 		Logger.logln("Done");
