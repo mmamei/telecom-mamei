@@ -73,7 +73,7 @@ public class TouristClassify {
 		boolean header = false;
 		
 		while((line=br.readLine())!=null) {
-			td = new TouristData(line,rm,TouristData.DP, TouristData.HP);
+			td = new TouristData(line,rm);
 			
 			if(USE==WEKA && !header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
 			
@@ -127,7 +127,7 @@ public class TouristClassify {
 		boolean header = false;
 		for(int k=0; k<num;k++) {
 			line=br.readLine();
-			td = new TouristData(line,rm,TouristData.DP, TouristData.HP);
+			td = new TouristData(line,rm);
 			
 			if(USE==WEKA && !header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
 			

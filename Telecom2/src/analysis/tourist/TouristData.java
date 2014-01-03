@@ -6,10 +6,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import network.NetworkCell;
 import network.NetworkMap;
@@ -52,20 +53,49 @@ public class TouristData implements Serializable {
 		 													  "8","9","10","11","12","13","14","15",
 		 													  "16","17","18","19","20","21","22","23"};
 	
+	
+	public static transient int[] DP_INT;
+	public static transient int[] HP_INT;
+	
 	static {
 		
-		if(DP != null) DP_LABELS = changePeriodLables(DP);
+		if(DP != null) { DP_LABELS = changePeriodLables(DP); DP_INT = toNum(DP);}
 		
-		if(HP != null) HP_LABELS = changePeriodLables(HP);
+		if(HP != null) { HP_LABELS = changePeriodLables(HP); HP_INT = toNum(HP);}
+		
+		
+		for(String s: HP_LABELS)
+			System.err.print(s+" ");
+		System.err.println();
+		for(int s: HP_INT)
+			System.err.print(s+" ");
+		System.err.println();
 		
 	}
 	
 	private static String[] changePeriodLables(String[] p) {
-		Set<String> l = new TreeSet<String>();
+		List<String> l = new ArrayList<String>();
 		for(String x: p)
-			l.add(x);
+			if(!l.contains(x)) l.add(x);
 		String[] labels = new String[l.size()];
 		return l.toArray(labels);
+	}
+	
+	private static int[] toNum(String[] l) {
+		int[] x = new int[l.length];
+		
+		Map<String,Integer> map = new HashMap<String,Integer>();
+		int cont = 0;
+		for(int i=0; i<x.length;i++) {
+			Integer n = map.get(l[i]);
+			if(n==null) { 
+				n = cont;
+				map.put(l[i], n);
+				cont++;
+			}
+			x[i] = n;
+		}
+		return x;
 	}
 	
 	
@@ -102,7 +132,7 @@ public class TouristData implements Serializable {
 	*/
 	
 
-	public TouristData(String events, RegionMap map,String[] d_periods, String[] h_periods) {
+	public TouristData(String events, RegionMap map) {
 		
 		if(events == null) return; // need for a null construcutor for testing
 		
@@ -139,7 +169,7 @@ public class TouristData implements Serializable {
 				plsMatrix[day][h][k] += ai[k];
 		}
 		
-		compactTime(d_periods,h_periods);
+		compactTime();
 	}
 	
 	
@@ -231,32 +261,15 @@ public class TouristData implements Serializable {
 	// mapping [7-13] in 0 (morning), [14,18] in 1 (afternoon), [19-22] in 2 (evening), [23-6] in 3 (night)
 	
 	
-	private void compactTime(String[] d_periods, String[] h_periods) {
-	
-		if(d_periods!=null) compact(toNum(d_periods,DP_LABELS),0);
-		if(h_periods!=null) compact(toNum(h_periods,HP_LABELS),1);
+	private void compactTime() {
+		if(DP!=null) compact(DP_INT,0);
+		if(DP!=null) compact(HP_INT,1);
 	}
 	
 	
 	
 	
-	private int[] toNum(String[] l,String[] labels) {
-		int[] x = new int[l.length];
-		
-		Map<String,Integer> map = new HashMap<String,Integer>();
-		int cont = 0;
-		for(int i=0; i<x.length;i++) {
-			Integer n = map.get(l[i]);
-			if(n==null) { 
-				n = cont;
-				map.put(l[i], n);
-				cont++;
-			}
-			x[i] = n;
-		}
-		
-		return x;
-	}
+	
 	
 	
 	
@@ -333,11 +346,11 @@ public class TouristData implements Serializable {
 	
 	public static void main(String[] args) throws Exception {
 		String city = "Venezia";
-		process(city,DP,HP);
+		process(city);
 		Logger.logln("Done");
 	}
 	
-	public static void process(String city, String[] d_periods, String[] h_periods) throws Exception {
+	public static void process(String city) throws Exception {
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
@@ -353,7 +366,7 @@ public class TouristData implements Serializable {
 		String line;
 		TouristData td;
 		while((line=br.readLine())!=null) {
-			td = new TouristData(line,rm,d_periods, h_periods);
+			td = new TouristData(line,rm);
 			out.println(td);
 			i++;
 			if(i % 10000 == 0) {

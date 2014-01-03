@@ -40,7 +40,7 @@ public class TouristCounter {
 			
 			if(!line.contains("2013-"+month)) continue;
 			
-			td = new TouristData(line,rm,TouristData.DP, TouristData.HP);
+			td = new TouristData(line,rm);
 			
 			if(td.num_days < 4 && td.days_interval < 3 * td.num_days) {
 				String country = mncT.get(td.mnt.substring(0,3));
