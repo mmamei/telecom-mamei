@@ -63,13 +63,14 @@ public class TouristData implements Serializable {
 		
 		if(HP != null) { HP_LABELS = changePeriodLables(HP); HP_INT = toNum(HP);}
 		
-		
+		/*
 		for(String s: HP_LABELS)
 			System.err.print(s+" ");
 		System.err.println();
 		for(int s: HP_INT)
 			System.err.print(s+" ");
 		System.err.println();
+		*/
 		
 	}
 	

@@ -25,7 +25,7 @@ public class TouristClassify {
 	public static final int USE = WEKA;
 	
 	static String city = "Venezia";
-	static int[] test_bounds = new int[]{0,100};
+	static int[] test_bounds = new int[]{0,1000};
 	static int[] train_bounds = new int[]{100,200}; // it is always better to have testing indices first!
 	
 	public static void main(String[] args) throws Exception {
