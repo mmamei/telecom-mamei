@@ -21,7 +21,7 @@ public class CreatorRegionMapCity2 {
 	
 	
 	public static void main(String[] args) throws Exception {
-		String city = "Firenze";
+		String city = "Venezia";
 		process(city);
 		RegionMap.process(city);
 		Logger.logln("Done!");

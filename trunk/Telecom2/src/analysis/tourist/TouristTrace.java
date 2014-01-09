@@ -17,7 +17,7 @@ public class TouristTrace {
 	
 	
 	static String city = "Venezia";
-	static String[] usr = new String[]{"21941c7ebe6578b99caa621df5553e44679eabd4270222644753c9a6624802"};
+	static String[] usr = new String[]{"dc49e6374d9879387cbe4d93117992aaf2e31bfe2b26aaffb17b0dbcacbb380"};
 	
 	public static void main(String[] args) throws Exception {
 		
