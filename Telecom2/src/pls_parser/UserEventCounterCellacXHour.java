@@ -87,7 +87,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		process("Venezia");
+		process("Firenze");
 		Logger.logln("Done");
 	}	
 		
