@@ -114,7 +114,6 @@ public class TouristActivity {
 		});
 		
 		
-		
 		domain = new String[temp.size()];
 		val = new double[temp.size()];
 		
@@ -141,7 +140,7 @@ public class TouristActivity {
 		String city = rm.getName();
 		BufferedReader br = FileUtils.getBR("TouristData/"+city+".csv");
 		if(br == null) {
-			TouristData.process(city);
+			TouristData.process(city,null);
 			br = FileUtils.getBR("TouristData/"+city+".csv");
 		}
 		

@@ -35,6 +35,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class TouristData implements Serializable {
 	
+	public static transient final int SVM = 0;
+	public static transient final int WEKA = 1;
+	
 	public static transient final String TIM_MNT = "22201";
 	
 	
@@ -43,9 +46,19 @@ public class TouristData implements Serializable {
 	// mapping weekends in 1
 	// h_periods = {3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3}
 	public static transient final String[] DP = new String[]{"W","W","W","W","W","WE","WE"};
-	public static transient final String[] HP = new String[]{"N","N","N","N","N","N","N","M",
-															 "M","M","M","M","M","M","A","A",
-															 "A","A","A","E","E","E","E","N"};
+	
+	public static transient final String[] HP1 = new String[]{"N","N","N","N","N","N","N","M", 
+															  "M","M","M","M","M","M","A","A", 
+															  "A","A","A","E","E","E","E","N"};
+	
+	public static transient final String[] HP2 = new String[]{"H","H","H","H","H","H","H","H", 
+															  "H","W","W","W","W","W","W","W", 
+															  "W","W","W","W","W","H","H","H"};
+	
+	public static transient final String[] HP3 = new String[]{"H","H","H","H","H","H","H","H", 
+		  													  "H","H","H","H","H","H","H","H", 
+		  													  "H","H","H","H","H","H","H","H"};
+	public static transient final String[] HP = HP3;
 	
 	// these will be overwritten in case of a compact operation
 	public static transient String[] DP_LABELS = new String[]{"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
@@ -57,21 +70,12 @@ public class TouristData implements Serializable {
 	public static transient int[] DP_INT;
 	public static transient int[] HP_INT;
 	
+	
+	public static transient final boolean COMPACT_SPACE = true;
+	
 	static {
-		
 		if(DP != null) { DP_LABELS = changePeriodLables(DP); DP_INT = toNum(DP);}
-		
-		if(HP != null) { HP_LABELS = changePeriodLables(HP); HP_INT = toNum(HP);}
-		
-		/*
-		for(String s: HP_LABELS)
-			System.err.print(s+" ");
-		System.err.println();
-		for(int s: HP_INT)
-			System.err.print(s+" ");
-		System.err.println();
-		*/
-		
+		if(HP != null) { HP_LABELS = changePeriodLables(HP); HP_INT = toNum(HP);}	
 	}
 	
 	private static String[] changePeriodLables(String[] p) {
@@ -99,12 +103,6 @@ public class TouristData implements Serializable {
 		return x;
 	}
 	
-	
-	
-	
-	public static transient String[] MAP_LABELS = null;
-	
-	
 	static transient Map<String,Integer> DM = new HashMap<String,Integer>();
 	static {
 		DM.put("Mon", 0);
@@ -118,6 +116,8 @@ public class TouristData implements Serializable {
 	static transient Map<String,float[]> cache_intersection = new HashMap<String,float[]>();
 	static transient NetworkMap nm = NetworkMapFactory.getNetworkMap();
 	
+	
+	public static transient String[] MAP_LABELS = null;	
 	
 	String user_id;
 	String mnt;
@@ -135,7 +135,7 @@ public class TouristData implements Serializable {
 
 	public TouristData(String events, RegionMap map) {
 		
-		if(events == null) return; // need for a null construcutor for testing
+		//if(events == null) return; // need for a null construcutor for testing
 		
 		if(MAP_LABELS == null) {
 			MAP_LABELS = new String[map.getNumRegions()];
@@ -171,6 +171,8 @@ public class TouristData implements Serializable {
 		}
 		
 		compactTime();
+		if(COMPACT_SPACE) compactSpace();
+		normalize();
 	}
 	
 	
@@ -191,6 +193,14 @@ public class TouristData implements Serializable {
 	}
 	
 	
+	public String toString(int mode, int clazz) {
+		if(mode == WEKA) return toWEKAString(clazz);
+		if(mode == SVM) return toSVMString(clazz);
+		return toString();
+	}
+	
+	
+	
 	public String toSVMString(int clazz) {
 		StringBuffer sb = new StringBuffer();
 		int fcont = 5;
@@ -201,7 +211,7 @@ public class TouristData implements Serializable {
 	    		sb.append(" "+fcont+":"+plsMatrix[i][j][k]);
 	    	fcont++;
 	    }
-		int roaming = roaming()? 0 : 1;
+		int roaming = roaming() ? 1 : 0;
 		return clazz+" 1:"+roaming+" 2:"+num_pls+" 3:"+num_days+" 4:"+days_interval+sb.toString();
 	}
 	
@@ -223,8 +233,12 @@ public class TouristData implements Serializable {
 		sb.append("@ATTRIBUTE days_interval NUMERIC\n");
 		for(int i=0; i<plsMatrix.length;i++)
 		for(int j=0; j<plsMatrix[0].length;j++)
-		for(int k=0; k<plsMatrix[0][0].length;k++) {
-			sb.append("@ATTRIBUTE "+DP_LABELS[i]+"_"+HP_LABELS[j]+"_"+MAP_LABELS[k]+" NUMERIC\n");
+		if(COMPACT_SPACE)
+			sb.append("@ATTRIBUTE "+DP_LABELS[i]+"_"+HP_LABELS[j]+" NUMERIC\n");
+		else {
+			for(int k=0; k<plsMatrix[0][0].length;k++) {
+				sb.append("@ATTRIBUTE "+DP_LABELS[i]+"_"+HP_LABELS[j]+"_"+MAP_LABELS[k]+" NUMERIC\n");
+			}
 		}
 		sb.append("@ATTRIBUTE class {0,1}\n");
 		sb.append("@DATA\n");
@@ -249,7 +263,7 @@ public class TouristData implements Serializable {
 	    		sb.append(","+fcont+" "+plsMatrix[i][j][k]);
 	    	fcont++;
 	    }
-		int roaming = roaming()? 0 : 1;
+		int roaming = roaming()? 1 : 0;
 		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+days_interval+sb.toString()+", "+fcont+" "+clazz+"}";
 	}
 	
@@ -266,13 +280,7 @@ public class TouristData implements Serializable {
 		if(DP!=null) compact(DP_INT,0);
 		if(DP!=null) compact(HP_INT,1);
 	}
-	
-	
-	
-	
-	
-	
-	
+
 	
 	/*
 	 * This code is rather tricky. To have just one method, I pass the index cindex that has to be reduced.
@@ -310,6 +318,29 @@ public class TouristData implements Serializable {
 		plsMatrix = compactPlsMatrix;
 	}
 	
+	
+	
+	
+	private void compactSpace() {
+		float[][][] cplsMatrix = new float[plsMatrix.length][plsMatrix[0].length][1];
+		for(int i=0; i<plsMatrix.length;i++)
+		for(int j=0; j<plsMatrix[0].length;j++)
+		for(int k=0; k<plsMatrix[0][0].length;k++) 
+			cplsMatrix[i][j][0] +=  plsMatrix[i][j][k];
+		
+		for(int i=0; i<plsMatrix.length;i++)
+		for(int j=0; j<plsMatrix[0].length;j++)
+			cplsMatrix[i][j][0] = Math.round(cplsMatrix[i][j][0]);
+		plsMatrix = cplsMatrix;
+	}
+	
+	
+	private void normalize() {
+		for(int i=0; i<plsMatrix.length;i++)
+		for(int j=0; j<plsMatrix[0].length;j++)
+		for(int k=0; k<plsMatrix[0][0].length;k++) 
+			plsMatrix[i][j][k] = plsMatrix[i][j][k] / num_pls;
+	}
 
 	
 	
@@ -346,12 +377,12 @@ public class TouristData implements Serializable {
 		
 	
 	public static void main(String[] args) throws Exception {
-		String city = "Venezia";
-		process(city);
+		String city = "Firenze";
+		process(city,100);
 		Logger.logln("Done");
 	}
 	
-	public static void process(String city) throws Exception {
+	public static void process(String city, Integer max) throws Exception {
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
@@ -360,13 +391,17 @@ public class TouristData implements Serializable {
 			br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		}
 		
-		File f = new File(FileUtils.create("TouristData")+"/"+city+".txt");
+		String s = max == null ? "" : "_"+max;
+		File f = new File(FileUtils.create("TouristData")+"/"+city+s+".txt");
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
 		
 		int i=0;
 		String line;
 		TouristData td;
 		while((line=br.readLine())!=null) {
+			
+			if(max != null && i > max) break;
+			
 			td = new TouristData(line,rm);
 			out.println(td);
 			i++;

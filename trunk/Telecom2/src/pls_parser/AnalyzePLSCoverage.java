@@ -27,6 +27,7 @@ public class AnalyzePLSCoverage {
 		Logger.logln("Days in the dataset:");
 		for(String d:allDays.keySet()) 
 			Logger.logln(d+" = "+allDays.get(d));
+		System.out.println("TOT = "+allDays.size());
 	}
 	
 	

@@ -22,11 +22,15 @@ public class UserEventCounterDay extends BufferAnalyzer {
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	
 	private Placemark placemark;
+	private Set<String> usernames;
+	private String prefix;
 	private String hashmap_outputfile;
 	private Map<String,UserInfo> users_info;
 	
-	public UserEventCounterDay(Placemark placemark) {
+	public UserEventCounterDay(Placemark placemark,Set<String> usernames, String prefix) {
 		this.placemark = placemark;
+		this.usernames = usernames;
+		this.prefix = prefix == null ? "" : prefix;
 		users_info = new HashMap<String,UserInfo>();
 		
 		
@@ -35,7 +39,9 @@ public class UserEventCounterDay extends BufferAnalyzer {
 			fd = FileUtils.create("UserEventCounter");
 			fd.mkdirs();
 		}
-		hashmap_outputfile = fd.getAbsolutePath()+"/"+placemark.name+"_day.csv";
+				
+		hashmap_outputfile = placemark!=null? fd.getAbsolutePath()+"/"+prefix+"_"+placemark.name+"_day.csv" : fd.getAbsolutePath()+"/"+prefix+"_"+Config.getInstance().pls_folder.replaceAll("/|:", "_")+"_day.csv";
+		System.out.println(hashmap_outputfile);
 	}
 
 	/*
@@ -59,7 +65,11 @@ public class UserEventCounterDay extends BufferAnalyzer {
 			celllac = fields[2];
 			timestamp = Long.parseLong(fields[3]);
 			cal.setTimeInMillis(timestamp);
-			if(placemark.contains(celllac)){
+			
+			boolean c1 = usernames == null || usernames.contains(username);
+			boolean c2 = placemark == null || placemark.contains(celllac);
+			
+			if(c1 && c2){
 				UserInfo info = users_info.get(username);
 				if(info == null) {
 					info = new UserInfo();
@@ -94,15 +104,36 @@ public class UserEventCounterDay extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Placemark p = Placemark.getPlacemark("Venezia");
-		UserEventCounterDay ba = new UserEventCounterDay(p);
+		String city = "Venezia";
+		//Placemark p = Placemark.getPlacemark("Venezia");
+		process(null,read(city),city);
+		Logger.logln("Done");
+	}
+	
+	
+	public static Set<String>  read(String city) throws Exception {
+		Set<String> user_in_base_region = new HashSet<String>();
+		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_day.csv");
+		String line;
+		while((line = br.readLine()) != null) {
+			String user = line.substring(0,line.indexOf(","));
+			user_in_base_region.add(user);
+		}
+		br.close();
+		System.out.println(user_in_base_region.size());
+		return user_in_base_region;
+	}
+	
+	
+	
+	public static void process(Placemark p, Set<String> usernames, String prefix) throws Exception {
+		UserEventCounterDay ba = new UserEventCounterDay(p,usernames,prefix);
 		if(!new File(ba.hashmap_outputfile).exists()) {
 			PLSParser.parse(ba);
 			ba.finish();
 			Logger.logln("Done");
 		}
 		else Logger.logln("file already exists!");
-		trim(p,3);
 	}
 	
 	/*
@@ -152,7 +183,7 @@ public class UserEventCounterDay extends BufferAnalyzer {
 			int eyear = last.get(Calendar.YEAR);
 			
 			
-			return imsi+","+num_pls+","+dt+","+days.size()+","+sday+"-"+MONTHS[smonth]+"-"+syear+","+eday+"-"+MONTHS[emonth]+"-"+eyear;
+			return imsi+","+num_pls+","+days.size()+","+dt+","+sday+"-"+MONTHS[smonth]+"-"+syear+","+eday+"-"+MONTHS[emonth]+"-"+eyear;
 		}
 	}
 
