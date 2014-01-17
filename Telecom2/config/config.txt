@@ -10,11 +10,11 @@
 network_map_dir = C:/DATASET/PLS/file_rete
 
 // Cartella con i PLS
-pls_folder = C:/DATASET/PLS/file_pls/file_pls_ve
+pls_folder = G:/DATASET/PLS/file_pls_piem
 
 // Filter events on the basis of time
-pls_start_time = 01/07/2011 00:00
-pls_end_time = 01/08/2015 00:00
+pls_start_time = 01/07/2013 00:00
+pls_end_time = 21/07/2013 00:00
 
 // Base dir where the program save files and results
 base_dir = /BASE

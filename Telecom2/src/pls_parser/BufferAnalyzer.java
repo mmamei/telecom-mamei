@@ -28,4 +28,15 @@ public abstract class BufferAnalyzer {
 	
 	public abstract void analyze(String line);
 	public abstract void finish();
+	
+	
+	public void run() {
+		try {
+		PLSParser.parse(this);
+		finish();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

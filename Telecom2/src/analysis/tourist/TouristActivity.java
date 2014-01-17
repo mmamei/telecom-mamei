@@ -176,8 +176,8 @@ public class TouristActivity {
 		String city = rm.getName();
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		if(br == null) {
-			UserEventCounterCellacXHour.process(city);
-			br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
+			Logger.logln("Launch UserEventCounterCellacXHour first!");
+			System.exit(0);
 		}
 		
 		
