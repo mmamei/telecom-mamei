@@ -1,5 +1,6 @@
 package pls_parser;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Calendar;
@@ -73,6 +74,29 @@ public class PLSParser {
 		
 	}
 	
+	
+	private static void analyzeFileSLOW(File plsFile, BufferAnalyzer analyzer) {	
+		//System.out.println(plsFile.getAbsolutePath());
+		ZipFile zf = null;
+		BufferedReader br = null;
+		try {
+			zf = new ZipFile(plsFile);
+			ZipEntry ze = (ZipEntry) zf.entries().nextElement();
+			br = new BufferedReader(new InputStreamReader(zf.getInputStream(ze)));
+			String line;
+			while((line=br.readLine())!=null) 
+				analyzer.analyze(line);
+		}catch(Exception e) {
+			System.err.println("Problems wirh file: "+plsFile.getAbsolutePath());
+			e.printStackTrace();
+		}
+		try {
+			br.close();
+			zf.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer) {	
 		//System.out.println(plsFile.getAbsolutePath());

@@ -66,8 +66,8 @@ public class TouristClassify {
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		if(br == null) {
-			UserEventCounterCellacXHour.process(city);
-			br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
+			Logger.logln("Launch UserEventCounterCellacXHour first!");
+			System.exit(0);
 		}
 		
 		File f = new File(FileUtils.create("TouristData")+"/"+MODE[USE]+"_train_"+city+"_"+skip+"_"+max_num_per_class+EXTENSION[USE]);
@@ -161,10 +161,9 @@ public class TouristClassify {
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		if(br == null) {
-			UserEventCounterCellacXHour.process(city);
-			br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
+			Logger.logln("Launch UserEventCounterCellacXHour first!");
+			System.exit(0);
 		}
-		
 		File f = new File(FileUtils.create("TouristData")+"/"+MODE[USE]+"_test_"+city+"_"+skip+"_"+num+EXTENSION[USE]);
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
 		

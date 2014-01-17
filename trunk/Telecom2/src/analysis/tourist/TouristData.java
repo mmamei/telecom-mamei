@@ -387,8 +387,8 @@ public class TouristData implements Serializable {
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
 		if(br == null) {
-			UserEventCounterCellacXHour.process(city);
-			br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
+			Logger.logln("Launch UserEventCounterCellacXHour first!");
+			System.exit(0);
 		}
 		
 		String s = max == null ? "" : "_"+max;
