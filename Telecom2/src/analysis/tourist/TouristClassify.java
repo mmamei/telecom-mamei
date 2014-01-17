@@ -8,10 +8,6 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 
-import pls_parser.UserEventCounterCellacXHour;
-import pre_delete.svm_predict;
-import pre_delete.svm_scale;
-import pre_delete.svm_train;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
@@ -19,11 +15,6 @@ import area.region.RegionMap;
 
 public class TouristClassify {
 	
-	public static final String[] MODE = new String[]{"svm","weka"};
-	public static final String[] EXTENSION = new String[]{".txt",".arff"};
-	
-	
-	public static final int USE = TouristData.WEKA;
 	
 	static String city = "Venezia";
 	static int test_n = 10000;
@@ -39,21 +30,6 @@ public class TouristClassify {
 		int skip = createTestingSet(city, 0, test_n,TYPE);
 		createTrainingSetFromMultiRegionData(city);
 		//createTrainingSet(city, skip, train_n);
-		
-		if(USE == TouristData.WEKA) return;
-		
-		String d = FileUtils.getFileS("TouristData");
-		String testf = d+"/svm_test_"+city+"_"+test_n+".txt";
-		String trainf = d+"/svm_train_"+city+"_"+train_n+".txt";
-		
-		svm_scale.main(new String[]{"-l","0","-u","1","-s",d+"/scaling.parms",trainf,d+"/train.scaled"});
-		double[] bestp = new double[]{0.125,0.03125}; //Test.gridSerach(d+"/train.scaled");
-		svm_train.main(new String[]{"-c",""+bestp[0],"-g",""+bestp[1],d+"/train.scaled",d+"/train.scaled.model"});
-		
-		svm_scale.main(new String[]{"-l","0","-u","1","-r",d+"/scaling.parms",testf,d+"/test.scaled"});
-		svm_predict.main(new String[]{d+"/test.scaled",d+"/train.scaled.model",d+"/predict.txt"});
-		
-		Logger.logln("Done");
 	}
 	
 	
@@ -70,7 +46,7 @@ public class TouristClassify {
 			System.exit(0);
 		}
 		
-		File f = new File(FileUtils.create("TouristData")+"/"+MODE[USE]+"_train_"+city+"_"+skip+"_"+max_num_per_class+EXTENSION[USE]);
+		File f = new File(FileUtils.create("TouristData")+"/weka_train_"+city+"_"+skip+"_"+max_num_per_class+".arff");
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
 		
 		int i=0;
@@ -89,17 +65,17 @@ public class TouristClassify {
 			how_many_read++;
 			td = new TouristData(line,rm);
 			
-			if(USE==TouristData.WEKA && !header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
+			if(!header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
 			
 			boolean oktraining1 = td.roaming() && td.num_days < 4 && td.num_pls > 1;
 			boolean oktraining2 = !td.roaming() && td.num_days > 14;
 			
 			if(how_many_samples_per_class[1] < max_num_per_class && oktraining1) {
-				out.println(td.toString(USE,1));
+				out.println(td.toWEKAString(1));
 				how_many_samples_per_class[1]++;
 			}
 			else if(how_many_samples_per_class[0] < max_num_per_class && oktraining2){
-				out.println(td.toString(USE,0));
+				out.println(td.toWEKAString(0));
 				how_many_samples_per_class[0]++;
 			}
 			
@@ -135,7 +111,7 @@ public class TouristClassify {
 		
 		System.out.println("found "+tourists.size()+" tourists and "+residents.size()+" residents");
 		
-		File f = new File(FileUtils.create("TouristData")+"/"+MODE[USE]+"_train_MR_"+city+EXTENSION[USE]);
+		File f = new File(FileUtils.create("TouristData")+"/weka_train_MR_"+city+".arff");
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
 		
 		boolean header = false;
@@ -148,8 +124,8 @@ public class TouristClassify {
 			if(residents.contains(un)) clazz = 0;
 			if(clazz != 0 && clazz != 1) continue;
 			TouristData td = new TouristData(line,rm);
-			if(USE==TouristData.WEKA && !header) {out.println(td.wekaHeader("train_MR_"+city)); header = true;}
-			out.println(td.toString(USE,clazz));
+			if(!header) {out.println(td.wekaHeader("train_MR_"+city)); header = true;}
+			out.println(td.toWEKAString(clazz));
 		}
 		br.close();
 		out.close();
@@ -164,7 +140,7 @@ public class TouristClassify {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
 		}
-		File f = new File(FileUtils.create("TouristData")+"/"+MODE[USE]+"_test_"+city+"_"+skip+"_"+num+EXTENSION[USE]);
+		File f = new File(FileUtils.create("TouristData")+"/weka_test_"+city+"_"+skip+"_"+num+".arff");
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
 		
 		String line;
@@ -182,14 +158,14 @@ public class TouristClassify {
 			line=br.readLine();
 			how_many_read ++;
 			td = new TouristData(line,rm);
-			if(USE==TouristData.WEKA && !header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
+			if(!header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
 			
 			boolean oktype = (TYPE==IT && !td.roaming()) || (TYPE==ROAMING && td.roaming()) || TYPE==ALL;
 			boolean oknum = (1.0 * td.num_pls / td.num_days) > 1;
 			
 			if(oktype && oknum) {
 				int supposed_class = td.num_days < 4 ? 1 : 0;
-				out.println(td.toString(USE,supposed_class));
+				out.println(td.toWEKAString(supposed_class));
 				k++;
 			}
 		}
