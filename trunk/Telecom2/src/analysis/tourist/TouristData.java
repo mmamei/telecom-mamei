@@ -35,9 +35,6 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class TouristData implements Serializable {
 	
-	public static transient final int SVM = 0;
-	public static transient final int WEKA = 1;
-	
 	public static transient final String TIM_MNT = "22201";
 	
 	
@@ -193,30 +190,6 @@ public class TouristData implements Serializable {
 	}
 	
 	
-	public String toString(int mode, int clazz) {
-		if(mode == WEKA) return toWEKAString(clazz);
-		if(mode == SVM) return toSVMString(clazz);
-		return toString();
-	}
-	
-	
-	
-	public String toSVMString(int clazz) {
-		StringBuffer sb = new StringBuffer();
-		int fcont = 5;
-		for(int i=0; i<plsMatrix.length;i++)
-		for(int j=0; j<plsMatrix[0].length;j++)
-	    for(int k=0; k<plsMatrix[0][0].length;k++) {
-	    	if(plsMatrix[i][j][k] > 0)
-	    		sb.append(" "+fcont+":"+plsMatrix[i][j][k]);
-	    	fcont++;
-	    }
-		int roaming = roaming() ? 1 : 0;
-		return clazz+" 1:"+roaming+" 2:"+num_pls+" 3:"+num_days+" 4:"+days_interval+sb.toString();
-	}
-	
-	
-	
 	/*
 	 * @RELATION iris
 	 * @ATTRIBUTE sepallength  NUMERIC
@@ -244,7 +217,6 @@ public class TouristData implements Serializable {
 		sb.append("@DATA\n");
 		return sb.toString();
 	}
-	
 	
 	
 	/*
