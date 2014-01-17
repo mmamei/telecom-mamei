@@ -1,4 +1,4 @@
-package classify;
+package pre_delete;
 
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
