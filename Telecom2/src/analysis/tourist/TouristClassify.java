@@ -9,13 +9,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import pls_parser.UserEventCounterCellacXHour;
+import pre_delete.svm_predict;
+import pre_delete.svm_scale;
+import pre_delete.svm_train;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
 import area.region.RegionMap;
-import classify.svm_predict;
-import classify.svm_scale;
-import classify.svm_train;
 
 public class TouristClassify {
 	
