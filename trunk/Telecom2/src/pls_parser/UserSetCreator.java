@@ -20,7 +20,7 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	}
 
 	
-	public void analyze(String username, String imsi, String celllac,long timestamp, Calendar cal) {
+	public void analyze(String username, String imsi, String celllac,long timestamp, Calendar cal,String header) {
 		users.add(username);
 	}
 

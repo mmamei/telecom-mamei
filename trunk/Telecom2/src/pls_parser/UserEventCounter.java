@@ -23,7 +23,7 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		users_events = new HashMap<String,Integer>();
 	}
 
-	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal) {
+	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal, String header) {
 		Integer n = users_events.get(username);
 		users_events.put(username, n == null ? 1 : n+1);
 	}

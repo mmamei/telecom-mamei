@@ -1,10 +1,8 @@
 package pls_parser;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -30,7 +28,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		users_info = new HashMap<String,UserInfo>();
 	}
 
-	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal) {
+	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal,String header) {
 		UserInfo info = users_info.get(username);
 		if(info == null) {
 			info = new UserInfo();
@@ -43,8 +41,18 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	}
 	
 	
+	private int getTotDays() {
+		Set<String> days = new HashSet<String>();
+		for(UserInfo ui:users_info.values()) {
+			days.addAll(ui.getDays());
+		}
+		return days.size();
+	}
+	
+	//private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
 	public void finish() {
 		PrintWriter out = FileUtils.getPW("UserEventCounter", this.getString()+"_cellXHour.csv");
+		out.println("// TOT. DAYS = "+getTotDays());
 		for(String user: users_info.keySet())
 			out.println(user+","+users_info.get(user));
 		out.close();
@@ -87,14 +95,25 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		}
 		
 		public int getNumDays() {
+			return getDays().size();
+		}
+		
+		
+		public Set<String> getDays() {
 			Set<String> days = new HashSet<String>();
 			for(String p:pls) 
 				days.add(p.substring(0, p.indexOf(":")));
-			return days.size();
+			return days;
 		}
 		
 		public int getDaysInterval() {
-			
+			Calendar[] min_max = getTimeRange();
+			Calendar min = min_max[0];
+			Calendar max = min_max[1];
+			return 1+(int)Math.floor((max.getTimeInMillis() - min.getTimeInMillis())/(1000*3600*24));
+		}
+		
+		public Calendar[] getTimeRange() {
 			Calendar min = null;
 			Calendar max = null;
 			for(String p:pls) {
@@ -106,8 +125,9 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 				if(min == null || c.before(min)) min = c;
 				if(max == null || c.after(max)) max = c;
 			}
-			return 1+(int)Math.floor((max.getTimeInMillis() - min.getTimeInMillis())/(1000*3600*24));
+			return new Calendar[]{min,max};
 		}
+		
 		
 		public String toString() {			
 			StringBuffer sb = new StringBuffer();
