@@ -15,8 +15,12 @@ import utils.Logger;
 public class Extractor {
 	
 	
-	static final String FILE = "UserEventCounter/Firenze_cellXHour.csv";
-	static final String PLACEMARK = "Firenze";
+	//static final String FILE = "UserEventCounter/file_pls_fi_Firenze_cellXHour_cellXHour.csv";
+	//static final String PLACEMARK = "Firenze";
+	
+	
+	static final String FILE = "UserEventCounter/file_pls_ve_Venezia_cellXHour.csv";
+	static final String PLACEMARK = "Venezia";
 	
 	public static void main(String[] args) throws Exception {
 		

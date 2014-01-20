@@ -58,8 +58,10 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 		String p = placemark == null ? c.pls_folder.substring(c.pls_folder.lastIndexOf("/")+1) : placemark_name;
 		if(user_list == null)
 			return p;
-		else
+		else {
+			user_list_name = user_list_name.replaceAll("\\\\", "/");
 			return p+"_"+user_list_name.substring(user_list_name.lastIndexOf("/")+1,user_list_name.indexOf("."));
+		}
 	}
 	
 	

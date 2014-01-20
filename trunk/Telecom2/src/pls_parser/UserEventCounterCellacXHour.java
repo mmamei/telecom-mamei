@@ -59,7 +59,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour("Firenze",null);
+		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,FileUtils.getFileS("UserSetCreator/Venezia.csv"));
 		ba.run();
 		Logger.logln("Done!");
 	}	

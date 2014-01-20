@@ -20,6 +20,29 @@ public class Transit extends Profile {
 	}
 
 	boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<CalCell> list, int tot_days) {
-		return false;
+		return isTransit(list);
 	}	
+	
+	
+	private boolean isTransit(List<CalCell> list) {
+		CalCell spotted = list.get(0);
+		if(placemark.contains(spotted.nc.getCellac())) return false; 
+		if(placemark.contains(list.get(list.size()-1).nc.getCellac())) return false;
+		
+		boolean outside_placemark = true;		
+		for(int i=1; i<list.size();i++) {
+			CalCell cc = list.get(i);
+			if(outside_placemark && !placemark.contains(cc.nc.getCellac())) 
+				spotted = cc;
+			if(!outside_placemark && !placemark.contains(cc.nc.getCellac())) {
+				int dh = (int)((cc.cal.getTimeInMillis() - spotted.cal.getTimeInMillis()) / (1000 * 3600));
+				if(dh > 8) return false;
+				spotted = cc;
+			}
+			if(placemark.contains(cc.nc.getCellac()))
+				outside_placemark = false;
+		}
+		return true;
+	}
+	
 }
