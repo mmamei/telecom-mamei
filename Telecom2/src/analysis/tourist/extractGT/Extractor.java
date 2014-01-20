@@ -1,16 +1,19 @@
 package analysis.tourist.extractGT;
 
 import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import area.Placemark;
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.FileUtils;
 import utils.Logger;
+import area.Placemark;
 
 public class Extractor {
 	
@@ -38,15 +41,16 @@ public class Extractor {
 		List<CalCell> list;
 		
 		Placemark placemark = Placemark.getPlacemark(PLACEMARK);
-		Profile resident = new Resident(placemark);
-		Profile tourist = new Tourist(placemark);
-		Profile commuter = new Commuter(placemark);
-		Profile transit = new Transit(placemark);
+		Profile residentP = new Resident(placemark);
+		Profile touristP = new Tourist(placemark);
+		Profile commuterP = new Commuter(placemark);
+		Profile transitP = new Transit(placemark);
 		
-		int n_resident = 0;
-		int n_tourist = 0;
-		int n_commuter = 0;
-		int n_transit = 0;
+		Set<String> residents = new HashSet<String>();
+		Set<String> tourists = new HashSet<String>();
+		Set<String> commuters = new HashSet<String>();
+		Set<String> transits = new HashSet<String>();
+		
 		int n_total = 0;
 		
 		// read header
@@ -72,25 +76,40 @@ public class Extractor {
 				list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
 			}
 			
-			boolean isResident = resident.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-			boolean isTourist = tourist.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-			boolean isCommuter = commuter.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-			boolean isTransit = transit.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+			boolean isResident = residentP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+			boolean isTourist = touristP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+			boolean isCommuter = commuterP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+			boolean isTransit = transitP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
 			
-			if(isResident) n_resident ++;
-			else if(isTourist) n_tourist++;
-			else if(isCommuter) n_commuter++;
-			else if(isTransit) n_transit++;
+			if(isResident) residents.add(user_id);
+			else if(isTourist) tourists.add(user_id);
+			else if(isCommuter) commuters.add(user_id);
+			else if(isTransit)  transits.add(user_id);
 			
 			n_total ++;
 		}
 		
+		save(PLACEMARK+"_Residents.csv",residents);
+		save(PLACEMARK+"_Tourists.csv",tourists);
+		save(PLACEMARK+"_Commuters.csv",commuters);
+		save(PLACEMARK+"_Transits.csv",transits);
 		
-		Logger.logln("N. RESIDENTS = "+n_resident);
-		Logger.logln("N. TOURISTS = "+n_tourist);
-		Logger.logln("N. COMMUTERS = "+n_commuter);
-		Logger.logln("N. IN TRANSIT = "+n_transit);	
+		Logger.logln("N. RESIDENTS = "+residents.size());
+		Logger.logln("N. TOURISTS = "+tourists.size());
+		Logger.logln("N. COMMUTERS = "+commuters.size());
+		Logger.logln("N. IN TRANSIT = "+transits.size());	
 		Logger.logln("N. TOTAL = "+n_total);	
+		
+		
+		
+	}
+	
+	
+	public static void save(String name, Set<String> set) {
+		PrintWriter pw = FileUtils.getPW("TouristData/GT", name);
+		for(String u: set)
+			pw.println(u);
+		pw.close();
 	}
 	
 	

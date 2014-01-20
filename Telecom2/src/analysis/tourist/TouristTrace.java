@@ -17,12 +17,12 @@ public class TouristTrace {
 	
 	
 	static String city = "Venezia";
-	static String[] usr = new String[]{"dc49e6374d9879387cbe4d93117992aaf2e31bfe2b26aaffb17b0dbcacbb380"};
+	static String[] usr = new String[]{"e6c563805a3eb56d3bdc5997b3e48e579671b57857bda2c5d164c67f8eed2a"};
 	
 	public static void main(String[] args) throws Exception {
 		
 		//RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
-		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
+		BufferedReader br = FileUtils.getBR("UserEventCounter/file_pls_ve_Venezia_cellXHour.csv");
 		if(br == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
