@@ -54,8 +54,8 @@ public class FileUtils {
 			d.mkdirs();
 		}
 		try {
-			//System.out.println(d.getAbsolutePath()+"/"+file);
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(d.getAbsolutePath()+"/"+file)));
+			System.out.println(d.getAbsolutePath()+"/"+file);
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(d.getAbsolutePath()+"/"+file))));
 			return pw;
 		} catch (IOException e) {
 			return null;
