@@ -19,7 +19,14 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	private Set<String> user_list = null;
 	
 	/*
-	 * You must pass a placemark and a userlist (that can be possibly null) to a BufferAnalyzerConstrained
+	 * You must pass a placemark and a userlist (that can be possibly null) to a BufferAnalyzerConstrained.
+	 * The semantics of this call is the following:
+	 * 
+	 * (null, null) extract info from all the users in the config pls file
+	 * (placemark, null) extract info from all the users that have an event in the placemark - the placemark must be contained in the config pls file
+	 * (null,list) consider only users in the list
+	 * 
+	 * 
 	 */
 	
 	public BufferAnalyzerConstrained(String placemark_name, String user_list_name) {
@@ -62,7 +69,15 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	String celllac;
 	long timestamp;
 	Calendar cal = new GregorianCalendar();
+	
+	String header = null;
+	
 	public void analyze(String line) {
+	
+		if(line.startsWith("//")) {
+		 header = header == null ? line : header + line;
+		 return;
+		}
 		try {
 			fields = line.split("\t");
 			username = fields[0];
@@ -75,10 +90,10 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 			boolean check_placemark = placemark == null || placemark.contains(celllac);
 			
 			if(check_users && check_placemark)
-				analyze(username,imsi,celllac,timestamp,cal);
+				analyze(username,imsi,celllac,timestamp,cal,header);
 		} catch(Exception e) {
 		}
 	}
 	
-	public abstract void analyze(String username, String imsi,String celllac,long timestamp, Calendar cal);
+	public abstract void analyze(String username, String imsi,String celllac,long timestamp, Calendar cal, String header);
 }

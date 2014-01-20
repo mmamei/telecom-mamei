@@ -31,7 +31,7 @@ public class UserEventCounterDay extends BufferAnalyzerConstrained {
 	
 	
 	
-	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal) {
+	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal,String header) {
 		UserInfo info = users_info.get(username);
 		if(info == null) {
 			info = new UserInfo();

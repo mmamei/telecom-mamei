@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import area.Placemark;
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
@@ -14,13 +15,14 @@ import utils.Logger;
 public class Extractor {
 	
 	
-	static final String FILE = "";
+	static final String FILE = "UserEventCounter/Firenze_cellXHour.csv";
+	static final String PLACEMARK = "Firenze";
 	
 	public static void main(String[] args) throws Exception {
 		
 		
 		String line;
-		BufferedReader br = FileUtils.getBR(FileUtils.getFileS("UserEventCounter")+"/"+FILE);
+		BufferedReader br = FileUtils.getBR(FILE);
 		if(br == null) {
 			Logger.logln("Run UserEventCounterCellacXHour first!");
 			System.exit(0);
@@ -30,7 +32,24 @@ public class Extractor {
 		String user_id,mnt;
 		int num_pls,num_days,days_interval;
 		List<CalCell> list;
-		while((line = br.readLine())!=null) {
+		
+		Placemark placemark = Placemark.getPlacemark(PLACEMARK);
+		Profile resident = new Resident(placemark);
+		Profile tourist = new Tourist(placemark);
+		Profile commuter = new Commuter(placemark);
+		Profile transit = new Transit(placemark);
+		
+		int n_resident = 0;
+		int n_tourist = 0;
+		int n_commuter = 0;
+		int n_transit = 0;
+		int n_total = 0;
+		
+		// read header
+		line = br.readLine();
+		int tot_days = Integer.parseInt(line.substring(line.indexOf("=")+1).trim());
+		
+		while((line = br.readLine())!=null) {		
 			String[] p = line.split(",");
 			user_id = p[0];
 			mnt = p[1];
@@ -49,12 +68,25 @@ public class Extractor {
 				list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
 			}
 			
-			boolean isResident = Resident.check(user_id,mnt,num_pls,num_days,days_interval,list);
-			boolean isTourist = Tourist.check(user_id,mnt,num_pls,num_days,days_interval,list);
-			boolean isCommuter = Commuter.check(user_id,mnt,num_pls,num_days,days_interval,list);
-			boolean isTransit = Transit.check(user_id,mnt,num_pls,num_days,days_interval,list);
+			boolean isResident = resident.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+			boolean isTourist = tourist.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+			boolean isCommuter = commuter.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+			boolean isTransit = transit.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+			
+			if(isResident) n_resident ++;
+			else if(isTourist) n_tourist++;
+			else if(isCommuter) n_commuter++;
+			else if(isTransit) n_transit++;
+			
+			n_total ++;
 		}
 		
+		
+		Logger.logln("N. RESIDENTS = "+n_resident);
+		Logger.logln("N. TOURISTS = "+n_tourist);
+		Logger.logln("N. COMMUTERS = "+n_commuter);
+		Logger.logln("N. IN TRANSIT = "+n_transit);	
+		Logger.logln("N. TOTAL = "+n_total);	
 	}
 	
 	
