@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 
 
@@ -17,8 +18,7 @@ public class NetworkMapParser {
 	public static void main(String[] args) throws Exception {
 		
 		
-		File odir = new File(Config.getInstance().base_dir+"/NetworkMapParser");
-		if(!odir.exists()) odir.mkdirs();
+		FileUtils.create("NetworkMapParser");
 		
 		
 		File dir = new File(Config.getInstance().network_map_dir);
@@ -35,7 +35,7 @@ public class NetworkMapParser {
 			in.close();
 			
 
-			ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(Config.getInstance().base_dir+"/NetworkMapParser/"+file.substring(0,file.length()-4)+".bin"))));
+			ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(FileUtils.getFileS("NetworkMapParser")+"/"+file.substring(0,file.length()-4)+".bin"))));
 			out.writeObject(map);
 			out.close();
 		}
