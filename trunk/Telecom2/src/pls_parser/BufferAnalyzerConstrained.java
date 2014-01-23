@@ -8,6 +8,8 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import network.NetworkMap;
+import network.NetworkMapFactory;
 import utils.Config;
 import area.Placemark;
 
@@ -74,6 +76,10 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	
 	String header = null;
 	
+	
+	
+	NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	
 	public void analyze(String line) {
 	
 		if(line.startsWith("//")) {
@@ -87,6 +93,10 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 			celllac = fields[2];
 			timestamp = Long.parseLong(fields[3]);
 			cal.setTimeInMillis(timestamp);
+			
+			//if the celllac is not in the networkmap, do not process the pls
+			if(nm.get(Long.parseLong(celllac)) == null) return;
+			
 			
 			boolean check_users = user_list == null || user_list.contains(username);
 			boolean check_placemark = placemark == null || placemark.contains(celllac);
