@@ -29,6 +29,7 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	}
 	
 	public void finish() {
+		System.out.println(users_events.size());
 		PrintWriter out = FileUtils.getPW("UserEventCounter", this.getString()+"_count.csv");
 		for(String user: users_events.keySet())
 			out.println(user+","+users_events.get(user));
@@ -59,7 +60,7 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		UserEventCounter ba = new UserEventCounter(null,null);
 		ba.run();
 		Logger.logln("Done!");
-		extractUsersAboveThreshol(FileUtils.getFileS("UserEventCounter")+"/Firenze_count.csv",2000);
+		//extractUsersAboveThreshol(FileUtils.getFileS("UserEventCounter")+"/Firenze_count.csv",2000);
 	}
 	
 }
