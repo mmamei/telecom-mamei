@@ -19,6 +19,7 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import utils.Config;
+import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
@@ -182,9 +183,11 @@ public class Placemark {
 		double[] ll = new double[]{center[0]-bbox,center[1]-bbox};
 		double[] tr = new double[]{center[0]+bbox,center[1]+bbox};
 		Set<NetworkCell> ncells = NM.getCellsIn(ll, tr);
-		for(NetworkCell nc: ncells) 
+		//for(NetworkCell nc: ncells) {
+		for(NetworkCell nc: NM.getAll()) {
 			if( (LatLonUtils.getHaversineDistance(nc.getPoint(),center_point) - nc.getRadius()) < radius )
 				cellsAround.add(String.valueOf(nc.getCellac()));
+		}
 		return cellsAround;
 	}
 	
@@ -243,6 +246,7 @@ public class Placemark {
 		out.println("</Point>");
 		out.println("</Placemark>");
 		
+		//out.println(NM.get(Long.parseLong("4018584023")).toKml());
 		
 		kml.printFooterFolder(out);
 		out.close();
@@ -255,29 +259,15 @@ public class Placemark {
 	public static void main(String[] args) throws Exception {
 		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
 		initPlacemaks();
-		Placemark p = PLACEMARKS.get("Juventus Stadium (TO)");
-		for(int r = MAX_R; r >= MIN_R; r = r - STEP) {
-			//p.changeRadiusRing(r);
-			p.changeRadius(r);
-			System.out.println(r+" --> "+p.getArea());
-		}
+		NetworkMap nm = NetworkMapFactory.getNetworkMap();
+		Placemark p = PLACEMARKS.get("Venezia");
+		System.out.println(p.getNumCells());
+		System.out.println(p.contains("4018584023"));
+		System.out.println(nm.get(Long.parseLong("4018584023")));
+		String f = FileUtils.getFileS("Placemark")+"/"+p.name+".kml";
+		System.out.println(f);
+		p.printKML(f);
+		
 		Logger.logln("Done!");
-	}
-	
-	
-	public static void main2(String[] args) throws Exception {
-		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
-		initPlacemaks();
-		for(String name: PLACEMARKS.keySet()) {
-			System.out.println(name);
-			Placemark x = Placemark.getPlacemark(name);
-			x.changeRadiusRing(500);
-			String dir = Config.getInstance().base_dir+"/Placemark";
-			File d = new File(dir);
-			if(!d.exists()) d.mkdirs();
-			x.printKML(dir+"/"+x+".kml");	
-		}
-		Logger.logln("Done!");
-	}
-	
+	}	
 }

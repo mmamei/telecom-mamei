@@ -66,7 +66,8 @@ public class KMLPath {
 					double lat1 = nm.get(pe.getCellac()).getBarycentreLatitude() + jitter(pe);
 					double lon2 = nm.get(pe1.getCellac()).getBarycentreLongitude() + jitter(pe1);
 					double lat2 = nm.get(pe1.getCellac()).getBarycentreLatitude() + jitter(pe1);
-					out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
+					//out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
+					out.println(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
 				}
 				else {
 					color_index ++;

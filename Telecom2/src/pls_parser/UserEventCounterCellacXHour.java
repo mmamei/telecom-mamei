@@ -2,13 +2,14 @@ package pls_parser;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import utils.FileUtils;
 import utils.Logger;
@@ -88,10 +89,11 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	private class UserInfo {
 		
 		String imsi;
-		Set<String> pls = new TreeSet<String>();
+		List<String> pls = new ArrayList<String>();
 		
 		public void add(String day, String dayw, int h, String cellac) {
-			pls.add(day+":"+dayw+":"+h+":"+celllac);
+			String s = day+":"+dayw+":"+h+":"+celllac;
+			if(!pls.contains(s)) pls.add(s);
 		}
 		
 		public int getNumDays() {

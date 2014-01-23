@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,10 +16,6 @@ import utils.Colors;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
-import utils.kdtree.GenericPoint;
-import utils.kdtree.KDTree;
-import utils.kdtree.Point;
-import utils.kdtree.RangeSearchTree;
 import visual.kml.KML;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -33,20 +28,13 @@ public class RegionMap implements Serializable {
 	private String name;
 	private Map<String,Region> rm;
 	
-	private KDTree<Double,Point<Double>,Region> kdtree;
-	private RangeSearchTree<Double,Point<Double>,Region> rangetree;
-	
 	public RegionMap(String name) {
 		this.name = name;
 		rm = new HashMap<String,Region>();
-		kdtree = new KDTree<Double,Point<Double>,Region>(2);
-		rangetree = (RangeSearchTree<Double,Point<Double>,Region>)kdtree;
 	}
 	
 	public void add(Region r) {
 		rm.put(r.getName(), r);
-		Point<Double> cellPoint = new GenericPoint<Double>(r.getCenterLon(),r.getCenterLat());
-		kdtree.put(cellPoint, r);
 	}
 	
 	public String getName() {
@@ -86,18 +74,7 @@ public class RegionMap implements Serializable {
 		
 		Geometry p = new GeometryFactory().createPoint(new Coordinate(lon, lat));
 		
-		Point<Double> lower_point = new GenericPoint<Double>(lon-deg_radius,lat-deg_radius);
-		Point<Double> upper_point = new GenericPoint<Double>(lon+deg_radius,lat+deg_radius);
-		Iterator<Map.Entry<Point<Double>,Region>> iter = rangetree.iterator(lower_point, upper_point);
-		while(iter.hasNext()) {
-			Region r = iter.next().getValue();
-			Geometry g = r.getGeom();
-			if(p.within(g)) return r;
-		}
-		
-		//Logger.logln("Fast search has failed, try complete search!");
 		for(Region r: rm.values()) {
-			//System.out.println(r.getName()+" = "+r.getCenterLon()+","+r.getCenterLat());
 			if(p.within(r.getGeom())) return r;
 		}
 		

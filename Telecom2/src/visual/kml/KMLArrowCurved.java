@@ -7,16 +7,25 @@ import java.io.PrintWriter;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+
+// ****************************************************************************************
+// Tesi di Luca Bonfatti, 2013
+// ****************************************************************************************
+
 public class KMLArrowCurved {
 	
 	
 	public static final double HI = 0.1;
 	public static final double MED = 0.06;
 	public static final double LOW = 0.03;
-	public static final double UP = 1;
-	public static final double DOWN = -1;
-	public static String printArrowC (double lon1, double lat1, double lon2, double lat2, int size, String color, double curvature , double concavity, boolean directed) throws Exception {
 	
+	
+	public static String printArrow (double lon1, double lat1, double lon2, double lat2, int size, String color, boolean directed) {
+		return printArrow(lon1,lat1,lon2,lat2,size,color,HI,directed);
+	}
+	
+	public static String printArrow (double lon1, double lat1, double lon2, double lat2, int size, String color, double curvature, boolean directed) {
+		double concavity = lon1 > lon2 ? 1 : -1;
 		double d = Math.sqrt(((lat1-lat2)*(lat1-lat2))+((lon1-lon2)*(lon1-lon2)));
 		double a = curvature * concavity;
 		double b=-a*d;
@@ -46,23 +55,22 @@ public class KMLArrowCurved {
 		double y = 0;
 		double l1;
 		double l2;
-		boolean dx=false;
 		if(lon1<=lon2) {
 			l1=lon1;
 			l2=lat1;
-			dx=true;
 		}
 		else {
 			l1=lon2;
 			l2=lat2;
-			dx=false;
 		}
 		
-		for(double i=0; i<d; i=i+(d/10.0)){
-			x = l1+(i+l1-l1)*Math.cos(Math.toRadians(teta)) - ((a*i*i+b*i)+l2-l2)*Math.sin(Math.toRadians(teta));
-		    y = l2+((a*i*i+b*i)+l2-l2)*Math.cos(Math.toRadians(teta))+(i+l1-l1)*Math.sin(Math.toRadians(teta));
+		sb.append(lon1+","+lat1+",0 ");
+		for(double i=1; i<d; i=i+(d/10.0)){
+			x = l1 + i*Math.cos(Math.toRadians(teta)) - ((a*i*i+b*i))*Math.sin(Math.toRadians(teta));
+		    y = l2 + ((a*i*i+b*i))*Math.cos(Math.toRadians(teta)) + i*Math.sin(Math.toRadians(teta));
 		    sb.append(x+","+y+",0 ");
 		}
+		sb.append(lon2+","+lat2+",0 ");
 		
 		sb.append("</coordinates>");
 		sb.append("</LineString>");
@@ -73,7 +81,7 @@ public class KMLArrowCurved {
 			LatLonPoint p1 = new LatLonPoint(lat1,lon1);
 			LatLonPoint p2 = new LatLonPoint(lat2,lon2);
 			double slope = LatLonUtils.getSlope(p2, p1);
-			double dist = LatLonUtils.getHaversineDistance(p1, p2) / 8;
+			double dist = 100; //LatLonUtils.getHaversineDistance(p1, p2) / 8;
 			LatLonPoint tip1 = LatLonUtils.getPointAtDistance(p2, slope+10, dist);
 			LatLonPoint tip2 = LatLonUtils.getPointAtDistance(p2, slope-10, dist);
 			
@@ -107,8 +115,8 @@ public class KMLArrowCurved {
 		double lon2 = 11.13493327581623;
 		double lat2 = 44.86936892789175;
 		
-		out.println(KMLArrow.printArrow(lon1,lat1,lon2,lat2, 2, "ff0000ff", false));
-		out.println(KMLArrowCurved.printArrowC(lon1,lat1,lon2,lat2, 2,  "ff00ff00", KMLArrowCurved.HI, KMLArrowCurved.UP, true));
+		out.println(KMLArrowCurved.printArrow(lon2,lat2,lon1,lat1, 2,  "ff00ff00", true));
+		out.println(KMLArrowCurved.printArrow(lon1,lat1,lon2,lat2, 2,  "ff00ff00", true));
 		kml.printFooterDocument(out);
 		out.close();
 		System.out.println("Done");
