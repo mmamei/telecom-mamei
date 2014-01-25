@@ -22,11 +22,11 @@ import visual.java.GraphScatterPlotter;
 public class ResultEvaluator {
 	
 	
-	public static boolean USE_INDIVIDUAL_EVENT = false;
+	public static boolean USE_INDIVIDUAL_EVENT = true;
 	public static boolean DIFF = false;
 
 	public static boolean LEAVE_ONE_OUT = true;
-	public static boolean PIECEWISE = true;
+	public static boolean PIECEWISE = false;
 	public static int PIECE_SIZE = 6000;
 	
 	public static boolean RANGE = false;
@@ -40,12 +40,12 @@ public class ResultEvaluator {
 		String type = USE_INDIVIDUAL_EVENT ? "individual" : "multiple";
 		String sdiff = DIFF ? "_diff" : "";
 		String lomb = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_"+type+"_0.0_3"+sdiff+".csv");
-		String piem2012 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
-		String piem2013 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
+		String piem2012 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
+		String piem2013 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
 		//String piem2013_openair = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_openair_"+type+"_0.0_3"+sdiff+".csv");
 
-		String[] training = new String[]{lomb,piem2012};
-		String[] testing = new String[]{lomb,piem2012};
+		String[] training = new String[]{lomb,piem2012,piem2013};
+		String[] testing = new String[]{lomb,piem2012,piem2013};
 		
 		run(training,testing);
 		

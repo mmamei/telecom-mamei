@@ -15,6 +15,7 @@ import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 import area.Placemark;
 
@@ -30,11 +31,8 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		placemarks = new ArrayList<Placemark>();
 		
 		try {
-			String dir = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark";
-			
-			String subdir = Config.getInstance().get_pls_subdir();
-			
-			dir = dir+"/"+subdir;
+			String dir = FileUtils.create("PLSEventsAroundAPlacemark").getAbsolutePath();
+			dir = dir+"/"+Config.getInstance().get_pls_subdir();
 			
 			System.out.println("Output Dir = "+dir);
 			
@@ -66,6 +64,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	Calendar cal = new GregorianCalendar();
 	
 	public void analyze(String line) {
+		try {
 		fields = line.split("\t");
 		username = fields[0];
 		imsi = fields[1];
@@ -79,6 +78,9 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 				if(nc == null) outs.get(i).println(username+","+timestamp+","+imsi+",null");
 				else outs.get(i).println(username+","+timestamp+","+imsi+","+cellac+","+nc.getCellName());
 			}
+		}
+		}catch(Exception e) {
+			System.err.println(line);
 		}
 	}
 	
@@ -102,22 +104,18 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	}
 	
 	
-	static double[] rs = new double[]{2500};//{1500,1400,1300,1200,1100,1000,900,800,700,600,500,400,300,200,100,0,-100,-200,-300,-400,-500};
+	static double[] rs = new double[]{1500,1400,1300,1200,1100,1000,900,800,700,600,500,400,300,200,100,0,-100,-200,-300,-400,-500};
 	static List<Placemark> ps = new ArrayList<Placemark>();
 	static {
-		
-		//ps.add(Placemark.getPlacemark("Juventus Stadium (TO)"));
-		
-		ps.add(Placemark.getPlacemark("Stadio Olimpico (TO)"));
-		
-		ps.add(Placemark.getPlacemark("Stadio Silvio Piola (NO)"));
-		/*
+		 
 		ps.add(Placemark.getPlacemark("Stadio San Siro (MI)"));
 		ps.add(Placemark.getPlacemark("Stadio Atleti Azzurri d'Italia (BG)"));
 		ps.add(Placemark.getPlacemark("Stadio Mario Rigamonti (BS)"));
 		ps.add(Placemark.getPlacemark("Stadio Franco Ossola (VA)"));
-		*/
 		
+		//ps.add(Placemark.getPlacemark("Juventus Stadium (TO)"));
+		//ps.add(Placemark.getPlacemark("Stadio Olimpico (TO)"));
+		//ps.add(Placemark.getPlacemark("Stadio Silvio Piola (NO)"));
 		//ps.add(Placemark.getPlacemark("Piazza San Carlo (TO)"));
 		//ps.add(Placemark.getPlacemark("Piazza Castello (TO)"));
 		//ps.add(Placemark.getPlacemark("Piazza Vittorio (TO)"));

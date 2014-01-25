@@ -13,9 +13,7 @@ public class FileUtils {
 	
 	
 	public static final String[] DISKS = new String[]{"C:","G:"};
-	
-	
-	
+
 	
 	public static File getFile(String fpath) {
 		for(String d: DISKS) {
@@ -26,6 +24,8 @@ public class FileUtils {
 	}
 	
 	public static String getFileS(String fpath) {
+		if(fpath.contains(":")) fpath = fpath.substring(3);
+		System.out.println(fpath);
 		File f = getFile(fpath);
 		return f.getAbsolutePath();
 	}
@@ -33,8 +33,11 @@ public class FileUtils {
 	
 	
 	public static File create(String path) {
-		File f = new File(DISKS[0]+Config.getInstance().base_dir+"/"+path);
-		f.mkdirs();
+		File f = getFile(path);
+		if(f == null) {
+			f = new File(DISKS[0]+Config.getInstance().base_dir+"/"+path);
+			f.mkdirs();
+		}
 		return f;
 	}
 	
