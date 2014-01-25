@@ -38,7 +38,7 @@ public class PlacemarkRadiusExtractor {
 	public static final boolean PLOT = false;
 	public static final boolean CALL_PRESENCE_COUNTER_AFTERWARDS = !PLOT;
 	public static final boolean NORMALIZE_SPATIALLY = true;
-	public static final boolean DIFF = true;
+	public static final boolean DIFF = false;
 	public static final boolean USE_INDIVIDUAL_EVENT = true;
 	public static final int MAX_R = 1500;
 	public static final int MIN_R = -500;
@@ -52,10 +52,11 @@ public class PlacemarkRadiusExtractor {
 	
 	// if MAX = true we compute the zXradius as the max of the z within the event time interval
 	// if MAX = false we compute the zXradius as the sum of the z within the event time interval
-	public static final boolean MAX = false;
+	public static final boolean MAX = true;
 	
 	
-	public static final String ODIR = FileUtils.getFileS("PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir());
+	
+	public static final String ODIR = FileUtils.create("PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
 	
 	public static void main(String[] args) throws Exception { 
 		
@@ -338,7 +339,8 @@ public class PlacemarkRadiusExtractor {
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		
-		String file = FileUtils.getFileS("PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt");
+		File d = FileUtils.create("PLSEventsAroundAPlacemark/"+subdir);
+		String file = d.getAbsolutePath()+"/"+p.name+"_"+p.getR()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -474,15 +476,14 @@ public class PlacemarkRadiusExtractor {
 	}
 	
 	static PLSMap getPLSMap(String file, Placemark p) {
-			
-		String dir = FileUtils.getFileS("PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()+"/saved_plsmaps");
-		new File(dir).mkdirs();
+		/*	
+		String dir = FileUtils.create("PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()+"/saved_plsmaps").getAbsolutePath();
 		File f = new File(dir+"/PLSMap_"+p.toString()+".ser");
 		if(f.exists()) {
 			Logger.logln("Restoring: "+f.getAbsolutePath());
 			return (PLSMap)CopyAndSerializationUtils.restore(f);
 		}
-		
+		*/
 		PLSMap plsmap = new PLSMap();
 		String[] splitted;
 		String line;
@@ -528,7 +529,7 @@ public class PlacemarkRadiusExtractor {
 			}
 		}
 		
-		CopyAndSerializationUtils.save(f, plsmap);
+		//CopyAndSerializationUtils.save(f, plsmap);
 		return plsmap;
 	}
 	/*
