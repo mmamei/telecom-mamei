@@ -8,18 +8,17 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
-import pls_parser.UserEventCounterCellacXHour;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
+import analysis.tourist.extractGT.GTExtractor;
 import area.region.Region;
 import area.region.RegionMap;
 
@@ -33,7 +32,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * {7*24*N matrix with the number of pls produced in a given area of the city in a givne day and hour - N are the areas of the city obtained from Voronoi}
  */
 
-public class TouristData implements Serializable {
+public class TouristData4Analysis implements Serializable {
 	
 	public static transient final String TIM_MNT = "22201";
 	
@@ -110,7 +109,7 @@ public class TouristData implements Serializable {
 		DM.put("Sat", 5);
 		DM.put("Sun", 6);
 	}
-	static transient Map<String,float[]> cache_intersection = new HashMap<String,float[]>();
+	static transient Map<Long,float[]> cache_intersection = new HashMap<Long,float[]>();
 	static transient NetworkMap nm = NetworkMapFactory.getNetworkMap();
 	
 	
@@ -130,7 +129,7 @@ public class TouristData implements Serializable {
 	*/
 	
 
-	public TouristData(String events, RegionMap map) {
+	public TouristData4Analysis(String events, RegionMap map) throws Exception {
 		
 		//if(events == null) return; // need for a null construcutor for testing
 		
@@ -152,19 +151,23 @@ public class TouristData implements Serializable {
 		plsMatrix = new float[7][24][map.getNumRegions()];
 		
 		for(int i=5;i<p.length;i++) {
-			// 2013-5-23:Sun:13:4018542484
-			String[] x = p[i].split(":");
-			int day = DM.get(x[1]);
-			int h = Integer.parseInt(x[2]);
-			String celllac = x[3];
-			float[] ai = cache_intersection.get(celllac);
-			if(ai == null) {
-				ai = computeAreaIntersection(celllac,map);
-				cache_intersection.put(celllac, ai);
+			try {
+				// 2013-5-23:Sun:13:4018542484
+				String[] x = p[i].split(":");
+				int day = DM.get(x[1]);
+				int h = Integer.parseInt(x[2]);
+				long celllac =Long.parseLong(x[3]);
+				float[] ai = cache_intersection.get(celllac);
+				if(ai == null) {
+					ai = computeAreaIntersection(celllac,map);
+					cache_intersection.put(celllac, ai);
+				}
+				
+				for(int k=0; k<ai.length;k++) 
+					plsMatrix[day][h][k] += ai[k];
+			} catch(Exception e) {
+				System.out.println("Problems with "+p[i]);
 			}
-			
-			for(int k=0; k<ai.length;k++) 
-				plsMatrix[day][h][k] += ai[k];
 		}
 		
 		compactTime();
@@ -200,7 +203,7 @@ public class TouristData implements Serializable {
 	public String wekaHeader(String title) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("@RELATION "+title+"\n");
-		sb.append("@ATTRIBUTE roaming {0,1}\n");
+		sb.append("@ATTRIBUTE roaming {TIM,ROAMING}\n");
 		sb.append("@ATTRIBUTE num_pls NUMERIC\n");
 		sb.append("@ATTRIBUTE num_days NUMERIC\n");
 		sb.append("@ATTRIBUTE days_interval NUMERIC\n");
@@ -213,7 +216,7 @@ public class TouristData implements Serializable {
 				sb.append("@ATTRIBUTE "+DP_LABELS[i]+"_"+HP_LABELS[j]+"_"+MAP_LABELS[k]+" NUMERIC\n");
 			}
 		}
-		sb.append("@ATTRIBUTE class {0,1}\n");
+		sb.append("@ATTRIBUTE class {"+GTExtractor.CLASSES+"}\n");
 		sb.append("@DATA\n");
 		return sb.toString();
 	}
@@ -225,7 +228,7 @@ public class TouristData implements Serializable {
 	 *     {2 W, 4 "class B"}
 	 *     Each instance is surrounded by curly braces, and the format for each entry is: <index> <space> <value> where index is the attribute index (starting from 0).
 	 */
-	public String toWEKAString(int clazz) {
+	public String toWEKAString(String clazz) {
 		StringBuffer sb = new StringBuffer();
 		int fcont = 4;
 		for(int i=0; i<plsMatrix.length;i++)
@@ -235,8 +238,9 @@ public class TouristData implements Serializable {
 	    		sb.append(","+fcont+" "+plsMatrix[i][j][k]);
 	    	fcont++;
 	    }
-		int roaming = roaming()? 1 : 0;
-		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+days_interval+sb.toString()+", "+fcont+" "+clazz+"}";
+		String roaming = roaming()? "ROAMING" : "TIM";
+		String class_attribute = clazz == null ? ""  : ", "+fcont+" "+clazz;
+		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+days_interval+sb.toString()+class_attribute+"}";
 	}
 	
 	
@@ -291,8 +295,6 @@ public class TouristData implements Serializable {
 	}
 	
 	
-	
-	
 	private void compactSpace() {
 		float[][][] cplsMatrix = new float[plsMatrix.length][plsMatrix[0].length][1];
 		for(int i=0; i<plsMatrix.length;i++)
@@ -316,9 +318,9 @@ public class TouristData implements Serializable {
 
 	
 	
-	public static float[] computeAreaIntersection(String celllac, RegionMap map) {
+	public static float[] computeAreaIntersection(long celllac, RegionMap map) {
 		float[] area_intersection = new float[map.getNumRegions()];
-		NetworkCell nc = nm.get(Long.parseLong(celllac));
+		NetworkCell nc = nm.get(celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
 		int i=0;
@@ -349,33 +351,57 @@ public class TouristData implements Serializable {
 		
 	
 	public static void main(String[] args) throws Exception {
+		/*
 		String city = "Firenze";
-		process(city,100);
+		String cellXHourFile = "file_pls_fi_Firenze_cellXHour.csv";
+		String gt_ser_file = "Firenze_gt_profiles.ser";
+		*/
+		String city = "Venezia";
+		String cellXHourFile = "file_pls_ve_Venezia_cellXHour.csv";
+		String gt_ser_file = "Venezia_gt_profiles.ser";
+		
+		process(city,cellXHourFile,gt_ser_file,null);
 		Logger.logln("Done");
 	}
 	
-	public static void process(String city, Integer max) throws Exception {
+	public static void process(String city, String cellXHourFile, String gt_ser_file, Integer max) throws Exception {
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
-		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
+		BufferedReader br = FileUtils.getBR("UserEventCounter/"+cellXHourFile);
 		if(br == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
 		}
 		
+		Map<String,String> user_gt_prof = null;
+		if(gt_ser_file != null)
+			user_gt_prof = (Map<String,String>)CopyAndSerializationUtils.restore(FileUtils.getFile("Tourist/"+gt_ser_file));
+		
 		String s = max == null ? "" : "_"+max;
-		File f = new File(FileUtils.create("TouristData")+"/"+city+s+".txt");
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
+	
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.create("Tourist")+"/"+city+s+".txt"))));
+		PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.create("Tourist")+"/"+city+s+".arff"))));
 		
 		int i=0;
 		String line;
-		TouristData td;
+		TouristData4Analysis td;
 		while((line=br.readLine())!=null) {
-			
+			if(line.startsWith("//")) continue;
 			if(max != null && i > max) break;
 			
-			td = new TouristData(line,rm);
+			try {
+			td = new TouristData4Analysis(line,rm);
+			} catch(Exception e) {
+				System.err.println(line);
+				continue;
+			}
+			
+			if(i==0) weka_out.println(td.wekaHeader(city));
+			
 			out.println(td);
+			String clazz = user_gt_prof == null ? null : user_gt_prof.get(td.user_id);
+			weka_out.println(td.toWEKAString(clazz));
+			
 			i++;
 			if(i % 10000 == 0) {
 				Logger.logln("Processed "+i+" users...");
@@ -383,6 +409,7 @@ public class TouristData implements Serializable {
 		}
 		br.close();
 		out.close();
+		weka_out.close();
 	}
 	
 }

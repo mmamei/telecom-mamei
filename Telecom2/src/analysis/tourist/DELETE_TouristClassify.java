@@ -13,7 +13,7 @@ import utils.FileUtils;
 import utils.Logger;
 import area.region.RegionMap;
 
-public class TouristClassify {
+public class DELETE_TouristClassify {
 	
 	
 	static String city = "Venezia";
@@ -47,7 +47,7 @@ public class TouristClassify {
 		
 		int i=0;
 		String line;
-		TouristData td = null;
+		TouristData4Analysis td = null;
 		
 		for(int k=0; k<skip;k++)
 			br.readLine();
@@ -59,7 +59,7 @@ public class TouristClassify {
 		
 		while((line=br.readLine())!=null) {
 			how_many_read++;
-			td = new TouristData(line,rm);
+			td = new TouristData4Analysis(line,rm);
 			
 			if(!header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
 			
@@ -119,7 +119,7 @@ public class TouristClassify {
 			if(tourists.contains(un)) clazz = 1;
 			if(residents.contains(un)) clazz = 0;
 			if(clazz != 0 && clazz != 1) continue;
-			TouristData td = new TouristData(line,rm);
+			TouristData4Analysis td = new TouristData4Analysis(line,rm);
 			if(!header) {out.println(td.wekaHeader("train_MR_"+city)); header = true;}
 			out.println(td.toWEKAString(clazz));
 		}
@@ -140,7 +140,7 @@ public class TouristClassify {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f)));
 		
 		String line;
-		TouristData td = null;
+		TouristData4Analysis td = null;
 		
 		for(int k=0; k<skip;k++)
 			br.readLine();
@@ -153,7 +153,7 @@ public class TouristClassify {
 		while(k<num) {
 			line=br.readLine();
 			how_many_read ++;
-			td = new TouristData(line,rm);
+			td = new TouristData4Analysis(line,rm);
 			if(!header) {out.println(td.wekaHeader("test_"+city+"_"+skip)); header = true;}
 			
 			boolean oktype = (TYPE==IT && !td.roaming()) || (TYPE==ROAMING && td.roaming()) || TYPE==ALL;
