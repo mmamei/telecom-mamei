@@ -34,13 +34,13 @@ public class TouristCounter {
 		
 		Map<String,Integer> count = new HashMap<String,Integer>();
 		
-		TouristData td;
+		TouristData4Analysis td;
 		String line;
 		while((line=br.readLine())!=null) {
 			
 			if(!line.contains("2013-"+month)) continue;
 			
-			td = new TouristData(line,rm);
+			td = new TouristData4Analysis(line,rm);
 			
 			if(td.num_days < 4 && td.days_interval < 3 * td.num_days) {
 				String country = mncT.get(td.mnt.substring(0,3));
