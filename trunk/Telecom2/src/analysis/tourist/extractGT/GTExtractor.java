@@ -28,8 +28,8 @@ public class GTExtractor {
 	//static final String PLACEMARK = "Firenze";
 	
 	
-	static final String FILE = "UserEventCounter/file_pls_fi_Firenze_cellXHour.csv";
-	static final String PLACEMARK = "Firenze";
+	static final String FILE = "UserEventCounter/file_pls_ve_Venezia_cellXHour.csv";
+	static final String PLACEMARK = "Venezia";
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -52,6 +52,11 @@ public class GTExtractor {
 		mp.put("Tourist", new Tourist(placemark));
 		mp.put("Commuter", new Commuter(placemark));
 		mp.put("Transit", new Transit(placemark));
+		
+		
+		Map<String,Integer> mcont = new HashMap<String,Integer>(); // map profiles
+		for(String p : mp.keySet())
+			mcont.put(p, 0);
 		
 		Map<String,String> mu = new HashMap<String,String>(); // user profile
 			
@@ -83,8 +88,10 @@ public class GTExtractor {
 				
 				
 				for(String prof: mp.keySet()) {
-					if(mp.get(prof).check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days))
+					if(mp.get(prof).check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days)) {
 						mu.put(user_id, prof);
+						mcont.put(prof,mcont.get(prof)+1);
+					}
 				}
 								
 				n_total ++;
@@ -93,11 +100,16 @@ public class GTExtractor {
 			}
 		}
 		
+		for(String prof: mcont.keySet())
+			Logger.logln(prof+" = "+mcont.get(prof)+"/"+n_total);
+		
 		PrintWriter pw = FileUtils.getPW("Tourist", PLACEMARK+"_gt_profiles.csv");
 		for(String user: mu.keySet())
 			pw.println(user+","+mu.get(user));
 		pw.close();
 		
 		CopyAndSerializationUtils.save(new File(FileUtils.getFileS("Tourist")+"/"+PLACEMARK+"_gt_profiles.ser"), mu);
+		
+		Logger.logln("Done!");
 	}	
 }
