@@ -239,7 +239,7 @@ public class TouristData4Analysis implements Serializable {
 	    	fcont++;
 	    }
 		String roaming = roaming()? "ROAMING" : "TIM";
-		String class_attribute = clazz == null ? ""  : ", "+fcont+" "+clazz;
+		String class_attribute = clazz == null ? ", "+fcont+" ?"  : ", "+fcont+" "+clazz;
 		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+days_interval+sb.toString()+class_attribute+"}";
 	}
 	
@@ -351,15 +351,16 @@ public class TouristData4Analysis implements Serializable {
 		
 	
 	public static void main(String[] args) throws Exception {
-		/*
+		
 		String city = "Firenze";
 		String cellXHourFile = "file_pls_fi_Firenze_cellXHour.csv";
 		String gt_ser_file = "Firenze_gt_profiles.ser";
-		*/
+		
+		/*
 		String city = "Venezia";
 		String cellXHourFile = "file_pls_ve_Venezia_cellXHour.csv";
 		String gt_ser_file = "Venezia_gt_profiles.ser";
-		
+		*/
 		process(city,cellXHourFile,gt_ser_file,null);
 		Logger.logln("Done");
 	}
