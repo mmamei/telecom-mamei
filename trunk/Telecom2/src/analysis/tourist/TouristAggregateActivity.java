@@ -138,10 +138,10 @@ public class TouristAggregateActivity {
 	
 	public static Map<String,Double> computeSpaceDensity(RegionMap rm) throws Exception {
 		String city = rm.getName();
-		BufferedReader br = FileUtils.getBR("TouristData/"+city+".csv");
+		BufferedReader br = FileUtils.getBR("Tourist/"+city+".csv");
 		if(br == null) {
-			TouristData.process(city,null);
-			br = FileUtils.getBR("TouristData/"+city+".csv");
+			Logger.logln("Run TouristData4Analysis first!");
+			System.exit(0);
 		}
 		
 		Map<String,Double> sd = new HashMap<String,Double>();
