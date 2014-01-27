@@ -24,7 +24,6 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	public UsersCSVCreator(String usersListFile) {
-		
 		if(!new File(usersListFile).exists()) {
 			Logger.logln(usersListFile+" Does not exist!");
 			Logger.logln("You must get the list of usesr by running one of the pls_parser.User* classes!");

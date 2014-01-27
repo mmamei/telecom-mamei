@@ -37,13 +37,14 @@ public class KMLPath {
 		kml.printHeaderDocument(out, "trace");
 	}
 	
+	static NetworkMap nm =  NetworkMapFactory.getNetworkMap();
 	public static void print(String username, List<PlsEvent> plsEvents) {
 		kml.printFolder(out, username);
 		List<PlsEvent> s = plsEvents;//FilterAndCounterUtils.smooth(plsEvents);
 		Map<String,List<PlsEvent>> evPerDay = splitByDay(s);
 		
 		
-		NetworkMap nm =  NetworkMapFactory.getNetworkMap();
+		
 		
 		kml.printFolder(out, "cells");
 		for(String day: evPerDay.keySet()) {
@@ -158,10 +159,10 @@ public class KMLPath {
 	
 	
 	private static List<PlsEvent> getDataFormUserEventCounterCellacXHour(String file, String username) throws Exception {
-		List<PlsEvent> l = null;
 		// read the UserEventCounterCellacXHour file ti find the line corresponding to the user being looked for.
 		// parse that line to create the List<PlsEvent> object
 		
+		List<PlsEvent> l = null;
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+file);
 		if(br == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
@@ -170,26 +171,33 @@ public class KMLPath {
 		String line;
 		while((line=br.readLine())!=null) 
 			if(line.startsWith(username)) {
-					String[] el = line.split(",");
-					String imsi = el[1];
-					l = new ArrayList<PlsEvent>();
-					for(int i=5;i<el.length;i++) {
-						String[] pls = el[i].split(":"); // 2013-3-27:Sat:19:1972908327
-						String[] ymd = pls[0].split("-");
-						int y = Integer.parseInt(ymd[0]);
-						int m = Integer.parseInt(ymd[1]);
-						int d = Integer.parseInt(ymd[2]);
-						int h = Integer.parseInt(pls[2]);
-						Calendar cal = new GregorianCalendar(y,m,d,h,0,0);
-						String timestamp = ""+cal.getTimeInMillis();
-						long celllac = Long.parseLong(pls[3]);
-						PlsEvent pe = new PlsEvent(username,imsi,celllac,timestamp);
-						l.add(pe);
-						//Logger.logln(pe.toString());
-					}
-					break;
+				l = getDataFormUserEventCounterCellacXHourLine(line);
+				break;
 			}
 		br.close();
+		return l;
+	}
+	
+	public static List<PlsEvent> getDataFormUserEventCounterCellacXHourLine(String line) {
+		List<PlsEvent> l = null;
+		String[] el = line.split(",");
+		String username = el[0];
+		String imsi = el[1];
+		l = new ArrayList<PlsEvent>();
+		for(int i=5;i<el.length;i++) {
+			String[] pls = el[i].split(":"); // 2013-3-27:Sat:19:1972908327
+			String[] ymd = pls[0].split("-");
+			int y = Integer.parseInt(ymd[0]);
+			int m = Integer.parseInt(ymd[1]);
+			int d = Integer.parseInt(ymd[2]);
+			int h = Integer.parseInt(pls[2]);
+			Calendar cal = new GregorianCalendar(y,m,d,h,0,0);
+			String timestamp = ""+cal.getTimeInMillis();
+			long celllac = Long.parseLong(pls[3]);
+			PlsEvent pe = new PlsEvent(username,imsi,celllac,timestamp);
+			l.add(pe);
+			//Logger.logln(pe.toString());
+		}
 		return l;
 	}
 	
