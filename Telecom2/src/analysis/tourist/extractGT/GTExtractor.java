@@ -1,32 +1,37 @@
 package analysis.tourist.extractGT;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
+import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
 import area.Placemark;
 
-public class Extractor {
+public class GTExtractor {
 	
+	
+	public static final String CLASSES = "Resident,Tourist,Commuter,Transit";
 	
 	//static final String FILE = "UserEventCounter/file_pls_fi_Firenze_cellXHour_cellXHour.csv";
 	//static final String PLACEMARK = "Firenze";
 	
 	
-	static final String FILE = "UserEventCounter/file_pls_ve_Venezia_cellXHour.csv";
-	static final String PLACEMARK = "Venezia";
+	static final String FILE = "UserEventCounter/file_pls_fi_Firenze_cellXHour.csv";
+	static final String PLACEMARK = "Firenze";
 	
 	public static void main(String[] args) throws Exception {
-		
 		
 		String line;
 		BufferedReader br = FileUtils.getBR(FILE);
@@ -41,16 +46,15 @@ public class Extractor {
 		List<CalCell> list;
 		
 		Placemark placemark = Placemark.getPlacemark(PLACEMARK);
-		Profile residentP = new Resident(placemark);
-		Profile touristP = new Tourist(placemark);
-		Profile commuterP = new Commuter(placemark);
-		Profile transitP = new Transit(placemark);
 		
-		Set<String> residents = new HashSet<String>();
-		Set<String> tourists = new HashSet<String>();
-		Set<String> commuters = new HashSet<String>();
-		Set<String> transits = new HashSet<String>();
+		Map<String,Profile> mp = new HashMap<String,Profile>(); // map profiles
+		mp.put("Resident", new Resident(placemark));
+		mp.put("Tourist", new Tourist(placemark));
+		mp.put("Commuter", new Commuter(placemark));
+		mp.put("Transit", new Transit(placemark));
 		
+		Map<String,String> mu = new HashMap<String,String>(); // user profile
+			
 		int n_total = 0;
 		
 		// read header
@@ -77,44 +81,23 @@ public class Extractor {
 					list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
 				}
 				
-				boolean isResident = residentP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-				boolean isTourist = touristP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-				boolean isCommuter = commuterP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-				boolean isTransit = transitP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
 				
-				if(isResident) residents.add(user_id);
-				else if(isTourist) tourists.add(user_id);
-				else if(isCommuter) commuters.add(user_id);
-				else if(isTransit)  transits.add(user_id);
-				
+				for(String prof: mp.keySet()) {
+					if(mp.get(prof).check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days))
+						mu.put(user_id, prof);
+				}
+								
 				n_total ++;
 			} catch(Exception e) {
 				System.err.println(line);
 			}
 		}
 		
-		save(PLACEMARK+"_Residents.csv",residents);
-		save(PLACEMARK+"_Tourists.csv",tourists);
-		save(PLACEMARK+"_Commuters.csv",commuters);
-		save(PLACEMARK+"_Transits.csv",transits);
-		
-		Logger.logln("N. RESIDENTS = "+residents.size());
-		Logger.logln("N. TOURISTS = "+tourists.size());
-		Logger.logln("N. COMMUTERS = "+commuters.size());
-		Logger.logln("N. IN TRANSIT = "+transits.size());	
-		Logger.logln("N. TOTAL = "+n_total);	
-		
-		
-		
-	}
-	
-	
-	public static void save(String name, Set<String> set) {
-		PrintWriter pw = FileUtils.getPW("TouristData/GT", name);
-		for(String u: set)
-			pw.println(u);
+		PrintWriter pw = FileUtils.getPW("Tourist", PLACEMARK+"_gt_profiles.csv");
+		for(String user: mu.keySet())
+			pw.println(user+","+mu.get(user));
 		pw.close();
-	}
-	
-	
+		
+		CopyAndSerializationUtils.save(new File(FileUtils.getFileS("Tourist")+"/"+PLACEMARK+"_gt_profiles.ser"), mu);
+	}	
 }
