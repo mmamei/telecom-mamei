@@ -57,36 +57,40 @@ public class Extractor {
 		line = br.readLine();
 		int tot_days = Integer.parseInt(line.substring(line.indexOf("=")+1).trim());
 		
-		while((line = br.readLine())!=null) {		
-			String[] p = line.split(",");
-			user_id = p[0];
-			mnt = p[1];
-			num_pls = Integer.parseInt(p[2]);
-			num_days = Integer.parseInt(p[3]);
-			days_interval = Integer.parseInt(p[4]);
-			list = new ArrayList<CalCell>();
-			// 2013-5-23:Sun:13:4018542484
-			for(int i=5;i<p.length;i++) {
-				String[] x = p[i].split(":|-");
-				int y = Integer.parseInt(x[0]);
-				int m = Integer.parseInt(x[1]);
-				int d = Integer.parseInt(x[2]);
-				int h = Integer.parseInt(x[4]);
-				NetworkCell nc = nm.get(Long.parseLong(x[5]));
-				list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
+		while((line = br.readLine())!=null) {	
+			try {
+				String[] p = line.split(",");
+				user_id = p[0];
+				mnt = p[1];
+				num_pls = Integer.parseInt(p[2]);
+				num_days = Integer.parseInt(p[3]);
+				days_interval = Integer.parseInt(p[4]);
+				list = new ArrayList<CalCell>();
+				// 2013-5-23:Sun:13:4018542484
+				for(int i=5;i<p.length;i++) {
+					String[] x = p[i].split(":|-");
+					int y = Integer.parseInt(x[0]);
+					int m = Integer.parseInt(x[1]);
+					int d = Integer.parseInt(x[2]);
+					int h = Integer.parseInt(x[4]);
+					NetworkCell nc = nm.get(Long.parseLong(x[5]));
+					list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
+				}
+				
+				boolean isResident = residentP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+				boolean isTourist = touristP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+				boolean isCommuter = commuterP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+				boolean isTransit = transitP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
+				
+				if(isResident) residents.add(user_id);
+				else if(isTourist) tourists.add(user_id);
+				else if(isCommuter) commuters.add(user_id);
+				else if(isTransit)  transits.add(user_id);
+				
+				n_total ++;
+			} catch(Exception e) {
+				System.err.println(line);
 			}
-			
-			boolean isResident = residentP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-			boolean isTourist = touristP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-			boolean isCommuter = commuterP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-			boolean isTransit = transitP.check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days);
-			
-			if(isResident) residents.add(user_id);
-			else if(isTourist) tourists.add(user_id);
-			else if(isCommuter) commuters.add(user_id);
-			else if(isTransit)  transits.add(user_id);
-			
-			n_total ++;
 		}
 		
 		save(PLACEMARK+"_Residents.csv",residents);

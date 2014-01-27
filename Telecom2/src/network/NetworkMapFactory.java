@@ -33,7 +33,7 @@ public class NetworkMapFactory {
 	}
 	
 	
-	public static String findClosestNetworkFile(String target_cal_string) {
+	private static String findClosestNetworkFile(String target_cal_string) {
 		
 		target_cal_string = target_cal_string.split(" ")[0];
 		
@@ -65,21 +65,33 @@ public class NetworkMapFactory {
 	}
 
 	
-	public static NetworkMap getNetworkMap() {
-		String pls = getPLS(Config.getInstance().pls_folder);
-		//PLS1541501_1371830346828.zip
-		Calendar cal = new GregorianCalendar();
-		cal.setTimeInMillis(Long.parseLong(pls.substring(pls.lastIndexOf("_")+1, pls.indexOf(".zip"))));
-		return getNetworkMap(F.format(cal.getTime()));
-	}
-	
-	private static String getPLS(String dir) {
+	private static long first = Long.MAX_VALUE;;
+	private static long last = 0;
+	private static Calendar getBestTime(String dir) {
 		File[] files = new File(dir).listFiles();
 		for(File f: files) {
-			if(f.isDirectory()) return getPLS(f.getAbsolutePath());
-			else return f.getName();
+			if(f.isDirectory()) return getBestTime(f.getAbsolutePath());
+			else {
+				long time = Long.parseLong(f.getName().substring(f.getName().lastIndexOf("_")+1, f.getName().indexOf(".zip")));
+				if(time < first) first = time;
+				if(time > last) last = time;
+			}
 		}
-		return null;
+		
+		long config_first = Config.getInstance().pls_start_time.getTimeInMillis() ;
+		long config_last = Config.getInstance().pls_end_time.getTimeInMillis() ;
+		
+		if(config_first > first) first = config_first;
+		if(config_last < last) last = config_last;
+
+		Calendar cal = new GregorianCalendar();
+		cal.setTimeInMillis((first+last)/2);
+		//System.out.println(cal.getTime());
+		return cal;
+	}
+	
+	public static NetworkMap getNetworkMap() {
+		return getNetworkMap(getBestTime(Config.getInstance().pls_folder));
 	}
 	
 	

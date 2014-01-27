@@ -32,10 +32,6 @@ public class TouristClassify {
 		//createTrainingSet(city, skip, train_n);
 	}
 	
-	
-	
-	
-	
 	public static int createTrainingSet(String city, int skip, int max_num_per_class) throws Exception {
 		int how_many_read = 0;
 		int[] how_many_samples_per_class = new int[2];

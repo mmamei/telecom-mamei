@@ -28,22 +28,25 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		super(placemark_name,user_list_name);
 		users_info = new HashMap<String,UserInfo>();
 	}
-
+	
+	
+	UserInfo info;
+	String day,dayw;
 	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal,String header) {
-		UserInfo info = users_info.get(username);
+		info = users_info.get(username);
 		if(info == null) {
 			info = new UserInfo();
 			info.imsi = imsi;
 			users_info.put(username, info);
 		}
-		String day = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH);
-		String dayw = DAY_WEEK[cal.get(Calendar.DAY_OF_WEEK)];
+		day = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH);
+		dayw = DAY_WEEK[cal.get(Calendar.DAY_OF_WEEK)];
 		info.add(day,dayw,cal.get(Calendar.HOUR_OF_DAY),celllac);
 	}
 	
-	
+	Set<String> days;
 	private int getTotDays() {
-		Set<String> days = new HashSet<String>();
+		days = new HashSet<String>();
 		for(UserInfo ui:users_info.values()) {
 			days.addAll(ui.getDays());
 		}
@@ -60,7 +63,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,FileUtils.getFileS("UserSetCreator/Venezia.csv"));
+		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,FileUtils.getFileS("UserSetCreator/Firenze.csv"));
 		ba.run();
 		Logger.logln("Done!");
 	}	
@@ -88,11 +91,12 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	
 	private class UserInfo {
 		
-		String imsi;
-		List<String> pls = new ArrayList<String>();
+		private String imsi;
+		private List<String> pls = new ArrayList<String>();
 		
+		String s;
 		public void add(String day, String dayw, int h, String cellac) {
-			String s = day+":"+dayw+":"+h+":"+celllac;
+			s = day+":"+dayw+":"+h+":"+celllac;
 			if(!pls.contains(s)) pls.add(s);
 		}
 		

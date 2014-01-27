@@ -46,7 +46,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 	String celllac;
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
-	
+	StringBuffer sb;
 	public void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
@@ -56,7 +56,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 		
 		if(!cevent.spot.contains(celllac)) return;
 		
-		StringBuffer sb = user_locations.get(username);
+		sb = user_locations.get(username);
 		if(sb == null) {
 			sb = new StringBuffer();
 			user_locations.put(username, sb);
@@ -80,6 +80,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 					out.println(un+","+loc);
 			}
 			out.close();
+			
 		}catch(Exception e) {
 			e.printStackTrace();
 		}

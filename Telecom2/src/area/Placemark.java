@@ -258,13 +258,13 @@ public class Placemark {
 	public static final int STEP = 100;
 	public static void main(String[] args) throws Exception {
 		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
-		initPlacemaks();
-		NetworkMap nm = NetworkMapFactory.getNetworkMap();
-		Placemark p = PLACEMARKS.get("Venezia");
-		System.out.println(p.getNumCells());
-		System.out.println(p.contains("4018584023"));
-		System.out.println(nm.get(Long.parseLong("4018584023")));
-		String f = FileUtils.getFileS("Placemark")+"/"+p.name+".kml";
+		//initPlacemaks();
+		//NetworkMap nm = NetworkMapFactory.getNetworkMap();
+		Placemark p = getPlacemark("Venezia");
+		//System.out.println(p.getNumCells());
+		//System.out.println(p.contains("4018584023"));
+		//System.out.println(nm.get(Long.parseLong("4018584023")));
+		String f = FileUtils.create("Placemark").getAbsolutePath()+"/"+p.name+".kml";
 		System.out.println(f);
 		p.printKML(f);
 		

@@ -54,10 +54,10 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 		}
 	}
 	
-	
+	Config c = Config.getInstance();
+	String p ;
 	public String getString() {
-		Config c = Config.getInstance();
-		String p = placemark == null ? c.pls_folder.substring(c.pls_folder.lastIndexOf("/")+1) : placemark_name;
+		p = placemark == null ? c.pls_folder.substring(c.pls_folder.lastIndexOf("/")+1) : placemark_name;
 		if(user_list == null)
 			return p;
 		else {
@@ -73,12 +73,10 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	String celllac;
 	long timestamp;
 	Calendar cal = new GregorianCalendar();
-	
 	String header = null;
-	
-	
-	
 	NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	boolean check_users;
+	boolean check_placemark;
 	
 	public void analyze(String line) {
 	
@@ -98,8 +96,8 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 			if(nm.get(Long.parseLong(celllac)) == null) return;
 			
 			
-			boolean check_users = user_list == null || user_list.contains(username);
-			boolean check_placemark = placemark == null || placemark.contains(celllac);
+			check_users = user_list == null || user_list.contains(username);
+			check_placemark = placemark == null || placemark.contains(celllac);
 			
 			if(check_users && check_placemark)
 				analyze(username,imsi,celllac,timestamp,cal,header);

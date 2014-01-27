@@ -33,7 +33,7 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	
 	
 	public static void main(String[] args) {
-		BufferAnalyzerConstrained ba = new UserSetCreator("Venezia",null);
+		BufferAnalyzerConstrained ba = new UserSetCreator("Firenze",null);
 		ba.run();
 		Logger.logln("Done!");
 	}
