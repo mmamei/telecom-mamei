@@ -12,9 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import network.NetworkCell;
+import network.NetworkMap;
+import network.NetworkMapFactory;
 import utils.Colors;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
+import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
 
@@ -22,9 +26,12 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class RegionMap implements Serializable {
-		
+	
+	private transient static NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	
 	private String name;
 	private Map<String,Region> rm;
 	
@@ -79,6 +86,57 @@ public class RegionMap implements Serializable {
 		}
 		
 		return null;		
+	}
+	
+	private static transient Map<Long,float[]> cache_intersection = new HashMap<Long,float[]>();
+	public float[] computeAreaIntersection(long celllac) {
+		float[] area_intersection = cache_intersection.get(celllac);
+		if(area_intersection != null) return area_intersection;
+		
+		area_intersection = new float[this.getNumRegions()];
+		NetworkCell nc = nm.get(celllac);
+		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
+		double ca = Math.PI * Math.pow(nc.getRadius(),2);
+		int i=0;
+		for(Region r: this.getRegions()) {
+			Geometry a = r.getGeom().intersection(circle);
+			area_intersection[i] = (float)(GeomUtils.geoArea(a)/ca);
+			i++;
+		}
+		
+		// normailze to 1
+		float sum = 0;
+		for(float f: area_intersection)
+			sum += f;
+		for(i=0; i<area_intersection.length;i++)
+			area_intersection[i] = area_intersection[i] / sum;
+		
+		cache_intersection.put(celllac, area_intersection);
+		
+		return area_intersection;
+	}
+	
+	private static transient Map<Long,Region> cache_closest = new HashMap<Long,Region>();
+	public Region getClosest(long celllac) {
+		Region reg = cache_closest.get(celllac);
+		if(reg != null) return reg;
+		
+		Region closest = null;
+		float max_intersection = 0;
+		NetworkCell nc = nm.get(celllac);
+		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
+		double ca = Math.PI * Math.pow(nc.getRadius(),2);
+		for(Region r: this.getRegions()) {
+			Geometry a = r.getGeom().intersection(circle);
+			float area = (float)(GeomUtils.geoArea(a)/ca);
+			if(area > max_intersection) {
+				max_intersection = area;
+				closest = r;
+			}
+		}
+		cache_closest.put(celllac, closest);
+		
+		return closest;
 	}
 	
 	

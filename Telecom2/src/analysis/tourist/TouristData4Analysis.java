@@ -109,7 +109,7 @@ public class TouristData4Analysis implements Serializable {
 		DM.put("Sat", 5);
 		DM.put("Sun", 6);
 	}
-	static transient Map<Long,float[]> cache_intersection = new HashMap<Long,float[]>();
+	
 	static transient NetworkMap nm = NetworkMapFactory.getNetworkMap();
 	
 	
@@ -149,7 +149,7 @@ public class TouristData4Analysis implements Serializable {
 		num_days = Integer.parseInt(p[3]);
 		days_interval = Integer.parseInt(p[4]);
 		plsMatrix = new float[7][24][map.getNumRegions()];
-		
+		float[] ai;
 		for(int i=5;i<p.length;i++) {
 			try {
 				// 2013-5-23:Sun:13:4018542484
@@ -157,12 +157,7 @@ public class TouristData4Analysis implements Serializable {
 				int day = DM.get(x[1]);
 				int h = Integer.parseInt(x[2]);
 				long celllac =Long.parseLong(x[3]);
-				float[] ai = cache_intersection.get(celllac);
-				if(ai == null) {
-					ai = computeAreaIntersection(celllac,map);
-					cache_intersection.put(celllac, ai);
-				}
-				
+				ai = map.computeAreaIntersection(celllac);
 				for(int k=0; k<ai.length;k++) 
 					plsMatrix[day][h][k] += ai[k];
 			} catch(Exception e) {
@@ -318,28 +313,7 @@ public class TouristData4Analysis implements Serializable {
 
 	
 	
-	public static float[] computeAreaIntersection(long celllac, RegionMap map) {
-		float[] area_intersection = new float[map.getNumRegions()];
-		NetworkCell nc = nm.get(celllac);
-		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
-		double ca = Math.PI * Math.pow(nc.getRadius(),2);
-		int i=0;
-		for(Region r: map.getRegions()) {
-			Geometry a = r.getGeom().intersection(circle);
-			area_intersection[i] = (float)(GeomUtils.geoArea(a)/ca);
-			i++;
-		}
-		
-		// normailze to 1
-		float sum = 0;
-		for(float f: area_intersection)
-			sum += f;
-		for(i=0; i<area_intersection.length;i++)
-			area_intersection[i] = area_intersection[i] / sum;
-		
-		
-		return area_intersection;
-	}
+	
 	
 	
 	
