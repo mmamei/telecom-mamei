@@ -1,10 +1,12 @@
 package visual.kml;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -14,6 +16,7 @@ import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
+import utils.FileUtils;
 import utils.FilterAndCounterUtils;
 import utils.Logger;
 import analysis.PlsEvent;
@@ -154,10 +157,56 @@ public class KMLPath {
 	}
 	
 	
+	private static List<PlsEvent> getDataFormUserEventCounterCellacXHour(String file, String username) throws Exception {
+		List<PlsEvent> l = null;
+		// read the UserEventCounterCellacXHour file ti find the line corresponding to the user being looked for.
+		// parse that line to create the List<PlsEvent> object
+		
+		BufferedReader br = FileUtils.getBR("UserEventCounter/"+file);
+		if(br == null) {
+			Logger.logln("Launch UserEventCounterCellacXHour first!");
+			System.exit(0);
+		}
+		String line;
+		while((line=br.readLine())!=null) 
+			if(line.startsWith(username)) {
+					String[] el = line.split(",");
+					String imsi = el[1];
+					l = new ArrayList<PlsEvent>();
+					for(int i=5;i<el.length;i++) {
+						String[] pls = el[i].split(":"); // 2013-3-27:Sat:19:1972908327
+						String[] ymd = pls[0].split("-");
+						int y = Integer.parseInt(ymd[0]);
+						int m = Integer.parseInt(ymd[1]);
+						int d = Integer.parseInt(ymd[2]);
+						int h = Integer.parseInt(pls[2]);
+						Calendar cal = new GregorianCalendar(y,m,d,h,0,0);
+						String timestamp = ""+cal.getTimeInMillis();
+						long celllac = Long.parseLong(pls[3]);
+						PlsEvent pe = new PlsEvent(username,imsi,celllac,timestamp);
+						l.add(pe);
+						//Logger.logln(pe.toString());
+					}
+					break;
+			}
+		br.close();
+		return l;
+	}
+	
+	
 	public static void main(String[] args) throws Exception {
-		openFile(Config.getInstance().base_dir+"/test.kml");
-		List<PlsEvent> data = PlsEvent.readEvents(new File(Config.getInstance().base_dir+"/UsersCSVCreator/test/164e6218294db749859bfffc798c5a51ba31262f6cfd7ab1e4e27d134789ba.csv"));
-		print("164e6218294db749859bfffc798c5a51ba31262f6cfd7ab1e4e27d134789ba",data);
+		openFile(FileUtils.create("TouristData").getAbsolutePath()+"/test.kml");
+		
+		/*
+		String user = "164e6218294db749859bfffc798c5a51ba31262f6cfd7ab1e4e27d134789ba";
+		List<PlsEvent> data = PlsEvent.readEvents(new File(Config.getInstance().base_dir+"/UsersCSVCreator/test/"+user+".csv"));
+		*/
+		
+		String user = "6f73f1939cbec78c2aa4d8da3ed44da8ed0357b46ccee4439836ec6fb7b90fe";
+		List<PlsEvent> data = getDataFormUserEventCounterCellacXHour("file_pls_fi_Firenze_cellXHour.csv",user);
+		
+		print(user,data);
+		
 		closeFile();
 		Logger.logln("Done!");
 	}

@@ -24,7 +24,7 @@ import visual.kml.KMLHeatMap;
 import area.region.Region;
 import area.region.RegionMap;
 
-public class TouristActivity {
+public class TouristAggregateActivity {
 	
 	public static final int TIM = 0;
 	public static final int ROAMING = 1;

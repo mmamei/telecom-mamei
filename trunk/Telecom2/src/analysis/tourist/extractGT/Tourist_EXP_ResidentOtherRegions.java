@@ -1,4 +1,4 @@
-package analysis.tourist;
+package analysis.tourist.extractGT;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,7 +13,7 @@ import java.util.Map;
 import utils.FileUtils;
 import utils.Logger;
 
-public class TouristTest {
+public class Tourist_EXP_ResidentOtherRegions {
 	
 	
 	static Map<String,String> R2F_SUFFIX = new HashMap<String,String>(); // region to file
