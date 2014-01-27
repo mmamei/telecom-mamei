@@ -20,9 +20,6 @@ public class Transit extends Profile {
 	}
 
 	boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<CalCell> list, int tot_days) {
-		if(user_id.equals("736c7a483ea0c5882241e7b4751e6f51e9a381c05823ad7234a8fb6b3ca997"))
-			System.out.println("here");
-		
 		return isTransit(list);
 	}	
 	
