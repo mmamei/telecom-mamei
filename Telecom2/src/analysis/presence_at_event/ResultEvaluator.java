@@ -27,9 +27,9 @@ public class ResultEvaluator {
 
 	public static boolean LEAVE_ONE_OUT = true;
 	public static boolean PIECEWISE = false;
-	public static int PIECE_SIZE = 6000;
+	public static int PIECE_SIZE = 6;
 	
-	public static boolean RANGE = false;
+	public static boolean RANGE = true;
 	public static int RANGE_TH = 10000;
 	
 	

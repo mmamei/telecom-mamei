@@ -35,12 +35,12 @@ import area.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	
-	public static final boolean PLOT = false;
+	public static final boolean PLOT = true;
 	public static final boolean CALL_PRESENCE_COUNTER_AFTERWARDS = !PLOT;
 	public static final boolean NORMALIZE_SPATIALLY = true;
 	public static final boolean DIFF = false;
 	public static final boolean USE_INDIVIDUAL_EVENT = true;
-	public static final int MAX_R = 1500;
+	public static final int MAX_R = 1400;
 	public static final int MIN_R = -500;
 	public static final int STEP = 100;
 	
