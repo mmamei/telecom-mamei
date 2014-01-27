@@ -17,7 +17,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 
-public class CreatorRegionMapCity2 {
+public class CreatorRegionMapCityGrid {
 	
 	
 	public static void main(String[] args) throws Exception {
@@ -70,7 +70,7 @@ public class CreatorRegionMapCity2 {
 		}
 		
 			
-		File f = FileUtils.getFile("RegionMap");
+		File f = FileUtils.create("RegionMap");
 		CopyAndSerializationUtils.save(new File(f.getAbsolutePath()+"/"+city+".ser"), rm);
 	}
 }
