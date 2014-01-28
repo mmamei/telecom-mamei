@@ -32,7 +32,10 @@ import cc.mallet.types.InstanceList;
 import cc.mallet.types.LabelSequence;
 
 public class TopicModel {
-
+	
+	static final DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
+    
+	
     public static void main(String[] args) throws Exception {
     	//String file = FileUtils.getFileS("Topic")+"/ap.txt";
     	//String stop = FileUtils.getFileS("Topic")+"/en.txt";
@@ -87,17 +90,13 @@ public class TopicModel {
         
         System.out.println("Should be proportional to topic importance p(z) ??");
         System.out.print("ALPHA = ");
-        double s = 0;
-        for(double a: model.alpha) {
-        	System.out.print(a/model.alphaSum+" ");
-        	s += a;
-        }
+        for(double a: model.alpha) 
+        	System.out.print(F.format(a/model.alphaSum)+" ");
         
-        model.printTopWords(new File("G:/BASE/Topic/printTopWords.txt"),4,true);
-        model.printTopicWordWeights(new File("G:/BASE/Topic/printTopicWordWeights.txt")); 
-        model.printDocumentTopics(new File("G:/BASE/Topic/printDocumentTopics.txt"));
+        //model.printTopWords(new File("G:/BASE/Topic/printTopWords.txt"),4,true);
+        //model.printTopicWordWeights(new File("G:/BASE/Topic/printTopicWordWeights.txt")); 
+        //model.printDocumentTopics(new File("G:/BASE/Topic/printDocumentTopics.txt"));
         
-        DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
         
         System.out.println("\n-----------------------------------------------\n");
         System.out.println("getTopicProbabilities (this is equvalent to printDocumentTopics)");
@@ -110,6 +109,23 @@ public class TopicModel {
         	}
         	System.out.println();
         }
+        
+        System.out.println("\n-----------------------------------------------\n");
+        System.out.println("Probablity of topics. p(z_j) = sum_i(p(z_j|d_i))");
+        double[] alpha2 = new double[model.numTopics];
+        
+        double alpha2_sum = 0;
+        for(int i=0; i<instances.size();i++) {
+        	double[] prob = model.getTopicProbabilities(i);
+        	for(int j=0; j<alpha2.length;j++) {
+        		alpha2[j] += prob[j]; 
+        		alpha2_sum += prob[j]; // normalization
+        	}	
+        }
+        System.out.print("ALPHA2 = ");
+        for(double a: alpha2) 
+        	System.out.print(F.format(a/alpha2_sum)+" ");
+        
         
         System.out.println("\n-----------------------------------------------\n");
         System.out.println("getSortedWords (this is equvalent to printTopicWordWeights)");
