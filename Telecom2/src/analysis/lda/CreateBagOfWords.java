@@ -15,7 +15,7 @@ import visual.kml.KMLPath;
 import area.region.Region;
 import area.region.RegionMap;
 
-public class TestLDA {
+public class CreateBagOfWords {
 	public static final boolean KML = true;
 	public static int MIN_DAYS = 14;
 	public static int MIN_PLS = 200;
@@ -35,12 +35,12 @@ public class TestLDA {
 			process(line);
 			cont ++;
 			if(cont % 1000 == 0) Logger.log(".");
-			if(cont % 10000 == 0) Logger.logln("");
+			if(cont % 100000 == 0) Logger.logln("");
 		}
 		
 		br.close();
 		if(KML) KMLPath.closeFile();
-		Logger.logln("Done!");
+		Logger.logln("\nDone!");
 	}
 	
 	
@@ -72,7 +72,7 @@ public class TestLDA {
 		for(int i=5;i<p.length;i++) {
 			// 2013-5-23:Sun:13:4018542484
 			String[] x = p[i].split(":");
-			String day = x[0]+":"+x[1];
+			String day = x[0]+"-"+x[1];
 			int h = Integer.parseInt(x[2]);
 			long celllac =Long.parseLong(x[3]);
 			Region r = rm.getClosest(celllac);

@@ -1,28 +1,40 @@
 package analysis.lda;
 
-import cc.mallet.util.*;
-import cc.mallet.types.*;
-import cc.mallet.pipe.*;
-import cc.mallet.pipe.iterator.*;
-import cc.mallet.topics.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
-import java.util.*;
-import java.util.regex.*;
-import java.io.*;
-
-import utils.Config;
+import cc.mallet.pipe.CharSequence2TokenSequence;
+import cc.mallet.pipe.CharSequenceLowercase;
+import cc.mallet.pipe.Pipe;
+import cc.mallet.pipe.SerialPipes;
+import cc.mallet.pipe.TokenSequence2FeatureSequence;
+import cc.mallet.pipe.TokenSequenceRemoveStopwords;
+import cc.mallet.pipe.iterator.CsvIterator;
+import cc.mallet.topics.ParallelTopicModel;
+import cc.mallet.types.Alphabet;
+import cc.mallet.types.FeatureSequence;
+import cc.mallet.types.IDSorter;
+import cc.mallet.types.InstanceList;
+import cc.mallet.types.LabelSequence;
+import utils.FileUtils;
 
 public class TopicModel {
 
     public static void main(String[] args) throws Exception {
-    	//String file = "C:/BASE/Topic/ap.txt";
-    	//String stop = "C:/BASE/Topic/en.txt";
+    	//String file = FileUtils.getFileS("Topic")+"/ap.txt";
+    	//String stop = FileUtils.getFileS("Topic")+"/en.txt";
     	
-    	
-    	String file = "C:/BASE/Topic/Venezia/5f3b21f24e1f9159632a3eff02b5bf023646ef46fea17ee73285eea530e7.txt";
-    	String stop = null;//"C:/BASE/Topic/en.txt";
-    	
-    	
+    	String user = "5f3b21f24e1f9159632a3eff02b5bf023646ef46fea17ee73285eea530e7";
+    	String file = FileUtils.getFileS("Topic/Venezia")+"/"+user+".txt";
+    	String stop = null;
     	run(file,stop);
     }
     
@@ -35,21 +47,24 @@ public class TopicModel {
 
         // Pipes: lowercase, tokenize, remove stopwords, map to features
         pipeList.add( new CharSequenceLowercase() );
-        pipeList.add( new CharSequence2TokenSequence(Pattern.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")) );
+        pipeList.add( new CharSequence2TokenSequence(Pattern.compile("\\S+")) );
         if(stop != null) pipeList.add( new TokenSequenceRemoveStopwords(new File(stop), "UTF-8", false, false, false) );
         pipeList.add( new TokenSequence2FeatureSequence() );
 
         InstanceList instances = new InstanceList (new SerialPipes(pipeList));
-
+        
+       
+        
         Reader fileReader = new InputStreamReader(new FileInputStream(new File(file)), "UTF-8");
         instances.addThruPipe(new CsvIterator (fileReader, Pattern.compile("^(\\S*)[\\s,]*(\\S*)[\\s,]*(.*)$"),
                                                3, 2, 1)); // data, label, name fields
 
+        
         // Create a model with 100 topics, alpha_t = 0.01, beta_w = 0.01
         //  Note that the first parameter is passed as the sum over topics, while
         //  the second is the parameter for a single dimension of the Dirichlet prior.
         int numTopics = 10;
-        ParallelTopicModel model = new ParallelTopicModel(numTopics, 1.0, 0.01);
+        ParallelTopicModel model = new ParallelTopicModel(numTopics, 1.0, 0.1);
 
         model.addInstances(instances);
 
@@ -65,6 +80,7 @@ public class TopicModel {
         // Show the words and topics in the first instance
         // The data alphabet maps word IDs to strings
         Alphabet dataAlphabet = instances.getDataAlphabet();
+        
         
         FeatureSequence tokens = (FeatureSequence) model.getData().get(0).instance.getData();
         LabelSequence topics = model.getData().get(0).topicSequence;
