@@ -72,7 +72,7 @@ public class TopicModel {
         // Create a model with 100 topics, alpha_t = 0.01, beta_w = 0.01
         //  Note that the first parameter is passed as the sum over topics, while
         //  the second is the parameter for a single dimension of the Dirichlet prior.
-        int numTopics = 10;
+        int numTopics = 5;
         ParallelTopicModel.logger.setLevel(Level.OFF);
         ParallelTopicModel model = new ParallelTopicModel(numTopics, 50/numTopics, 0.01);
         
@@ -103,11 +103,12 @@ public class TopicModel {
         System.out.println("p(z_j|d_i)   sum_j(p(z_j|d_i)) = 1");
         for(int i=0; i<instances.size();i++) {
         	double[] prob = model.getTopicProbabilities(i);
-        	System.out.print("document "+i+": ");
+        	StringBuffer sb = new StringBuffer();
+        	sb.append(instances.get(i).getName());
         	for(double p: prob) {
-        		System.out.print(F.format(p)+", ");
+        		sb.append(","+F.format(p));
         	}
-        	System.out.println();
+        	System.out.println(sb);
         }
         
         System.out.println("\n-----------------------------------------------\n");
