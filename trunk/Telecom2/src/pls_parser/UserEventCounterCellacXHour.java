@@ -39,9 +39,14 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 			info.imsi = imsi;
 			users_info.put(username, info);
 		}
-		day = cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH);
+		day = cal.get(Calendar.YEAR)+"-"+TwoDigits(cal.get(Calendar.MONTH))+"-"+TwoDigits(cal.get(Calendar.DAY_OF_MONTH));
 		dayw = DAY_WEEK[cal.get(Calendar.DAY_OF_WEEK)];
 		info.add(day,dayw,cal.get(Calendar.HOUR_OF_DAY),celllac);
+	}
+	
+	// convert 1 to 01
+	private String TwoDigits(int x) {
+		return x < 10 ? "0"+x : ""+x; 
 	}
 	
 	Set<String> days;
@@ -58,13 +63,14 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		PrintWriter out = FileUtils.getPW("UserEventCounter", this.getString()+"_cellXHour.csv");
 		out.println("// TOT. DAYS = "+getTotDays());
 		for(String user: users_info.keySet())
-			out.println(user+","+users_info.get(user));
+			if(users_info.get(user).getNumDays() >= 14)
+				out.println(user+","+users_info.get(user));
 		out.close();
 	}
 	
 	public static void main(String[] args) throws Exception {
 		//BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,FileUtils.getFileS("UserSetCreator/Firenze.csv"));
-		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour("Venezia",null);
+		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour("Torino",null);
 		ba.run();
 		Logger.logln("Done!");
 	}	

@@ -43,7 +43,7 @@ public class CreatorRegionMapCityGrid {
 		
 		Placemark p = Placemark.getPlacemark(city);
 		p.changeRadius(p.getR()+1000);
-		int size = 5;
+		int size = 20;
 		double[][] bbox = p.getBBox();
 		
 		SpaceGrid sg = new SpaceGrid(bbox[0][0],bbox[0][1],bbox[1][0],bbox[1][1],size,size);

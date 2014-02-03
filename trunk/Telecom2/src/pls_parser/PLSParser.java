@@ -45,28 +45,26 @@ public class PLSParser {
 	
 	
 	
-	static Map<String,String> allDays = null;
-	static File[] items;
-	static File item;
-	static Calendar begin_cal,end_cal;
-	static String n,key,h;
+	static Map<String,String> allDays = new TreeMap<String,String>();
+	
 	private static void analyzeDirectory(File directory, BufferAnalyzer analyzer) throws Exception{	
-		allDays = new TreeMap<String,String>();
-		items = directory.listFiles();
+		System.out.println(directory.getAbsolutePath());
+		
+		File[] items = directory.listFiles();
 		for(int i=0; i<items.length;i++){
-			item = items[i];
+			File item = items[i];
 			if(item.isFile()) {
-				end_cal = new GregorianCalendar();
-				n = item.getName();
+				Calendar end_cal = new GregorianCalendar();
+				String n = item.getName();
 				end_cal.setTimeInMillis(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))));
 				
-				begin_cal = (Calendar)end_cal.clone();
+				Calendar begin_cal = (Calendar)end_cal.clone();
 				begin_cal.add(Calendar.MINUTE, -30); // a pls file with time T contains events from T-30 min, to T
 				
 				if(end_cal.before(startTime) || begin_cal.after(endTime)) continue;
 				
-				key = end_cal.get(Calendar.DAY_OF_MONTH)+"/"+MONTHS[end_cal.get(Calendar.MONTH)]+"/"+end_cal.get(Calendar.YEAR);
-				h = allDays.get(key);
+				String key = end_cal.get(Calendar.DAY_OF_MONTH)+"/"+MONTHS[end_cal.get(Calendar.MONTH)]+"/"+end_cal.get(Calendar.YEAR);
+				String h = allDays.get(key);
 				allDays.put(key, h==null? end_cal.get(Calendar.HOUR_OF_DAY)+"-" : h+end_cal.get(Calendar.HOUR_OF_DAY)+"-");
 				
 				analyzeFile(item, analyzer);

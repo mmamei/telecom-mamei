@@ -120,7 +120,7 @@ public class KMLPath {
 		kml.closeFolder(out); // close user folder
 	}
 
-	
+	static final String[] DAY_WEEK = new String[]{"0","Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	public static Map<String,List<PlsEvent>> splitByDay(List<PlsEvent> plsEvents ) {
 		Map<String,List<PlsEvent>> eventsPerDay = new TreeMap<String,List<PlsEvent>>();
@@ -130,8 +130,9 @@ public class KMLPath {
 			int d = pe.getCalendar().get(Calendar.DAY_OF_MONTH);
 			int m = pe.getCalendar().get(Calendar.MONTH);
 			int y = pe.getCalendar().get(Calendar.YEAR);
+			int dow = pe.getCalendar().get(Calendar.DAY_OF_WEEK);
 			String k = d < 10 ? "0" : ""; 
-		    k = k + d+"-"+MONTHS[m]+"-"+y;
+		    k = k + d+"-"+MONTHS[m]+"-"+y+"-"+DAY_WEEK[dow];
 			List<PlsEvent> de = eventsPerDay.get(k);
 			if(de == null) 
 				de = new ArrayList<PlsEvent>();
