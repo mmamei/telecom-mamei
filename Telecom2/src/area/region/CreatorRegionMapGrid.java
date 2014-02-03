@@ -9,6 +9,7 @@ import area.CityEvent;
 import area.Placemark;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
+import utils.FileUtils;
 import utils.Logger;
 
 public class CreatorRegionMapGrid {
@@ -16,7 +17,7 @@ public class CreatorRegionMapGrid {
 	public static void main(String[] args) throws Exception {
 	
 		
-		Placemark p = Placemark.getPlacemark("Venezia");
+		Placemark p = Placemark.getPlacemark("Torino");
 		p.changeRadius(p.getR()+1000);
 		run(p.name,p.getBBox(),10);
 		
@@ -32,7 +33,7 @@ public class CreatorRegionMapGrid {
 		
 	public static void run(String name, double[][] bbox, int size) throws Exception {
 		
-		String output_obj_file=Config.getInstance().base_dir+"/RegionMap/"+name+".ser";
+		String output_obj_file=FileUtils.create("RegionMap").getAbsolutePath()+"/"+name+".ser";
 		
 		SpaceGrid sg = new SpaceGrid(bbox[0][0],bbox[0][1],bbox[1][0],bbox[1][1],size,size);
 		

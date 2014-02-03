@@ -58,7 +58,8 @@ public class UserEventCounterDay extends BufferAnalyzerConstrained {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		BufferAnalyzerConstrained ba = new UserEventCounterDay(null,FileUtils.getFileS("UserSetCreator")+"/Firenze.csv");
+		String city = "Torino";
+		BufferAnalyzerConstrained ba = new UserEventCounterDay(null,FileUtils.getFileS("UserSetCreator")+"/"+city+".csv");
 		ba.run();
 		Logger.logln("Done!");
 	}
