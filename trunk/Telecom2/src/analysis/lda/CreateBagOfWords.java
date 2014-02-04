@@ -10,7 +10,7 @@ import utils.FileUtils;
 import utils.Logger;
 import visual.kml.KMLPath;
 import analysis.lda.bow.Bow;
-import analysis.lda.bow.OneDocXTimePeriodMov;
+import analysis.lda.bow.OneDocXDayMov;
 import area.region.RegionMap;
 
 public class CreateBagOfWords {
@@ -18,11 +18,11 @@ public class CreateBagOfWords {
 	public static final int MAX_NUM = 10;
 	public static final int MAX_KML = 10;
 	public static int MIN_DAYS = 30;
-	public static int MIN_PLS = 400;
+	public static int MIN_PLS = 500;
 	
 	
 	public static final String city = "Torino";
-	public static final Bow bow = new OneDocXTimePeriodMov();
+	public static final Bow bow = new OneDocXDayMov();
 	
 	public static void main(String[] args) throws Exception {	
 		

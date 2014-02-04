@@ -44,21 +44,18 @@ public class TopicModel {
 	
 	static boolean TEST = false;
 	
-	public static final int numTopics = 3;
-	public static final int numIterations = 50;
-	
+	public static final int numTopics = 4;
+	public static final int burnin = 10000;
+	public static final int numIterations = 1000;
+	public static final double alpha = 1; // the higher the more topic per document
+	public static final double beta = 1; // the higher the more word per topic
 	
 	static final DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
     
 	
     public static void main(String[] args) throws Exception {
     	
-    	String file = FileUtils.getFileS("Topic")+"/ap.txt";
-    	String stop = FileUtils.getFileS("Topic")+"/en.txt";
-    	run(file,new String[]{stop});
-    	System.exit(0);
-    	
-    	String user = "d5c63b3017f6a17ded9de49750b3297bfdedbc695f5b1853331a10639b7156";
+    	String user = "1b31217a5f116283259cad385b774edeb9323b6781f0f674646bc806519f97";
     	process(CreateBagOfWords.city,CreateBagOfWords.bow.getClass().getSimpleName(),user);
     }
     
@@ -166,16 +163,19 @@ public class TopicModel {
         //  Note that the first parameter is passed as the sum over topics, while
         //  the second is the parameter for a single dimension of the Dirichlet prior.
        
+       
+        
+        
         ParallelTopicModel.logger.setLevel(Level.OFF);
-        ParallelTopicModel model = new ParallelTopicModel(numTopics, 50/numTopics, 0.1);
+        ParallelTopicModel model = new ParallelTopicModel(numTopics,alpha,beta);
         
         
         model.addInstances(instances);
-
+        model.setBurninPeriod(burnin);
         // Use two parallel samplers, which each look at one half the corpus and combine
         //  statistics after every iteration.
         model.setNumThreads(2);
-
+        //model.optimizeInterval = 1000;
         // Run the model for 50 iterations and stop (this is for testing only, 
         //  for real applications, use 1000 to 2000 iterations)
         model.setNumIterations(numIterations);
