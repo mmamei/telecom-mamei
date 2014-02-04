@@ -9,7 +9,7 @@ import analysis.lda.CreateBagOfWords;
 import analysis.lda.TopicModel;
 
 
-public class OneDocXDayMov extends Bow {
+public class OneDocXDayOfWeekMov extends Bow {
 	
 	public static final String[] HP = new String[]{"N","N","N","N","N","N","N","M", 
 		   										   "M","M","M","M","M","M","A","A", 
@@ -20,24 +20,17 @@ public class OneDocXDayMov extends Bow {
 	public  Map<String,List<String>> process(List<TimePlace> tps) {
 		Map<String,List<String>> dailyPatterns = new TreeMap<String,List<String>>();
 		TimePlace last = tps.get(0);
-		
-		int long_trip = 0;
-		
 		for(int i=1; i<tps.size();i++) {
 			TimePlace tp = tps.get(i);
 			
 			boolean tc = last.day.equals(tp.day);
-			boolean sc = dist(tp.rname,last.rname) > 3;
-			
-			if(dist(tp.rname,last.rname) > 3)
-				long_trip ++;
+			boolean sc = dist(tp.rname,last.rname) > 2;
 			
 			if(tc && sc) {
-				String key = tp.dow+"-"+tp.day;
-				List<String> d = dailyPatterns.get(key);
+				List<String> d = dailyPatterns.get(tp.dow);
 				if(d == null) {
 					d = new ArrayList<String>();
-					dailyPatterns.put(key, d);
+					dailyPatterns.put(tp.dow, d);
 				}
 				d.add(HP[last.h]+"-"+last.rname+"->"+HP[tp.h]+"-"+tp.rname);
 				//d.add(last.rname+"->"+tp.rname);
@@ -45,9 +38,18 @@ public class OneDocXDayMov extends Bow {
 			}
 			if(!tc) last = tp;		
 		}
-		
-		if(long_trip < 40) return null;
-		
 		return dailyPatterns;
-	}	
+	}
+	
+	
+	public int dist(String rname1, String rname2) {
+		String[] x1 = rname1.split("-");
+		String[] x2 = rname2.split("-");
+		int i1 = Integer.parseInt(x1[0]);
+		int j1 = Integer.parseInt(x1[1]);
+		int i2 = Integer.parseInt(x2[0]);
+		int j2 = Integer.parseInt(x2[1]);
+		return Math.abs(i1-i2) + Math.abs(j1-j2);
+		
+	}
 }

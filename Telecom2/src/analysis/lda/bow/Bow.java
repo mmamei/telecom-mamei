@@ -50,4 +50,15 @@ public abstract class Bow {
 			this.rname = rname;
 		}
 	}
+	
+	protected int dist(String rname1, String rname2) {
+		String[] x1 = rname1.split("-");
+		String[] x2 = rname2.split("-");
+		int i1 = Integer.parseInt(x1[0]);
+		int j1 = Integer.parseInt(x1[1]);
+		int i2 = Integer.parseInt(x2[0]);
+		int j2 = Integer.parseInt(x2[1]);
+		return Math.abs(i1-i2) + Math.abs(j1-j2);
+		
+	}
 }
