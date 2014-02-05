@@ -10,6 +10,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import network.NetworkCell;
+import network.NetworkMap;
+import network.NetworkMapFactory;
+
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
@@ -44,8 +48,9 @@ public abstract class Bow {
 			int h = Integer.parseInt(x[2]);
 			long celllac =Long.parseLong(x[3]);
 			Region r = rm.getClosest(celllac);
-			tps.add(new TimePlace(x[0],x[1],h,r));
-			places.add(r == null ? "EXT" : r.getName() );
+			String rname = r == null ? "EXT" : r.getName();
+			tps.add(new TimePlace(x[0],x[1],h,rname,rm,events));
+			places.add(rname);
 		}
 		
 		if(places.size() < MIN_PLACES) return null;
@@ -60,20 +65,45 @@ public abstract class Bow {
 	
 	/*******************************************************************************/
 	static final DecimalFormat F = new DecimalFormat("##.####",new DecimalFormatSymbols(Locale.US));
+	static NetworkMap nm = NetworkMapFactory.getNetworkMap();
 	protected class TimePlace {
 		String day;
 		String dow;
 		int h;
-		Region r;
+		String rname;
 		LatLonPoint p;
 		
-		TimePlace(String day,String dow, int h, Region r) {
+		TimePlace(String day,String dow, int h, String rname,RegionMap rm, String[] events) {
 			this.day = day;
 			this.dow = dow;
 			this.h = h;
-			this.r = r;
-			p = new LatLonPoint(r.getCenterLat(),r.getCenterLon());
+			this.rname = rname;
+			p = getCenter(rm,events);
 		}
+		
+		
+		
+		private LatLonPoint getCenter(RegionMap rm, String[] events) {
+			
+			double lon = 0;
+			double lat = 0;
+			int cont = 0;
+			for(int i=5;i<events.length;i++) {
+				// 2013-5-23:Sun:13:4018542484
+				String[] x = events[i].split(":");
+				int h = Integer.parseInt(x[2]);
+				long celllac =Long.parseLong(x[3]);
+				if(rm.getClosest(celllac).getName().equals(rname)) {
+					NetworkCell nc = nm.get(celllac);
+					lon += nc.getBarycentreLongitude();
+					lat += nc.getBarycentreLatitude();
+					cont ++;
+				}
+			}
+			if(cont == 0) return null;
+			return new LatLonPoint(lat/cont,lon/cont);
+		}
+		
 		
 		double sdist(TimePlace o) {
 			return LatLonUtils.getHaversineDistance(p,o.p);
@@ -89,11 +119,11 @@ public abstract class Bow {
 		
 		
 		String getRegionName() {
-			return r == null ? "EXT" : r.getName();
+			return rname;
 		}
 		
 		String getGeo() {
-			return r == null ? "EXT" : F.format(r.getCenterLon())+","+F.format(r.getCenterLat());
+			return p == null ? "EXT" : F.format(p.getLongitude())+","+F.format(p.getLatitude());
 		}
 		
 	}
