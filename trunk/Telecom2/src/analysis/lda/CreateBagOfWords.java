@@ -1,6 +1,7 @@
 package analysis.lda;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
@@ -14,72 +15,84 @@ import analysis.lda.bow.OneDocXDayMov;
 import area.region.RegionMap;
 
 public class CreateBagOfWords {
-	public static final boolean KML = true;
+	
+	public static final int REPETITIONS = 100;
 	public static final int MAX_NUM = 10;
-	public static final int MAX_KML = 10;
 	public static int MIN_DAYS = 30;
-	public static int MIN_PLS = 500;
+	public static int MIN_PLS = 300;
+	
+	public static void main(String[] args) throws Exception {
+		process("Torino",new OneDocXDayMov());
+	}
 	
 	
-	public static final String city = "Torino";
-	public static final Bow bow = new OneDocXDayMov();
-	
-	public static void main(String[] args) throws Exception {	
-		
-		String output_dir = "Topic/"+city+"_"+bow.getClass().getSimpleName();
+	public static void process(String city, Bow bow) throws Exception {
 		String user_id;
-		String mnt;
 		int num_pls;
 		int num_days;
-		int days_interval;
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
 		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellXHour.csv");
-		if(KML) KMLPath.openFile(FileUtils.create("Topic").getAbsolutePath()+"/"+city+".kml");	
+		
+		int n_users_processed = 0;
+		
 		String line;
-		int cont = 0;
 		while((line=br.readLine())!=null) {
 			if(line.startsWith("//")) {Logger.logln(line); continue;}
 			
 			String[] p = line.split(",");
 			user_id = p[0];
-			mnt = p[1];
+			//String mnt = p[1];
 			num_pls = Integer.parseInt(p[2]);
 			num_days = Integer.parseInt(p[3]);
-			days_interval = Integer.parseInt(p[4]);
-			
+			//int days_interval = Integer.parseInt(p[4]);
 			if(num_pls < MIN_PLS || num_days < MIN_DAYS) continue;
-			
 			Map<String,List<String>> docs = bow.process(p,5,rm);
-			
 			if(docs == null) continue;
 			
+			processUser(user_id,docs,line,rm);
 			
-			if(KML && cont < MAX_KML) KMLPath.print(user_id,KMLPath.getDataFormUserEventCounterCellacXHourLine(line));	
-			PrintWriter pw = FileUtils.getPW(output_dir, user_id+".txt");
-			for(String day : docs.keySet())
-				pw.println(day+"\tX\t"+toString(docs.get(day)));
-			pw.close();
+			n_users_processed ++;
 			
-			cont ++;
-			
-			
-			if(cont > MAX_NUM) break;
-			
-			
-			if(cont % 10 == 0) Logger.log(".");
-			if(cont % 1000 == 0) Logger.logln("");
-		}
+			if(n_users_processed > MAX_NUM) break;
 		
+			if(n_users_processed % 10 == 0) Logger.log(".");
+			if(n_users_processed % 1000 == 0) Logger.logln("");
+		}
 		br.close();
-		if(KML) KMLPath.closeFile();
 		Logger.logln("\nDone!");
 	}
 	
-	public static String toString(List<String> d) {
+	
+	
+	public static void processUser(String user_id,Map<String,List<String>> docs,String line,RegionMap rm) {
+		
+		// create user directory
+		File dir = FileUtils.create("Topic/"+user_id);
+		
+		// create kml file
+		KMLPath.openFile(dir.getAbsolutePath()+"/"+user_id+".kml");	
+		
+		KMLPath.addKml("<Folder><name>RegionMap</name>"+rm.getKMLBorders()+"</Folder>");
+		
+		KMLPath.print(user_id,KMLPath.getDataFormUserEventCounterCellacXHourLine(line));	
+		KMLPath.closeFile();	
+		
+		// create bag of words file
+		PrintWriter pw = FileUtils.getPW("Topic/"+user_id, user_id+".txt");
+		for(int r=0; r<REPETITIONS;r++)
+		for(String day : docs.keySet())
+			pw.println(day+"\tX\t"+toString(docs.get(day),REPETITIONS));
+		pw.close();
+	}
+	
+	
+	
+	public static String toString(List<String> d, int rep) {
 		StringBuffer sb = new StringBuffer();
-		for(String w : d)
-			sb.append(" "+w);
+		for(int r=0; r<rep;r++)
+			for(String w : d)
+				sb.append(" "+w);
 		return sb.substring(1);
 	}
 }

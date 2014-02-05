@@ -11,10 +11,7 @@ import analysis.lda.TopicModel;
 
 public class OneDocXDayMov extends Bow {
 	
-	public static final String[] HP = new String[]{"N","N","N","N","N","N","N","M", 
-		   										   "M","M","M","M","M","M","A","A", 
-		   										   "A","A","A","E","E","E","E","N"};
-	
+	public static int minL = 4000;
 	
 	
 	public  Map<String,List<String>> process(List<TimePlace> tps) {
@@ -27,26 +24,28 @@ public class OneDocXDayMov extends Bow {
 			TimePlace tp = tps.get(i);
 			
 			boolean tc = last.day.equals(tp.day);
-			boolean sc = dist(tp.rname,last.rname) > 3;
+			boolean sc = tp.tdist(last) > 1 || tp.sdist(last) >= minL;
 			
-			if(dist(tp.rname,last.rname) > 3)
+			if(tp.sdist(last) >= minL)
 				long_trip ++;
 			
 			if(tc && sc) {
+				
 				String key = tp.dow+"-"+tp.day;
+				
 				List<String> d = dailyPatterns.get(key);
 				if(d == null) {
 					d = new ArrayList<String>();
 					dailyPatterns.put(key, d);
 				}
-				d.add(HP[last.h]+"-"+last.rname+"->"+HP[tp.h]+"-"+tp.rname);
-				//d.add(last.rname+"->"+tp.rname);
+				String w = HP[last.h]+","+last.getGeo()+"-"+HP[tp.h]+","+tp.getGeo();
+				d.add(w);
 				last = tp;
 			}
 			if(!tc) last = tp;		
 		}
 		
-		if(long_trip < 40) return null;
+		if(long_trip < 30) return null;
 		
 		return dailyPatterns;
 	}	

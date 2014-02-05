@@ -179,6 +179,19 @@ public class RegionMap implements Serializable {
 	}
 	
 	
+	public String getKMLBorders() {
+		StringBuffer sb = new StringBuffer();
+		int index = 0;
+		for(Region r: rm.values()) {
+			sb.append(r.toKml("01ffffff","ffffffff",r.getName())+"\n");
+			index++;
+			if(index >= Colors.RANDOM_COLORS.length) index = 0;
+		}
+		return sb.toString();
+	}
+	
+	
+	
 	public static void main(String[] args) throws Exception {
 		process("Venezia");
 		Logger.logln("Done!");
