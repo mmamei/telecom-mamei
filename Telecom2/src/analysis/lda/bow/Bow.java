@@ -1,17 +1,37 @@
 package analysis.lda.bow;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import org.gps.utils.LatLonPoint;
+import org.gps.utils.LatLonUtils;
 
 import area.region.Region;
 import area.region.RegionMap;
 
 public abstract class Bow {
 	
-	protected static int MIN_PLACES = 10;
+	public static final String[] HP = new String[]{"N","N","N","N","N","N","N","M", 
+		   										   "M","M","M","M","M","M","A","A", 
+		   										   "A","A","A","E","E","E","E","E"};
+
+	static final Map<String,Integer> TM = new HashMap<String,Integer>();
+	static {
+		TM.put("N", 0);
+		TM.put("M", 1);
+		TM.put("A", 2);
+		TM.put("E", 3);
+	}
+	
+	
+	protected static int MIN_PLACES = 3;
 	
 	public Map<String,List<String>> process(String[] events, int startIndex, RegionMap rm) {
 		
@@ -24,9 +44,8 @@ public abstract class Bow {
 			int h = Integer.parseInt(x[2]);
 			long celllac =Long.parseLong(x[3]);
 			Region r = rm.getClosest(celllac);
-			String rname = r == null ? "OUT" : r.getName().replaceAll(",", "-");
-			tps.add(new TimePlace(x[0],x[1],h,rname));
-			places.add(rname);
+			tps.add(new TimePlace(x[0],x[1],h,r));
+			places.add(r == null ? "EXT" : r.getName() );
 		}
 		
 		if(places.size() < MIN_PLACES) return null;
@@ -37,28 +56,45 @@ public abstract class Bow {
 	protected abstract Map<String,List<String>> process(List<TimePlace> tps);
 	
 	
+	
+	
+	/*******************************************************************************/
+	static final DecimalFormat F = new DecimalFormat("##.####",new DecimalFormatSymbols(Locale.US));
 	protected class TimePlace {
 		String day;
 		String dow;
 		int h;
-		String rname;
+		Region r;
+		LatLonPoint p;
 		
-		TimePlace(String day,String dow, int h, String rname) {
+		TimePlace(String day,String dow, int h, Region r) {
 			this.day = day;
 			this.dow = dow;
 			this.h = h;
-			this.rname = rname;
+			this.r = r;
+			p = new LatLonPoint(r.getCenterLat(),r.getCenterLon());
 		}
-	}
-	
-	protected int dist(String rname1, String rname2) {
-		String[] x1 = rname1.split("-");
-		String[] x2 = rname2.split("-");
-		int i1 = Integer.parseInt(x1[0]);
-		int j1 = Integer.parseInt(x1[1]);
-		int i2 = Integer.parseInt(x2[0]);
-		int j2 = Integer.parseInt(x2[1]);
-		return Math.abs(i1-i2) + Math.abs(j1-j2);
+		
+		double sdist(TimePlace o) {
+			return LatLonUtils.getHaversineDistance(p,o.p);
+		}
+		
+		
+		
+		int tdist(TimePlace prev) {
+			int tp = TM.get(HP[prev.h]);
+			int ta = TM.get(HP[h]);
+			return ta - tp;
+		}
+		
+		
+		String getRegionName() {
+			return r == null ? "EXT" : r.getName();
+		}
+		
+		String getGeo() {
+			return r == null ? "EXT" : F.format(r.getCenterLon())+","+F.format(r.getCenterLat());
+		}
 		
 	}
 }

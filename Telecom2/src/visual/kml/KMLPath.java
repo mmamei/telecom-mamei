@@ -38,6 +38,13 @@ public class KMLPath {
 	}
 	
 	static NetworkMap nm =  NetworkMapFactory.getNetworkMap();
+	
+	
+	public static void addKml(String kml) {
+		out.println(kml);
+	}
+	
+	
 	public static void print(String username, List<PlsEvent> plsEvents) {
 		kml.printFolder(out, username);
 		List<PlsEvent> s = plsEvents;//FilterAndCounterUtils.smooth(plsEvents);
