@@ -43,7 +43,7 @@ public class CreateTopicModel {
 	
 	public static final boolean VERBOSE = false;
 	
-	public static final int numTopics = 6;
+	public static final int numTopics = 4;
 	public static final int burnin = 10000;
 	public static final int numIterations = 500;
 	public static final double alpha = 1; // the higher the more topic per document
@@ -71,7 +71,7 @@ public class CreateTopicModel {
     
     public static void processUser(String user) throws Exception {
     	File file = FileUtils.getFile("Topic/"+user+"/"+user+".txt");
-    	String[] stop = getStopWords(file);
+    	String[] stop = new String[1]; //getStopWords(file);
     	run(file,stop);
     }
     
