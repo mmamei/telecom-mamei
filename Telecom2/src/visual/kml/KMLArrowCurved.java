@@ -115,8 +115,8 @@ public class KMLArrowCurved {
 		double lon2 = 11.13493327581623;
 		double lat2 = 44.86936892789175;
 		
-		out.println(KMLArrowCurved.printArrow(lon2,lat2,lon1,lat1, 2,  "ff00ff00", true));
-		out.println(KMLArrowCurved.printArrow(lon1,lat1,lon2,lat2, 2,  "ff00ff00", true));
+		out.println(KMLArrowCurved.printArrow(lon2,lat2,lon1,lat1, 2,"ff00ff00", true));
+		out.println(KMLArrowCurved.printArrow(lon1,lat1,lon2,lat2, 2,"ff00ff00", true));
 		kml.printFooterDocument(out);
 		out.close();
 		System.out.println("Done");
