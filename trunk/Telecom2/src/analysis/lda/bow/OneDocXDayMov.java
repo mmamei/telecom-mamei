@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import analysis.lda.CreateBagOfWords;
-import analysis.lda.TopicModel;
+import analysis.lda.CreateTopicModel;
 
 
 public class OneDocXDayMov extends Bow {
 	
-	public static int minL = 4000;
+	public static int minL = 2000;
 	
 	
 	public  Map<String,List<String>> process(List<TimePlace> tps) {
