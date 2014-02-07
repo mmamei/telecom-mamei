@@ -15,9 +15,9 @@ import org.gps.utils.LatLonUtils;
 public class KMLArrowCurved {
 	
 	
-	public static final double HI = 0.1;
-	public static final double MED = 0.06;
-	public static final double LOW = 0.03;
+	public static final double HI = 6;
+	public static final double MED = 3;
+	public static final double LOW = 1;
 	
 	
 	public static String printArrow (double lon1, double lat1, double lon2, double lat2, int size, String color, boolean directed) {
@@ -53,24 +53,27 @@ public class KMLArrowCurved {
 		sb.append("<coordinates>");
 		double x = 0;
 		double y = 0;
-		double l1;
-		double l2;
+		double l1,l2,l3,l4;
 		if(lon1<=lon2) {
 			l1=lon1;
 			l2=lat1;
+			l3=lon2;
+			l4=lat2;
 		}
 		else {
 			l1=lon2;
 			l2=lat2;
+			l3=lon1;
+			l4=lat1;
 		}
 		
-		sb.append(lon1+","+lat1+",0 ");
-		for(double i=1; i<d; i=i+(d/10.0)){
-			x = l1 + i*Math.cos(Math.toRadians(teta)) - ((a*i*i+b*i))*Math.sin(Math.toRadians(teta));
-		    y = l2 + ((a*i*i+b*i))*Math.cos(Math.toRadians(teta)) + i*Math.sin(Math.toRadians(teta));
+		sb.append(l1+","+l2+",0 ");
+		for(double i=d/10.0;i<d;i=i+(d/10.0)){
+			x = l1+i*Math.cos(Math.toRadians(teta)) - (a*i*i+b*i)*Math.sin(Math.toRadians(teta));
+		    y = l2+(a*i*i+b*i)*Math.cos(Math.toRadians(teta))+i*Math.sin(Math.toRadians(teta));
 		    sb.append(x+","+y+",0 ");
 		}
-		sb.append(lon2+","+lat2+",0 ");
+		sb.append(l3+","+l4+",0 ");
 		
 		sb.append("</coordinates>");
 		sb.append("</LineString>");

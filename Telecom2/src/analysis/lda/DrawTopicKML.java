@@ -149,7 +149,7 @@ public class DrawTopicKML {
 		 sb.append("</Point>");
 		 sb.append("</Placemark>");
 		 
-		 sb.append(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, (int)(50*prob), "ff000000", 0.5, true));
+		 sb.append(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, 6 , "ff000000", true));
 		 
 		 
 		 return sb.toString();
