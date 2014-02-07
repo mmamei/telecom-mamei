@@ -14,7 +14,7 @@ import utils.FileUtils;
 import visual.kml.KML;
 import visual.kml.KMLArrowCurved;
 
-public class TopicKML {
+public class DrawTopicKML {
 	 public static void main(String[] args) throws Exception {
 		 File maind = FileUtils.getFile("Topic");
 		for(File d: maind.listFiles()) {

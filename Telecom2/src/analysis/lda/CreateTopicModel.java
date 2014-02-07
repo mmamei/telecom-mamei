@@ -39,7 +39,7 @@ import cc.mallet.types.Alphabet;
 import cc.mallet.types.IDSorter;
 import cc.mallet.types.InstanceList;
 
-public class TopicModel {
+public class CreateTopicModel {
 	
 	public static final boolean VERBOSE = false;
 	
