@@ -11,8 +11,9 @@ import analysis.lda.CreateTopicModel;
 
 public class OneDocXDayMov extends Bow {
 	
-	public static int minL = 2000;
 	
+	public static final int MIN_DIST_FOR_LONG_TRIP = 2000; // min distance to be considerd long trip
+	public static final int MIN_LONG_TRIPS = 30;  
 	
 	public  Map<String,List<String>> process(List<TimePlace> tps) {
 		Map<String,List<String>> dailyPatterns = new TreeMap<String,List<String>>();
@@ -24,9 +25,9 @@ public class OneDocXDayMov extends Bow {
 			TimePlace tp = tps.get(i);
 			
 			boolean tc = last.day.equals(tp.day);
-			boolean sc = tp.tdist(last) > 1 || tp.sdist(last) >= minL;
+			boolean sc = tp.tdist(last) > 1 || tp.sdist(last) >= MIN_DIST_FOR_LONG_TRIP;
 			
-			if(tp.sdist(last) >= minL)
+			if(tp.sdist(last) >= MIN_DIST_FOR_LONG_TRIP)
 				long_trip ++;
 			
 			if(tc && sc) {
@@ -45,7 +46,7 @@ public class OneDocXDayMov extends Bow {
 			if(!tc) last = tp;		
 		}
 		
-		if(long_trip < 30) return null;
+		if(long_trip < MIN_LONG_TRIPS) return null;
 		
 		return dailyPatterns;
 	}	
