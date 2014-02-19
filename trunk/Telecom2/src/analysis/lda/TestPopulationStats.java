@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import utils.FileUtils;
 import utils.Logger;
 
-public class CreatePopGraph {
+public class TestPopulationStats {
 	public static void main(String[] args) throws Exception {
 		
 		
