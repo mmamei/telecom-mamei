@@ -6,19 +6,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import network.NetworkMap;
+import network.NetworkMapFactory;
+
+import org.gps.utils.LatLonPoint;
+
 import utils.FileUtils;
 
 public class TestTopicAccuracy {
+	
+	
+	public static final boolean VERBOSE = false;
+	
 	public static void main(String[] args) throws Exception {
 		process("4a783b4759a83ac53e448ca5dd24294bea7e715876c69bcb552e873ae568e");
 		System.out.println("Done!");
 	}
 	
-	
+	static NetworkMap nm = NetworkMapFactory.getNetworkMap();
 	public static void process(String user) throws Exception  {
 		
 		// read p_w_z ****************************************************************************************************
-		BufferedReader br = FileUtils.getBR("Topics/"+user+"/p_w_z.txt");
+		BufferedReader br = FileUtils.getBR("Topic/"+user+"/p_w_z.txt");
 		String line;
 		// Topic_0,n,7.666,45.0713-n,7.6529,45.055,0.27,n,7.6529,45.055-n,7.666,45.0713,0.2,m,7.6529,45.055-e,7.6587,45.0707,0.13,m,7.666,45.0713-a,7.6529,45.055,0.07
 		Map<Integer,List<WordProb>> topics = new TreeMap<Integer,List<WordProb>>();
@@ -40,13 +49,14 @@ public class TestTopicAccuracy {
 		}
 		br.close();
 		
-		for(int t: topics.keySet()) 
-			System.out.println(WordProb.print(topics.get(t)));
+		if(VERBOSE) {
+			for(int t: topics.keySet()) 
+				System.out.println(WordProb.print(topics.get(t)));
+		}
 		
-		
-		// read p_z_t
+		// read p_z_d *******************************************************************************************************
 		Map<String,double[]> pzd = new TreeMap<String,double[]>();
-		br = FileUtils.getBR("Topics/"+user+"/p_z_d.txt");
+		br = FileUtils.getBR("Topic/"+user+"/p_z_d.txt");
 		while((line = br.readLine()) != null) {
 			String[] e = line.split(",");
 			String day = e[0];
@@ -57,12 +67,67 @@ public class TestTopicAccuracy {
 		}
 		br.close();
 		
-		for(String day: pzd.keySet()) {
-			System.out.print(day);
-			for(double p: pzd.get(day))
-				System.out.print(", "+p);
-			System.out.println();
+		if(VERBOSE) {
+			for(String day: pzd.keySet()) {
+				System.out.print(day);
+				for(double p: pzd.get(day))
+					System.out.print(", "+p);
+				System.out.println();
+			}
 		}
+		
+		// read the user trace ************************************************************************************************
+		
+		Map<String,LatLonPoint[]> trace = new TreeMap<String,LatLonPoint[]>();
+		br = FileUtils.getBR("UserEventCounter/Torino_cellXHour.csv");
+		while((line=br.readLine())!=null) {
+			if(line.startsWith("//")) 
+				continue;
+			String[] p = line.split(",");
+			if(p[0].equals(user)) {
+				
+				String[] e = line.split(",");
+				for(int i=5;i<e.length;i++) {
+					// 2013-5-23:Sun:13:4018542484
+					String[] x = e[i].split(":");
+					String day = x[0];
+					String day_of_week = x[1];
+					int h = Integer.parseInt(x[2]);
+					LatLonPoint point = nm.get(Long.parseLong(x[3])).getPoint();
+					
+					LatLonPoint[] t = trace.get(day_of_week+"-"+day);
+					if(t == null) {
+						t = new LatLonPoint[24];
+						trace.put(day_of_week+"-"+day, t);
+					}
+					t[h] = point;
+					break;
+				}
+			}
+		}
+		br.close();
+		
+		if(VERBOSE) {
+			System.out.println("\ntrace");
+			for(String k: trace.keySet()) {
+				System.out.print(k);
+				for(LatLonPoint p: trace.get(k)) {
+					if(p==null) System.out.print(",(null)");
+					else System.out.print(",("+p.getLongitude()+","+p.getLatitude()+")");
+				}
+				System.out.println();
+			}
+		}
+		
+		
+		computeAccuracy(topics,pzd,trace);
+		
+	}
+	
+	
+	
+	public static void computeAccuracy(Map<Integer,List<WordProb>> topics,Map<String,double[]> pzd,Map<String,LatLonPoint[]> trace) {
+		System.out.println("computing");
 	}
 }
 
