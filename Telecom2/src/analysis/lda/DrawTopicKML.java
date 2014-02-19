@@ -15,11 +15,15 @@ import visual.kml.KML;
 import visual.kml.KMLArrowCurved;
 
 public class DrawTopicKML {
-	 public static void main(String[] args) throws Exception {
+	 public static void main(String[] args) {
 		 File maind = FileUtils.getFile("Topic");
 		for(File d: maind.listFiles()) {
 			System.out.println("Processing user "+d.getName()+" ...");
-			processUser(d.getName());
+			try {
+				processUser(d.getName());
+			}catch(Exception e) {
+				System.out.println("Problems with user "+d.getName());
+			}
 		}
 	    	
 	    System.out.println("Done!");

@@ -69,10 +69,15 @@ public class CreateTopicModel {
     }
     
     
-    public static void processUser(String user) throws Exception {
-    	File file = FileUtils.getFile("Topic/"+user+"/"+user+".txt");
-    	String[] stop = new String[1]; //getStopWords(file);
-    	run(file,stop);
+    public static void processUser(String user) {
+    	try {
+    		if(FileUtils.getFile("Topic/"+user+"/p_w_z.txt") != null) return;
+	    	File file = FileUtils.getFile("Topic/"+user+"/"+user+".txt");
+	    	String[] stop = new String[1]; //getStopWords(file);
+	    	run(file,stop);
+    	}catch(Exception e) {
+    		System.out.println("ERROR in user: "+user);
+    	}
     }
     
     

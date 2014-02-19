@@ -17,9 +17,9 @@ import area.region.RegionMap;
 public class CreateBagOfWords {
 	
 	public static final int REPETITIONS = 100;
-	public static final int MAX_NUM = 10;
+	public static final int MAX_NUM = 1000; // negative value for infinite
 	public static int MIN_DAYS = 30;
-	public static int MIN_PLS = 300;
+	public static int MIN_PLS = 200;
 	
 	public static void main(String[] args) throws Exception {
 		process("Torino",new OneDocXDayMov());
@@ -54,7 +54,7 @@ public class CreateBagOfWords {
 			
 			n_users_processed ++;
 			
-			if(n_users_processed > MAX_NUM) break;
+			if(MAX_NUM > 0 && n_users_processed > MAX_NUM) break;
 		
 			if(n_users_processed % 10 == 0) Logger.log(".");
 			if(n_users_processed % 1000 == 0) Logger.logln("");
@@ -67,8 +67,12 @@ public class CreateBagOfWords {
 	
 	public static void processUser(String user_id,Map<String,List<String>> docs,String line,RegionMap rm) {
 		
+		File dir = FileUtils.getFile("Topic/"+user_id);
+		if(dir != null) return;
 		// create user directory
-		File dir = FileUtils.create("Topic/"+user_id);
+		dir = FileUtils.create("Topic/"+user_id);
+		
+		
 		
 		// create kml file
 		KMLPath.openFile(dir.getAbsolutePath()+"/"+user_id+".kml");	
@@ -78,12 +82,18 @@ public class CreateBagOfWords {
 		KMLPath.print(user_id,KMLPath.getDataFormUserEventCounterCellacXHourLine(line));	
 		KMLPath.closeFile();	
 		
-		// create bag of words file
-		PrintWriter pw = FileUtils.getPW("Topic/"+user_id, user_id+".txt");
-		for(int r=0; r<REPETITIONS;r++)
-		for(String day : docs.keySet())
-			pw.println(day+"\tX\t"+toString(docs.get(day),REPETITIONS));
-		pw.close();
+		try {
+			// create bag of words file
+			PrintWriter pw = FileUtils.getPW("Topic/"+user_id, user_id+".txt");
+			for(int r=0; r<REPETITIONS;r++)
+			for(String day : docs.keySet())
+				pw.println(day+"\tX\t"+toString(docs.get(day),REPETITIONS));
+			pw.close();
+		} catch(Exception e) {
+			System.out.println("ERROR:");
+			System.out.println(user_id);
+			System.out.println(docs.size());
+		}
 	}
 	
 	
