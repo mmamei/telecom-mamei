@@ -11,7 +11,7 @@ import java.util.GregorianCalendar;
 
 public class Config {
 	
-	private static final String CFILE = "config/config.txt";
+	private static final String CFILE = "G:/CODE/Telecom/config/config.txt";
 	// singleton
 	private static Config conf = null;
 	
