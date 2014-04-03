@@ -1,6 +1,7 @@
 package pls_parser;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -25,10 +26,15 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	}
 
 	public void finish() {
-		PrintWriter out = FileUtils.getPW("UserSetCreator", this.getString()+".csv");
-		for(String u: users)
-			out.println(u);
-		out.close();
+		try {
+			File dir = FileUtils.createDir("BASE/UserSetCreator");
+			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+".csv"));
+			for(String u: users)
+				out.println(u);
+			out.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

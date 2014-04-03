@@ -37,12 +37,14 @@ public class Tourist_EXP_ResidentOtherRegions {
 		Map<String,Map<String,Integer>> users = new HashMap<String,Map<String,Integer>>();
 		
 		for(String o: other) 
-			run(users,o,FileUtils.getFileS("UserEventCounter/"+city+R2F_SUFFIX.get(o)),true);
-		run(users,city,FileUtils.getFileS("UserEventCounter/"+city+"_day.csv"),false);
+			run(users,o,FileUtils.getFile("BASE/UserEventCounter/"+city+R2F_SUFFIX.get(o)),true);
+		run(users,city,FileUtils.getFile("BASE/UserEventCounter/"+city+"_day.csv"),false);
 		
 		String of = city;
 		for(String o: other) of = of+"_"+o;
-		PrintWriter out = FileUtils.getPW("UserEventCounter", of+".csv");
+		
+		File dir = FileUtils.createDir("BASE/UserEventCounter");
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+of+".csv"));
 		for(String un: users.keySet()) {
 			Map<String,Integer> m = users.get(un);
 			
@@ -56,7 +58,7 @@ public class Tourist_EXP_ResidentOtherRegions {
 	}
 	
 	
-	public static void run(Map<String,Map<String,Integer>> users, String city, String file, boolean add) throws Exception {
+	public static void run(Map<String,Map<String,Integer>> users, String city, File file, boolean add) throws Exception {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String line;
 		while((line=br.readLine())!=null) {
@@ -76,6 +78,7 @@ public class Tourist_EXP_ResidentOtherRegions {
 	
 	static Map<String,Integer> C2S = new HashMap<String,Integer>(); // city to size (num days of data available)
 	static {
+		System.out.println("WARNING: statically assigned days");
 		C2S.put("Firenze", 40);
 		C2S.put("Venezia", 84);
 		C2S.put("Lombardia",35);

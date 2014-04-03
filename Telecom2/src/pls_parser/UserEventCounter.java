@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -29,11 +30,15 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	}
 	
 	public void finish() {
-		System.out.println(users_events.size());
-		PrintWriter out = FileUtils.getPW("UserEventCounter", this.getString()+"_count.csv");
-		for(String user: users_events.keySet())
-			out.println(user+","+users_events.get(user));
-		out.close();
+		try{
+			System.out.println(users_events.size());
+			PrintWriter out = new PrintWriter(new FileWriter(FileUtils.createDir("UserEventCounter")+"/"+this.getString()+"_count.csv"));
+			for(String user: users_events.keySet())
+				out.println(user+","+users_events.get(user));
+			out.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void extractUsersAboveThreshol(String file, int n) throws Exception {

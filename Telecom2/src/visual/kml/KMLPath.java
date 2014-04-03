@@ -2,6 +2,7 @@ package visual.kml;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -15,9 +16,7 @@ import java.util.TreeMap;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Colors;
-import utils.Config;
 import utils.FileUtils;
-import utils.FilterAndCounterUtils;
 import utils.Logger;
 import analysis.PlsEvent;
 
@@ -171,11 +170,14 @@ public class KMLPath {
 		// parse that line to create the List<PlsEvent> object
 		
 		List<PlsEvent> l = null;
-		BufferedReader br = FileUtils.getBR("UserEventCounter/"+file);
-		if(br == null) {
+		
+		File f = FileUtils.getFile("BASE/UserEventCounter/"+file);
+		if(f == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
 		}
+		BufferedReader br = new BufferedReader(new FileReader(f));
+		
 		String line;
 		while((line=br.readLine())!=null) 
 			if(line.startsWith(username)) {
@@ -211,7 +213,7 @@ public class KMLPath {
 	
 	
 	public static void main(String[] args) throws Exception {
-		openFile(FileUtils.create("TouristData").getAbsolutePath()+"/test.kml");
+		openFile(FileUtils.createDir("BASE/TouristData").getAbsolutePath()+"/test.kml");
 		
 		/*
 		String user = "164e6218294db749859bfffc798c5a51ba31262f6cfd7ab1e4e27d134789ba";

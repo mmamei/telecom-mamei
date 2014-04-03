@@ -60,7 +60,7 @@ public class CreatorRegionMapCity {
 	
 		
 		// print the kml placemarks in kml
-		PrintWriter out = new PrintWriter(new FileWriter(FileUtils.getFileS("RegionMap")+"/"+city+"_places.kml"));
+		PrintWriter out = new PrintWriter(new FileWriter(FileUtils.getFile("BASE/RegionMap")+"/"+city+"_places.kml"));
 		KML kml = new KML();
 		kml.printHeaderDocument(out, city+"_places");
 		for(int i=0; i<names.size();i++) {

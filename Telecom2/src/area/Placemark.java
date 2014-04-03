@@ -264,7 +264,8 @@ public class Placemark {
 		//System.out.println(p.getNumCells());
 		//System.out.println(p.contains("4018584023"));
 		//System.out.println(nm.get(Long.parseLong("4018584023")));
-		String f = FileUtils.create("Placemark").getAbsolutePath()+"/"+p.name+".kml";
+		File dir = FileUtils.createDir("BASE/Placemark");
+		String f = dir+"/"+p.name+".kml";
 		System.out.println(f);
 		p.printKML(f);
 		

@@ -33,7 +33,7 @@ public class CreatorRegionMapGrid {
 		
 	public static void run(String name, double[][] bbox, int size) throws Exception {
 		
-		String output_obj_file=FileUtils.create("RegionMap").getAbsolutePath()+"/"+name+".ser";
+		String output_obj_file=FileUtils.createDir("BASE/RegionMap").getAbsolutePath()+"/"+name+".ser";
 		
 		SpaceGrid sg = new SpaceGrid(bbox[0][0],bbox[0][1],bbox[1][0],bbox[1][1],size,size);
 		

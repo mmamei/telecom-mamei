@@ -1,6 +1,9 @@
 package analysis.lda;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 
 import utils.FileUtils;
@@ -13,7 +16,8 @@ public class TestPopulationStats {
 		int[] h_num_pls = new int[50];
 		int[] h_num_days = new int[50];
 		
-		BufferedReader br = FileUtils.getBR("UserEventCounter/torino_cellXHour.csv");		
+		
+		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/UserEventCounter/torino_cellXHour.csv")));		
 		String line;
 		while((line=br.readLine())!=null) {
 			if(line.startsWith("//")) {Logger.logln(line); continue;}
@@ -30,8 +34,8 @@ public class TestPopulationStats {
 			h_num_days[num_days]++;
 		}
 		
-		
-		PrintWriter pw = FileUtils.getPW("Topic","stat.csv");
+		File dir = FileUtils.createDir("BASE/Topic");
+		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/stat.csv"));
 		pw.println("num pls per day");
 		for(int i=0; i<h_num_pls.length;i++)
 			pw.println(i+","+h_num_pls[i]);

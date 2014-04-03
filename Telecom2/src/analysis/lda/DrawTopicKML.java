@@ -2,10 +2,11 @@ package analysis.lda;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -33,13 +34,15 @@ public class DrawTopicKML {
 	 static final double PROB = 0.2;
 	 public static void processUser(String user) throws Exception {
 		 
-		 PrintWriter out = FileUtils.getPW("Topic/"+user, "topics.kml");
+		 File dir = FileUtils.createDir("BASE/Topic/"+user);
+		 
+		 PrintWriter out = new PrintWriter(new FileWriter(dir+"/topics.kml"));
 		 KML kml = new KML();
 		 kml.printHeaderDocument(out, user);
 		 
-		
-		
-		 BufferedReader br = FileUtils.getBR("Topic/"+user+"/p_z_d.txt");
+		 BufferedReader br = new BufferedReader(new FileReader(dir+"/p_z_d.txt"));
+		 
+	
 		 String line;
 		 
 		 //Fri-2013-06-05,0,0,1,0,0,0
@@ -73,8 +76,7 @@ public class DrawTopicKML {
 		 }
 		 br.close();
 		 
-		  
-		 br = FileUtils.getBR("Topic/"+user+"/p_w_z.txt");
+		 br = new BufferedReader(new FileReader(dir+"/p_w_z.txt"));
 		 // Topic_0,n,7.645,45.0805-a,7.645,45.0805,0.47,n,7.645,45.0805-m,7.726,45.1091,0.18,m,7.726,45.1091-m,7.6044,45.0805,0.18,m,7.6044,45.0805-e,7.645,45.0805,0.18
 		 while((line=br.readLine()) != null) {
 			 String[] e = line.split(",|-");

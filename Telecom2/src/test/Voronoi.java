@@ -1,5 +1,6 @@
 package test;
 
+import java.io.FileWriter;
 import java.io.PrintWriter;
 
 import utils.Colors;
@@ -35,7 +36,7 @@ public class Voronoi {
 		
 		
 		Geometry voronoi = v.getDiagram(fact);
-		PrintWriter out = FileUtils.getPW("Voronoi", "test.kml");
+		PrintWriter out = new PrintWriter(new FileWriter(FileUtils.createDir("BASE/Voronoi")+"/test.kml"));
 		KML kml = new KML();
 		kml.printHeaderDocument(out, "test");
 		for(int i=0; i<voronoi.getNumGeometries();i++) {

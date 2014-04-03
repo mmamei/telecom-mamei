@@ -101,15 +101,13 @@ public class PresenceCounter {
 		
 		
 		
-		String dir = FileUtils.getFileS("PresenceCounter/"+Config.getInstance().get_pls_subdir());
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
+		File d = FileUtils.createDir("BASE/PresenceCounter/"+Config.getInstance().get_pls_subdir());
 		
 		String im = PlacemarkRadiusExtractor.USE_INDIVIDUAL_EVENT? "individual" : "multiple";
 		String sdiff = PlacemarkRadiusExtractor.DIFF ? "_diff" : "";
 		
 		String file = "result_"+im+"_"+o_radius+"_"+days+sdiff+".csv";
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+file));
+		PrintWriter out = new PrintWriter(new FileWriter(d+"/"+file));
 		out.println("event,estimated,groundtruth");
 		
 		int i = 0;	

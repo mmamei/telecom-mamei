@@ -1,6 +1,9 @@
 package pls_parser;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,12 +63,17 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	
 	//private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
 	public void finish() {
-		PrintWriter out = FileUtils.getPW("UserEventCounter", this.getString()+"_cellXHour.csv");
-		out.println("// TOT. DAYS = "+getTotDays());
-		for(String user: users_info.keySet())
-			if(users_info.get(user).getNumDays() >= 14)
-				out.println(user+","+users_info.get(user));
-		out.close();
+		try {
+			File dir = FileUtils.createDir("BASE/UserEventCounter");
+			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+"_cellXHour.csv"));
+			out.println("// TOT. DAYS = "+getTotDays());
+			for(String user: users_info.keySet())
+				if(users_info.get(user).getNumDays() >= 14)
+					out.println(user+","+users_info.get(user));
+			out.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -80,8 +88,9 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	 * This main is places here for convenience. It just read the file and remove all the users producing few events
 	 */
 	public static void trim(Placemark p, int min_size) throws Exception {
-		BufferedReader br = FileUtils.getBR("UserEventCounter/"+p.name+"_cellacXhour.csv");
-		PrintWriter out = FileUtils.getPW("UserEventCounter", p.name+"_cellacXhour_trim"+min_size+".csv");
+		File dir = FileUtils.createDir("BASE/UserEventCounter");
+		BufferedReader br = new BufferedReader(new FileReader(dir+"/"+p.name+"_cellacXhour.csv"));
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+p.name+"_cellacXhour_trim"+min_size+".csv"));
 		String line;
 		while((line = br.readLine()) != null) {
 			int num_pls = Integer.parseInt(line.split(",")[2]);

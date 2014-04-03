@@ -39,7 +39,7 @@ public class AnalyzePLSCoverageDetailed {
 			e.printStackTrace();
 		}
 		
-		String odir = FileUtils.create("AnalyzePLSCoverageDetailed").getAbsolutePath();
+		File odir = FileUtils.createDir("BASE/AnalyzePLSCoverageDetailed");
 		
 		String time_suffix = "";
 		if(TIME_DETAIL) {

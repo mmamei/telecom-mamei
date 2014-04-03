@@ -2,6 +2,7 @@ package analysis.tourist;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -14,7 +15,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import pls_parser.UserEventCounterCellacXHour;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
@@ -53,8 +53,7 @@ public class TouristAggregateActivity {
 	}
 	
 	public static void plotSpaceDensity(String city, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
-		File d = FileUtils.getFile("TouristActivity");
-		if(d == null) d = FileUtils.create("TouristActivity");
+		File d = FileUtils.createDir("BASE/TouristActivity");
 		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+city+".kml",space_density,rm,city,false);
 		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+city+".html", city, space_density, rm, threshold);
 	}
@@ -78,7 +77,7 @@ public class TouristAggregateActivity {
 		}
 		
 		GraphPlotter gp = GraphPlotter.drawGraph(""+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], ""+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], "", "hour", "num pls", domain, val);
-		gp.save(FileUtils.getFileS("TouristActivity")+"/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_day.png");
+		gp.save(FileUtils.getFile("BASE/TouristActivity")+"/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_day.png");
 	
 		double[] hmeans = new double[24];
 		double[] hsigmas = new double[24];
@@ -132,17 +131,21 @@ public class TouristAggregateActivity {
 		
 		
 		gp = GraphPlotter.drawGraph(""+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], ""+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], "", "time", "z_num pls", domain, val);			
-		gp.save(FileUtils.getFileS("TouristActivity")+"/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_z_day.png");
+		gp.save(FileUtils.getFile("BASE/TouristActivity")+"/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_z_day.png");
 	}
 	
 	
 	public static Map<String,Double> computeSpaceDensity(RegionMap rm) throws Exception {
 		String city = rm.getName();
-		BufferedReader br = FileUtils.getBR("Tourist/"+city+".csv");
-		if(br == null) {
+		
+		
+		File f = FileUtils.getFile("BASE/Tourist/"+city+".csv");
+		if(f == null) {
 			Logger.logln("Run TouristData4Analysis first!");
 			System.exit(0);
 		}
+		BufferedReader br = new BufferedReader(new FileReader(f));
+		
 		
 		Map<String,Double> sd = new HashMap<String,Double>();
 		for(Region r: rm.getRegions())
@@ -174,11 +177,14 @@ public class TouristAggregateActivity {
 	
 	public static Map<String,Double> computeTimeDensity(RegionMap rm) throws Exception {
 		String city = rm.getName();
-		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
-		if(br == null) {
+		
+		File f = FileUtils.getFile("UserEventCounter/"+city+"_cellacXhour.csv");
+		if(f == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
 		}
+		BufferedReader br = new BufferedReader(new FileReader(f));
+		
 		
 		
 		Map<String,Double> td = new TreeMap<String,Double>();

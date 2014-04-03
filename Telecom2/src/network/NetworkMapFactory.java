@@ -39,7 +39,7 @@ public class NetworkMapFactory {
 		
 		String best_file = null;
 		
-		File dir = FileUtils.getFile("NetworkMapParser");
+		File dir = FileUtils.getFile("BASE/NetworkMapParser");
 		
 		try {
 			Calendar target_cal = Calendar.getInstance();

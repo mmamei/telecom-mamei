@@ -18,7 +18,7 @@ public class NetworkMapParser {
 	public static void main(String[] args) throws Exception {
 		
 		
-		FileUtils.create("NetworkMapParser");
+		FileUtils.createDir("BASE/NetworkMapParser");
 		
 		
 		File dir = new File(Config.getInstance().network_map_dir);
@@ -35,7 +35,7 @@ public class NetworkMapParser {
 			in.close();
 			
 
-			ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(FileUtils.getFileS("NetworkMapParser")+"/"+file.substring(0,file.length()-4)+".bin"))));
+			ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(FileUtils.getFile("NetworkMapParser")+"/"+file.substring(0,file.length()-4)+".bin")));
 			out.writeObject(map);
 			out.close();
 		}

@@ -56,7 +56,7 @@ public class PlacemarkRadiusExtractor {
 	
 	
 	
-	public static final String ODIR = FileUtils.create("PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+	public static final String ODIR = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
 	
 	public static void main(String[] args) throws Exception { 
 		
@@ -339,7 +339,7 @@ public class PlacemarkRadiusExtractor {
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		
-		File d = FileUtils.create("PLSEventsAroundAPlacemark/"+subdir);
+		File d = FileUtils.createDir("BASE/PLSEventsAroundAPlacemark/"+subdir);
 		String file = d.getAbsolutePath()+"/"+p.name+"_"+p.getR()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
