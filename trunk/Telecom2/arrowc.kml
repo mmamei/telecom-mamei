@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://earth.google.com/kml/2.2">
-<Document>
-<name>ArrowC</name>
-<Style id="ff00ff002"><LineStyle><color>ff00ff00</color><width>2</width></LineStyle><PolyStyle><color>ff00ff00</color><width>2</width></PolyStyle></Style><Placemark><name></name><styleUrl>#ff00ff002</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><coordinates>11.13493327581623,44.86936892789175,0 10.92118234337734,44.75196646802829,0 </coordinates></LineString></Placemark><Placemark><styleUrl>#ff00ff002</styleUrl><Polygon><outerBoundaryIs><LinearRing><coordinates>10.922302321187933,44.75238620458893,0 10.92118234337734,44.75196646802829,0 10.92203262881584,44.752632922172566,0 10.922302321187933,44.75238620458893,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-<Style id="ff00ff002"><LineStyle><color>ff00ff00</color><width>2</width></LineStyle><PolyStyle><color>ff00ff00</color><width>2</width></PolyStyle></Style><Placemark><name></name><styleUrl>#ff00ff002</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><coordinates>10.92118234337734,44.75196646802829,0 11.13493327581623,44.86936892789175,0 </coordinates></LineString></Placemark><Placemark><styleUrl>#ff00ff002</styleUrl><Polygon><outerBoundaryIs><LinearRing><coordinates>11.133809478897739,44.868951272989605,0 11.13493327581623,44.86936892789175,0 11.134078807981739,44.868704057333154,0 11.133809478897739,44.868951272989605,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>
-</Document>
-</kml>
