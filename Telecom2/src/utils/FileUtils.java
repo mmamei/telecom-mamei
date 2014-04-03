@@ -12,11 +12,11 @@ import java.io.PrintWriter;
 public class FileUtils {
 	
 	
-	public static final String[] DISKS = new String[]{"C:","G:"};
+	public static final File[] DISKS = File.listRoots();
 
 	
 	public static File getFile(String fpath) {
-		for(String d: DISKS) {
+		for(File d: DISKS) {
 			File f = new File(d+Config.getInstance().base_dir+"/"+fpath);
 			if(f.exists()) return f;
 		}
@@ -65,9 +65,9 @@ public class FileUtils {
 	
 	
 	public static void main(String[] args) {
-		File f = getFile("UserEventCounterDetailed/Asti.csv");
+		File f = getFile("UserSetCreator/Firenze.csv");
 		System.out.println(f.getAbsolutePath());
-		f = getFile("PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
+		f = getFile("UserEventCounter/Venezia_cellXHour.csv");
 		System.out.println(f.getAbsolutePath());
 	}
 	
