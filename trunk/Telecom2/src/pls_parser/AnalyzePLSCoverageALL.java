@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 
 public class AnalyzePLSCoverageALL {
@@ -22,22 +23,21 @@ public class AnalyzePLSCoverageALL {
 	
 	
 	public static void main(String[] args) {
-		process("E:/DATASET/PLS/file_pls");
+		File[] files = FileUtils.getFiles("DATASET/PLS/file_pls");
+		for(File f: files) {
+			Map<String,String> allDays = compute(f);
+			Logger.logln("Days in the dataset:");
+			for(String d:allDays.keySet()) 
+				Logger.logln(d+" = "+allDays.get(d));
+			System.out.println("TOT = "+allDays.size());
+		}
 	}
 	
-	public static void process(String rootdir) {
-		Map<String,String> allDays = compute(rootdir);
-		Logger.logln("Days in the dataset:");
-		for(String d:allDays.keySet()) 
-			Logger.logln(d+" = "+allDays.get(d));
-		System.out.println("TOT = "+allDays.size());
-	}
-
 	
-	public static Map<String,String> compute(String dir) {	
+	public static Map<String,String> compute(File dir) {	
 		Map<String,String> allDays = new TreeMap<String,String>();
 		try {
-			analyzeDirectory(new File(dir),allDays);
+			analyzeDirectory(dir,allDays);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
