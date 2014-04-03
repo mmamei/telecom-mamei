@@ -1,26 +1,20 @@
 package pls_parser;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 
 public class AnalyzePLSCoverage {
 	
 	static Config conf = null;
-	private static final int BUFFER_SIZE = 1048576;
 	
-	
-	private static Calendar startTime = null;
-	private static Calendar endTime = null;
-	
-	
+
 	public static void main(String[] args) {
 		Map<String,String> allDays = compute();
 		
@@ -32,14 +26,14 @@ public class AnalyzePLSCoverage {
 	
 	
 	public static Map<String,String> compute() {
-		String dir = Config.getInstance().pls_folder;
+		File dir = FileUtils.getFile(Config.getInstance().pls_folder);
 		return compute(dir);
 	}
 	
-	public static Map<String,String> compute(String dir) {	
+	public static Map<String,String> compute(File dir) {	
 		Map<String,String> allDays = new TreeMap<String,String>();
 		try {
-			analyzeDirectory(new File(dir),allDays);
+			analyzeDirectory(dir,allDays);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
