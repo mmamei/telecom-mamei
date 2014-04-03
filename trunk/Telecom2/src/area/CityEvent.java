@@ -69,7 +69,8 @@ public class CityEvent {
 		 * key = 2013/Jul/18
 		 * values = 0-0-1-1-2-2-3-3-4-4-5-5-6-6-7-7-8-.... 23
 		 */
-		Map<String,String> ad = AnalyzePLSCoverage.compute();
+		AnalyzePLSCoverage apc = new AnalyzePLSCoverage();
+		Map<String,String> ad = apc.compute();
 
 		if(CITY_EVENTS == null) init();
 		List<CityEvent> result = new ArrayList<CityEvent>();

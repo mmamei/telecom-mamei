@@ -3,6 +3,7 @@ package pls_parser;
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -16,21 +17,40 @@ public class AnalyzePLSCoverage {
 	
 
 	public static void main(String[] args) {
-		Map<String,String> allDays = compute();
-		
+		AnalyzePLSCoverage apc = new AnalyzePLSCoverage();
+		/*
+		Map<String,String> allDays = apc.compute();
 		Logger.logln("Days in the dataset:");
 		for(String d:allDays.keySet()) 
 			Logger.logln(d+" = "+allDays.get(d));
 		System.out.println("TOT = "+allDays.size());
+		*/
+		Map<String,Map<String,String>> all =  apc.computeAll();
+		for(String file: all.keySet()) {
+			Map<String,String> allDays = all.get(file);
+			Logger.logln("Days in the dataset:");
+			for(String d:allDays.keySet()) 
+				Logger.logln(d+" = "+allDays.get(d));
+			System.out.println("TOT = "+allDays.size());
+		}
 	}
 	
+	public Map<String,Map<String,String>> computeAll() {
+		File[] files = FileUtils.getFiles("DATASET/PLS/file_pls");
+		Map<String,Map<String,String>> all = new HashMap<String,Map<String,String>>();
+		for(File f: files) 
+            all.put(f.getAbsolutePath(), compute(f));
+		return all;
+	}
+   
 	
-	public static Map<String,String> compute() {
+	
+	public Map<String,String> compute() {
 		File dir = FileUtils.getFile(Config.getInstance().pls_folder);
 		return compute(dir);
 	}
 	
-	public static Map<String,String> compute(File dir) {	
+	public Map<String,String> compute(File dir) {	
 		Map<String,String> allDays = new TreeMap<String,String>();
 		try {
 			analyzeDirectory(dir,allDays);
