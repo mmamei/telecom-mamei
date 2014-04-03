@@ -1,73 +1,46 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 public class FileUtils {
-	
-	
+		
 	public static final File[] DISKS = File.listRoots();
 
-	
 	public static File getFile(String fpath) {
+		
+		if(!fpath.startsWith("BASE") && !fpath.startsWith("DATASET")) {
+			try {
+				throw new Exception("WARNING: Requested file does not start with BASE nor DATASET!!!");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		File file = null;
 		for(File d: DISKS) {
-			File f = new File(d+Config.getInstance().base_dir+"/"+fpath);
-			if(f.exists()) return f;
+			File f = new File(d+"/"+fpath);
+			if(f.exists()) {
+				if(file!=null) Logger.log("WARNING: FILE AT MULTIPLE LOCATIONS");
+				file = f;
+			}
 		}
-		return null;
+		return file;
 	}
 	
-	public static String getFileS(String fpath) {
-		if(fpath.contains(":")) fpath = fpath.substring(3);
-		//System.out.println(fpath);
-		File f = getFile(fpath);
-		return f.getAbsolutePath();
+	public static File createDir(String fpath) {
+		File file = getFile(fpath);
+		if(file == null) {
+			file = new File(DISKS[0]+"/"+fpath);
+			file.mkdirs();
+		}
+		return file;
 	}
 	
-	public static File create(String path) {
-		File f = getFile(path);
-		if(f == null) {
-			f = new File(DISKS[0]+Config.getInstance().base_dir+"/"+path);
-			f.mkdirs();
-		}
-		return f;
-	}
-	
-	public static BufferedReader getBR(String fpath) {
-		File f = getFile(fpath);
-		try {
-			return new BufferedReader(new FileReader(f));
-		} catch (FileNotFoundException e) {
-			return null;
-		}
-	}
-	
-	public static PrintWriter getPW(String dir, String file) {
-		File d = getFile(dir);
-		if(d == null) {
-			d = new File(DISKS[0]+Config.getInstance().base_dir+"/"+dir);
-			d.mkdirs();
-		}
-		try {
-			//System.out.println(d.getAbsolutePath()+"/"+file);
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(d.getAbsolutePath()+"/"+file))));
-			return pw;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-	
-	
+
 	public static void main(String[] args) {
-		File f = getFile("UserSetCreator/Firenze.csv");
+		File f = getFile("BASE/UserSetCreator/Firenze.csv");
 		System.out.println(f.getAbsolutePath());
-		f = getFile("UserEventCounter/Venezia_cellXHour.csv");
+		f = getFile("BASE/UserEventCounter/Venezia_cellXHour.csv");
 		System.out.println(f.getAbsolutePath());
 	}
 	

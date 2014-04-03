@@ -1,6 +1,7 @@
 package analysis.tourist;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -27,8 +28,9 @@ public class TouristCounter {
 	
 	public static void process(String city, int month) throws Exception {
 		
-		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellacXhour.csv");
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
+		
+		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/UserEventCounter/"+city+"_cellacXhour.csv")));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("BASE/RegionMap/"+city+".ser"));
 		
 		Map<String,String> mncT = mncT();
 		
@@ -54,7 +56,7 @@ public class TouristCounter {
 		}
 		br.close();
 		
-		String f = FileUtils.getFileS("TouristData");
+		File f = FileUtils.getFile("BASE/TouristData");
 		PrintWriter out = new PrintWriter(new FileWriter(f+"/"+city+"_"+MONTHS[month]+"_count.csv"));
 	
 		LinkedHashMap<String, Integer> ordered = Sort.sortHashMapByValuesD(count,null);

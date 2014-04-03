@@ -51,15 +51,20 @@ public class UserEventCounterDay extends BufferAnalyzerConstrained {
 	
 	
 	public void finish() {
-		PrintWriter out = FileUtils.getPW("UserEventCounter", this.getString()+"_day.csv");
-		for(String user: users_info.keySet())
-			out.println(user+","+users_info.get(user));
-		out.close();
+		try {
+			File dir = FileUtils.createDir("BASE/UserEventCounter");
+			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+"_day.csv"));
+			for(String user: users_info.keySet())
+				out.println(user+","+users_info.get(user));
+			out.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) throws Exception {
 		String city = "Torino";
-		BufferAnalyzerConstrained ba = new UserEventCounterDay(null,FileUtils.getFileS("UserSetCreator")+"/"+city+".csv");
+		BufferAnalyzerConstrained ba = new UserEventCounterDay(null,FileUtils.getFile("BASE/UserSetCreator")+"/"+city+".csv");
 		ba.run();
 		Logger.logln("Done!");
 	}

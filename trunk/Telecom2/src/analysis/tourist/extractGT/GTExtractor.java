@@ -2,14 +2,14 @@ package analysis.tourist.extractGT;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import network.NetworkCell;
 import network.NetworkMap;
@@ -28,17 +28,20 @@ public class GTExtractor {
 	//static final String PLACEMARK = "Firenze";
 	
 	
-	static final String FILE = "UserEventCounter/file_pls_ve_Venezia_cellXHour.csv";
+	static final String FILE = "BASE/UserEventCounter/file_pls_ve_Venezia_cellXHour.csv";
 	static final String PLACEMARK = "Venezia";
 	
 	public static void main(String[] args) throws Exception {
 		
 		String line;
-		BufferedReader br = FileUtils.getBR(FILE);
-		if(br == null) {
+		
+		File f = FileUtils.getFile(FILE);
+		if(f == null) {
 			Logger.logln("Run UserEventCounterCellacXHour first!");
 			System.exit(0);
 		}
+		
+		BufferedReader br = new BufferedReader(new FileReader(f));
 		
 		NetworkMap nm = NetworkMapFactory.getNetworkMap();
 		String user_id,mnt;
@@ -99,16 +102,20 @@ public class GTExtractor {
 				System.err.println(line);
 			}
 		}
+		br.close();
 		
 		for(String prof: mcont.keySet())
 			Logger.logln(prof+" = "+mcont.get(prof)+"/"+n_total);
 		
-		PrintWriter pw = FileUtils.getPW("Tourist", PLACEMARK+"_gt_profiles.csv");
+		
+		File dir = FileUtils.createDir("BASE/Tourist");
+		
+		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/"+PLACEMARK+"_gt_profiles.csv"));
 		for(String user: mu.keySet())
 			pw.println(user+","+mu.get(user));
 		pw.close();
 		
-		CopyAndSerializationUtils.save(new File(FileUtils.getFileS("Tourist")+"/"+PLACEMARK+"_gt_profiles.ser"), mu);
+		CopyAndSerializationUtils.save(FileUtils.getFile("BASE/Tourist/"+PLACEMARK+"_gt_profiles.ser"), mu);
 		
 		Logger.logln("Done!");
 	}	

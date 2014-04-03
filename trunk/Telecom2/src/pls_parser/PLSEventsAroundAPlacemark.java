@@ -31,7 +31,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		placemarks = new ArrayList<Placemark>();
 		
 		try {
-			String dir = FileUtils.create("PLSEventsAroundAPlacemark").getAbsolutePath();
+			String dir = FileUtils.createDir("BASE/PLSEventsAroundAPlacemark").getAbsolutePath();
 			dir = dir+"/"+Config.getInstance().get_pls_subdir();
 			
 			System.out.println("Output Dir = "+dir);

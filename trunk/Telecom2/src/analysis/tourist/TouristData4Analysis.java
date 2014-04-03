@@ -3,6 +3,7 @@ package analysis.tourist;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -11,19 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
-import utils.GeomUtils;
 import utils.Logger;
 import analysis.tourist.extractGT.GTExtractor;
 import area.region.Region;
 import area.region.RegionMap;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
 
 
 /*
@@ -341,8 +337,8 @@ public class TouristData4Analysis implements Serializable {
 	
 	public static void process(String city, String cellXHourFile, String gt_ser_file, Integer max) throws Exception {
 		
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
-		BufferedReader br = FileUtils.getBR("UserEventCounter/"+cellXHourFile);
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("BASE/RegionMap/"+city+".ser"));
+		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/UserEventCounter/"+cellXHourFile)));
 		if(br == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
@@ -354,8 +350,8 @@ public class TouristData4Analysis implements Serializable {
 		
 		String s = max == null ? "" : "_"+max;
 	
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.create("Tourist")+"/"+city+s+".txt"))));
-		PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.create("Tourist")+"/"+city+s+".arff"))));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".txt"))));
+		PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".arff"))));
 		
 		int i=0;
 		String line;

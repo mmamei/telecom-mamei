@@ -2,6 +2,8 @@ package analysis.lda;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +19,7 @@ import area.region.RegionMap;
 public class CreateBagOfWords {
 	
 	public static final int REPETITIONS = 100;
-	public static final int MAX_NUM = 1000; // negative value for infinite
+	public static final int MAX_NUM = 1;//1000; // negative value for infinite
 	public static int MIN_DAYS = 30;
 	public static int MIN_PLS = 200;
 	
@@ -30,9 +32,8 @@ public class CreateBagOfWords {
 		String user_id;
 		int num_pls;
 		int num_days;
-		
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
-		BufferedReader br = FileUtils.getBR("UserEventCounter/"+city+"_cellXHour.csv");
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("BASE/RegionMap/"+city+".ser"));
+		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/UserEventCounter/"+city+"_cellXHour.csv")));
 		
 		int n_users_processed = 0;
 		
@@ -67,11 +68,10 @@ public class CreateBagOfWords {
 	
 	public static void processUser(String user_id,Map<String,List<String>> docs,String line,RegionMap rm) {
 		
-		File dir = FileUtils.getFile("Topic/"+user_id);
+		File dir = FileUtils.getFile("BASE/Topic/"+user_id);
 		if(dir != null) return;
 		// create user directory
-		dir = FileUtils.create("Topic/"+user_id);
-		
+		dir = FileUtils.createDir("BASE/Topic/"+user_id);
 		
 		
 		// create kml file
@@ -84,7 +84,7 @@ public class CreateBagOfWords {
 		
 		try {
 			// create bag of words file
-			PrintWriter pw = FileUtils.getPW("Topic/"+user_id, user_id+".txt");
+			PrintWriter pw = new PrintWriter(new FileWriter(dir+user_id+".txt"));
 			for(int r=0; r<REPETITIONS;r++)
 			for(String day : docs.keySet())
 				pw.println(day+"\tX\t"+toString(docs.get(day),REPETITIONS));

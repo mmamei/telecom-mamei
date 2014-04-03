@@ -70,7 +70,7 @@ public class CreatorRegionMapCityGrid {
 		}
 		
 			
-		File f = FileUtils.create("RegionMap");
-		CopyAndSerializationUtils.save(new File(f.getAbsolutePath()+"/"+city+".ser"), rm);
+		File dir = FileUtils.createDir("BASE/RegionMap");
+		CopyAndSerializationUtils.save(new File(dir.getAbsolutePath()+"/"+city+".ser"), rm);
 	}
 }

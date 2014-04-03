@@ -162,8 +162,7 @@ public class RegionMap implements Serializable {
 	
 	
 	public void printKML() throws Exception  {
-		File d = FileUtils.getFile("RegionMap");
-		if(d == null) d = FileUtils.create("RegionMap");
+		File d = FileUtils.createDir("BASE/RegionMap");
 		
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(d.getAbsolutePath()+"/"+name+".kml")));
 		KML kml = new KML();

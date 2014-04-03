@@ -1,6 +1,7 @@
 package analysis.presence_at_event;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -39,13 +40,13 @@ public class ResultEvaluator {
 		
 		String type = USE_INDIVIDUAL_EVENT ? "individual" : "multiple";
 		String sdiff = DIFF ? "_diff" : "";
-		String lomb = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_"+type+"_0.0_3"+sdiff+".csv");
-		String piem2012 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
-		String piem2013 = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
+		File lomb = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_"+type+"_0.0_3"+sdiff+".csv");
+		File piem2012 = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
+		File piem2013 = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
 		//String piem2013_openair = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_openair_"+type+"_0.0_3"+sdiff+".csv");
 
-		String[] training = new String[]{lomb,piem2012,piem2013};
-		String[] testing = new String[]{lomb,piem2012,piem2013};
+		File[] training = new File[]{lomb,piem2012,piem2013};
+		File[] testing = new File[]{lomb,piem2012,piem2013};
 		
 		run(training,testing);
 		
@@ -53,7 +54,7 @@ public class ResultEvaluator {
 	}
 	
 	
-	public static void run(String[] training_files, String[] testing_files) throws Exception {
+	public static void run(File[] training_files, File[] testing_files) throws Exception {
 		Map<String,List<double[]>> training_map = read(training_files);
 		Map<String,List<double[]>> testing_map = read(testing_files);
 		if(RANGE) {
@@ -201,10 +202,10 @@ public class ResultEvaluator {
 		Logger.logln(title+": r="+F.format(sr.getR()));//+", r^2="+Fsr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 	}
 	
-	public static Map<String,List<double[]>> read(String[] files) throws Exception {
+	public static Map<String,List<double[]>> read(File[] files) throws Exception {
 		Map<String,List<double[]>> map = new HashMap<String,List<double[]>>();
 		
-		for(String file: files) {
+		for(File file: files) {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line;
 			br.readLine(); // skip header
