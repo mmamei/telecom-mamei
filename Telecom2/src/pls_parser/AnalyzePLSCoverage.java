@@ -46,7 +46,7 @@ public class AnalyzePLSCoverage {
 	
 	
 	public Map<String,String> compute() {
-		File dir = FileUtils.getFile(Config.getInstance().pls_folder);
+		File dir = new File(Config.getInstance().pls_folder);
 		return compute(dir);
 	}
 	
