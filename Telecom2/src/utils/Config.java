@@ -33,6 +33,7 @@ public class Config {
 				String s[] = line.split("=");
 				parse(s[0].trim(),s[1].trim());
 			}
+			br.close();
 		} catch(Exception e) {
 			System.err.println("Cannot read config file! "+line);
 			
