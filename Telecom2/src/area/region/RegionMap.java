@@ -189,6 +189,17 @@ public class RegionMap implements Serializable {
 		return sb.toString();
 	}
 	
+	public String toKml(String color) {
+		StringBuffer sb = new StringBuffer();
+		int index = 0;
+		for(Region r: rm.values()) {
+			sb.append(r.toKml(color,color,r.getName())+"\n");
+			index++;
+			if(index >= Colors.RANDOM_COLORS.length) index = 0;
+		}
+		return sb.toString();
+	}
+	
 	
 	
 	public static void main(String[] args) throws Exception {
