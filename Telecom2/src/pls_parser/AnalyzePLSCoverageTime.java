@@ -11,13 +11,13 @@ import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 
-public class AnalyzePLSCoverage {
+public class AnalyzePLSCoverageTime {
 	
 	static Config conf = null;
 	
 
 	public static void main(String[] args) {
-		AnalyzePLSCoverage apc = new AnalyzePLSCoverage();
+		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
 		/*
 		Map<String,String> allDays = apc.compute();
 		Logger.logln("Days in the dataset:");
