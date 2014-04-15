@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import pls_parser.AnalyzePLSCoverage;
+import pls_parser.AnalyzePLSCoverageTime;
 import utils.Config;
 
 
@@ -69,7 +69,7 @@ public class CityEvent {
 		 * key = 2013/Jul/18
 		 * values = 0-0-1-1-2-2-3-3-4-4-5-5-6-6-7-7-8-.... 23
 		 */
-		AnalyzePLSCoverage apc = new AnalyzePLSCoverage();
+		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
 		Map<String,String> ad = apc.compute();
 
 		if(CITY_EVENTS == null) init();
