@@ -1,15 +1,18 @@
 package pls_parser;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import utils.Config;
 import utils.FileUtils;
-import utils.Logger;
 
 public class AnalyzePLSCoverageTime {
 	
@@ -25,21 +28,73 @@ public class AnalyzePLSCoverageTime {
 			Logger.logln(d+" = "+allDays.get(d));
 		System.out.println("TOT = "+allDays.size());
 		*/
+		/*
 		Map<String,Map<String,String>> all =  apc.computeAll();
 		for(String file: all.keySet()) {
 			Map<String,String> allDays = all.get(file);
-			Logger.logln("Days in the dataset:");
+			Logger.logln("Days in the dataset "+file+":");
 			for(String d:allDays.keySet()) 
 				Logger.logln(d+" = "+allDays.get(d));
 			System.out.println("TOT = "+allDays.size());
 		}
+		*/
+		Map<String,Map<String,String>> all =  apc.computeAll();
+		for(String key: all.keySet()) 
+			System.out.println(key+" -> "+apc.getNumYears(all.get(key)));
+		
+		//String js = apc.getJSMap(all);
+		//System.out.println(js);
 	}
 	
+	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
+	public String getJSMap(Map<String,Map<String,String>> map) {
+		StringBuffer sb = new StringBuffer();
+		Calendar cal = Calendar.getInstance();
+		for(String key: map.keySet()) {
+			sb.append("var dataTable_"+key+" = new google.visualization.DataTable();");
+			sb.append("dataTable_"+key+".addColumn({ type: 'date', id: 'Date' });");
+			sb.append("dataTable_"+key+".addColumn({ type: 'number', id: 'PLS Coverage' });");
+			sb.append("dataTable_"+key+".addRows([\n");
+			Map<String,String> dmap = map.get(key);
+			
+			for(String day: dmap.keySet()) {
+				try {
+					cal.setTime(f.parse(day));
+					int h = dmap.get(day).split("-").length;
+					sb.append("[ new Date("+cal.get(Calendar.YEAR)+", "+cal.get(Calendar.MONTH)+", "+cal.get(Calendar.DAY_OF_MONTH)+"), "+h+" ],\n");
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			sb.append("]);\n");
+		}
+		return sb.toString();
+	}
+	
+	public int getNumYears(Map<String,String> dmap) {
+		Set<String> y = new HashSet<String>();
+		for(String d: dmap.keySet()) {
+			String year = d.substring(0,d.indexOf("/"));
+			y.add(year);
+		}
+		return y.size();
+	}
+
+	
+	
 	public Map<String,Map<String,String>> computeAll() {
-		File[] files = FileUtils.getFiles("DATASET/PLS/file_pls");
+		File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
 		Map<String,Map<String,String>> all = new HashMap<String,Map<String,String>>();
-		for(File f: files) 
-            all.put(f.getAbsolutePath(), compute(f));
+		for(File basedir: basedirs) {
+			for(File dir: basedir.listFiles()) {
+				Map<String,String> val = all.get(dir.getName());
+				if(val == null) {
+					val = new TreeMap<String,String>();
+					all.put(dir.getName(), val);
+				}
+				val.putAll(compute(dir));
+			}
+		}
 		return all;
 	}
    
@@ -61,8 +116,9 @@ public class AnalyzePLSCoverageTime {
 	}
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	private static void analyzeDirectory(File directory, Map<String,String> allDays) throws Exception{
+	private static void analyzeDirectory(File directory, Map<String,String> allDays) throws Exception {
 		File[] items = directory.listFiles();
+		
 		for(int i=0; i<items.length;i++){
 			File item = items[i];
 			if(item.isFile()) {
@@ -73,7 +129,7 @@ public class AnalyzePLSCoverageTime {
 				int day =  cal.get(Calendar.DAY_OF_MONTH);
 				String sday = day < 10 ? "0"+day : ""+day;
 				
-				String key = getRegion(item)+"-"+cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
+				String key = cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
 				
 				String h = allDays.get(key);
 				
@@ -87,13 +143,4 @@ public class AnalyzePLSCoverageTime {
 				analyzeDirectory(item,allDays);
 		}	
 	}
-	
-	
-	static final String[] REGIONS = new String[]{"piem","lomb","ve","fi"};
-	public static String getRegion(File f) {
-		for(String r: REGIONS)
-			if(f.getAbsolutePath().contains(r)) return r;
-		return "nan";
-	}
-	
 }
