@@ -11,7 +11,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import area.region.RegionMap;
 import utils.Config;
+import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 
 public class AnalyzePLSCoverageTime {
@@ -83,17 +85,27 @@ public class AnalyzePLSCoverageTime {
 	
 	
 	public Map<String,Map<String,String>> computeAll() {
-		File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
-		Map<String,Map<String,String>> all = new HashMap<String,Map<String,String>>();
-		for(File basedir: basedirs) {
-			for(File dir: basedir.listFiles()) {
-				Map<String,String> val = all.get(dir.getName());
-				if(val == null) {
-					val = new TreeMap<String,String>();
-					all.put(dir.getName(), val);
+		
+		Map<String,Map<String,String>> all;
+		File odir = FileUtils.createDir("BASE/PLSCoverageTime");
+		File f = new File(odir+"/plsCoverageTime.ser");
+		if(f.exists()) {
+			all = (Map<String,Map<String,String>>)CopyAndSerializationUtils.restore(f);
+		}
+		else {
+			File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
+			all = new HashMap<String,Map<String,String>>();
+			for(File basedir: basedirs) {
+				for(File dir: basedir.listFiles()) {
+					Map<String,String> val = all.get(dir.getName());
+					if(val == null) {
+						val = new TreeMap<String,String>();
+						all.put(dir.getName(), val);
+					}
+					val.putAll(compute(dir));
 				}
-				val.putAll(compute(dir));
 			}
+			CopyAndSerializationUtils.save(f, all);
 		}
 		return all;
 	}

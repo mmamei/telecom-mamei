@@ -1,8 +1,6 @@
 package analysis.presence_at_event;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
+import java.util.HashMap;
 import java.util.Map;
 
 import pls_parser.AnalyzePLSCoverageSpace;
@@ -26,6 +24,14 @@ public class EventFilesFinder {
 	
 	public String find(String sday, String shour, String eday, String ehour, double lon1, double lat1, double lon2, double lat2) {
 		try {
+			
+			
+			sday = convertDay(sday);
+			eday = convertDay(eday);
+			
+			
+			System.out.println(sday);
+			System.out.println(eday);
 			
 			double clat = (lat1 + lat2)/2;
 			double clon = (lon1 + lon2)/2;
@@ -69,11 +75,23 @@ public class EventFilesFinder {
 		return null;
 	}
 	
+	static final Map<String,String> htmlMontMmap = new HashMap<String,String>();
+	static {
+		htmlMontMmap.put("01", "Jan"); htmlMontMmap.put("02", "Feb"); htmlMontMmap.put("03", "Mar"); htmlMontMmap.put("04", "Apr");
+		htmlMontMmap.put("05", "May"); htmlMontMmap.put("06", "Jun"); htmlMontMmap.put("07", "Jul"); htmlMontMmap.put("08", "Aug");  
+		htmlMontMmap.put("09", "Sep"); htmlMontMmap.put("10", "Oct"); htmlMontMmap.put("11", "Nov"); htmlMontMmap.put("12", "Dec"); 
+	}
+	
+	private String convertDay(String day) {
+		String[] s = day.split("-");
+		return s[0]+"/"+htmlMontMmap.get(s[1])+"/"+s[2];
+	}
+	
 	
 	public static void main(String[] args) {
 		
 		EventFilesFinder eff = new EventFilesFinder();
-		String dir = eff.find("2014/Mar/17","4","2014/Mar/17","7",11.2477,43.7629,11.2491,43.7620);
+		String dir = eff.find("2014-03-10","4","2014-03-10","7",11.2477,43.7629,11.2491,43.7620);
 		System.out.println(dir);
 	}
 }

@@ -6,17 +6,21 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.gps.utils.LatLonPoint;
+import org.gps.utils.LatLonUtils;
 
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
@@ -50,21 +54,70 @@ public class PLSBehaviorInAnArea {
 	};
 	
 	public static void main(String[] args) throws Exception { 
-		
+		/*
 		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true,true);	
-		
 		for(String pn: pnames) {
 			Placemark p = Placemark.getPlacemark(pn);
 			//double bestr = bestRadiusIE.get(pn);
 			double bestr = -200;
 			System.out.println("BEST RADIUS = "+bestr);
 			p.changeRadius(bestr);
-			process(p);
+			
+			PLSBehaviorInAnArea pbia = new PLSBehaviorInAnArea();
+			pbia.process(p);
 		}
+		*/
+		
+		PLSBehaviorInAnArea pbia = new PLSBehaviorInAnArea();
+		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672);
+		System.out.println(pbia.getJSMap(plsdata));
 		Logger.logln("Done!");
 	}
 	
-	public static void process(Placemark p) throws Exception {
+	
+	
+	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
+	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2) {
+		try {
+			Config.getInstance().pls_folder = "G:/DATASET/PLS/file_pls/file_pls_fi"; // <-- questo va eliminato!
+			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
+			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));
+			double lon = (lon1+lon2)/2;
+			double lat = (lat1+lat2)/2;
+			LatLonPoint p1 = new LatLonPoint(lat1,lon1);
+			LatLonPoint p2 = new LatLonPoint(lat2,lon2);
+			double r = LatLonUtils.getHaversineDistance(p1, p2) / 2;
+			String n = lon+","+lat;
+			Placemark p = new Placemark(n,n,new double[]{lat,lon},r);
+			
+			PLSEventsAroundAPlacemark.process(p);
+			String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";
+			PLSMap plsmap = getPLSMap(file,false).get("all");
+			(new File(file)).delete();
+			DescriptiveStatistics[] stats = getStats(plsmap);
+			return new Object[]{plsmap.getDomain(),stats[1].getValues()}; // domain, user_stat		
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	
+	public String getJSMap(Object[] plsdata) {
+		String[] domain = (String[])plsdata[0];
+		double[] data = (double[])plsdata[1];
+		StringBuffer sb = new StringBuffer();
+		sb.append("var data = google.visualization.arrayToDataTable([['Day', 'PLS']");
+		for(int i=0; i<domain.length;i++) {
+			sb.append(",['"+domain[i].substring(1,domain[i].length()-1)+"',  "+data[i]+"]");
+		}
+		sb.append("]);");
+		return sb.toString();
+	}
+	
+
+	public void process(Placemark p) throws Exception {
 		
 		Logger.logln("Processing... "+p.name);
 		
@@ -115,10 +168,7 @@ public class PLSBehaviorInAnArea {
 				
 				out.close();
 			}
-			
-			
 			drawGraph(p.name+"_"+p.getR()+" Cell = "+cell,plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);
-		
 		}
 	}
 	
@@ -309,7 +359,7 @@ public class PLSBehaviorInAnArea {
 	}
 
 	
-	public static Map<String,PLSMap> getPLSMap(String file, boolean group_by_cells) throws Exception {
+	public Map<String,PLSMap> getPLSMap(String file, boolean group_by_cells) throws Exception {
 		
 		Map<String,PLSMap> cell_plsmap = new TreeMap<String,PLSMap>();
 		String[] splitted;
