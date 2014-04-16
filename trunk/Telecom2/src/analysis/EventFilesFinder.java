@@ -1,4 +1,4 @@
-package analysis.presence_at_event;
+package analysis;
 
 import java.util.HashMap;
 import java.util.Map;
