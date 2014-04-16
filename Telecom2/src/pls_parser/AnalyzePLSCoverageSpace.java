@@ -17,6 +17,7 @@ import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
+import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
@@ -96,16 +97,27 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
 	
 	public Map<String,RegionMap> getPlsCoverage() {
-		File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
-		Map<String,RegionMap> map = new HashMap<String,RegionMap>();
-		for(File basedir: basedirs) {
-			for(File dir: basedir.listFiles()) {
-				if(!map.containsKey(dir.getName())) {
-					AnalyzePLSCoverageSpace ba = new AnalyzePLSCoverageSpace(dir.getAbsolutePath());
-					ba.run();
-					map.put(dir.getName(),ba.rm);
+		
+		
+		Map<String,RegionMap> map = null;
+		File odir = FileUtils.createDir("BASE/RegionMap");
+		File f = new File(odir+"/plsCoverageSpace.ser");
+		if(f.exists()) {
+			map = (Map<String,RegionMap>)CopyAndSerializationUtils.restore(f);
+		}
+		else {
+			File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
+			map = new HashMap<String,RegionMap>();
+			for(File basedir: basedirs) {
+				for(File dir: basedir.listFiles()) {
+					if(!map.containsKey(dir.getName())) {
+						AnalyzePLSCoverageSpace ba = new AnalyzePLSCoverageSpace(dir.getAbsolutePath());
+						ba.run();
+						map.put(dir.getName(),ba.rm);
+					}
 				}
 			}
+			CopyAndSerializationUtils.save(f, map);
 		}
 		return map;
 	}

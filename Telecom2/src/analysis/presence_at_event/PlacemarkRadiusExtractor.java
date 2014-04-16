@@ -54,8 +54,7 @@ public class PlacemarkRadiusExtractor {
 	// if MAX = false we compute the zXradius as the sum of the z within the event time interval
 	public static final boolean MAX = true;
 	
-	
-	
+
 	public static final String ODIR = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
 	
 	public static void main(String[] args) throws Exception { 
