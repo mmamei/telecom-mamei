@@ -70,7 +70,8 @@ public class PLSBehaviorInAnArea {
 		
 		PLSBehaviorInAnArea pbia = new PLSBehaviorInAnArea();
 		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672);
-		System.out.println(pbia.getJSMap(plsdata));
+		if(plsdata!=null)
+			System.out.println(pbia.getJSMap(plsdata));
 		Logger.logln("Done!");
 	}
 	
@@ -79,7 +80,12 @@ public class PLSBehaviorInAnArea {
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2) {
 		try {
-			Config.getInstance().pls_folder = "G:/DATASET/PLS/file_pls/file_pls_fi"; // <-- questo va eliminato!
+			
+			EventFilesFinder eff = new EventFilesFinder();
+			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
+			if(dir == null) return null;
+			
+			Config.getInstance().pls_folder = "G:/DATASET/PLS/file_pls/"+dir; 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));
 			double lon = (lon1+lon2)/2;
