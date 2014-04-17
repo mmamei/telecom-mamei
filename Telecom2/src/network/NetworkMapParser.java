@@ -24,7 +24,7 @@ public class NetworkMapParser {
 		File dir = new File(Config.getInstance().network_map_dir);
 		String[] files = dir.list();
 		for(String file: files) {
-			BufferedReader in = new BufferedReader(new FileReader(Config.getInstance().network_map_dir+"/"+file));
+			BufferedReader in = new BufferedReader(new FileReader(dir+"/"+file));
 			HashMap<Long, NetworkCell> map = new HashMap<Long, NetworkCell>();
 			String line;
 			while((line = in.readLine()) != null){
@@ -35,7 +35,7 @@ public class NetworkMapParser {
 			in.close();
 			
 
-			ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(FileUtils.getFile("NetworkMapParser")+"/"+file.substring(0,file.length()-4)+".bin")));
+			ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(FileUtils.getFile("BASE/NetworkMapParser")+"/"+file.substring(0,file.length()-4)+".bin")));
 			out.writeObject(map);
 			out.close();
 		}
