@@ -10,8 +10,13 @@ import java.util.GregorianCalendar;
 
 
 public class Config {
+	private static String CFILE = "G:/CODE/Telecom/config/config.txt";
+	static {
+		File f = new File(CFILE);
+		if(!f.exists()) CFILE = "C:/Users/Marco/Google Drive/Code/TELECOM/Telecom2/config/config.txt";
+	}
 	
-	private static final String CFILE = "G:/CODE/Telecom/config/config.txt";
+	
 	// singleton
 	private static Config conf = null;
 	
@@ -93,7 +98,7 @@ public class Config {
 	public String get_pls_subdir() {
 		String subdir = pls_folder;
 		subdir = subdir.replaceAll(":", "");
-		subdir = subdir.replaceAll("/", "_");
+		subdir = subdir.replaceAll("/|\\\\", "_");
 		return subdir;
 	}
 	

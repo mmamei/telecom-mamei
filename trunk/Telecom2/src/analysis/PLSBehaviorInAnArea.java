@@ -24,6 +24,7 @@ import org.gps.utils.LatLonUtils;
 
 import pls_parser.PLSEventsAroundAPlacemark;
 import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphPlotter;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
@@ -84,8 +85,8 @@ public class PLSBehaviorInAnArea {
 			EventFilesFinder eff = new EventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
 			if(dir == null) return null;
-			
-			Config.getInstance().pls_folder = "G:/DATASET/PLS/file_pls/"+dir; 
+				
+			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));
 			double lon = (lon1+lon2)/2;
