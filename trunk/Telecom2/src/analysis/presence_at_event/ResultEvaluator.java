@@ -23,28 +23,35 @@ import visual.java.GraphScatterPlotter;
 public class ResultEvaluator {
 	
 	
+	public static boolean PLOT = false;
+	
 	public static boolean USE_INDIVIDUAL_EVENT = true;
 	public static boolean DIFF = false;
 
 	public static boolean LEAVE_ONE_OUT = true;
-	public static boolean PIECEWISE = false;
+	public static boolean PIECEWISE = true;
 	public static int PIECE_SIZE = 6;
 	
-	public static boolean RANGE = true;
+	public static boolean RANGE = false;
 	public static int RANGE_TH = 10000;
 	
 	
 	public static boolean INTERCEPT = true;
 	public static final boolean VERBOSE = false;
+	
+	
+	private static String type = USE_INDIVIDUAL_EVENT ? "individual" : "multiple";
+	private static String sdiff = DIFF ? "_diff" : "";
+	
+	private static File lomb = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_"+type+"_0.0_3"+sdiff+".csv");
+	private static File piem2012 = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
+	private static File piem2013 = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
+	//private static String piem2013_openair = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_openair_"+type+"_0.0_3"+sdiff+".csv");
+
+	
+	
 	public static void main(String[] args) throws Exception {
 		
-		String type = USE_INDIVIDUAL_EVENT ? "individual" : "multiple";
-		String sdiff = DIFF ? "_diff" : "";
-		File lomb = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_"+type+"_0.0_3"+sdiff+".csv");
-		File piem2012 = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
-		File piem2013 = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
-		//String piem2013_openair = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_openair_"+type+"_0.0_3"+sdiff+".csv");
-
 		File[] training = new File[]{lomb,piem2012,piem2013};
 		File[] testing = new File[]{lomb,piem2012,piem2013};
 		
@@ -53,48 +60,68 @@ public class ResultEvaluator {
 		Logger.logln("Done");
 	}
 	
+	public static int run(File file) {
+		try {
+			Map<String,List<double[]>>  scaled = run(new File[]{lomb,piem2012,piem2013},new File[]{file});
+			return (int)scaled.values().iterator().next().get(0)[0];
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 	
-	public static void run(File[] training_files, File[] testing_files) throws Exception {
+	
+	
+	public static Map<String,List<double[]>> run(File[] training_files, File[] testing_files) throws Exception {
 		Map<String,List<double[]>> training_map = read(training_files);
 		Map<String,List<double[]>> testing_map = read(testing_files);
+		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
 		if(RANGE) {
 			Map<String,List<double[]>>[] tra = divide(training_map,RANGE_TH);
 			Map<String,List<double[]>>[] tst = divide(testing_map,RANGE_TH);
 			
 			Logger.logln("RESULTS FOR EVENTS BELOW "+RANGE_TH);
 			INTERCEPT = false;
-			run(tra[0],tst[0]);
+			scaled.putAll(run(tra[0],tst[0]));
 			
 			Logger.logln("\nRESULTS FOR EVENTS ABOVE "+RANGE_TH);
 			INTERCEPT = true;
-			run(tra[1],tst[1]);
+			scaled.putAll(run(tra[1],tst[1]));
 		}
-		else run(training_map,testing_map);
-		
+		else scaled.putAll(run(training_map,testing_map));
+		return scaled;
 	}
+
 		
-		// scale testing data according to training regression
+     // scale testing data according to training regression
 		
-	public static void run(Map<String,List<double[]>> training_map, Map<String,List<double[]>> testing_map) throws Exception {
+	public static Map<String,List<double[]>> run(Map<String,List<double[]>> training_map, Map<String,List<double[]>> testing_map) throws Exception {
 		
 		Map<String,List<double[]>> scaled = PIECEWISE ? scalePiecewise(testing_map,training_map) : scale(testing_map,training_map);
-		draw("Testing",testing_map);
-		draw("Result after scaling",scaled);
 		
-		// compute error
+		if(PLOT) {
+			draw("Testing",testing_map);
+			draw("Result after scaling",scaled);
 		
-		DescriptiveStatistics[] abs_perc_errors = computeErrorStats(scaled);
-		DescriptiveStatistics abs_err_stat = abs_perc_errors[0];
-		DescriptiveStatistics perc_err_stat = abs_perc_errors[1];
-		
-		
-		Logger.logln("MEAN ABS ERROR = "+(int)abs_err_stat.getMean());
-		Logger.logln("MEDIAN ABS ERROR = "+(int)abs_err_stat.getPercentile(50));
-		Logger.logln("SKEWNESS ABS ERROR ="+abs_err_stat.getSkewness());
-		Logger.logln("MEAN % ERROR = "+(int)perc_err_stat.getMean()+"%");
-		Logger.logln("MEDIAN % ERROR = "+(int)perc_err_stat.getPercentile(50)+"%");
-		Logger.logln("SKEWNESS % ERROR ="+perc_err_stat.getSkewness());
+			// compute error
+			
+			DescriptiveStatistics[] abs_perc_errors = computeErrorStats(scaled);
+			DescriptiveStatistics abs_err_stat = abs_perc_errors[0];
+			DescriptiveStatistics perc_err_stat = abs_perc_errors[1];
+			
+			
+			Logger.logln("MEAN ABS ERROR = "+(int)abs_err_stat.getMean());
+			Logger.logln("MEDIAN ABS ERROR = "+(int)abs_err_stat.getPercentile(50));
+			Logger.logln("SKEWNESS ABS ERROR ="+abs_err_stat.getSkewness());
+			Logger.logln("MEAN % ERROR = "+(int)perc_err_stat.getMean()+"%");
+			Logger.logln("MEDIAN % ERROR = "+(int)perc_err_stat.getPercentile(50)+"%");
+			Logger.logln("SKEWNESS % ERROR ="+perc_err_stat.getSkewness());
+		}
+		return scaled;
 	}
+	
+	
+	
 	
 	
 	public static Map<String,List<double[]>>[] divide(Map<String,List<double[]>> x, double threshold) {
@@ -260,7 +287,7 @@ public class ResultEvaluator {
 			
 			if(LEAVE_ONE_OUT && i==0 && Math.abs(x-all.get(i)[0]) < 0.0000001) {
 				PIECE_SIZE ++;
-				System.out.println("-------------------------------------------------------------leave one out effective!");
+				//System.out.println("-------------------------------------------------------------leave one out effective!");
 				continue;
 			}
 			r.addData(all.get(i)[0], all.get(i)[1]);

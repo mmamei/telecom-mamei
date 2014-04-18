@@ -35,7 +35,7 @@ import area.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	
-	public static final boolean PLOT = true;
+	public static boolean PLOT = false;
 	public static final boolean CALL_PRESENCE_COUNTER_AFTERWARDS = !PLOT;
 	public static final boolean NORMALIZE_SPATIALLY = true;
 	public static final boolean DIFF = false;
@@ -56,20 +56,22 @@ public class PlacemarkRadiusExtractor {
 	
 
 	public static final String ODIR = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
-	
+	public static final String OFILE = DIFF ? "result_individual_diff.csv" :  "result_individual.csv";
 	public static void main(String[] args) throws Exception { 
+		List<CityEvent> all = CityEvent.getEventsInData();
+		process(all);
+		Logger.logln("Done");
+		if(CALL_PRESENCE_COUNTER_AFTERWARDS) PresenceCounter.process(all);
+	}
 		
-		String file = DIFF ? "result_individual_diff.csv" :  "result_individual.csv";
-		
+	public static void process(List<CityEvent> all) throws Exception {
 		new File(ODIR).mkdirs();
-		File f = new File(ODIR+"/"+file);
+		File f = new File(ODIR+"/"+OFILE);
 		if(f.exists() && f.length() > 0) {
-			System.err.println(ODIR+"/"+file+" already exists!!!!!");
+			System.err.println(ODIR+"/"+OFILE+" already exists!!!!!");
 			System.err.println("Manually remove the file before proceeding!");
 			//System.exit(0);
 		}
-		
-		List<CityEvent> all = CityEvent.getEventsInData();
 		
 		// divide all the events by placemark
 		Map<String,List<CityEvent>> eventsByPlacemark = new HashMap<String,List<CityEvent>>();
@@ -84,9 +86,9 @@ public class PlacemarkRadiusExtractor {
 		
 		PrintWriter out = new PrintWriter(new FileWriter(f));
 		for(String p : eventsByPlacemark.keySet()) {
-			List<CityEvent> le = eventsByPlacemark.get(p);
-			List<double[][]> valXradius = createOrLoadValueRadiusDistrib(le,false);
-			List<double[][]> valXring = createOrLoadValueRadiusDistrib(le,true);
+			List<CityEvent> le = eventsByPlacemark.get(p);  // <--------------------------------------------------- here
+			List<double[][]> valXradius = createOrLoadValueRadiusDistrib(p,le,false);
+			List<double[][]> valXring = createOrLoadValueRadiusDistrib(p,le,true);
 			
 			if(NORMALIZE_SPATIALLY) {
 				Placemark x = le.get(0).spot.clone();
@@ -113,10 +115,7 @@ public class PlacemarkRadiusExtractor {
 						if(data2 != null) data2[r][1] = data2[r][1] / durationH;
 						if(data3 != null) data3[r][1] = data3[r][1] / durationH;
 					}
-						
-					
-					
-					
+								
 					plot(le.get(i).toString(),data1,data2,data3,ODIR+"/"+le.get(i)+"_val_r_distrib.png");
 				}
 			
@@ -131,12 +130,9 @@ public class PlacemarkRadiusExtractor {
 			}
 		} 
 		
-		out.close();
-		Logger.logln("Done");
-		
-		if(CALL_PRESENCE_COUNTER_AFTERWARDS) PresenceCounter.main(null);
-		
+		out.close();	
 	}
+	
 	
 	public static void normalizeByArea(List<double[][]> valXradius, Placemark p) {
 		for(double[][] vxr: valXradius) {
@@ -167,7 +163,7 @@ public class PlacemarkRadiusExtractor {
 	}
 	
 	
-	public static List<double[][]> createOrLoadValueRadiusDistrib(List<CityEvent> le, boolean ring) throws Exception {
+	public static List<double[][]> createOrLoadValueRadiusDistrib(String placemark, List<CityEvent> le, boolean ring) throws Exception {
 		List<double[][]> list_valueRadiusDistrib  = null;
 		// restore
 		
@@ -175,11 +171,12 @@ public class PlacemarkRadiusExtractor {
 		if(ring) n = "ring_"+n;
 		
 		
+		File dir = MAX ? new File(ODIR+"/"+placemark+"/zXr_ser_computed_with_max") : new File(ODIR+"/"+placemark+"/zXr_ser_computed_with_sum");
+		File f = new File(dir+"/"+n+"_zXradius.ser");
 		
-		
-		File f = MAX ? new File(ODIR+"/zXr_ser_computed_with_max/"+n+"_zXradius.ser") : new File(ODIR+"/"+n+"_zXradius.ser");
 		if(f.exists()) list_valueRadiusDistrib = (List<double[][]>)CopyAndSerializationUtils.restore(f);
 		else {
+			dir.mkdirs();
 			list_valueRadiusDistrib = computeZXRadius(le,ring); 
 			CopyAndSerializationUtils.save(f, list_valueRadiusDistrib);
 		}

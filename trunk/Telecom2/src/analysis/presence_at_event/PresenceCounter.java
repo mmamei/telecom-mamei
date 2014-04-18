@@ -30,24 +30,28 @@ public class PresenceCounter {
 	
 	public static boolean USE_PROBABILITY = true;
 	public static boolean USE_INDIVIDUAL_EVENT = true;
+	public static boolean PLOT = false;
+	public static boolean WRITE_PROB_SCORES = false;
+	
+	private static double O_RADIUS = 0;
+	private static int DAYS = 3;
+	
+	
+	public static File ODIR = FileUtils.createDir("BASE/PresenceCounter/"+Config.getInstance().get_pls_subdir());
+	public static String IM = PlacemarkRadiusExtractor.USE_INDIVIDUAL_EVENT? "individual" : "multiple";
+	public static String SDIFF = PlacemarkRadiusExtractor.DIFF ? "_diff" : "";
+	public static String OFILE = "result_"+IM+"_"+O_RADIUS+"_"+DAYS+SDIFF+".csv";
 	
 	
 	public static void main(String[] args) throws Exception {	
-		double o_radius = 0;
-		int days = 3;
-		process(o_radius,days);
-		
+		List<CityEvent> events = CityEvent.getEventsInData();
+		process(events);
 	}
 		
-	
-	public static void process(double o_radius, int days) throws Exception {
-		
-		Logger.log("Processing: o_radius = "+o_radius+" days = "+days+" ");
-		
+	public static void process(List<CityEvent> events) throws Exception {
+		Logger.log("Processing: o_radius = "+O_RADIUS+" days = "+DAYS+" ");
 		
 		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(USE_INDIVIDUAL_EVENT,PlacemarkRadiusExtractor.DIFF);	
-		
-		List<CityEvent> events = CityEvent.getEventsInData();
 		
 		//create a map that associates a Placemark with the list of events happening in there
 		Map<String,List<CityEvent>> placemark_events = new HashMap<String,List<CityEvent>>();
@@ -75,10 +79,8 @@ public class PresenceCounter {
 				
 				String key = USE_INDIVIDUAL_EVENT ? ce.toString() : ce.spot.name;
 				double bestr = bestRadius.get(key);
-				
 				ce.spot.changeRadius(bestr);
-				
-				double c = count(ce,o_radius,days);
+				double c = count(ce,O_RADIUS,DAYS);
 				
 				//Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
 				Logger.logln(ce.toString()+","+bestr+","+(int)c+","+ce.head_count);
@@ -95,19 +97,12 @@ public class PresenceCounter {
 		
 		Logger.logln("r="+sr.getR()+", r^2="+sr.getRSquare()+", sse="+sr.getSumSquaredErrors());
 		
-		
-		new GraphScatterPlotter("PC Result: o_radius = "+o_radius+",days = "+days+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
-		
+		if(PLOT) new GraphScatterPlotter("PC Result: o_radius = "+O_RADIUS+",days = "+DAYS+",R = "+sr.getR(),"Estimated","GroundTruth",data,labels);
 		
 		
+
 		
-		File d = FileUtils.createDir("BASE/PresenceCounter/"+Config.getInstance().get_pls_subdir());
-		
-		String im = PlacemarkRadiusExtractor.USE_INDIVIDUAL_EVENT? "individual" : "multiple";
-		String sdiff = PlacemarkRadiusExtractor.DIFF ? "_diff" : "";
-		
-		String file = "result_"+im+"_"+o_radius+"_"+days+sdiff+".csv";
-		PrintWriter out = new PrintWriter(new FileWriter(d+"/"+file));
+		PrintWriter out = new PrintWriter(new FileWriter(ODIR+"/"+OFILE));
 		out.println("event,estimated,groundtruth");
 		
 		int i = 0;	
@@ -131,16 +126,18 @@ public class PresenceCounter {
 		
 		String suffix = USE_INDIVIDUAL_EVENT ? "" : "Multi";
 		
-		String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir()+"/ProbScores"+suffix;
-		File d = new File(dir);
-		if(!d.exists()) d.mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+event.toFileName()));
-		
+		PrintWriter out = null;
+		if(WRITE_PROB_SCORES) {
+			String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir()+"/ProbScores"+suffix;
+			File d = new File(dir);
+			if(!d.exists()) d.mkdirs();
+			out = new PrintWriter(new FileWriter(dir+"/"+event.toFileName()));
+		}
 		
 		//Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
 		
-		String file_event = getFile(event.spot.clone(),event.spot.getR());
-		String file_other = getFile(event.spot.clone(),o_radius);
+		File file_event = getFile(event.spot.clone(),event.spot.getR());
+		File file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
 		
@@ -153,7 +150,7 @@ public class PresenceCounter {
 		
 		CityEvent e2 = new CityEvent(event.spot.clone(),start,end,event.head_count);
 		e2.spot.changeRadius(o_radius);
-				
+		
 		Map<String,List<PlsEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
 		Map<String,List<PlsEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
 		
@@ -171,27 +168,26 @@ public class PresenceCounter {
 				if(f2 > 0) f2 = 1;
 			}
 			
-			out.println(u+";"+(f1 * (1-f2)));
+			if(WRITE_PROB_SCORES) out.println(u+";"+(f1 * (1-f2)));
 			prob +=  f1*(1-f2);
 		}
 		
-		out.close();
+		if(WRITE_PROB_SCORES) out.close();
 		return prob;
 	}
 	
-	public static String getFile(Placemark p, double radius) throws Exception{
+	public static File getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
-		String file = "G:/BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";
-		File f = new File(file);
-		if(!f.exists()) {
-			Logger.logln(file+" does not exist");
+		File f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt");
+		if(f==null || !f.exists()) {
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
 			PLSEventsAroundAPlacemark.process(p);
+			f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt");
 		}
-		return file;
+		return f;
 	}
 	
-	public static Set<String> getUsers(String file, Calendar start, Calendar end, Calendar start_exclude, Calendar end_exclude) throws Exception {
+	public static Set<String> getUsers(File file, Calendar start, Calendar end, Calendar start_exclude, Calendar end_exclude) throws Exception {
 		Set<String> users = new HashSet<String>();
 		String line;
 		Calendar cal = new GregorianCalendar();
@@ -220,7 +216,8 @@ public class PresenceCounter {
 	}
 	
 	
-	public static Map<String,List<PlsEvent>> getUsersPLS(String file, Set<String> users) throws Exception {
+	public static Map<String,List<PlsEvent>> getUsersPLS(File file, Set<String> users) throws Exception {
+		
 		Map<String,List<PlsEvent>> usr_pls = new HashMap<String,List<PlsEvent>>();
 		for(String u: users)
 			usr_pls.put(u, new ArrayList<PlsEvent>());
