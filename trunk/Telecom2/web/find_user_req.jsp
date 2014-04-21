@@ -4,7 +4,7 @@
 <%@include file="includes/mapTimeSelectJS.html" %>
 
 <script type="text/javascript">
-jspLocation = "plsBehaviorInAnArea_res.jsp";
+jspLocation = "event_attendance_res.jsp";
 longRun = true;
 </script>
 
@@ -13,7 +13,7 @@ longRun = true;
 <%@include file="includes/header.html" %>
 <div class="wrapper style1">
 <div class="container">
-<h2>PLS Behavior In An Area</h2>
+<h2>Event Attendance Estimate</h2>
 
 <%@include file="includes/mapTimeSelectHTML.html" %>
 
