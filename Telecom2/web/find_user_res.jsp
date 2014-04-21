@@ -1,5 +1,6 @@
 <html>
 <head>
+<jsp:useBean id="uf" scope="application" class="analysis.find_user.UserFinder"/>
 <%@include file="includes/head.html" %>
 </head>
 <body class="no-sidebar">
@@ -14,7 +15,8 @@
 		<h3>Request:</h3>
 		<%
 		String q = request.getParameter("q");
-		out.println(q);
+		//out.println(q);
+		out.println(uf.find(q));
 		%>
 		
 	</article>
