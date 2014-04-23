@@ -51,7 +51,6 @@ public class Config {
 	public String pls_folder = null;
 	public Calendar pls_start_time = null;
 	public Calendar	pls_end_time = null;
-	public String base_dir = null;
 	public String placemarks_file = null;
 	public String events_file = null;
 	
@@ -79,10 +78,6 @@ public class Config {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
-		}
-		else if(name.equals("base_dir")) {
-			base_dir = value;
-			new File(base_dir).mkdir();
 		}
 		else if(name.equals("placemarks_file")) 
 			placemarks_file = value;

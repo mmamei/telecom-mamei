@@ -30,7 +30,7 @@ public class ODMatrixEventPresence {
 		
 		CityEvent ce_expand = CityEvent.expand(ce, 1, expand);
 		
-		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+ce.spot.name+".ser");
+		File input_obj_file = new File("BASE/cache/"+ce.spot.name+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
 			System.exit(0);
@@ -42,7 +42,7 @@ public class ODMatrixEventPresence {
 		
 		// READ INFORMATION ABOUT EVENT ATTENDANCE
 		Map<String,Double> user_pres_prob = new HashMap<String,Double>();
-		BufferedReader br1 = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/PresenceCounterProbability/ProbScores/"+ce.toFileName())));
+		BufferedReader br1 = new BufferedReader(new FileReader(new File("BASE/PresenceCounterProbability/ProbScores/"+ce.toFileName())));
 		String line;
 		//c1a4c67ec172ae1554e9856db5358fcb1664fcbff4b0222a1d86c093a32736b;0.8324594444444444
 		while((line=br1.readLine())!=null) {
@@ -56,7 +56,7 @@ public class ODMatrixEventPresence {
 		Map<Move,Double> incoming_od = new HashMap<Move,Double>();
 		Map<Move,Double> outgoing_od = new HashMap<Move,Double>();
 		
-		BufferedReader br2 = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent/"+ce_expand.toFileName())));
+		BufferedReader br2 = new BufferedReader(new FileReader(new File("BASE/LocationsXUserAroundAnEvent/"+ce_expand.toFileName())));
 		
 		NetworkMap nm = NetworkMapFactory.getNetworkMap(event.substring(event.indexOf(",")+1));
 		

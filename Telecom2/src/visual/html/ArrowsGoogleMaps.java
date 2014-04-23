@@ -116,7 +116,7 @@ public class ArrowsGoogleMaps {
 		w.add(3.0);
 		colors.add("#00ff");
 		
-		draw(Config.getInstance().base_dir+"/arrows.html","Arrow Map Example",points,w,colors,false);
+		draw("BASE/arrows.html","Arrow Map Example",points,w,colors,false);
 		Logger.log("Done!");
 	}
 	

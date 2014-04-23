@@ -37,7 +37,7 @@ public class PLSParser {
 		
 		eTime = System.currentTimeMillis();
 		mins = (int)((eTime - sTime) / 60000);
-		Logger.logln("Completed after "+mins+" mins");
+		//Logger.logln("Completed after "+mins+" mins");
 	}
 	
 	
@@ -48,7 +48,7 @@ public class PLSParser {
 	static Map<String,String> allDays = new TreeMap<String,String>();
 	
 	private static void analyzeDirectory(File directory, BufferAnalyzer analyzer) throws Exception{	
-		System.out.println(directory.getAbsolutePath());
+		//System.out.println(directory.getAbsolutePath());
 		
 		File[] items = directory.listFiles();
 		for(int i=0; i<items.length;i++){

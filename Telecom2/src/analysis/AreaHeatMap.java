@@ -32,7 +32,7 @@ public class AreaHeatMap {
 	
 	public static void execute(CityEvent ce) throws Exception {
 		
-		String dir = Config.getInstance().base_dir+"/UsersCSVCreator/"+ce.toString();
+		String dir = "BASE/UsersCSVCreator/"+ce.toString();
 		File fd = new File(dir);
 		if(!fd.exists()) {
 			Logger.logln(dir+" does not exist");

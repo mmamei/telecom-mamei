@@ -15,7 +15,8 @@
 		<h3>Request:</h3>
 		<%
 		String q = request.getParameter("q");
-		//out.println(q);
+		out.println(q);
+		out.println("<h3>Response:</h3>");
 		out.println(uf.find(q));
 		%>
 		

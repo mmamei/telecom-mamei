@@ -98,7 +98,7 @@ public class PLSBehaviorInAnArea {
 			Placemark p = new Placemark(n,n,new double[]{lat,lon},r);
 			
 			PLSEventsAroundAPlacemark.process(p);
-			String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";
+			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";
 			PLSMap plsmap = getPLSMap(file,false).get("all");
 			(new File(file)).delete();
 			DescriptiveStatistics[] stats = getStats(plsmap);
@@ -130,7 +130,7 @@ public class PLSBehaviorInAnArea {
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		
-		String file = Config.getInstance().base_dir+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt";
+		String file = "BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -166,8 +166,7 @@ public class PLSBehaviorInAnArea {
 			//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
 			
 			if(VERBOSE) {
-				
-				PrintWriter out = new PrintWriter(new FileWriter(Config.getInstance().base_dir+"/PLSBehaviorInAnArea/"+p.name+"_"+p.getR()+".csv"));
+				PrintWriter out = new PrintWriter(new FileWriter("BASE/PLSBehaviorInAnArea/"+p.name+"_"+p.getR()+".csv"));
 				out.println("time,n_user,z_score");
 				for(int i=0; i<plsmap.getDomain().length;i++) {
 					out.println(plsmap.getDomain()[i]+";"+(int)usr_data[i]+";"+DF.format(z_usr_data[i]));

@@ -22,7 +22,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 	private PrintWriter out = null;
 	private NetworkMap nm;
 	public PLSEventsAroundAnEvent(CityEvent ce, int time_shift, double space_shift) {
-		String dir = Config.getInstance().base_dir+"/"+this.getClass().getSimpleName();
+		String dir = "BASE/"+this.getClass().getSimpleName();
 		File fd = new File(dir);
 		if(!fd.exists()) fd.mkdirs();
 		cevent = CityEvent.expand(ce,time_shift,space_shift);

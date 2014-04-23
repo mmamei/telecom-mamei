@@ -32,7 +32,7 @@ public class CreatorRegionMapComuni {
 	public static void main(String[] args) throws Exception {
 		String region = "Piemonte";
 		String input_kml_file="C:/DATASET/GEO/"+region+".kml";
-		String output_obj_file=Config.getInstance().base_dir+"/cache/"+region+".ser";
+		String output_obj_file="BASE/cache/"+region+".ser";
 		process(region, input_kml_file,output_obj_file);
 	}
 	

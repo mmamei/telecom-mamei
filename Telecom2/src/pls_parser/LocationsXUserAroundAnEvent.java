@@ -68,7 +68,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 	public void finish() {
 		try {
 			
-			String dir = Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent";
+			String dir = "BASE/LocationsXUserAroundAnEvent";
 			File fd = new File(dir);
 			if(!fd.exists()) fd.mkdirs();
 			

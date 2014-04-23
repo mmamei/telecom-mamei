@@ -18,7 +18,7 @@ public class ParserDatiISTAT {
 		String dir = "C:/DATASET/ISTAT/DatiDemografici/Piemonte";
 		Map<String,Integer> data = parse(dir);
 		
-		File out_dir = new File(Config.getInstance().base_dir+"/ParserDatiISTAT");
+		File out_dir = new File("BASE/ParserDatiISTAT");
 		out_dir.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(out_dir+"/Piemonte.csv"));
 		
@@ -29,7 +29,7 @@ public class ParserDatiISTAT {
 	
 	
 	public static Map<String,Integer> load(String region) throws Exception {
-		File f = new File(Config.getInstance().base_dir+"/ParserDatiISTAT/"+region+".csv");
+		File f = new File("BASE/ParserDatiISTAT/"+region+".csv");
 		BufferedReader br = new BufferedReader(new FileReader(f));
 		
 		Map<String,Integer> istat = new HashMap<String,Integer>();

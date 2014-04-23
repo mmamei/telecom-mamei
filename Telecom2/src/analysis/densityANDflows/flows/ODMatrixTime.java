@@ -19,7 +19,7 @@ public class ODMatrixTime {
 	public static void main(String[] args) throws Exception {
 		
 		String region = "Stadio Silvio Piola (NO)";//"TorinoGrid20";
-		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+region+".ser");
+		File input_obj_file = new File("BASE/cache/"+region+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
 			System.exit(0);
@@ -34,7 +34,7 @@ public class ODMatrixTime {
 		String file = "Stadio_Silvio_Piola_(NO)-11_03_2012_18_00-12_03_2012_00_00.txt";//"Torino-11_03_2012_17_00-11_03_2012_19_00.txt";
 		NetworkMap nm = NetworkMapFactory.getNetworkMap("11/03/2012");
 		
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_dir+"/LocationsXUserAroundAnEvent/"+file)));
+		BufferedReader br = new BufferedReader(new FileReader("BASE/LocationsXUserAroundAnEvent/"+file));
 		String line;
 		while((line=br.readLine())!=null) {
 			line = line.substring(line.indexOf(",")+1).trim();

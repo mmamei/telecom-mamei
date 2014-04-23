@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-
-import utils.Config;
+import utils.FileUtils;
 import utils.Logger;
 import analysis.UserTrace;
 import area.CityEvent;
@@ -19,46 +19,15 @@ import area.CityEvent;
 public class UsersCSVCreator extends BufferAnalyzer {
 
 	private HashMap<String,UserTrace> traces;
+	private String subdir;
 	
-	private String outputdir;
 	
 	
-	public UsersCSVCreator(String usersListFile) {
-		if(!new File(usersListFile).exists()) {
-			Logger.logln(usersListFile+" Does not exist!");
-			Logger.logln("You must get the list of usesr by running one of the pls_parser.User* classes!");
-			System.exit(0);
-		}
-		
-		String odir_name = usersListFile.substring(usersListFile.lastIndexOf("/")+1,usersListFile.lastIndexOf("."));
-		outputdir = Config.getInstance().base_dir +"/"+ this.getClass().getSimpleName() +"/"+ odir_name;
-		try {
-			FileUtils.deleteDirectory(new File(outputdir));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		boolean ok = new File(outputdir).mkdirs();
-		if(ok)
-			Logger.logln("Create directory: "+outputdir);
-		else {
-			Logger.logln("Failed to create directory: "+outputdir);
-			System.exit(0);
-		}
-			
-		
+	public UsersCSVCreator(Set<String> users, String subdir) {
+		this.subdir = subdir;
 		traces = new HashMap<String,UserTrace>();
-		// file contains the username of the users to be processed
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(usersListFile));
-			String line;
-			while((line=in.readLine())!=null) {
-				String username = line.trim();
-				traces.put(username,new UserTrace(username));
-			}
-			in.close();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		for(String u: users) 
+			traces.put(u, new UserTrace(u));
 	}
 	
 	String[] fields;
@@ -69,23 +38,51 @@ public class UsersCSVCreator extends BufferAnalyzer {
 			ut.addEvent(fields[1].trim(), Long.parseLong(fields[2].trim()), fields[3].trim());
 	}
 	
+	
+	public UserTrace get(String user) {
+		return traces.get(user);
+	}
+	
 	public void finish() {
+		
+		File dir = FileUtils.getFile("BASE/UsersCSVCreator/"+subdir);
+		if(dir != null) {
+			Logger.logln(dir+" is already there! Manually remove before proceeding");
+			System.exit(0);
+		}
+		dir = FileUtils.createDir("BASE/UsersCSVCreator/"+subdir);
+		
 		for(UserTrace ut: traces.values()) 
 			try {
-				ut.saveToCSV(outputdir);
+				ut.saveToCSV(dir.getAbsolutePath());
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
 	}
 	
+	public static Set<String> getUserListFromFile(File file) {
+		Set<String> users = new HashSet<String>();
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(file));
+			String line;
+			while((line=in.readLine())!=null) 
+				users.add(line.trim());
+			in.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return users;
+	}
+	
 	
 	public static void create(CityEvent ce) throws Exception {
-		String file = Config.getInstance().base_dir+"/UsersAroundAnEvent/"+ce.toFileName();
-		if(!new File(file).exists()) {
+		File file = FileUtils.getFile("BASE/UsersAroundAnEvent/"+ce.toFileName());
+		if(file == null) {
 			Logger.logln(file+" Does not exist!");
 			Logger.logln("Running UsersAroundAnEvent.process()");
 			try {
 				UsersAroundAnEvent.process(ce);
+				file = FileUtils.getFile("BASE/UsersAroundAnEvent/"+ce.toFileName());
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(0);
@@ -94,7 +91,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 		else {
 			Logger.logln(file+" already exists!");
 		}
-		UsersCSVCreator ba = new UsersCSVCreator(file);
+		UsersCSVCreator ba = new UsersCSVCreator(getUserListFromFile(file),ce.toString());
 		if(ba.traces.size() > 0) {
 			PLSParser.parse(ba);
 			ba.finish();
@@ -104,8 +101,12 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	public static void main(String[] args) throws Exception {
-		String file = "C:/BASE/UserEventCounter/file_pls_piem_users_above_2000.txt";
-		UsersCSVCreator ba = new UsersCSVCreator(file);
+		File file = FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_users_above_2000.txt");
+		if(file == null) {
+			Logger.logln(file+" Does not exist!");
+			System.exit(0);
+		}
+		UsersCSVCreator ba = new UsersCSVCreator(getUserListFromFile(file),"file_pls_piem_users_above_2000");
 		if(ba.traces.size() > 0) {
 			PLSParser.parse(ba);
 			ba.finish();

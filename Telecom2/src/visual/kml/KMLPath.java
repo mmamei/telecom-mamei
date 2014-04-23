@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Colors;
+import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import analysis.PlsEvent;
@@ -215,14 +216,14 @@ public class KMLPath {
 	public static void main(String[] args) throws Exception {
 		openFile(FileUtils.createDir("BASE/TouristData").getAbsolutePath()+"/test.kml");
 		
-		/*
-		String user = "164e6218294db749859bfffc798c5a51ba31262f6cfd7ab1e4e27d134789ba";
-		List<PlsEvent> data = PlsEvent.readEvents(new File(Config.getInstance().base_dir+"/UsersCSVCreator/test/"+user+".csv"));
-		*/
+		String user = "feaf164623aa5fcac0512b3b4a62496c34458ac017141a808dfe306b62759f";
+		File dir = FileUtils.createDir("BASE/UsersCSVCreator/test");
+		List<PlsEvent> data = PlsEvent.readEvents(new File(dir+"/"+user+".csv"));
 		
+		/*
 		String user = "6f73f1939cbec78c2aa4d8da3ed44da8ed0357b46ccee4439836ec6fb7b90fe";
 		List<PlsEvent> data = getDataFormUserEventCounterCellacXHour("file_pls_fi_Firenze_cellXHour.csv",user);
-		
+		*/
 		print(user,data);
 		
 		closeFile();
