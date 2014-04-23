@@ -3,6 +3,7 @@
 <%@include file="includes/head.html" %>
 <jsp:useBean id="pu" scope="application" class="analysis.find_user.UserPlotter"/>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+<script type="text/javascript" src="js/geoxmlfull_v3.js"></script>
 <script>
 // This example creates circles on the map, representing
 // populations in the United States.
@@ -17,33 +18,34 @@ double lat1 = Double.parseDouble(request.getParameter("lat1"));
 double lon1 = Double.parseDouble(request.getParameter("lon1"));
 double lat2 = Double.parseDouble(request.getParameter("lat2"));
 double lon2 = Double.parseDouble(request.getParameter("lon2"));
+pu.plot(sd,ed, user, lon1, lat1,  lon2, lat2);
 %>
 
 
+var map;
+var cta_layer;
+var gxml; 
 function initialize() {
-  // Create the map.
-  var mapOptions = {
-    zoom: 12,
-    center: new google.maps.LatLng(<%=(lat1+lat2)/2%>,<%=(lon1+lon2)/2%>),
-    mapTypeId: google.maps.MapTypeId.TERRAIN
-  };
-
-  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-  //var utrace = new google.maps.KmlLayer({url: ''});
-  
-  var kmlLayer = new google.maps.KmlLayer('https://localhost:8443/pls/kml/feaf164623aa5fcac0512b3b4a62496c34458ac017141a808dfe306b62759f.kml', {
-	    map: map
-	  });
-
-  
-  //utrace.setMap(map);
+//    var kmlUrl = 'http://earth-api-samples.googlecode.com/svn/trunk/examples/static/red.kml';
+    var myOptions = {
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+		zoom: 8,
+		center: new google.maps.LatLng(42,0.7)
+		}
+    var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+	gxml = new GeoXml("gxml", map, "kml/<%=user%>.kml", {
+		sidebarid:"the_side_bar",
+		quiet:true,
+		iconFromDescription:false
+	}); 
+	gxml.parse();
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
 </script>
-
-
+<link type="text/css" rel="stylesheet" href="css/gmap.css" />
 </head>
+
 <body class="no-sidebar">
 <%@include file="includes/header.html" %>
 <!-- Main -->
@@ -51,12 +53,19 @@ google.maps.event.addDomListener(window, 'load', initialize);
 <div class="container">
 	<article id="main" class="special">
 		<header>
-		<h2><%=user%></h2>
+		<h2><%=user.substring(0,10)+"..."%></h2>
 		</header>
 	</article>
-	<div style="height: 600px" id="map-canvas"></div>
+	<div id="map-container">
+	<div id="the_side_bar" style="font-size:11;float: right;"></div>
+	<div style="height: 600px" id="map_canvas"></div>
+	</div>
 </div>
 </div>
+
+
+
+
 
 </body>
 </html>
