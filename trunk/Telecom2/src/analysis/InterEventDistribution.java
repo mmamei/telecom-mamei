@@ -23,7 +23,7 @@ public class InterEventDistribution {
 	
 	public static void process(CityEvent e) throws Exception {
 		
-		String dir = Config.getInstance().base_dir+"/UsersCSVCreator/"+e.toString();
+		String dir = "BASE/UsersCSVCreator/"+e.toString();
 		File fd = new File(dir);
 		if(!fd.exists()) {
 			Logger.logln(dir+" does not exist");
@@ -103,7 +103,7 @@ public class InterEventDistribution {
 			labels[i] = String.valueOf((int)xaxis[i]);
 		
 		
-		PrintWriter out = new PrintWriter(new FileWriter(new File(Config.getInstance().base_dir+"/InterEventDistribution/InterEventDistrib"+e.toFileName())));
+		PrintWriter out = new PrintWriter(new FileWriter(new File("BASE/InterEventDistribution/InterEventDistrib"+e.toFileName())));
 		out.print("xlabels");
 		for(String l: labels)
 			out.print(","+l);

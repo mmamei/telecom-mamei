@@ -21,6 +21,7 @@ import network.NetworkMapFactory;
 import org.gps.utils.LatLonPoint;
 
 import utils.Config;
+import utils.FileUtils;
 import visual.kml.KML;
 import analysis.PlsEvent;
 
@@ -30,11 +31,8 @@ public class PlaceRecognizerLogger {
 	
 	public static void log(String username, String kind_of_place, Map<Integer, Cluster> clusters) {
 		try {
-		new File(Config.getInstance().base_dir+"/PlaceRecognizerLogger/"+username).mkdirs();
-		new File(Config.getInstance().base_dir+"/PlaceRecognizerLogger/"+username+"/"+kind_of_place).mkdirs();
-		
-		
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(Config.getInstance().base_dir+"/PlaceRecognizerLogger/"+username+"/"+kind_of_place+"/eventsXcluster.txt")));	
+		File dir = FileUtils.createDir("BASE/PlaceRecognizerLogger/"+username+"/"+kind_of_place);
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/eventsXcluster.txt")));	
 		for(int k : clusters.keySet()) {
 			out.println("Cluster "+k+":");
 			List<PlsEvent> events = clusters.get(k).getEvents();
@@ -45,7 +43,7 @@ public class PlaceRecognizerLogger {
 		out.close();
 		
 		DecimalFormat df = new DecimalFormat("###.####",new DecimalFormatSymbols(Locale.US));
-		out = new PrintWriter(new BufferedWriter(new FileWriter(Config.getInstance().base_dir+"/PlaceRecognizerLogger/"+username+"/"+kind_of_place+"/weight_evolution.txt")));	
+		out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/weight_evolution.txt")));	
 		for(int k : clusters.keySet()) {
 			Cluster c = clusters.get(k);
 			double w_time = c.getWeight("WeightOnTime");

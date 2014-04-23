@@ -114,7 +114,7 @@ public class HeatMapGoogleMaps {
 		points.add(new double[]{37.785, -122.435});
 		weights.add(4.0);
 		
-		draw(Config.getInstance().base_dir+"/heatmap.html","Heat Map Example",points,weights);
+		draw("BASE/heatmap.html","Heat Map Example",points,weights);
 		Logger.log("Done!");
 	}
 	

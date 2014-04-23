@@ -59,7 +59,7 @@ public class IstatComparator {
 		}
 		
 		
-		String dir = Config.getInstance().base_dir+"/PopulationDensity";
+		String dir = "BASE/PopulationDensity";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		

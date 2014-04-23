@@ -23,7 +23,7 @@ public class ODMatrixHW {
 	public static void main(String[] args) throws Exception {
 		
 		String region = "Piemonte";//"TorinoGrid20";
-		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+region+".ser");
+		File input_obj_file = new File("BASE/cache/"+region+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
 			System.exit(0);
@@ -32,7 +32,7 @@ public class ODMatrixHW {
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
 		
 		
-		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_dir+"/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
+		Map<String,UserPlaces> up = UserPlaces.readUserPlaces("BASE/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
 		
 		
 		Map<Move,Double> list_od = new HashMap<Move,Double>();

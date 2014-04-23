@@ -28,14 +28,14 @@ public class PopulationDensity {
 		String kind_of_place = "SATURDAY_NIGHT";
 		String exclude_kind_of_place = null;//"HOME";
 		
-		File input_obj_file = new File(Config.getInstance().base_dir+"/cache/"+region+".ser");
+		File input_obj_file = new File("BASE/cache/"+region+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
 			System.exit(0);
 		}
 		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
-		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_dir+"/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
+		Map<String,UserPlaces> up = UserPlaces.readUserPlaces("BASE/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
 		
 		
 		Map<String,Double> density = process(rm,up,kind_of_place,exclude_kind_of_place);

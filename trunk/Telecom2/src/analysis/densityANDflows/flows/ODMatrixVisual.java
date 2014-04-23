@@ -80,7 +80,7 @@ public class ODMatrixVisual {
 		}
 		
 		
-		String dir = Config.getInstance().base_dir+"/ODMatrix";
+		String dir = "BASE/ODMatrix";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
@@ -124,7 +124,7 @@ public class ODMatrixVisual {
 		}
 		
 		
-		String dir = Config.getInstance().base_dir+"/ODMatrix";
+		String dir = "BASE/ODMatrix";
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		

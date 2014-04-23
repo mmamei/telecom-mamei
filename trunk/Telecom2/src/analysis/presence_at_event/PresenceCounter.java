@@ -128,7 +128,7 @@ public class PresenceCounter {
 		
 		PrintWriter out = null;
 		if(WRITE_PROB_SCORES) {
-			String dir = Config.getInstance().base_dir +"/PresenceCounter/"+Config.getInstance().get_pls_subdir()+"/ProbScores"+suffix;
+			String dir = "BASE/PresenceCounter/"+Config.getInstance().get_pls_subdir()+"/ProbScores"+suffix;
 			File d = new File(dir);
 			if(!d.exists()) d.mkdirs();
 			out = new PrintWriter(new FileWriter(dir+"/"+event.toFileName()));

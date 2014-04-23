@@ -30,14 +30,14 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 	public UsersAroundAnEvent(CityEvent c) {
 		event = c;
 		usersAround = new HashSet<String>();
-		String dir = Config.getInstance().base_dir+"/"+this.getClass().getSimpleName();
+		String dir = "BASE/"+this.getClass().getSimpleName();
 		File fd = new File(dir);
 		if(!fd.exists()) fd.mkdirs();
 		
 		this.outputfile = dir+"/"+c.toFileName();
 		startTime = c.st;
 		endTime = c.et;
-		Logger.logln("Extracting users who were close to: "+c);
+		//Logger.logln("Extracting users who were close to: "+c);
 	}
 	
 	public Calendar getStartTime() {
@@ -80,6 +80,10 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Set<String> getUsers() {
+		return usersAround;
 	}
 	
 	

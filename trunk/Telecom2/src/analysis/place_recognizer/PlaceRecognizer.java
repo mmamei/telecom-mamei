@@ -46,7 +46,7 @@ public class PlaceRecognizer {
 		String tperiod = events.get(0).getTimeStamp()+"-"+events.get(events.size()-1).getTimeStamp();
 		
 		Map<Integer, Cluster> clusters = null;
-		File f = new File(Config.getInstance().base_dir+"/cache/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
+		File f = new File("BASE/cache/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
 		if(f.exists()) 
 			clusters = (Map<Integer, Cluster>)CopyAndSerializationUtils.restore(f);
 		else {
@@ -106,8 +106,8 @@ public class PlaceRecognizer {
 	
 	public static void main(String[] args) throws Exception {
 		String dir = "file_pls_piem_users_above_2000";
-		String in_dir = Config.getInstance().base_dir+"/UsersCSVCreator/"+dir;
-		String out_dir = Config.getInstance().base_dir+"/PlaceRecognizer/"+dir;
+		String in_dir = "BASE/UsersCSVCreator/"+dir;
+		String out_dir = "BASE/PlaceRecognizer/"+dir;
 		File d = new File(out_dir);
 		if(!d.exists()) d.mkdirs();
 		

@@ -2,7 +2,6 @@
 <head>
 <%@include file="includes/head.html" %>
 <%@include file="includes/multiMapTimeSelectJS.html" %>
-
 <script type="text/javascript">
 jspLocation = "find_user_res.jsp";
 longRun = true;
