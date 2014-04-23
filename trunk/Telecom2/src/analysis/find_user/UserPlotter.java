@@ -40,10 +40,9 @@ public class UserPlotter {
 			
 			UserTrace trace = ba.get(user);
 		
-			KMLPath.openFile("web/kml/"+user+".kml");
+			KMLPath.openFile("G:/CODE/Telecom/web/kml/"+user+".kml");
 			KMLPath.print(user,trace.getEvents());
-			KMLPath.closeFile();
-					
+			KMLPath.closeFile();		
 			
 		} catch(Exception e) {
 			e.printStackTrace();

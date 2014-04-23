@@ -46,7 +46,7 @@ public class KMLPath {
 	
 	
 	public static void print(String username, List<PlsEvent> plsEvents) {
-		kml.printFolder(out, username);
+		kml.printFolder(out, username.substring(0,10)+"...");
 		List<PlsEvent> s = plsEvents;//FilterAndCounterUtils.smooth(plsEvents);
 		Map<String,List<PlsEvent>> evPerDay = splitByDay(s);
 		
@@ -100,7 +100,7 @@ public class KMLPath {
 	        	"<color>ff0000ff</color>" +
 	        	"<scale>1.2</scale>" +
 	        	"<Icon>" +
-	        	"<href>http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href>" +
+	        	"<href>https://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href>" +
 	        	"</Icon>" +
 	        	"</IconStyle>" +
 				"</Style>");
