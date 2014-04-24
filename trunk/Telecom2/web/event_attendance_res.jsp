@@ -26,9 +26,10 @@
 		out.println("Event End: "+ed+" at "+et+"<br>");
 		out.println("Event Bbox: ("+lat1+","+lon1+") ("+lat2+","+lon2+")<br>");
 		out.println("<h3>Response:</h3>");
-		int attendance = ra.estimateAttendance(sd,st,ed,et,lon1,lat1,lon2,lat2);
+		int[] rad_att = ra.radiusAndAttendance(sd,st,ed,et,lon1,lat1,lon2,lat2);
 		%>
-		Estimated Attendance: <span style="margin-left:20px; font-size:72px; color:#dd0000"><%=attendance%></span>
+		Best Radius: <span style="margin-left:20px; font-size:24px;"><%=rad_att[0]%></span><br>
+		Estimated Attendance: <span style="margin-left:20px; font-size:72px; color:#dd0000"><%=rad_att[1]%></span>
 		
 	</article>
 </div>

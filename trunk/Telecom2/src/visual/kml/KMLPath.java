@@ -37,15 +37,16 @@ public class KMLPath {
 		kml.printHeaderDocument(out, "trace");
 	}
 	
-	static NetworkMap nm =  NetworkMapFactory.getNetworkMap();
+	
 	
 	
 	public static void addKml(String kml) {
 		out.println(kml);
 	}
 	
-	
+	static NetworkMap nm = null;
 	public static void print(String username, List<PlsEvent> plsEvents) {
+		nm =  NetworkMapFactory.getNetworkMap(plsEvents.get(0).getCalendar());
 		kml.printFolder(out, username.substring(0,10)+"...");
 		List<PlsEvent> s = plsEvents;//FilterAndCounterUtils.smooth(plsEvents);
 		Map<String,List<PlsEvent>> evPerDay = splitByDay(s);

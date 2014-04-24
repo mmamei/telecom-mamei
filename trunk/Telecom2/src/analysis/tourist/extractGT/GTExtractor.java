@@ -14,6 +14,7 @@ import java.util.Map;
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
@@ -43,7 +44,7 @@ public class GTExtractor {
 		
 		BufferedReader br = new BufferedReader(new FileReader(f));
 		
-		NetworkMap nm = NetworkMapFactory.getNetworkMap();
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 		String user_id,mnt;
 		int num_pls,num_days,days_interval;
 		List<CalCell> list;

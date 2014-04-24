@@ -41,6 +41,9 @@ public class EventFilesFinder {
 			// check spatial constraints
 			
 			for(String r: maps.keySet()) {
+				
+				System.out.println("testing "+r+", ("+clon+","+clat+")");
+				
 				if(maps.get(r).get(clon, clat) != null) {
 					if(dir==null) dir = r;
 					else Logger.logln("Warning: Multiple matching regions!");

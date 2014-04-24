@@ -55,9 +55,6 @@ public class NetworkMap {
 		return cells;
 	}
 	
-	
-	
-	
 	public double getAvgCellRadiusAround(LatLonPoint c, double radius){
 		
 		double dist = 0;

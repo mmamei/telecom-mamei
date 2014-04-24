@@ -35,7 +35,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 		this.imsi = imsi;
 		this.cellac = cellac;
 		this.timestamp = Long.parseLong(timestamp);
-		if(NM == null) NM = NetworkMapFactory.getNetworkMap(getTime());
+		if(NM == null) NM = NetworkMapFactory.getNetworkMap(getCalendar());
 	}
 	
 	public PlsEvent clone(){
@@ -79,6 +79,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	}
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	
 	public String getTime(){
 		//if(getCalendar().get(Calendar.DAY_OF_MONTH) < 10) return "0"+F.format(getCalendar().getTime());
 		return F.format(getCalendar().getTime());

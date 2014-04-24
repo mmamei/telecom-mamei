@@ -13,6 +13,7 @@ import network.NetworkMapFactory;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import utils.Config;
 import utils.Logger;
 
 public class PlaceRecognizerEvaluator {
@@ -85,7 +86,7 @@ public class PlaceRecognizerEvaluator {
 		
 	}
 	
-	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
+	static NetworkMap NM = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	
 	public int[] analyze(LatLonPoint ref, List<LatLonPoint> res) {
 		int tp = 0;

@@ -12,11 +12,7 @@ public class FileUtils {
 		File[] files = getFiles(fpath);
 		if(files.length == 0) return null;
 		if(files.length > 1)
-			try {
-				throw new Exception("WARNING: FILE AT MULTIPLE LOCATIONS");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			Logger.logln("WARNING: FILE AT MULTIPLE LOCATIONS");
 		return files[0];
 	}
 	

@@ -17,6 +17,7 @@ import java.util.TreeMap;
 
 import network.NetworkMap;
 import network.NetworkMapFactory;
+import utils.Config;
 import utils.FileUtils;
 
 public class TestTopicAccuracy {
@@ -24,7 +25,7 @@ public class TestTopicAccuracy {
 	
 	public static final boolean VERBOSE = false;
 	static final DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
-	static NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	static NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	
 	public static void main(String[] args) throws Exception  {
 		

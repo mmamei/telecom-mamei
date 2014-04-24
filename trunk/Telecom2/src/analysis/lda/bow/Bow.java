@@ -17,6 +17,7 @@ import network.NetworkMapFactory;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import utils.Config;
 import area.region.Region;
 import area.region.RegionMap;
 
@@ -65,7 +66,7 @@ public abstract class Bow {
 	
 	/*******************************************************************************/
 	static final DecimalFormat F = new DecimalFormat("##.####",new DecimalFormatSymbols(Locale.US));
-	static NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	static NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	protected class TimePlace {
 		String day;
 		String dow;

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
@@ -25,20 +26,28 @@ public class RunAll {
 	
 	public static boolean CLEANUP = true;
 	
-	public int estimateAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2) {
+	
+	public int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1) {
+		return radiusAndAttendance(sday,shour,eday, ehour, lon1, lat1, lon1, lat1);
+	}
+	
+	public int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2) {
 		try {
 			PlacemarkRadiusExtractor.PLOT = false;
 			PresenceCounter.PLOT = false;
 			EventFilesFinder eff = new EventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
-			if(dir == null) return 0;
+			System.out.println("---> "+dir);
+			if(dir == null) return new int[]{0,0};
+			
 			SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));
 			
-			Config.getInstance().pls_start_time.add(Calendar.DAY_OF_YEAR, -3);
-			Config.getInstance().pls_start_time.add(Calendar.DAY_OF_YEAR, +3);
+			Config.getInstance().pls_start_time.add(Calendar.DAY_OF_MONTH, -3);
+			Config.getInstance().pls_end_time.add(Calendar.DAY_OF_MONTH, +3);
+			
 			
 			double lon = (lon1+lon2)/2;
 			double lat = (lat1+lat2)/2;
@@ -52,15 +61,20 @@ public class RunAll {
 			all.add(ce);
 			
 			PlacemarkRadiusExtractor.process(all);
+			Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(PresenceCounter.USE_INDIVIDUAL_EVENT,PlacemarkRadiusExtractor.DIFF);	
+			int bestr = (int)Math.round(bestRadius.get(ce.toString()));
+			
+			
 			PresenceCounter.process(all);
 			int attendance =  ResultEvaluator.run(new File(PresenceCounter.ODIR+"/"+PresenceCounter.OFILE));
 			
 			if(CLEANUP) {
 				// clean up
-				File f = new File(PlacemarkRadiusExtractor.ODIR+"/"+PlacemarkRadiusExtractor.OFILE);
+				String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+				File f = new File(odir+"/"+PlacemarkRadiusExtractor.OFILE);
 				f.delete();
 				
-				File d = new File(PlacemarkRadiusExtractor.ODIR+"/"+p.name);
+				File d = new File(odir+"/"+p.name);
 				File[] files = d.listFiles();
 				for(File f1: files) {
 					if(f1.isFile()) f1.delete();
@@ -84,13 +98,13 @@ public class RunAll {
 					f1.delete();
 			}
 			
-			return attendance;
+			return new int[]{bestr,attendance};
 			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	
-		return 0;
+		return new int[]{0,0};
 	}
 	
 	//"2014-03-02", "19" ----> "dd/MM/yyyy HH:mm"
@@ -110,22 +124,15 @@ public class RunAll {
 	
 	
 	public static void main(String[] args) throws Exception {
-		
-		
-		// partita Fiorentina - Lazio
-		// capienza stadio 47000
-		double lon = 11.28265300110946;
-		double lat = 43.78066799975202;
-		String sd = "2014-03-02";
-		String st = "19";
-		String ed = "2014-03-03";
-		String et = "0";
-		
 	
 		RunAll ra = new RunAll();
 			
-		int attendance = ra.estimateAttendance(sd,st,ed,et,lon,lat,lon,lat);
-		System.out.println("ATTENDANCE = "+attendance);
+		//int[] rad_att = ra.radiusAndAttendance("2014-03-02","19","2014-03-03","0",11.28265300110946,43.78066799975202); // partita Fiorentina - Lazio. capienza stadio 47000
+		//int[] rad_att = ra.radiusAndAttendance("2012-04-01","13","2012-04-01","18",9.123845,45.478068); // San Siro
+		int[] rad_att = ra.radiusAndAttendance("2012-03-20","19","2012-03-20","23",7.641453,45.109536); // Juventus Stadium
+		
+		System.out.println("RADIUS = "+rad_att[0]);
+		System.out.println("ATTENDANCE = "+rad_att[1]);
 	} 
 	
 }

@@ -3,6 +3,7 @@ package analysis.densityANDflows.flows;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +59,9 @@ public class ODMatrixEventPresence {
 		
 		BufferedReader br2 = new BufferedReader(new FileReader(new File("BASE/LocationsXUserAroundAnEvent/"+ce_expand.toFileName())));
 		
-		NetworkMap nm = NetworkMapFactory.getNetworkMap(event.substring(event.indexOf(",")+1));
+		
+		
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(event.substring(event.indexOf(",")+1)));
 		
 		while((line=br2.readLine())!=null) {
 			String user = line.substring(0, line.indexOf(","));
