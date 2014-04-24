@@ -127,7 +127,7 @@ public class PlaceRecognizerLogger {
 		kml.closeFolder(outKml);
 	}
 	
-	static NetworkMap NM = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
+	//static NetworkMap NM = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 	public static void logkml(String kind_of_place, Map<Integer, Cluster> clusters, List<LatLonPoint> placemarks) {
 		try {
 			
@@ -185,7 +185,8 @@ public class PlaceRecognizerLogger {
 				for(long celllac: clusterByCells.keySet()){
 					String desc = getDescription(clusterEvents, clusterByCells.get(celllac));
 					int cellsize = clusterByCells.get(celllac).size();
-					NetworkCell cell = NM.get(celllac);
+					NetworkMap nm = NetworkMapFactory.getNetworkMap(clusterByCells.get(celllac).get(0).getTimeStamp());
+					NetworkCell cell = nm.get(celllac);
 					String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
 					outKml.println(cell.toKml(COLORS[colorIndex % (COLORS.length)],name,desc));
 				}

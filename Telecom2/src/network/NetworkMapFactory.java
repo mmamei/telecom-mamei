@@ -70,33 +70,10 @@ public class NetworkMapFactory {
 	}
 
 	
-	private static long first = Long.MAX_VALUE;;
-	private static long last = 0;
-	private static Calendar getBestTime(String dir) {
-		File[] files = new File(dir).listFiles();
-		for(File f: files) {
-			if(f.isDirectory()) return getBestTime(f.getAbsolutePath());
-			else {
-				long time = Long.parseLong(f.getName().substring(f.getName().lastIndexOf("_")+1, f.getName().indexOf(".zip")));
-				if(time < first) first = time;
-				if(time > last) last = time;
-			}
-		}
-		
-		long config_first = Config.getInstance().pls_start_time.getTimeInMillis() ;
-		long config_last = Config.getInstance().pls_end_time.getTimeInMillis() ;
-		
-		if(config_first > first) first = config_first;
-		if(config_last < last) last = config_last;
-
-		Calendar cal = new GregorianCalendar();
-		cal.setTimeInMillis((first+last)/2);
-		//System.out.println(cal.getTime());
-		return cal;
-	}
-	
-	public static NetworkMap getNetworkMap(String dir) {
-		return getNetworkMap(getBestTime(dir));
+	public static NetworkMap getNetworkMap(long time) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(time);
+		return getNetworkMap(cal);
 	}
 	
 	
@@ -117,7 +94,7 @@ public class NetworkMapFactory {
 	
 	
 	public static void main(String[] args) {
-		NetworkMap nm = getNetworkMap(Config.getInstance().pls_folder);
+		NetworkMap nm = getNetworkMap(Config.getInstance().pls_start_time);
 		System.out.println(nm);
 	}
 }

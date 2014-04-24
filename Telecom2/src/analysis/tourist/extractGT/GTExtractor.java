@@ -44,7 +44,7 @@ public class GTExtractor {
 		
 		BufferedReader br = new BufferedReader(new FileReader(f));
 		
-		NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
+		//NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 		String user_id,mnt;
 		int num_pls,num_days,days_interval;
 		List<CalCell> list;
@@ -86,6 +86,7 @@ public class GTExtractor {
 					int m = Integer.parseInt(x[1]);
 					int d = Integer.parseInt(x[2]);
 					int h = Integer.parseInt(x[4]);
+					NetworkMap nm = NetworkMapFactory.getNetworkMap(new GregorianCalendar(y,m,d));
 					NetworkCell nc = nm.get(Long.parseLong(x[5]));
 					list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
 				}

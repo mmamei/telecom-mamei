@@ -20,7 +20,7 @@ import network.NetworkMapFactory;
 public class KMLHeatMap {
 	
 	public static String drawHeatMap(String name, Map<Long,Double> map, double max) {
-		NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 		StringBuffer result = new StringBuffer();
 		for(long celllac: map.keySet()) {
 			NetworkCell nc = nm.get(celllac);

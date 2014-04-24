@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -16,22 +17,17 @@ import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Colors;
-import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class RegionMap implements Serializable {
-	
-	private transient static NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	
 	private String name;
 	private Map<String,Region> rm;
@@ -79,22 +75,21 @@ public class RegionMap implements Serializable {
 	public static final double deg_radius = Math.toDegrees(search_radius/earth_radius);
 	
 	public Region get(double lon, double lat) {
-		
-		Geometry p = new GeometryFactory().createPoint(new Coordinate(lon, lat));
-		
+		Geometry p = GeomUtils.getCircle(lon, lat, 100);
 		for(Region r: rm.values()) {
-			if(p.within(r.getGeom())) return r;
+			if(p.intersects(r.getGeom())) return r;
 		}
 		
 		return null;		
 	}
 	
 	private static transient Map<Long,float[]> cache_intersection = new HashMap<Long,float[]>();
-	public float[] computeAreaIntersection(long celllac) {
+	
+	public float[] computeAreaIntersection(long celllac, long time) {
 		float[] area_intersection = cache_intersection.get(celllac);
 		if(area_intersection != null) return area_intersection;
-		
 		area_intersection = new float[this.getNumRegions()];
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(time);
 		NetworkCell nc = nm.get(celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
@@ -118,12 +113,13 @@ public class RegionMap implements Serializable {
 	}
 	
 	private static transient Map<Long,Region> cache_closest = new HashMap<Long,Region>();
-	public Region getClosest(long celllac) {
+	public Region getClosest(long celllac, long time) {
 		Region reg = cache_closest.get(celllac);
 		if(reg != null) return reg;
 		
 		Region closest = null;
 		float max_intersection = 0;
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(time);
 		NetworkCell nc = nm.get(celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
