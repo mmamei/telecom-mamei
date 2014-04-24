@@ -25,7 +25,6 @@ public class TestTopicAccuracy {
 	
 	public static final boolean VERBOSE = false;
 	static final DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
-	static NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	
 	public static void main(String[] args) throws Exception  {
 		

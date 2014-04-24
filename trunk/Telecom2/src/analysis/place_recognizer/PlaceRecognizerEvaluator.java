@@ -3,6 +3,7 @@ package analysis.place_recognizer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,6 @@ import network.NetworkMapFactory;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import utils.Config;
 import utils.Logger;
 
 public class PlaceRecognizerEvaluator {
@@ -44,7 +44,7 @@ public class PlaceRecognizerEvaluator {
 			e.printStackTrace();
 		}		
 	}
-
+	/*
 	public void evaluate(Map<String, List<LatLonPoint>> allResults) {
 		Map<String,int[]> stats = new HashMap<String,int[]>();
 		for(String x: allResults.keySet()) {
@@ -54,7 +54,7 @@ public class PlaceRecognizerEvaluator {
 				Logger.logln("Warning: "+x+" has multiple or none groundtruth");
 				continue;
 			}
-			int[] r = analyze(gt.get(0),allResults.get(x));
+			int[] r = analyze(gt.get(0),allResults.get(x),.FIX ME..);
 			int[] tot_r = stats.get(kind_of_place);
 			if(tot_r == null) {
 				tot_r = new int[6];
@@ -85,15 +85,15 @@ public class PlaceRecognizerEvaluator {
 		
 		
 	}
+	*/
 	
-	static NetworkMap NM = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
-	
-	public int[] analyze(LatLonPoint ref, List<LatLonPoint> res) {
+	public int[] analyze(LatLonPoint ref, List<LatLonPoint> res, Calendar cal) {
 		int tp = 0;
 		int fp = 0;
 		int fn = 0;
 		
-		double avg_r = NM.getAvgCellRadiusAround(ref, 4000);
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(cal);
+		double avg_r = nm.getAvgCellRadiusAround(ref, 4000);
 		
 		double max_dist = 1.0 * (maxdist + avg_r); // avg_r * UserNew.RESULT_FACTOR; 
 		//max_dist = Math.max(4000, avg_r * factor);

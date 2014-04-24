@@ -78,9 +78,10 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	public void finish() {
 		try{
 			System.out.println("N. Cells = "+cells.size());
-			for(NetworkCell nc : cells.values()) 
-				rm.add(new Region(""+nc.getCellac(),GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius())));
-			
+			for(NetworkCell nc : cells.values()) {
+				String name = nc.getBarycentreLatitude()+","+nc.getBarycentreLongitude()+","+nc.getRadius();
+				rm.add(new Region(name,GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius())));
+			}
 			/*
 			KML kml = new KML();
 			File dir = FileUtils.createDir("BASE/RegionMap");
@@ -157,14 +158,15 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 			if(rm.getNumRegions() > 0) {
 				sb.append("citymap['"+name+"'] = new Array();\n");
 				System.out.println(rm.getName());
-				nm = NetworkMapFactory.getNetworkMap(rm.getName());
+				//nm = NetworkMapFactory.getNetworkMap(rm.getName());
 				int i = 0;
 				for(Region r: rm.getRegions()) {
-					NetworkCell nc = nm.get(Long.parseLong(r.getName()));
-					if(nc != null) {
-						sb.append("citymap['"+name+"']["+i+"] = {center: new google.maps.LatLng("+nc.getBarycentreLatitude()+", "+nc.getBarycentreLongitude()+"),radius: "+nc.getRadius()+"};\n");
-						i++;
-					}
+					String[] x = r.getName().split(",");
+					double lat = Double.parseDouble(x[0]);
+					double lon = Double.parseDouble(x[1]);
+					double radius = Double.parseDouble(x[2]);
+					sb.append("citymap['"+name+"']["+i+"] = {center: new google.maps.LatLng("+lat+", "+lon+"),radius: "+radius+"};\n");
+					i++;
 					if(i >= 100) break;
 				}
 			}
@@ -180,18 +182,13 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 		
 		for(String name: map.keySet()) {
 			RegionMap rm = map.get(name);
-			NetworkMap nm = NetworkMapFactory.getNetworkMap(rm.getName());
 			for(Region r: rm.getRegions()) {
-				NetworkCell nc = nm.get(Long.parseLong(r.getName()));
-				if(nc != null) {
-					lat += nc.getBarycentreLatitude();
-					lng += nc.getBarycentreLongitude();
-					cont ++;
-				}
-					
+				String[] x = r.getName().split(",");
+				lat += Double.parseDouble(x[0]);
+				lng += Double.parseDouble(x[1]);
+				cont ++;
 			}
 		}
-		
 		return (lat/cont)+","+(lng/cont);
 	}
 	

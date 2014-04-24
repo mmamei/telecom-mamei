@@ -2,6 +2,7 @@ package analysis.lda.bow;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,10 +36,10 @@ public abstract class Bow {
 		TM.put("E", 3);
 	}
 	
-	
+	private static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-mm-HH");
 	protected static int MIN_PLACES = 3;
 	
-	public Map<String,List<String>> process(String[] events, int startIndex, RegionMap rm) {
+	public Map<String,List<String>> process(String[] events, int startIndex, RegionMap rm) throws Exception {
 		
 		Set<String> places = new HashSet<String>();
 		List<TimePlace> tps = new ArrayList<TimePlace>();
@@ -48,7 +49,7 @@ public abstract class Bow {
 			String[] x = events[i].split(":");
 			int h = Integer.parseInt(x[2]);
 			long celllac =Long.parseLong(x[3]);
-			Region r = rm.getClosest(celllac);
+			Region r = rm.getClosest(celllac, DF.parse(x[0]).getTime());
 			String rname = r == null ? "EXT" : r.getName();
 			tps.add(new TimePlace(x[0],x[1],h,rname,rm,events));
 			places.add(rname);
@@ -65,8 +66,8 @@ public abstract class Bow {
 	
 	
 	/*******************************************************************************/
+	
 	static final DecimalFormat F = new DecimalFormat("##.####",new DecimalFormatSymbols(Locale.US));
-	static NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	protected class TimePlace {
 		String day;
 		String dow;
@@ -79,13 +80,16 @@ public abstract class Bow {
 			this.dow = dow;
 			this.h = h;
 			this.rname = rname;
-			p = getCenter(rm,events);
+			try {
+				p = getCenter(rm,events);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		
 		
-		private LatLonPoint getCenter(RegionMap rm, String[] events) {
-			
+		private LatLonPoint getCenter(RegionMap rm, String[] events) throws Exception {
 			double lon = 0;
 			double lat = 0;
 			int cont = 0;
@@ -94,7 +98,8 @@ public abstract class Bow {
 				String[] x = events[i].split(":");
 				int h = Integer.parseInt(x[2]);
 				long celllac =Long.parseLong(x[3]);
-				if(rm.getClosest(celllac).getName().equals(rname)) {
+				if(rm.getClosest(celllac,DF.parse(x[0]).getTime()).getName().equals(rname)) {
+					NetworkMap nm = NetworkMapFactory.getNetworkMap(DF.parse(x[0]).getTime());
 					NetworkCell nc = nm.get(celllac);
 					lon += nc.getBarycentreLongitude();
 					lat += nc.getBarycentreLatitude();

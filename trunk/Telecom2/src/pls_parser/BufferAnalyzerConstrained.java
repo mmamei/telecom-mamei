@@ -74,7 +74,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	long timestamp;
 	Calendar cal = new GregorianCalendar();
 	String header = null;
-	NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
+	NetworkMap nm; 
 	boolean check_users;
 	boolean check_placemark;
 	
@@ -91,7 +91,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 			celllac = fields[2];
 			timestamp = Long.parseLong(fields[3]);
 			cal.setTimeInMillis(timestamp);
-			
+			nm= NetworkMapFactory.getNetworkMap(cal);
 			//if the celllac is not in the networkmap, do not process the pls
 			if(nm.get(Long.parseLong(celllac)) == null) return;
 			

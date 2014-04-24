@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -107,9 +108,6 @@ public class TouristData4Analysis implements Serializable {
 		DM.put("Sun", 6);
 	}
 	
-	static transient NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
-	
-	
 	public static transient String[] MAP_LABELS = null;	
 	
 	String user_id;
@@ -125,7 +123,7 @@ public class TouristData4Analysis implements Serializable {
 	 * 1b44888ff4f,22201,3,1,2013-5-23:Sun:13:4018542484,2013-5-23:Sun:17:4018542495,2013-5-23:Sun:13:4018542391,
 	*/
 	
-
+	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-mm-HH");
 	public TouristData4Analysis(String events, RegionMap map) throws Exception {
 		
 		//if(events == null) return; // need for a null construcutor for testing
@@ -154,7 +152,7 @@ public class TouristData4Analysis implements Serializable {
 				int day = DM.get(x[1]);
 				int h = Integer.parseInt(x[2]);
 				long celllac =Long.parseLong(x[3]);
-				ai = map.computeAreaIntersection(celllac);
+				ai = map.computeAreaIntersection(celllac,F.parse(x[0]).getTime());
 				for(int k=0; k<ai.length;k++) 
 					plsMatrix[day][h][k] += ai[k];
 			} catch(Exception e) {
