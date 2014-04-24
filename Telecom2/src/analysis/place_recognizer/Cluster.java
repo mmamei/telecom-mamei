@@ -35,12 +35,12 @@ public class Cluster implements Serializable {
 	
 	public void addAll(Cluster c) {
 		events.addAll(c.getEvents());
-		if(NM == null) NM = NetworkMapFactory.getNetworkMap(c.getEvents().get(0).getTime());
+		if(NM == null) NM = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(c.getEvents().get(0).getTime()));
 	}
 	
 	public void add(PlsEvent e) {
 		events.add(e);
-		if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTime());
+		if(NM == null) NM = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(e.getTime()));
 	} 
 	
 	public List<PlsEvent> getEvents() {

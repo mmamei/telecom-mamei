@@ -31,7 +31,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
 	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
 	String name;
-	NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	NetworkMap nm = null;
 	RegionMap rm;  
 	
 	Map<String,NetworkCell> cells = new HashMap<String,NetworkCell>();
@@ -43,20 +43,22 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
 	public AnalyzePLSCoverageSpace(String plsf) {
 		super();
+		System.out.println("======================> "+plsf);
 		plsf = plsf.replaceAll("\\\\", "/");
 		Config.getInstance().pls_folder = plsf;
 		name =  plsf.substring(plsf.lastIndexOf("/")+1);
-		rm = new RegionMap(name);
+		rm = new RegionMap(plsf);
 		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
 		Map<String,String> coverage = apc.compute();
+		
 		String first = coverage.keySet().iterator().next();
 		first = first.substring(first.indexOf("-")+1);
-		
 		try {
 			Config.getInstance().pls_start_time.setTime(f.parse(first));
-			
-			Config.getInstance().pls_end_time = Config.getInstance().pls_start_time;
-			Config.getInstance().pls_end_time.add(Calendar.DAY_OF_YEAR, 20);
+			Config.getInstance().pls_end_time = (Calendar)Config.getInstance().pls_start_time.clone();
+			Config.getInstance().pls_end_time.add(Calendar.DAY_OF_YEAR, 10);
+			nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
+			System.out.println(plsf+" FROM: "+Config.getInstance().pls_start_time.getTime()+" TO: "+Config.getInstance().pls_end_time.getTime());
 			
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -89,6 +91,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 			kml.printFooterDocument(out);
 			out.close();
 			*/
+			nm = null; // clean up the network map
 			
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -97,8 +100,6 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
 	
 	public Map<String,RegionMap> getPlsCoverage() {
-		
-		
 		Map<String,RegionMap> map = null;
 		File odir = FileUtils.createDir("BASE/RegionMap");
 		File f = new File(odir+"/plsCoverageSpace.ser");
@@ -111,6 +112,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 			for(File basedir: basedirs) {
 				for(File dir: basedir.listFiles()) {
 					if(!map.containsKey(dir.getName())) {
+						
 						AnalyzePLSCoverageSpace ba = new AnalyzePLSCoverageSpace(dir.getAbsolutePath());
 						ba.run();
 						map.put(dir.getName(),ba.rm);
@@ -133,6 +135,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 		for(String name: map.keySet()) {
 			RegionMap rm = map.get(name);
 			if(rm.getNumRegions() > 0) {
+				System.out.println(rm.getName()+" ==> "+rm.getNumRegions());
 				kml.printFolder(out, name);
 				out.println(rm.toKml(Colors.RANDOM_COLORS[index]));
 				index ++;
@@ -153,6 +156,8 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 			RegionMap rm = map.get(name);
 			if(rm.getNumRegions() > 0) {
 				sb.append("citymap['"+name+"'] = new Array();\n");
+				System.out.println(rm.getName());
+				nm = NetworkMapFactory.getNetworkMap(rm.getName());
 				int i = 0;
 				for(Region r: rm.getRegions()) {
 					NetworkCell nc = nm.get(Long.parseLong(r.getName()));
@@ -169,13 +174,13 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
 	
 	public String getJSMapCenterLatLng(Map<String,RegionMap> map) {
-	
 		double lat = 0;
 		double lng = 0;
 		double cont = 0;
 		
 		for(String name: map.keySet()) {
 			RegionMap rm = map.get(name);
+			NetworkMap nm = NetworkMapFactory.getNetworkMap(rm.getName());
 			for(Region r: rm.getRegions()) {
 				NetworkCell nc = nm.get(Long.parseLong(r.getName()));
 				if(nc != null) {
@@ -198,7 +203,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 		
 	
 		Map<String,RegionMap> map = ba.getPlsCoverage();
-		//ba.printKml(map);
+		ba.printKml(map);
 		ba.getJSMap(map);
 		System.out.println(ba.getJSMapCenterLatLng(map));
 

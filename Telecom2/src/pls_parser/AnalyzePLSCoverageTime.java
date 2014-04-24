@@ -15,6 +15,7 @@ import area.region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
+import utils.Logger;
 
 public class AnalyzePLSCoverageTime {
 	
@@ -44,26 +45,38 @@ public class AnalyzePLSCoverageTime {
 		for(String key: all.keySet()) 
 			System.out.println(key+" -> "+apc.getNumYears(all.get(key)));
 		
-		//String js = apc.getJSMap(all);
+		
+		Map<String,String> x = all.get("file_pls_lomb");
+		for(String d: x.keySet())
+			System.out.println(d);
+		
+		System.out.println("**************************************************************************");
+		
+		String js = apc.getJSMap(all);
 		//System.out.println(js);
 	}
 	
 	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
-	public String getJSMap(Map<String,Map<String,String>> map) {
+	public String getJSMap(Map<String,Map<String,String>> all) {
 		StringBuffer sb = new StringBuffer();
 		Calendar cal = Calendar.getInstance();
-		for(String key: map.keySet()) {
+		for(String key: all.keySet()) {
 			sb.append("var dataTable_"+key+" = new google.visualization.DataTable();");
 			sb.append("dataTable_"+key+".addColumn({ type: 'date', id: 'Date' });");
 			sb.append("dataTable_"+key+".addColumn({ type: 'number', id: 'PLS Coverage' });");
 			sb.append("dataTable_"+key+".addRows([\n");
-			Map<String,String> dmap = map.get(key);
+			Map<String,String> dmap = all.get(key);
 			
 			for(String day: dmap.keySet()) {
 				try {
 					cal.setTime(f.parse(day));
 					int h = dmap.get(day).split("-").length;
-					sb.append("[ new Date("+cal.get(Calendar.YEAR)+", "+cal.get(Calendar.MONTH)+", "+cal.get(Calendar.DAY_OF_MONTH)+"), "+h+" ],\n");
+					String s = "[ new Date("+cal.get(Calendar.YEAR)+", "+cal.get(Calendar.MONTH)+", "+cal.get(Calendar.DAY_OF_MONTH)+"), "+h+" ],\n";
+					
+					if(key.equals("file_pls_lomb"))
+						System.out.print(s);
+					
+					sb.append(s);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -74,12 +87,14 @@ public class AnalyzePLSCoverageTime {
 	}
 	
 	public int getNumYears(Map<String,String> dmap) {
-		Set<String> y = new HashSet<String>();
+		int min_year = 3000;
+		int max_year = 0;
 		for(String d: dmap.keySet()) {
-			String year = d.substring(0,d.indexOf("/"));
-			y.add(year);
+			int year = Integer.parseInt(d.substring(0,d.indexOf("/")));
+			min_year = Math.min(min_year, year);
+			max_year = Math.max(max_year, year);
 		}
-		return y.size();
+		return max_year - min_year + 1;
 	}
 
 	
@@ -97,6 +112,7 @@ public class AnalyzePLSCoverageTime {
 			all = new HashMap<String,Map<String,String>>();
 			for(File basedir: basedirs) {
 				for(File dir: basedir.listFiles()) {
+					Logger.logln(dir.getAbsolutePath());
 					Map<String,String> val = all.get(dir.getName());
 					if(val == null) {
 						val = new TreeMap<String,String>();
@@ -129,6 +145,9 @@ public class AnalyzePLSCoverageTime {
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	private static void analyzeDirectory(File directory, Map<String,String> allDays) throws Exception {
+		
+		Logger.logln("\t"+directory.getAbsolutePath());
+		
 		File[] items = directory.listFiles();
 		
 		for(int i=0; i<items.length;i++){

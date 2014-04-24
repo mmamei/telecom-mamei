@@ -9,6 +9,7 @@ import java.util.Map;
 import area.region.Region;
 import area.region.RegionMap;
 import utils.Colors;
+import utils.Config;
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
@@ -19,7 +20,7 @@ import network.NetworkMapFactory;
 public class KMLHeatMap {
 	
 	public static String drawHeatMap(String name, Map<Long,Double> map, double max) {
-		NetworkMap nm = NetworkMapFactory.getNetworkMap();
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 		StringBuffer result = new StringBuffer();
 		for(long celllac: map.keySet()) {
 			NetworkCell nc = nm.get(celllac);

@@ -16,6 +16,7 @@ import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Colors;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.GeomUtils;
@@ -30,7 +31,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class RegionMap implements Serializable {
 	
-	private transient static NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	private transient static NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	
 	private String name;
 	private Map<String,Region> rm;

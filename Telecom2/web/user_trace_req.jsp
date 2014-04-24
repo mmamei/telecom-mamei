@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
 jspLocation = "user_trace_res.jsp";
-longRun = false;
+longRun = true;
 
 
 function process2() {

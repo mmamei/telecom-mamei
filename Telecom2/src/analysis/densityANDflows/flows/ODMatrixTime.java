@@ -32,7 +32,7 @@ public class ODMatrixTime {
 		Map<Move,Double> list_od = new HashMap<Move,Double>();
 		
 		String file = "Stadio_Silvio_Piola_(NO)-11_03_2012_18_00-12_03_2012_00_00.txt";//"Torino-11_03_2012_17_00-11_03_2012_19_00.txt";
-		NetworkMap nm = NetworkMapFactory.getNetworkMap("11/03/2012");
+		NetworkMap nm = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar("11/03/2012"));
 		
 		BufferedReader br = new BufferedReader(new FileReader("BASE/LocationsXUserAroundAnEvent/"+file));
 		String line;

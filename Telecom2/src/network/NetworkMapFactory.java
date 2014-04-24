@@ -26,9 +26,14 @@ public class NetworkMapFactory {
 	}
 
 	
-	private static Calendar getCalendar(String f) throws Exception{
-		Calendar c = Calendar.getInstance();
-		c.setTime(F.parse(getCalString(f)));
+	public static Calendar getCalendar(String f) {
+		Calendar c = null;
+		try{
+		    c = Calendar.getInstance();
+			c.setTime(F.parse(getCalString(f)));
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 		return c;
 	}
 	
@@ -90,17 +95,14 @@ public class NetworkMapFactory {
 		return cal;
 	}
 	
-	public static NetworkMap getNetworkMap() {
-		return getNetworkMap(getBestTime(Config.getInstance().pls_folder));
+	public static NetworkMap getNetworkMap(String dir) {
+		return getNetworkMap(getBestTime(dir));
 	}
 	
 	
-	public static NetworkMap getNetworkMap(Calendar cal) {
-		return getNetworkMap(F.format(cal.getTime()));
-	}
+	public static NetworkMap getNetworkMap(Calendar calendar) {
+		String cal = F.format(calendar.getTime());
 	
-	public static NetworkMap getNetworkMap(String cal) {
-		
 		String file = findClosestNetworkFile(cal);
 		
 		Logger.logln("!!!! Using network file "+file);
@@ -115,7 +117,7 @@ public class NetworkMapFactory {
 	
 	
 	public static void main(String[] args) {
-		NetworkMap nm = getNetworkMap();
+		NetworkMap nm = getNetworkMap(Config.getInstance().pls_folder);
 		System.out.println(nm);
 	}
 }

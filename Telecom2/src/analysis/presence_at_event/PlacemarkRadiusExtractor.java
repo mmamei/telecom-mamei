@@ -53,9 +53,7 @@ public class PlacemarkRadiusExtractor {
 	// if MAX = true we compute the zXradius as the max of the z within the event time interval
 	// if MAX = false we compute the zXradius as the sum of the z within the event time interval
 	public static final boolean MAX = true;
-	
 
-	public static final String ODIR = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
 	public static final String OFILE = DIFF ? "result_individual_diff.csv" :  "result_individual.csv";
 	public static void main(String[] args) throws Exception { 
 		List<CityEvent> all = CityEvent.getEventsInData();
@@ -65,10 +63,11 @@ public class PlacemarkRadiusExtractor {
 	}
 		
 	public static void process(List<CityEvent> all) throws Exception {
-		new File(ODIR).mkdirs();
-		File f = new File(ODIR+"/"+OFILE);
+		String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+		new File(odir).mkdirs();
+		File f = new File(odir+"/"+OFILE);
 		if(f.exists() && f.length() > 0) {
-			System.err.println(ODIR+"/"+OFILE+" already exists!!!!!");
+			System.err.println(odir+"/"+OFILE+" already exists!!!!!");
 			System.err.println("Manually remove the file before proceeding!");
 			//System.exit(0);
 		}
@@ -86,7 +85,9 @@ public class PlacemarkRadiusExtractor {
 		
 		PrintWriter out = new PrintWriter(new FileWriter(f));
 		for(String p : eventsByPlacemark.keySet()) {
-			List<CityEvent> le = eventsByPlacemark.get(p);  // <--------------------------------------------------- here
+			
+			List<CityEvent> le = eventsByPlacemark.get(p); 
+			
 			List<double[][]> valXradius = createOrLoadValueRadiusDistrib(p,le,false);
 			List<double[][]> valXring = createOrLoadValueRadiusDistrib(p,le,true);
 			
@@ -116,7 +117,7 @@ public class PlacemarkRadiusExtractor {
 						if(data3 != null) data3[r][1] = data3[r][1] / durationH;
 					}
 								
-					plot(le.get(i).toString(),data1,data2,data3,ODIR+"/"+le.get(i)+"_val_r_distrib.png");
+					plot(le.get(i).toString(),data1,data2,data3,odir+"/"+le.get(i)+"_val_r_distrib.png");
 				}
 			
 			for(int i=0; i<valXradius.size(); i++) {
@@ -170,8 +171,8 @@ public class PlacemarkRadiusExtractor {
 		String n = le.get(0).spot.name;
 		if(ring) n = "ring_"+n;
 		
-		
-		File dir = MAX ? new File(ODIR+"/"+placemark+"/zXr_ser_computed_with_max") : new File(ODIR+"/"+placemark+"/zXr_ser_computed_with_sum");
+		String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+		File dir = MAX ? new File(odir+"/"+placemark+"/zXr_ser_computed_with_max") : new File(odir+"/"+placemark+"/zXr_ser_computed_with_sum");
 		File f = new File(dir+"/"+n+"_zXradius.ser");
 		
 		if(f.exists()) list_valueRadiusDistrib = (List<double[][]>)CopyAndSerializationUtils.restore(f);
@@ -344,14 +345,14 @@ public class PlacemarkRadiusExtractor {
 			PLSEventsAroundAPlacemark.process(p);
 		}
 		
+		
+		
 		List<double[][]> zXradius = new ArrayList<double[][]>();
 		for(int i=0; i<relevantEvents.size();i++)
 			zXradius.add(new double[1+(MAX_R - MIN_R)/STEP][2]);
 		
 		int index = 0;
-		
-
-		
+	
 		for(int max_r = MAX_R; max_r >= MIN_R; max_r = max_r - STEP) {
 			
 			if(ring) p.changeRadiusRing(max_r);
@@ -406,7 +407,8 @@ public class PlacemarkRadiusExtractor {
 	public static Map<String,Double> readBestR(boolean individual,boolean diff) throws Exception {
 		String im = individual ? "individual" : "multiple";
 		String sdiff = diff ? "_diff" : "";
-		return readBestR(ODIR+"/result_"+im+sdiff+".csv");
+		String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+		return readBestR(odir+"/result_"+im+sdiff+".csv");
 	}
 
 	

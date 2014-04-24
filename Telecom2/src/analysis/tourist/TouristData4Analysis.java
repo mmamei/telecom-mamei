@@ -14,6 +14,7 @@ import java.util.Map;
 
 import network.NetworkMap;
 import network.NetworkMapFactory;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
@@ -106,7 +107,7 @@ public class TouristData4Analysis implements Serializable {
 		DM.put("Sun", 6);
 	}
 	
-	static transient NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	static transient NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	
 	
 	public static transient String[] MAP_LABELS = null;	

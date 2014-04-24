@@ -23,7 +23,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 
 	private List<PrintWriter> outs;
 	private List<Placemark> placemarks;
-	private NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	private NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	
 	public PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
 		

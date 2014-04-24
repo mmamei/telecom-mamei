@@ -74,7 +74,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	long timestamp;
 	Calendar cal = new GregorianCalendar();
 	String header = null;
-	NetworkMap nm = NetworkMapFactory.getNetworkMap();
+	NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	boolean check_users;
 	boolean check_placemark;
 	

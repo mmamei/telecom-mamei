@@ -127,7 +127,7 @@ public class PlaceRecognizerLogger {
 		kml.closeFolder(outKml);
 	}
 	
-	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
+	static NetworkMap NM = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	public static void logkml(String kind_of_place, Map<Integer, Cluster> clusters, List<LatLonPoint> placemarks) {
 		try {
 			

@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 
 public class Placemark {
-	static NetworkMap NM = NetworkMapFactory.getNetworkMap();
+	static NetworkMap NM = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_folder);
 	private static Map<String,Placemark> PLACEMARKS = null;
 	
 	public String region;
