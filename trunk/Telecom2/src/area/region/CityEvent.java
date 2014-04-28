@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import analysis.EventFilesFinder;
 import pls_parser.AnalyzePLSCoverageTime;
 import utils.Config;
 
@@ -71,6 +72,10 @@ public class CityEvent {
 		 */
 		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
 		Map<String,String> ad = apc.compute();
+		
+		//for(String s : ad.keySet())
+		//	System.out.println(s+" ==> "+ad.get(s));
+		
 
 		if(CITY_EVENTS == null) init();
 		List<CityEvent> result = new ArrayList<CityEvent>();
@@ -79,8 +84,17 @@ public class CityEvent {
 			String[] s = get(ce.st);
 			String[] e = get(ce.et);
 			
-			String key_s = ce.spot.region+"-"+s[0];
-			String key_e = ce.spot.region+"-"+e[0];
+			
+			//String dir = eff.find("2014-03-10","4","2014-03-10","7",11.2477,43.7629,11.2491,43.7620);
+			// get region
+			EventFilesFinder eff = new EventFilesFinder();
+			String dir = eff.find(ce.st,ce.et,ce.spot.center[1],ce.spot.center[0],ce.spot.center[1],ce.spot.center[0]);
+				
+			String key_s = s[0];
+			String key_e = e[0];
+			
+			//System.out.println(key_s);
+			//System.out.println(key_e);
 			
 			if(ad.get(key_s)!=null && ad.get(key_s).contains(s[1]) &&
 			   ad.get(key_e)!=null && ad.get(key_e).contains(e[1]))
@@ -106,10 +120,6 @@ public class CityEvent {
 		String h = cal.get(Calendar.HOUR_OF_DAY)+"-";
 		return new String[]{date,h};
 	}
-	 
-	
-	
-	
 	
 	public static void init() {
 		CITY_EVENTS = new HashMap<String,CityEvent>();		
@@ -217,7 +227,7 @@ public class CityEvent {
 	
 	
 	public static CityEvent expand(CityEvent ce, int time_shift, double space_shift) {
-		Placemark p = new Placemark(ce.spot.region,ce.spot.name,ce.spot.center,ce.spot.getR()+space_shift);
+		Placemark p = new Placemark(ce.spot.name,ce.spot.center,ce.spot.getR()+space_shift);
 		Calendar st = (Calendar)ce.st.clone();
 		st.add(Calendar.HOUR_OF_DAY, -time_shift);
 		Calendar et = (Calendar)ce.et.clone();

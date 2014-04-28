@@ -123,7 +123,7 @@ public class UserFinder {
 			double lat2 = Double.parseDouble(coord[2].trim());
 			double lon2 = Double.parseDouble(coord[3].trim());
 			double r = LatLonUtils.getHaversineDistance(new LatLonPoint(lat1,lon1), new LatLonPoint(lat2,lon2));
-			Placemark p = new Placemark("","",new double[]{(lat1+lat2)/2,(lon1+lon2)/2},r);
+			Placemark p = new Placemark("",new double[]{(lat1+lat2)/2,(lon1+lon2)/2},r);
 			Sightseeing s = new Sightseeing(p, st, et, weekly_repeat);
 			
 			String dir = eff.find(e[i],e[i+1].split(":")[0],e[i+2],e[i+3].split(":")[0],lon1,lat1,lon2,lat2);

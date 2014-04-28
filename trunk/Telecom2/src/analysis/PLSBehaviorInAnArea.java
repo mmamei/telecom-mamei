@@ -95,7 +95,7 @@ public class PLSBehaviorInAnArea {
 			LatLonPoint p2 = new LatLonPoint(lat2,lon2);
 			double r = LatLonUtils.getHaversineDistance(p1, p2) / 2;
 			String n = lon+","+lat;
-			Placemark p = new Placemark(n,n,new double[]{lat,lon},r);
+			Placemark p = new Placemark(n,new double[]{lat,lon},r);
 			
 			PLSEventsAroundAPlacemark.process(p);
 			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";

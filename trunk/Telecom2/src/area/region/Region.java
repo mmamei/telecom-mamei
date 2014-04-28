@@ -2,6 +2,8 @@ package area.region;
 
 import java.io.Serializable;
 
+import org.gps.utils.LatLonPoint;
+
 import utils.GeomUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -9,11 +11,11 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 
 public class Region implements Serializable {
-	private String name;
+	public String name;
 	private String kmlcoordinates;
-	private double[][] bbox;
-	private double[] center;
-	private Geometry g;
+	protected double[][] bbox;
+	public double[] center;
+	protected Geometry g;
 	
 	public Region(String name, String kmlcoordinates) {
 		this.name = name.replaceAll("\\\\", "");
@@ -38,35 +40,18 @@ public class Region implements Serializable {
 		StringBuffer sb = new StringBuffer();
 		for(Coordinate c: cs) 
 			sb.append(c.x+","+c.y+",0 ");
-		this.kmlcoordinates = sb.toString();
-		
-		
-		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
-		String x = GeomUtils.kml2OpenGis(kmlcoordinates);
-		if(x.equals("")) return;
-		String[] coord = x.split(",");
-		for(String c: coord) {
-			double lon = Double.parseDouble(c.substring(0,c.indexOf(" ")));
-			double lat = Double.parseDouble(c.substring(c.indexOf(" ")+1));
-			minlon = Math.min(minlon, lon);
-			minlat = Math.min(minlat, lat);
-			maxlon = Math.max(maxlon, lon);
-			maxlat = Math.max(maxlat, lat);
-		}
-		
-		bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
-		center = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
-		
+		this.kmlcoordinates = sb.toString();	
 		this.g = g;
+		process();
 	}
 	
 	
 	
 	public double getCenterLon() {
-		return center[0];
+		return center[1];
 	}
 	public double getCenterLat() {
-		return center[1];
+		return center[0];
 	}
 	
 	public Geometry getGeom() {
@@ -83,8 +68,9 @@ public class Region implements Serializable {
 		if(x.equals("")) return;
 		String[] coord = x.split(",");
 		for(String c: coord) {
-			double lon = Double.parseDouble(c.substring(0,c.indexOf(" ")));
-			double lat = Double.parseDouble(c.substring(c.indexOf(" ")+1));
+			double lat = Double.parseDouble(c.substring(0,c.indexOf(" ")));
+			double lon = Double.parseDouble(c.substring(c.indexOf(" ")+1));
+			
 			minlon = Math.min(minlon, lon);
 			minlat = Math.min(minlat, lat);
 			maxlon = Math.max(maxlon, lon);
@@ -94,12 +80,18 @@ public class Region implements Serializable {
 		bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
 		center = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
 		
-		
-		try {
-			g = new WKTReader().read("POLYGON (("+x+"))");
-		} catch(Exception e) {
-			e.printStackTrace();
+		if(g == null) {
+			try {
+				g = new WKTReader().read("POLYGON (("+x+"))");
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	
+	public LatLonPoint getCenterPoint() {
+		return new LatLonPoint(center[0],center[1]);
 	}
 	
 	

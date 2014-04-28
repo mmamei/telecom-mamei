@@ -1,6 +1,8 @@
 package analysis;
 
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Map;
 
 import pls_parser.AnalyzePLSCoverageSpace;
@@ -14,6 +16,10 @@ import area.region.RegionMap;
 
 public class EventFilesFinder {
 	
+	
+	private SimpleDateFormat F1 = new SimpleDateFormat("yyyy-MM-dd-hh");
+	private SimpleDateFormat F2 = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
+	
 	private Map<String,RegionMap> maps;
 	private Map<String,Map<String,String>> mapt;
 	
@@ -22,17 +28,27 @@ public class EventFilesFinder {
 		mapt = new AnalyzePLSCoverageTime().computeAll();
 	}
 	
+	
 	public String find(String sday, String shour, String eday, String ehour, double lon1, double lat1, double lon2, double lat2) {
 		try {
+			Calendar c1 = Calendar.getInstance();
+			Calendar c2 = Calendar.getInstance();
+			c1.setTime(F1.parse(sday+"-"+shour));
+			c2.setTime(F1.parse(eday+"-"+ehour));
+			return find(c1,c2,lon1,lat1,lon2,lat2);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	
+	public String find(Calendar cs, Calendar ce, double lon1, double lat1, double lon2, double lat2) {
+		try {
 			
-			
-			sday = convertDay(sday);
-			eday = convertDay(eday);
-			
-			
-			System.out.println(sday);
-			System.out.println(eday);
-			
+			String sday = F2.format(cs.getTime());
+			String eday = F2.format(ce.getTime());
+	
 			double clat = (lat1 + lat2)/2;
 			double clon = (lon1 + lon2)/2;
 			
@@ -42,7 +58,7 @@ public class EventFilesFinder {
 			
 			for(String r: maps.keySet()) {
 				
-				System.out.println("testing "+r+", ("+clon+","+clat+")");
+				//System.out.println("testing "+r+", ("+clon+","+clat+")");
 				
 				if(maps.get(r).get(clon, clat) != null) {
 					if(dir==null) dir = r;
@@ -51,7 +67,7 @@ public class EventFilesFinder {
 			}
 			
 			if(dir == null) {
-				Logger.logln("Selected event is out of PLS coverage area in space");
+				//Logger.logln("Selected event is out of PLS coverage area in space");
 				return null;
 			}
 			
@@ -61,12 +77,12 @@ public class EventFilesFinder {
 			boolean okend = false;
 			Map<String,String> dmap = mapt.get(dir);
 			for(String day: dmap.keySet()) {
-				if(day.equals(sday) && dmap.get(day).contains(shour+"-")) okstart = true;		
-				if(day.equals(eday) && dmap.get(day).contains(ehour+"-")) okend = true;		
+				if(day.equals(sday) && dmap.get(day).contains(cs.get(Calendar.HOUR_OF_DAY)+"-")) okstart = true;		
+				if(day.equals(eday) && dmap.get(day).contains(ce.get(Calendar.HOUR_OF_DAY)+"-")) okend = true;		
 			}
 			
 			if(!okstart || !okend) {
-				Logger.logln("Selected event is out of PLS coverage area in time");
+				//Logger.logln("Selected event is out of PLS coverage area in time");
 				return null;
 			}
 						
@@ -78,17 +94,7 @@ public class EventFilesFinder {
 		return null;
 	}
 	
-	static final Map<String,String> htmlMontMmap = new HashMap<String,String>();
-	static {
-		htmlMontMmap.put("01", "Jan"); htmlMontMmap.put("02", "Feb"); htmlMontMmap.put("03", "Mar"); htmlMontMmap.put("04", "Apr");
-		htmlMontMmap.put("05", "May"); htmlMontMmap.put("06", "Jun"); htmlMontMmap.put("07", "Jul"); htmlMontMmap.put("08", "Aug");  
-		htmlMontMmap.put("09", "Sep"); htmlMontMmap.put("10", "Oct"); htmlMontMmap.put("11", "Nov"); htmlMontMmap.put("12", "Dec"); 
-	}
 	
-	private String convertDay(String day) {
-		String[] s = day.split("-");
-		return s[0]+"/"+htmlMontMmap.get(s[1])+"/"+s[2];
-	}
 	
 	
 	public static void main(String[] args) {
