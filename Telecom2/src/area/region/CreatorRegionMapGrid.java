@@ -17,7 +17,7 @@ public class CreatorRegionMapGrid {
 		
 		Placemark p = Placemark.getPlacemark("Torino");
 		p.changeRadius(p.getR()+1000);
-		run(p.name,p.getBBox(),4);
+		run(p.name,p.bbox,4);
 		
 		/*
 		CityEvent ce = CityEvent.getEvent("Juventus Stadium (TO),20/03/2012");

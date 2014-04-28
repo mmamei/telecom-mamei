@@ -42,7 +42,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 			for(Placemark p: ps)
 			for(double r: radii) {
 				outs.add(new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.name+"_"+r+".txt")))));
-				placemarks.add(new Placemark(p.region,p.name,p.center,r));
+				placemarks.add(new Placemark(p.name,p.center,r));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

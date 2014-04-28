@@ -55,7 +55,7 @@ public class RunAll {
 			LatLonPoint p2 = new LatLonPoint(lat2,lon2);
 			double r = LatLonUtils.getHaversineDistance(p1, p2) / 2;
 			String n = "tmp";
-			final Placemark p = new Placemark(n,n,new double[]{lat,lon},r);
+			final Placemark p = new Placemark(n,new double[]{lat,lon},r);
 			CityEvent ce = new CityEvent(p,convert2CityEventTimeFormat(sday,shour),convert2CityEventTimeFormat(eday,ehour),0);
 			List<CityEvent> all = new ArrayList<CityEvent>();
 			all.add(ce);
