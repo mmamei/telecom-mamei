@@ -17,7 +17,7 @@ import network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
-import area.Placemark;
+import area.region.Placemark;
 
 public class PLSEventsAroundAPlacemark extends BufferAnalyzer {	
 

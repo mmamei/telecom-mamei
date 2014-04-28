@@ -14,8 +14,8 @@ import org.gps.utils.LatLonUtils;
 import utils.Config;
 import utils.FileUtils;
 import analysis.EventFilesFinder;
-import area.CityEvent;
-import area.Placemark;
+import area.region.CityEvent;
+import area.region.Placemark;
 
 /*
  * This class encapsulates all the code required to estimate the attendance to a give event.

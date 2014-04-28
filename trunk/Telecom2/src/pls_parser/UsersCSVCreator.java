@@ -11,7 +11,7 @@ import java.util.Set;
 import utils.FileUtils;
 import utils.Logger;
 import analysis.UserTrace;
-import area.CityEvent;
+import area.region.CityEvent;
 
 
 

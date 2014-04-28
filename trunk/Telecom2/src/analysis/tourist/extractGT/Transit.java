@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import area.Placemark;
+import area.region.Placemark;
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;

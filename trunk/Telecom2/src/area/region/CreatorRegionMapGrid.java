@@ -5,8 +5,6 @@ import java.io.File;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import area.CityEvent;
-import area.Placemark;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;

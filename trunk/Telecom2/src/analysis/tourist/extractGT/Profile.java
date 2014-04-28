@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import area.Placemark;
+import area.region.Placemark;
 
 public abstract class Profile {
 	static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");

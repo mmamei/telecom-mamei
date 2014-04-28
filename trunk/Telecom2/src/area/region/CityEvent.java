@@ -1,4 +1,4 @@
-package area;
+package area.region;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

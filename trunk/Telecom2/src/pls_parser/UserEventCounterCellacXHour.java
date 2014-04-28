@@ -16,7 +16,7 @@ import java.util.Set;
 
 import utils.FileUtils;
 import utils.Logger;
-import area.Placemark;
+import area.region.Placemark;
 
 public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	

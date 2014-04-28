@@ -14,7 +14,7 @@ import network.NetworkCell;
 import network.NetworkMap;
 import utils.Config;
 import utils.Logger;
-import area.CityEvent;
+import area.region.CityEvent;
 
 public class UsersAroundAnEvent extends BufferAnalyzer {
 	

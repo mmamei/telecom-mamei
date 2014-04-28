@@ -12,7 +12,7 @@ import pls_parser.UsersCSVCreator;
 import utils.Config;
 import utils.Logger;
 import visual.java.GraphPlotter;
-import area.CityEvent;
+import area.region.CityEvent;
 
 public class InterEventDistribution {
 	public static void main(String[] args) throws Exception {

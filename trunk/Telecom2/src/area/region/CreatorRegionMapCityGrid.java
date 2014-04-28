@@ -11,7 +11,6 @@ import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
-import area.Placemark;
 
 import com.vividsolutions.jts.geom.Geometry;
 

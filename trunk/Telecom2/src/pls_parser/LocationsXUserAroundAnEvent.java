@@ -13,8 +13,8 @@ import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Config;
 import utils.Logger;
-import area.CityEvent;
-import area.Placemark;
+import area.region.CityEvent;
+import area.region.Placemark;
 
 public class LocationsXUserAroundAnEvent extends BufferAnalyzer {	
 
