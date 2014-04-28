@@ -30,8 +30,8 @@ import utils.Logger;
 import visual.java.GraphPlotter;
 import analysis.PLSBehaviorInAnArea;
 import analysis.PLSMap;
-import area.CityEvent;
-import area.Placemark;
+import area.region.CityEvent;
+import area.region.Placemark;
 
 public class PlacemarkRadiusExtractor {
 	

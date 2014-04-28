@@ -23,8 +23,8 @@ import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 import analysis.PlsEvent;
-import area.CityEvent;
-import area.Placemark;
+import area.region.CityEvent;
+import area.region.Placemark;
 
 public class PresenceCounter {
 	

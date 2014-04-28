@@ -14,7 +14,7 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
-import area.CityEvent;
+import area.region.CityEvent;
 import area.region.Region;
 import area.region.RegionMap;
 

@@ -11,7 +11,7 @@ import java.util.Set;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Config;
-import area.Placemark;
+import area.region.Placemark;
 
 public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	

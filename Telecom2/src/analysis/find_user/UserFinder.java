@@ -23,7 +23,7 @@ import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
 import analysis.EventFilesFinder;
-import area.Placemark;
+import area.region.Placemark;
 
 public class UserFinder {
 	

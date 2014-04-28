@@ -10,11 +10,10 @@ import java.util.GregorianCalendar;
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
-
 import utils.Config;
 import utils.Logger;
 import analysis.PlsEvent;
-import area.CityEvent;
+import area.region.CityEvent;
 
 public class PLSEventsAroundAnEvent extends BufferAnalyzer {	
 
