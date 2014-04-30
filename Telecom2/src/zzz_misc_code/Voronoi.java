@@ -1,4 +1,4 @@
-package test;
+package zzz_misc_code;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
