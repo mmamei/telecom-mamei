@@ -1,23 +1,27 @@
 package analysis.place_recognizer;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.gps.utils.LatLonPoint;
 
+import pls_parser.PLSParser;
+import pls_parser.UsersCSVCreator;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
+import utils.FileUtils;
 import utils.FilterAndCounterUtils;
 import utils.Logger;
+import visual.kml.KMLPath;
+import analysis.EventFilesFinder;
 import analysis.PlsEvent;
+import analysis.UserTrace;
 import analysis.place_recognizer.clustering.AgglomerativeClusterer;
 import analysis.place_recognizer.weight_functions.WeightFunction;
 import analysis.place_recognizer.weight_functions.WeightOnDay;
@@ -27,6 +31,7 @@ import analysis.place_recognizer.weight_functions.Weights;
 
 public class PlaceRecognizer {
 	
+	public static boolean VERBOSE = true;
 	
 	public static List<LatLonPoint> analyze(String username, String kind_of_place, List<PlsEvent> events, 
 			                   double alpha, double beta, double delta, double rwf) {
@@ -46,7 +51,9 @@ public class PlaceRecognizer {
 		String tperiod = events.get(0).getTimeStamp()+"-"+events.get(events.size()-1).getTimeStamp();
 		
 		Map<Integer, Cluster> clusters = null;
-		File f = new File("BASE/cache/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
+		
+		File dir = FileUtils.createDir("BASE/PlaceRecognizer/Clusters");
+		File f = new File(dir+"/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
 		if(f.exists()) 
 			clusters = (Map<Integer, Cluster>)CopyAndSerializationUtils.restore(f);
 		else {
@@ -101,10 +108,44 @@ public class PlaceRecognizer {
 	}
 	
 	
+	private static String[] KIND_OF_PLACES = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
+	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
+	public void runSingle(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
+		try {
+			
+			EventFilesFinder eff = new EventFilesFinder();
+			String dir = eff.find(sday,"12",eday,"12",lon1,lat1,lon2,lat2);
+			if(dir == null) return;
+			
+			
+			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
+			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-0"));
+			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-23"));
+			
+			Set<String> users = new HashSet<String>();
+			users.add(user);
+			
+			UsersCSVCreator ba = new UsersCSVCreator(users,"");
+			PLSParser.parse(ba);
+			
+			List<PlsEvent> events = ba.get(user).getEvents();
+			Map<String, List<LatLonPoint>> results = new HashMap<String, List<LatLonPoint>>();
+			PlaceRecognizerLogger.openKMLFile("G:/CODE/Telecom/web/kml/"+user+".kml");
+			for(String kind_of_place:KIND_OF_PLACES)
+				results.put(kind_of_place, analyze(user,kind_of_place,events,0.25,0.25,2000,0.6));
+			PlaceRecognizerLogger.closeKMLFile();
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
-	public static boolean VERBOSE = false;
+	
+	
+	
 	
 	public static void main(String[] args) throws Exception {
+		/*
 		String dir = "file_pls_piem_users_above_2000";
 		String in_dir = "BASE/UsersCSVCreator/"+dir;
 		String out_dir = "BASE/PlaceRecognizer/"+dir;
@@ -117,7 +158,6 @@ public class PlaceRecognizer {
 		
 		Map<String, List<LatLonPoint>> allResults = new HashMap<String, List<LatLonPoint>>();
 		
-		String[] kind_of_places = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
 		for(int i=0; i<files.length; i++){
 			File f = files[i];	
 			if(!f.isFile()) continue;
@@ -126,7 +166,7 @@ public class PlaceRecognizer {
 			List<PlsEvent> events = PlsEvent.readEvents(f);
 			PlaceRecognizerLogger.openUserFolderKML(username);
 			
-			for(String kind_of_place:kind_of_places)
+			for(String kind_of_place:KIND_OF_PLACES)
 				allResults.put(username+"_"+kind_of_place, analyze(username,kind_of_place,events,0.25,0.25,2000,0.6));
 				
 			PlaceRecognizerLogger.closeUserFolderKML();
@@ -136,8 +176,12 @@ public class PlaceRecognizer {
 		
 		//PlaceRecognizerEvaluator rs = new PlaceRecognizerEvaluator(2000);
 		//rs.evaluate(allResults);
+		*/
+		PlaceRecognizer pr = new PlaceRecognizer();
 		
 		
+		pr.runSingle("2012-03-06", "2012-04-30", "362f6cf6e8cfba0e09b922e21d59563d26ae0207744af2de3766c5019415af", 7.6855,45.0713,  7.6855,45.0713);
+		//pr.runSingle("2012-03-06", "2012-04-30", "7f3e4f68105e863aa369e5c39ab5789975f0788386b45954829346b7ca63", 7.6855,45.0713,  7.6855,45.0713);
 		Logger.logln("Done!");
 	}
 	

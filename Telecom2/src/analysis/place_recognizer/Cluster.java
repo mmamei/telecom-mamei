@@ -40,7 +40,7 @@ public class Cluster implements Serializable {
 	
 	public void add(PlsEvent e) {
 		events.add(e);
-		if(NM == null) NM = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(e.getTime()));
+		if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
 	} 
 	
 	public List<PlsEvent> getEvents() {

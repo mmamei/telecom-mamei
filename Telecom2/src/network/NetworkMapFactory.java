@@ -32,6 +32,7 @@ public class NetworkMapFactory {
 		    c = Calendar.getInstance();
 			c.setTime(F.parse(getCalString(f)));
 		}catch(Exception e) {
+			System.err.println("--- "+f);
 			e.printStackTrace();
 		}
 		return c;
