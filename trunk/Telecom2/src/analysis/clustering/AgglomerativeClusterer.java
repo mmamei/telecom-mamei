@@ -16,7 +16,7 @@ import utils.CopyAndSerializationUtils;
 import utils.Sort;
 import analysis.PlsEvent;
 import analysis.place_recognizer.Cluster;
-import analysis.weighting.WeightOnTime;
+import analysis.place_recognizer.weight_functions.WeightOnTime;
 
 
 public class AgglomerativeClusterer extends Clusterer {

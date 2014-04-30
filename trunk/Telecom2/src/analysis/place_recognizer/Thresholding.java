@@ -5,8 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import analysis.PlsEvent;
-import analysis.weighting.Weights;
-
+import analysis.place_recognizer.weight_functions.Weights;
 import utils.FilterAndCounterUtils;
 
 

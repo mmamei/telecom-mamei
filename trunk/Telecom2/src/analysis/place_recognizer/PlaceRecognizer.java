@@ -19,11 +19,11 @@ import utils.FilterAndCounterUtils;
 import utils.Logger;
 import analysis.PlsEvent;
 import analysis.clustering.AgglomerativeClusterer;
-import analysis.weighting.WeightFunction;
-import analysis.weighting.WeightOnDay;
-import analysis.weighting.WeightOnDiversity;
-import analysis.weighting.WeightOnTime;
-import analysis.weighting.Weights;
+import analysis.place_recognizer.weight_functions.WeightFunction;
+import analysis.place_recognizer.weight_functions.WeightOnDay;
+import analysis.place_recognizer.weight_functions.WeightOnDiversity;
+import analysis.place_recognizer.weight_functions.WeightOnTime;
+import analysis.place_recognizer.weight_functions.Weights;
 
 public class PlaceRecognizer {
 	

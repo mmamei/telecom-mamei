@@ -15,6 +15,8 @@ import utils.Logger;
 
 public class PLSParser {
 	
+	public static boolean QUIET = false;
+	
 	static Config conf = null;
 	private static final int BUFFER_SIZE = 1048576;
 	
@@ -69,7 +71,7 @@ public class PLSParser {
 				
 				analyzeFile(item, analyzer);
 				if((i+1) % 10 == 0) {
-					Logger.logln(i+"/"+items.length+" done!");
+					if(!QUIET) Logger.logln(i+"/"+items.length+" done!");
 					System.gc();
 				}
 			}
