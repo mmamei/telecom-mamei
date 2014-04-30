@@ -1,4 +1,4 @@
-package analysis.clustering;
+package analysis.place_recognizer.clustering;
 
 import java.util.ArrayList;
 import java.util.Calendar;
