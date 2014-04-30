@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import region.Region;
+import region.RegionMap;
 import utils.Config;
 import utils.Logger;
-import area.region.Region;
-import area.region.RegionMap;
 
 public class HeatMapGoogleMaps {
 	
