@@ -2,7 +2,7 @@
 <head>
 <%@include file="includes/head.html" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="area.region.RegionMap" %>
+<%@ page import="region.RegionMap" %>
 <jsp:useBean id="apbbox" scope="application" class="pls_parser.AnalyzePLSCoverageSpace"/>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 <script>
