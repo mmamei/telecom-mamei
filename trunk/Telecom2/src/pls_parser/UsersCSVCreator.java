@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import region.CityEvent;
 import utils.FileUtils;
 import utils.Logger;
 import analysis.UserTrace;
-import area.region.CityEvent;
 
 
 

@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import region.Region;
+import region.RegionMap;
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
@@ -22,8 +24,6 @@ import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
-import area.region.Region;
-import area.region.RegionMap;
 
 
 
