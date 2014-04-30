@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import region.Region;
+import region.RegionMap;
 import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
@@ -17,8 +19,6 @@ import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
 import visual.kml.KML;
 import visual.kml.KMLHeatMap;
-import area.region.Region;
-import area.region.RegionMap;
 
 public class PopulationDensity {
 	

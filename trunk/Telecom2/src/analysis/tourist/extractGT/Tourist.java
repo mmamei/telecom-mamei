@@ -4,7 +4,7 @@ package analysis.tourist.extractGT;
 
 import java.util.List;
 
-import area.region.Placemark;
+import region.Placemark;
 
 public class Tourist extends Profile {
 	public Tourist(Placemark placemark) {

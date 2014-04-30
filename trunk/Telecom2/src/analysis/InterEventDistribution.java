@@ -9,10 +9,10 @@ import java.util.List;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import pls_parser.UsersCSVCreator;
+import region.CityEvent;
 import utils.Config;
 import utils.Logger;
 import visual.java.GraphPlotter;
-import area.region.CityEvent;
 
 public class InterEventDistribution {
 	public static void main(String[] args) throws Exception {

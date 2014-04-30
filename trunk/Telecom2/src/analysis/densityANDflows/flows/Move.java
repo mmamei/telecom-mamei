@@ -3,7 +3,7 @@ package analysis.densityANDflows.flows;
 import java.util.HashMap;
 import java.util.Map;
 
-import area.region.Region;
+import region.Region;
 
 public class Move {
 	Region s;

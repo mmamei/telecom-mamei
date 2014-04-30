@@ -6,14 +6,14 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import region.Region;
+import region.RegionMap;
 import network.NetworkCell;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import area.region.Region;
-import area.region.RegionMap;
 
 public class ODMatrixTime {
 	public static void main(String[] args) throws Exception {

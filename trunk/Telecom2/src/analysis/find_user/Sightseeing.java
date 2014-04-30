@@ -2,8 +2,8 @@ package analysis.find_user;
 
 import java.util.Calendar;
 
-import area.region.CityEvent;
-import area.region.Placemark;
+import region.CityEvent;
+import region.Placemark;
 
 public class Sightseeing extends CityEvent {
 	

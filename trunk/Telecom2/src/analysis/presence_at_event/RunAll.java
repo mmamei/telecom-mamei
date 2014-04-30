@@ -11,11 +11,11 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import region.CityEvent;
+import region.Placemark;
 import utils.Config;
 import utils.FileUtils;
 import analysis.EventFilesFinder;
-import area.region.CityEvent;
-import area.region.Placemark;
 
 /*
  * This class encapsulates all the code required to estimate the attendance to a give event.

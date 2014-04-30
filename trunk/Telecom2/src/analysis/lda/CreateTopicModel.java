@@ -23,7 +23,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import area.region.RegionMap;
+import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Sort;

@@ -10,12 +10,12 @@ import java.util.Map;
 
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
+import region.ParserDatiISTAT;
+import region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
-import area.region.ParserDatiISTAT;
-import area.region.RegionMap;
 
 public class IstatComparator {
 	

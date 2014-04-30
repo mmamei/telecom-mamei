@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
-import area.region.RegionMap;
 
 public class TouristCounter {
 	

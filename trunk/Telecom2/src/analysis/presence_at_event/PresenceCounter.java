@@ -18,13 +18,13 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import pls_parser.PLSEventsAroundAPlacemark;
+import region.CityEvent;
+import region.Placemark;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 import analysis.PlsEvent;
-import area.region.CityEvent;
-import area.region.Placemark;
 
 public class PresenceCounter {
 	

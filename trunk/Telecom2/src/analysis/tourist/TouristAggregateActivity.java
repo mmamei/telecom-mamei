@@ -15,14 +15,14 @@ import java.util.TreeMap;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import region.Region;
+import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
 import visual.java.GraphPlotter;
 import visual.kml.KMLHeatMap;
-import area.region.Region;
-import area.region.RegionMap;
 
 public class TouristAggregateActivity {
 	
