@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import region.Region;
+import region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -16,8 +18,6 @@ import visual.html.ArrowsGoogleMaps;
 import visual.kml.KML;
 import visual.kml.KMLArrow;
 import analysis.densityANDflows.density.UserPlaces;
-import area.region.Region;
-import area.region.RegionMap;
 
 public class ODMatrixHW {
 	public static void main(String[] args) throws Exception {

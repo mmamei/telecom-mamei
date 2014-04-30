@@ -18,12 +18,12 @@ import org.gps.utils.LatLonUtils;
 import pls_parser.AnalyzePLSCoverageTime;
 import pls_parser.PLSParser;
 import pls_parser.UsersAroundAnEvent;
+import region.Placemark;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
 import analysis.EventFilesFinder;
-import area.region.Placemark;
 
 public class UserFinder {
 	

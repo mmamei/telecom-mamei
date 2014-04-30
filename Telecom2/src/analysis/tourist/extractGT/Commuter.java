@@ -3,7 +3,7 @@ package analysis.tourist.extractGT;
 import java.util.Calendar;
 import java.util.List;
 
-import area.region.Placemark;
+import region.Placemark;
 
 public class Commuter extends Profile {
 	

@@ -7,8 +7,8 @@ import java.util.Map;
 
 import pls_parser.AnalyzePLSCoverageSpace;
 import pls_parser.AnalyzePLSCoverageTime;
+import region.RegionMap;
 import utils.Logger;
-import area.region.RegionMap;
 
 /*
  * This class identifies the proper PLS folder (if any) to process the event

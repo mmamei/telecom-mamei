@@ -23,13 +23,13 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import pls_parser.PLSEventsAroundAPlacemark;
+import region.CityEvent;
+import region.Placemark;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphPlotter;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
-import area.region.CityEvent;
-import area.region.Placemark;
 
 public class PLSBehaviorInAnArea {
 	

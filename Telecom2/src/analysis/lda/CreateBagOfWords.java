@@ -8,13 +8,13 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
+import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
 import visual.kml.KMLPath;
 import analysis.lda.bow.Bow;
 import analysis.lda.bow.OneDocXDayMov;
-import area.region.RegionMap;
 
 public class CreateBagOfWords {
 	
