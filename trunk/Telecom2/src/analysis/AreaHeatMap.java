@@ -11,12 +11,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import pls_parser.UsersCSVCreator;
-import utils.Config;
 import utils.Logger;
-import visual.kml.KMLHeatMap;
 import visual.kml.KML;
+import visual.kml.KMLHeatMap;
 import area.region.CityEvent;
-import area.region.Placemark;
 
 public class AreaHeatMap {
 	
