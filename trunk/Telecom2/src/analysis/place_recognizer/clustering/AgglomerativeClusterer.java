@@ -19,7 +19,7 @@ import analysis.place_recognizer.Cluster;
 import analysis.place_recognizer.weight_functions.WeightOnTime;
 
 
-public class AgglomerativeClusterer extends Clusterer {
+public class AgglomerativeClusterer implements Clusterer {
 	
 	
 	private int minPts;

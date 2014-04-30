@@ -1,7 +1,7 @@
 <html>
 <head>
 <%@include file="includes/head.html" %>
-<jsp:useBean id="pu" scope="application" class="analysis.find_user.UserPlotter"/>
+<jsp:useBean id="pr" scope="application" class="analysis.place_recognizer.PlaceRecognizer"/>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 <script type="text/javascript" src="js/geoxmlfull_v3.js"></script>
 <script>
@@ -18,7 +18,7 @@ double lat1 = Double.parseDouble(request.getParameter("lat1"));
 double lon1 = Double.parseDouble(request.getParameter("lon1"));
 double lat2 = Double.parseDouble(request.getParameter("lat2"));
 double lon2 = Double.parseDouble(request.getParameter("lon2"));
-pu.plot(sd,ed, user, lon1, lat1,  lon2, lat2);
+pr.runSingle(sd,ed, user, lon1, lat1,  lon2, lat2);
 %>
 
 

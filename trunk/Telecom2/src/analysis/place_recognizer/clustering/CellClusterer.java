@@ -12,7 +12,7 @@ import analysis.place_recognizer.Cluster;
  *
  */
 
-public class CellClusterer extends Clusterer {
+public class CellClusterer implements Clusterer {
 	
 	public CellClusterer() {
 	}

@@ -85,13 +85,15 @@ public class PlaceRecognizerLogger {
 	}
 	
 	public static void closeTotalCSVFile() {
-		totalCSV.close();
+		if(totalCSV!=null) totalCSV.close();
 	}
 	public static void logcsv(String username, String kind_of_place, List<LatLonPoint> placemarks) {
-		StringBuffer sb = new StringBuffer();
-		for(LatLonPoint p: placemarks)
-			sb.append(","+p.getLongitude()+" "+p.getLatitude());
-		totalCSV.println(username+","+kind_of_place+""+sb.toString());
+		if(totalCSV!=null){
+			StringBuffer sb = new StringBuffer();
+			for(LatLonPoint p: placemarks)
+				sb.append(","+p.getLongitude()+" "+p.getLatitude());
+			totalCSV.println(username+","+kind_of_place+""+sb.toString());
+		}
 	}
 	
 	
