@@ -1,4 +1,4 @@
-package analysis.weighting;
+package analysis.place_recognizer.weight_functions;
 
 import java.util.Calendar;
 

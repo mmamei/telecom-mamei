@@ -29,6 +29,8 @@ public class UserFinder {
 	
 	public static int MAX_RESULT = 10;
 	
+	static String[] DOW = new String[]{"","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
+	
 	public String find(String q) {
 		
 		Map<String,Integer> map = new HashMap<String,Integer>();
@@ -37,8 +39,9 @@ public class UserFinder {
 		List<Sightseeing> ls = parseInput(q);
 		for(Sightseeing s: ls) {
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+s.dir).toString(); // set right working directory
+			System.out.println(Config.getInstance().pls_folder);
+			System.out.println("Processing "+s+ (s.weekly_repeat ? " REPEAT = "+DOW[s.st.get(Calendar.DAY_OF_WEEK)]:""));
 			addSightseeings(map,s);
-			
 			if(s.weekly_repeat == true)  {
 				Calendar start = null;
 				Calendar end = null;
@@ -85,9 +88,8 @@ public class UserFinder {
 	
 	
 	private void addSightseeings(Map<String,Integer> map, Sightseeing s) {
-		System.out.println("Processing "+s);
 		UsersAroundAnEvent ba = new UsersAroundAnEvent(s);
-		
+		PLSParser.QUIET = true;
 		try {
 			PLSParser.parse(ba);
 		} catch (Exception e) {
@@ -141,7 +143,24 @@ public class UserFinder {
 	
 	public static void main(String[] args) {
 		UserFinder uf = new UserFinder();
-		String q = "2014-03-04;9:14;2014-03-04;9:15;false;((45.44161099742083, 12.329521196126962), (45.442161915033715, 12.330405397176719));";
+		
+		//7f3e4f68105e863aa369e5c39ab5789975f0788386b45954829346b7ca63	Home,45.073963,7.676248999999999	Work,45.468133,7.872852
+		String h = "((45.073963,7.676249), (45.073963,7.676249));";
+		String w = "((45.468133,7.872852), (45.468133,7.872852));";
+		String q = "2012-03-05;5:00;2012-03-05;7:00;true;"+h+
+				   "2012-03-06;5:00;2012-03-06;7:00;true;"+h+
+				   "2012-03-07;5:00;2012-03-07;7:00;true;"+h+
+				   "2012-03-08;5:00;2012-03-08;7:00;true;"+h+
+				   "2012-03-09;5:00;2012-03-09;7:00;true;"+h+
+				   "2012-03-10;5:00;2012-03-10;7:00;true;"+h+
+				   "2012-03-11;5:00;2012-03-11;7:00;true;"+h+
+				   
+				   "2012-03-05;9:00;2012-03-05;17:00;true;"+w;
+				   //"2012-03-06;9:00;2012-03-06;17:00;true;"+w+
+				   //"2012-03-07;9:00;2012-03-07;17:00;true;"+w+
+				   //"2012-03-08;9:00;2012-03-08;17:00;true;"+w+
+				   //"2012-03-09;9:00;2012-03-09;17:00;true;"+w;
+				
 		System.out.println(uf.find(q));
 	}
 }
