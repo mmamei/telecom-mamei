@@ -6,8 +6,8 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import area.region.Region;
-import area.region.RegionMap;
+import region.Region;
+import region.RegionMap;
 import utils.Colors;
 import utils.Config;
 import network.NetworkCell;
