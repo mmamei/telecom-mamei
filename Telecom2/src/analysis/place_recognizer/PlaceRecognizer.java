@@ -18,7 +18,7 @@ import utils.CopyAndSerializationUtils;
 import utils.FilterAndCounterUtils;
 import utils.Logger;
 import analysis.PlsEvent;
-import analysis.clustering.AgglomerativeClusterer;
+import analysis.place_recognizer.clustering.AgglomerativeClusterer;
 import analysis.place_recognizer.weight_functions.WeightFunction;
 import analysis.place_recognizer.weight_functions.WeightOnDay;
 import analysis.place_recognizer.weight_functions.WeightOnDiversity;

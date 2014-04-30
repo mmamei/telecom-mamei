@@ -1,4 +1,4 @@
-package analysis.clustering;
+package analysis.place_recognizer.clustering;
 
 import java.util.List;
 import java.util.HashMap;
