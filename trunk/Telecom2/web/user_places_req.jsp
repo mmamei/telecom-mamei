@@ -4,7 +4,7 @@
 <%@include file="includes/mapTimeSelectJS.html" %>
 
 <script type="text/javascript">
-jspLocation = "user_trace_res.jsp";
+jspLocation = "user_places_res.jsp";
 longRun = true;
 
 
@@ -27,7 +27,7 @@ function process2() {
 <%@include file="includes/header.html" %>
 <div class="wrapper style1">
 <div class="container">
-<h2>Show User Trace</h2>
+<h2>Find User Places</h2>
 
 Start Date <input type="date" id="start_day">
 End Date <input type="date" id="end_day">
