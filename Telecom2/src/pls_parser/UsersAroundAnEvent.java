@@ -10,11 +10,11 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import region.CityEvent;
 import network.NetworkCell;
 import network.NetworkMap;
 import utils.Config;
 import utils.Logger;
-import area.region.CityEvent;
 
 public class UsersAroundAnEvent extends BufferAnalyzer {
 	

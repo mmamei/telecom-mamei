@@ -8,10 +8,10 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import region.Placemark;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Config;
-import area.region.Placemark;
 
 public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	

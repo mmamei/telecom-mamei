@@ -9,12 +9,12 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import region.CityEvent;
+import region.Placemark;
 import network.NetworkMap;
 import network.NetworkMapFactory;
 import utils.Config;
 import utils.Logger;
-import area.region.CityEvent;
-import area.region.Placemark;
 
 public class LocationsXUserAroundAnEvent extends BufferAnalyzer {	
 

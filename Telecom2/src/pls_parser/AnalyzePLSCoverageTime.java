@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import area.region.RegionMap;
+import region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
