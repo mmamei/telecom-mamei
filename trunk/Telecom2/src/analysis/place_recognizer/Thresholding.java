@@ -11,7 +11,7 @@ import utils.FilterAndCounterUtils;
 
 public class Thresholding {
 	
-	public static final long REF_NETWORK_CELLAC = 4044247943l;
+	public static final String REF_NETWORK_CELLAC = "4044247943";
 	
 	public static List<PlsEvent> buildReferenceTower(List<PlsEvent> events, double[][] weights) {
 		ArrayList<PlsEvent> refEvents = new ArrayList<PlsEvent>();

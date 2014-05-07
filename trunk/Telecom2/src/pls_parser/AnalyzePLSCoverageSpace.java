@@ -69,7 +69,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 
 	public void analyze(String line) {
 		String celllac = line.split("\t")[2];
-		NetworkCell c = nm.get(Long.parseLong(celllac));
+		NetworkCell c = nm.get(celllac);
 		if(c!=null) 
 			cells.put(c.getCellName(), c);			
 	}

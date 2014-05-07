@@ -35,7 +35,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 		fields = line.split("\t");
 		UserTrace ut = traces.get(fields[0].trim());
 		if(ut != null)
-			ut.addEvent(fields[1].trim(), Long.parseLong(fields[2].trim()), fields[3].trim());
+			ut.addEvent(fields[1].trim(), fields[2].trim(), fields[3].trim());
 	}
 	
 	

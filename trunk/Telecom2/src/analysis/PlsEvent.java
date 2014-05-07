@@ -26,10 +26,10 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
 	private String username;
 	private String imsi;
-	private long cellac;
+	private String cellac;
 	private long timestamp;
 	
-	public PlsEvent(String username, String imsi, long cellac, String timestamp){
+	public PlsEvent(String username, String imsi, String cellac, String timestamp){
 		this.username = username;
 		this.imsi = imsi;
 		this.cellac = cellac;
@@ -57,7 +57,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
 	public boolean equals(Object e){
 		PlsEvent o = (PlsEvent) e;
-		return (o.getCellac()==cellac && o.getIMSI().equals(imsi) && o.timestamp==timestamp && o.getUsername().equals(username));
+		return (o.getCellac().equals(cellac) && o.getIMSI().equals(imsi) && o.timestamp==timestamp && o.getUsername().equals(username));
 	}
 	
 
@@ -70,10 +70,10 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 		return cal;
 	}
 	
-	public long getCellac(){
+	public String getCellac(){
 		return cellac;
 	}
-	public void setCellac(long celllac){
+	public void setCellac(String celllac){
 		this.cellac = celllac;
 	}
 	
@@ -133,7 +133,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 						if(splitted[3].equals("null")) continue;
 						cal.setTimeInMillis(Long.parseLong(splitted[1]));
 						if(start.before(cal) && end.after(cal)) {
-							PlsEvent e = new PlsEvent(splitted[0], splitted[2], Long.parseLong(splitted[3]), splitted[1]);
+							PlsEvent e = new PlsEvent(splitted[0], splitted[2], splitted[3], splitted[1]);
 							events.add(e);
 						}
 					}

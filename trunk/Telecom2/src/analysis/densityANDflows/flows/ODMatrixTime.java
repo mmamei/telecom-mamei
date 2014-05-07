@@ -40,8 +40,8 @@ public class ODMatrixTime {
 			line = line.substring(line.indexOf(",")+1).trim();
 			String[] cells = line.split(" ");
 			for(int i=1;i<cells.length;i++) {
-				NetworkCell nc1 = nm.get(Long.parseLong(cells[i-1]));
-				NetworkCell nc2 = nm.get(Long.parseLong(cells[i]));
+				NetworkCell nc1 = nm.get(cells[i-1]);
+				NetworkCell nc2 = nm.get(cells[i]);
 				
 				//System.out.print(nc1.getBarycentreLongitude()+","+nc1.getBarycentreLatitude()+" ---> ");
 				//System.out.println(nc2.getBarycentreLongitude()+","+nc2.getBarycentreLatitude());

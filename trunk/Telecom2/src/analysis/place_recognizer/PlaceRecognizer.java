@@ -65,7 +65,7 @@ public class PlaceRecognizer {
 		int found = -1;
 		for(int k : clusters.keySet()) {
 			Cluster c = clusters.get(k);
-			if(c.getEvents().get(0).getCellac() == Thresholding.REF_NETWORK_CELLAC) {
+			if(c.getEvents().get(0).getCellac().equals(Thresholding.REF_NETWORK_CELLAC)) {
 				found = k;
 				break;
 			}	

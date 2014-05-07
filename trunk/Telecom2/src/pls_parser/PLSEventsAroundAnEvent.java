@@ -67,11 +67,10 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 		timestamp = fields[3];
 		
 		if(!cevent.spot.contains(celllac)) return;
-		
-		long cellac = Long.parseLong(celllac);
-		NetworkCell nc = nm.get(cellac);
+	
+		NetworkCell nc = nm.get(celllac);
 		if(nc == null) out.println(username+","+timestamp+","+imsi+",null");
-		else out.println(username+","+timestamp+","+imsi+","+cellac+","+nc.getCellName());
+		else out.println(username+","+timestamp+","+imsi+","+celllac+","+nc.getCellName());
 	}
 	
 	public void finish() {

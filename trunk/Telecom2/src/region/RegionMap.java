@@ -90,7 +90,7 @@ public class RegionMap implements Serializable {
 		if(area_intersection != null) return area_intersection;
 		area_intersection = new float[this.getNumRegions()];
 		NetworkMap nm = NetworkMapFactory.getNetworkMap(time);
-		NetworkCell nc = nm.get(celllac);
+		NetworkCell nc = nm.get(""+celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
 		int i=0;
@@ -120,7 +120,7 @@ public class RegionMap implements Serializable {
 		Region closest = null;
 		float max_intersection = 0;
 		NetworkMap nm = NetworkMapFactory.getNetworkMap(time);
-		NetworkCell nc = nm.get(celllac);
+		NetworkCell nc = nm.get(""+celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
 		for(Region r: this.getRegions()) {

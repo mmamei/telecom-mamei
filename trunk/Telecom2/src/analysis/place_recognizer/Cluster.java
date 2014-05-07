@@ -79,7 +79,7 @@ public class Cluster implements Serializable {
 		double tot_w = w(weights);
 		double r = 0;
 		for(PlsEvent e: events) {
-			NetworkCell x = NM.get(e.getCellac());
+			NetworkCell x = NM.get(String.valueOf(e.getCellac()));
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			r += x.getRadius() * f;
 		}
@@ -93,7 +93,7 @@ public class Cluster implements Serializable {
 		
 		double tot_w = w(weights);
 		for(PlsEvent e: events) {
-			NetworkCell x = NM.get(e.getCellac());
+			NetworkCell x = NM.get(String.valueOf(e.getCellac()));
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			aLat += x.getBarycentreLatitude() * f;
 			aLon += x.getBarycentreLongitude() * f;
@@ -111,7 +111,7 @@ public class Cluster implements Serializable {
 		double maxLat=0, maxLon=0;
 		double minLat = Double.MAX_VALUE, minLon = Double.MAX_VALUE;
 		for(PlsEvent e: events){
-			NetworkCell cell = NM.get(e.getCellac());
+			NetworkCell cell = NM.get(String.valueOf(e.getCellac()));
 			maxLat = Math.max(maxLat, cell.getBarycentreLatitude());
 			maxLon = Math.max(maxLon, cell.getBarycentreLongitude());
 			minLat = Math.min(minLat, cell.getBarycentreLatitude());

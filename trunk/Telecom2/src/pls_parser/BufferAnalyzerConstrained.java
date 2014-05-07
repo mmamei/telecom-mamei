@@ -93,7 +93,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 			cal.setTimeInMillis(timestamp);
 			nm= NetworkMapFactory.getNetworkMap(cal);
 			//if the celllac is not in the networkmap, do not process the pls
-			if(nm.get(Long.parseLong(celllac)) == null) return;
+			if(nm.get(celllac) == null) return;
 			
 			
 			check_users = user_list == null || user_list.contains(username);
