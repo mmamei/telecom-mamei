@@ -15,16 +15,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.gps.utils.LatLonUtils;
 
 import pls_parser.PLSEventsAroundAPlacemark;
 import region.CityEvent;
 import region.Placemark;
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;

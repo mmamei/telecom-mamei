@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import network.NetworkMap;
-import network.NetworkMapFactory;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
 import utils.FileUtils;

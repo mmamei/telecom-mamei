@@ -6,8 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
+import region.network.NetworkCell;
 import visual.kml.KML;
-import network.NetworkCell;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;

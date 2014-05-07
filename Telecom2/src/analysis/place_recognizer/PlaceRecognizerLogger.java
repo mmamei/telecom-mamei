@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
-
 import org.gps.utils.LatLonPoint;
 
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
 import visual.kml.KML;

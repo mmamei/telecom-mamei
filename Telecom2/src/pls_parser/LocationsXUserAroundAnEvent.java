@@ -11,8 +11,8 @@ import java.util.Map;
 
 import region.CityEvent;
 import region.Placemark;
-import network.NetworkMap;
-import network.NetworkMapFactory;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.Logger;
 

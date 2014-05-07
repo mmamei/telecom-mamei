@@ -2,7 +2,7 @@ package analysis.tourist.extractGT;
 
 import java.util.Calendar;
 
-import network.NetworkCell;
+import region.network.NetworkCell;
 
 class CalCell {
 	Calendar cal;

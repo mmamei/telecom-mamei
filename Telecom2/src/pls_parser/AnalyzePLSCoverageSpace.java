@@ -14,9 +14,9 @@ import java.util.Set;
 
 import region.Region;
 import region.RegionMap;
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;

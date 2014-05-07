@@ -11,13 +11,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
-
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
 import utils.GeomUtils;

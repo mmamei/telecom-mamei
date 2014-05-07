@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import network.NetworkMap;
-import network.NetworkMapFactory;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
 
