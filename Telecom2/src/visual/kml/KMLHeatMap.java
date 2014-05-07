@@ -19,10 +19,10 @@ import utils.Config;
 
 public class KMLHeatMap {
 	
-	public static String drawHeatMap(String name, Map<Long,Double> map, double max) {
+	public static String drawHeatMap(String name, Map<String,Double> map, double max) {
 		NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 		StringBuffer result = new StringBuffer();
-		for(long celllac: map.keySet()) {
+		for(String celllac: map.keySet()) {
 			NetworkCell nc = nm.get(celllac);
 			int index = (int)(map.get(celllac) / max * (Colors.HEAT_COLORS.length-1));
 			

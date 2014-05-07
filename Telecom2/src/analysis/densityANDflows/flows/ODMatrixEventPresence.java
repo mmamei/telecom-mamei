@@ -72,8 +72,8 @@ public class ODMatrixEventPresence {
 			
 			boolean before = true;
 			for(int i=1;i<cells.length;i++) {
-				NetworkCell nc1 = nm.get(Long.parseLong(cells[i-1]));
-				NetworkCell nc2 = nm.get(Long.parseLong(cells[i]));
+				NetworkCell nc1 = nm.get(cells[i-1]);
+				NetworkCell nc2 = nm.get(cells[i]);
 				
 				if(ce.spot.contains(nc1.getCellac()) && !ce.spot.contains(nc2.getCellac())) before = false;
 				

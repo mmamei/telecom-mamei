@@ -172,7 +172,7 @@ public class PlaceRecognizerLogger {
 				
 				kml.printFolder(outKml, "cluster "+k);
 				
-				Map<Long, List<PlsEvent>> clusterByCells = new HashMap<Long, List<PlsEvent>>();
+				Map<String, List<PlsEvent>> clusterByCells = new HashMap<String, List<PlsEvent>>();
 				for(PlsEvent e: clusterEvents){
 					List<PlsEvent> l = clusterByCells.get(e.getCellac());
 					if(l == null) {
@@ -183,11 +183,11 @@ public class PlaceRecognizerLogger {
 				} 
 				
 				
-				for(long celllac: clusterByCells.keySet()){
+				for(String celllac: clusterByCells.keySet()){
 					String desc = getDescription(clusterEvents, clusterByCells.get(celllac));
 					int cellsize = clusterByCells.get(celllac).size();
 					NetworkMap nm = NetworkMapFactory.getNetworkMap(clusterByCells.get(celllac).get(0).getTimeStamp());
-					NetworkCell cell = nm.get(celllac);
+					NetworkCell cell = nm.get(String.valueOf(celllac));
 					String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
 					outKml.println(cell.toKml(COLORS[colorIndex % (COLORS.length)],name,desc));
 				}

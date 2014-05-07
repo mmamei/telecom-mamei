@@ -228,7 +228,7 @@ public class PresenceCounter {
 			String[] splitted = line.split(",");
 			List<PlsEvent> list = usr_pls.get(splitted[0]);
 			try{
-			if(list!=null) list.add(new PlsEvent(splitted[0],"imsi",Long.parseLong(splitted[3]),splitted[1]));
+			if(list!=null) list.add(new PlsEvent(splitted[0],"imsi",splitted[3],splitted[1]));
 			}catch(NumberFormatException e) {
 				System.err.println(line);
 				continue;

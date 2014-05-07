@@ -99,7 +99,7 @@ public abstract class Bow {
 				long celllac =Long.parseLong(x[3]);
 				if(rm.getClosest(celllac,DF.parse(x[0]).getTime()).getName().equals(rname)) {
 					NetworkMap nm = NetworkMapFactory.getNetworkMap(DF.parse(x[0]).getTime());
-					NetworkCell nc = nm.get(celllac);
+					NetworkCell nc = nm.get(String.valueOf(celllac));
 					lon += nc.getBarycentreLongitude();
 					lat += nc.getBarycentreLatitude();
 					cont ++;

@@ -19,12 +19,12 @@ import visual.kml.KML;
 
 
 public class NetworkMap {
-	private HashMap<Long, NetworkCell> hm;
+	private HashMap<String, NetworkCell> hm;
 	
 	NetworkMap(String file) {
 		try {
 			ObjectInputStream in_network = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(file))));
-			hm = (HashMap<Long, NetworkCell>)in_network.readObject();
+			hm = (HashMap<String, NetworkCell>)in_network.readObject();
 			in_network.close();
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -32,7 +32,7 @@ public class NetworkMap {
 	}
 	
 	
-	public NetworkCell get(long cellac) {
+	public NetworkCell get(String cellac) {
 		return hm.get(cellac);
 	}
 	

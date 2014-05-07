@@ -90,7 +90,7 @@ public class Placemark extends Region {
 	public double getArea() {
 		Geometry u = null;
 		for(String c: cellsAround) {
-			NetworkCell nc = NM.get(Long.parseLong(c));
+			NetworkCell nc = NM.get(c);
 			Polygon p = GeomUtils.getCircle(nc.getBarycentreLongitude(),nc.getBarycentreLatitude(),nc.getRadius());
 			if(u == null) u = p;
 			else u = u.union(p);
@@ -106,7 +106,7 @@ public class Placemark extends Region {
 	public double getSumRadii() {
 		double a = 0;
 		for(String c: cellsAround) {
-			double r = NM.get(Long.parseLong(c)).getRadius();
+			double r = NM.get(c).getRadius();
 			a = a + r;
 		}
 		return a;
@@ -117,7 +117,7 @@ public class Placemark extends Region {
 		double max_dist = 0;
 		LatLonPoint center_point = getCenterPoint();
 		for(String c: cellsAround) {
-			NetworkCell nc = NM.get(Long.parseLong(c));
+			NetworkCell nc = NM.get(c);
 			double d = LatLonUtils.getHaversineDistance(nc.getPoint(),center_point);
 			
 			max_dist = Math.max(max_dist, d + nc.getRadius());
@@ -218,7 +218,7 @@ public class Placemark extends Region {
 		kml.printHeaderFolder(out, name);
 			
 		for(String cell: cellsAround) 
-			out.println(NM.get(Long.parseLong(cell)).toKml());
+			out.println(NM.get(cell).toKml());
 		
 		
 		out.println("<Style id=\"placemark\">");

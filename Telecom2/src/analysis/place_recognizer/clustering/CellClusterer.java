@@ -22,7 +22,7 @@ public class CellClusterer implements Clusterer {
 		HashMap<Integer, Cluster> result = new HashMap<Integer, Cluster>();
 		
 		for(PlsEvent e: events) {
-			int cell = (int)e.getCellac();
+			int cell = Integer.parseInt(e.getCellac());
 			Cluster ce = result.get(cell);
 			if(ce == null) {
 				ce = new Cluster();

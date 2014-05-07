@@ -58,7 +58,7 @@ public class KMLPath {
 		for(String day: evPerDay.keySet()) {
 			kml.printFolder(out, day);
 			for(PlsEvent pe: evPerDay.get(day))
-				out.println(nm.get(pe.getCellac()).toKml());
+				out.println(nm.get(String.valueOf(pe.getCellac())).toKml());
 			kml.closeFolder(out);
 		}
 		kml.closeFolder(out);
@@ -74,10 +74,10 @@ public class KMLPath {
 				PlsEvent pe1 = evPerDay.get(day).get(i+1);
 				int dmin =  (int)((pe1.getTimeStamp() - pe.getTimeStamp()) / 60000);
 				if(dmin < 180) {
-					double lon1 = nm.get(pe.getCellac()).getBarycentreLongitude() + jitter(pe);
-					double lat1 = nm.get(pe.getCellac()).getBarycentreLatitude() + jitter(pe);
-					double lon2 = nm.get(pe1.getCellac()).getBarycentreLongitude() + jitter(pe1);
-					double lat2 = nm.get(pe1.getCellac()).getBarycentreLatitude() + jitter(pe1);
+					double lon1 = nm.get(String.valueOf(pe.getCellac())).getBarycentreLongitude() + jitter(pe);
+					double lat1 = nm.get(String.valueOf(pe.getCellac())).getBarycentreLatitude() + jitter(pe);
+					double lon2 = nm.get(String.valueOf(pe1.getCellac())).getBarycentreLongitude() + jitter(pe1);
+					double lat2 = nm.get(String.valueOf(pe1.getCellac())).getBarycentreLatitude() + jitter(pe1);
 					//out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
 					out.println(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
 				}
@@ -205,7 +205,7 @@ public class KMLPath {
 			int h = Integer.parseInt(pls[2]);
 			Calendar cal = new GregorianCalendar(y,m,d,h,0,0);
 			String timestamp = ""+cal.getTimeInMillis();
-			long celllac = Long.parseLong(pls[3]);
+			String celllac = pls[3];
 			PlsEvent pe = new PlsEvent(username,imsi,celllac,timestamp);
 			l.add(pe);
 			//Logger.logln(pe.toString());

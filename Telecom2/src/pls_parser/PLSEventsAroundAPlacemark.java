@@ -70,13 +70,12 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		imsi = fields[1];
 		celllac = fields[2];
 		timestamp = fields[3];
-		long cellac = Long.parseLong(celllac);
-		NetworkCell nc = nm.get(cellac);
+		NetworkCell nc = nm.get(celllac);
 		
 		for(int i=0; i<placemarks.size();i++) {
 			if(placemarks.get(i).contains(celllac)) {
 				if(nc == null) outs.get(i).println(username+","+timestamp+","+imsi+",null");
-				else outs.get(i).println(username+","+timestamp+","+imsi+","+cellac+","+nc.getCellName());
+				else outs.get(i).println(username+","+timestamp+","+imsi+","+celllac+","+nc.getCellName());
 			}
 		}
 		}catch(Exception e) {

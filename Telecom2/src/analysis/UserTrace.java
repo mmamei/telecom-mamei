@@ -20,7 +20,7 @@ public class UserTrace {
 		events = new ArrayList<PlsEvent>();
 	}
 	
-	public void addEvent(String imsi, long cellac, String timestamp){
+	public void addEvent(String imsi, String cellac, String timestamp){
 		events.add(new PlsEvent(username, imsi, cellac, timestamp));
 	}
 	

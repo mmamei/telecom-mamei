@@ -87,7 +87,7 @@ public class GTExtractor {
 					int d = Integer.parseInt(x[2]);
 					int h = Integer.parseInt(x[4]);
 					NetworkMap nm = NetworkMapFactory.getNetworkMap(new GregorianCalendar(y,m,d));
-					NetworkCell nc = nm.get(Long.parseLong(x[5]));
+					NetworkCell nc = nm.get(x[5]);
 					list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
 				}
 				

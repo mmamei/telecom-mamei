@@ -41,15 +41,15 @@ public class AreaHeatMap {
 		CityEvent cevent = CityEvent.expand(ce,10,10000);
 		
 		List<PlsEvent> events = PlsEvent.readEvents(new File(dir),cevent.st,cevent.et);
-		Map<String,Map<Long,Double>> hms = new TreeMap<String,Map<Long,Double>>();
+		Map<String,Map<String,Double>> hms = new TreeMap<String,Map<String,Double>>();
 		
 		for(PlsEvent e: events) {
 			
 			if(!cevent.spot.contains(e.getCellac())) continue;
 			
 			String key = getKey(e.getCalendar());
-			Map<Long,Double> hm = hms.get(key);
-			if(hm == null) hm = new HashMap<Long,Double>();			
+			Map<String,Double> hm = hms.get(key);
+			if(hm == null) hm = new HashMap<String,Double>();			
 			Double count = hm.get(e.getCellac());
 			hm.put(e.getCellac(), count == null ? 1 : count+1);
 			hms.put(key, hm);
@@ -57,7 +57,7 @@ public class AreaHeatMap {
 		
 		// compute overall max value
 		double max = 0;
-		for(Map<Long,Double> hm: hms.values()) 
+		for(Map<String,Double> hm: hms.values()) 
 		for(double v: hm.values())
 			if(v > max) max = v;
 		
@@ -85,7 +85,7 @@ public class AreaHeatMap {
 			out.println("</TimeStamp>");
 			
 			
-			Map<Long,Double> map = hms.get(key);
+			Map<String,Double> map = hms.get(key);
 			out.println(KMLHeatMap.drawHeatMap(getLabel(startTime), map, max));
 			kml.closeFolder(out);
 			startTime.add(Calendar.HOUR, 1);
