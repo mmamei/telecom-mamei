@@ -8,11 +8,11 @@ import java.util.Map;
 
 import region.Region;
 import region.RegionMap;
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
 
 
 

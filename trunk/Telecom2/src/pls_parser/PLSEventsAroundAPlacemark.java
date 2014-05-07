@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 import region.Placemark;
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;

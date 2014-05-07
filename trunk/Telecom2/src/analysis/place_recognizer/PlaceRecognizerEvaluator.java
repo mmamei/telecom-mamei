@@ -8,12 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import network.NetworkMap;
-import network.NetworkMapFactory;
-
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Logger;
 
 public class PlaceRecognizerEvaluator {

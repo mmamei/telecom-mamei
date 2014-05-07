@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;

@@ -13,12 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
-
 import org.gps.utils.LatLonUtils;
 
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 
 public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {

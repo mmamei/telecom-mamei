@@ -11,15 +11,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
-
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import region.Region;
 import region.RegionMap;
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 
 public abstract class Bow {

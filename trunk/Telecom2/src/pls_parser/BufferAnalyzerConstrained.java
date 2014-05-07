@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import region.Placemark;
-import network.NetworkMap;
-import network.NetworkMapFactory;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 
 public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {

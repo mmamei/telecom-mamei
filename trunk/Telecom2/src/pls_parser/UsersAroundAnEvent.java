@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import region.CityEvent;
-import network.NetworkCell;
-import network.NetworkMap;
+import region.network.NetworkCell;
+import region.network.NetworkMap;
 import utils.Config;
 import utils.Logger;
 

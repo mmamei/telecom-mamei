@@ -8,9 +8,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import region.CityEvent;
-import network.NetworkCell;
-import network.NetworkMap;
-import network.NetworkMapFactory;
+import region.network.NetworkCell;
+import region.network.NetworkMap;
+import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.Logger;
 import analysis.PlsEvent;
