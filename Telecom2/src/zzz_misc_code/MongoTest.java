@@ -21,21 +21,34 @@ public class MongoTest {
 			System.out.println(db);		
 		
 		DBCollection table = dbt.getCollection("user");
-		Set<String> tables = dbt.getCollectionNames();
-		 
-		for(String coll : tables){
-			System.out.println(coll);
-		}
-		
+		table.drop();
+		table = dbt.getCollection("user");
 		
 		BasicDBObject document = new BasicDBObject();
-		document.put("name", "mkyong");
+		document.put("name", "marco");
+		document.put("surname", "mamei");
 		document.put("age", 30);
 		table.insert(document);
 		
-		BasicDBObject searchQuery = new BasicDBObject();
-		searchQuery.put("name", "mkyong");
+		document = new BasicDBObject();
+		document.put("name", "marco");
+		document.put("surname", "picci");
+		document.put("age", 30);
+		table.insert(document);
+		
+		
+		document = new BasicDBObject();
+		document.put("name", "marco");
+		document.put("surname", "picci");
+		document.put("age", 30);
+		table.insert(document);
+		
+		table.createIndex(new BasicDBObject("name", 1).append("surname", 1),new BasicDBObject().append("unique", true).append("dropDups", true));
+		
 	 
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("name", "marco");
+		
 		DBCursor cursor = table.find(searchQuery);
 	 
 		while (cursor.hasNext()) {
