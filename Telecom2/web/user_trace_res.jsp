@@ -60,6 +60,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 	<div id="the_side_bar" style="font-size:11;float: right;"></div>
 	<div style="height: 600px" id="map_canvas"></div>
 	</div>
+	<a href="kml/<%=user%>.kml">Download the KML file!</a>
 </div>
 </div>
 
