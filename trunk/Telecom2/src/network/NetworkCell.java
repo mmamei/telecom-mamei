@@ -6,6 +6,10 @@ import org.gps.utils.LatLonPoint;
 
 import visual.kml.KMLCircle;
 
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
 public class NetworkCell implements Serializable {
 
 	private String cellName;		// Nome Cella
@@ -38,6 +42,31 @@ public class NetworkCell implements Serializable {
 		barycentre_lat = Double.parseDouble(splitted[9]);
 		barycentre_lon = Double.parseDouble(splitted[10]);
 		radius = Float.parseFloat(splitted[11]);
+	}
+	
+	// the following two methods serialize the object into a bson (binary json) to be saved in mongoDB
+	
+	public NetworkCell(BasicDBObject bson) {
+		cellName = bson.getString("cellName");
+		barycentre = bson.getInt("barycentre");
+		lac = bson.getLong("lac");
+		cell_id = bson.getLong("cell_id");
+		BasicDBList lonlat = (BasicDBList)((BasicDBObject)bson.get("loc")).get("coordinates");
+		barycentre_lon = (Double)lonlat.get(0);
+		barycentre_lat = (Double)lonlat.get(1);
+		radius = bson.getDouble("radius");
+	}
+	
+	
+	public DBObject getBSON() {
+		BasicDBObject nc = new BasicDBObject();
+		nc.append("cellName", cellName);
+		nc.append("barycentre", barycentre);
+		nc.append("lac", lac);
+		nc.append("cell_id", cell_id);
+		nc.append("loc", new BasicDBObject().append("type", "Point").append("coordinates", new double[]{barycentre_lon,barycentre_lat}));
+		nc.append("radius", radius);
+		return nc;
 	}
 	
 
