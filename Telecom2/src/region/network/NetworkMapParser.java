@@ -25,11 +25,28 @@ public class NetworkMapParser {
 		String[] files = dir.list();
 		for(String file: files) {
 			BufferedReader in = new BufferedReader(new FileReader(dir+"/"+file));
-			HashMap<Long, NetworkCell> map = new HashMap<Long, NetworkCell>();
+			HashMap<String, NetworkCell> map = new HashMap<String, NetworkCell>();
 			String line;
 			while((line = in.readLine()) != null){
 				String [] splitted = line.split(":");
-				NetworkCell cell = new NetworkCell(splitted);
+				
+				
+				String description = splitted[0];
+				int barycentre = Integer.parseInt(splitted[1]);
+				long lac = Long.parseLong(splitted[2]);
+				long cell_id = Long.parseLong(splitted[3]);
+				//String param5 = splitted[4];
+				//String param6 = splitted[5];
+				//String param7 = splitted[6];
+				//String param8 = splitted[7];
+				//String param9 = splitted[8];
+				double barycentre_lat = Double.parseDouble(splitted[9]);
+				double barycentre_lon = Double.parseDouble(splitted[10]);
+				double radius = Double.parseDouble(splitted[11]);
+				
+				String celllac = String.valueOf(lac*65536+cell_id);
+				
+				NetworkCell cell = new NetworkCell(celllac,description,barycentre,lac,cell_id,barycentre_lat,barycentre_lon,radius);
 				map.put(cell.getCellac(), cell);
 			}
 			in.close();

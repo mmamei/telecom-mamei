@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import region.Region;
+import region.RegionI;
 import region.RegionMap;
 import region.network.NetworkCell;
 import region.network.NetworkMap;
@@ -54,7 +54,7 @@ public class KMLHeatMap {
 		KML kml = new KML();
 		kml.printHeaderFolder(out, rm.getName());
 		
-		for(Region r: rm.getRegions()) {
+		for(RegionI r: rm.getRegions()) {
 			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
 			String description = desc+" DENSITY = "+(logscale ? Math.pow(10, val) : val);
 			out.println(r.toKml(Colors.val01_to_color(val/max),"44aaaaaa",description));

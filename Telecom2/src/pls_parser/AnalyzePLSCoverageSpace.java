@@ -7,12 +7,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import region.Region;
+import region.RegionI;
 import region.RegionMap;
 import region.network.NetworkCell;
 import region.network.NetworkMap;
@@ -71,7 +70,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 		String celllac = line.split("\t")[2];
 		NetworkCell c = nm.get(celllac);
 		if(c!=null) 
-			cells.put(c.getCellName(), c);			
+			cells.put(c.getDescription(), c);			
 	}
 	
 	
@@ -160,7 +159,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 				System.out.println(rm.getName());
 				//nm = NetworkMapFactory.getNetworkMap(rm.getName());
 				int i = 0;
-				for(Region r: rm.getRegions()) {
+				for(RegionI r: rm.getRegions()) {
 					String[] x = r.getName().split(",");
 					double lat = Double.parseDouble(x[0]);
 					double lon = Double.parseDouble(x[1]);
@@ -182,7 +181,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 		
 		for(String name: map.keySet()) {
 			RegionMap rm = map.get(name);
-			for(Region r: rm.getRegions()) {
+			for(RegionI r: rm.getRegions()) {
 				String[] x = r.getName().split(",");
 				lat += Double.parseDouble(x[0]);
 				lng += Double.parseDouble(x[1]);

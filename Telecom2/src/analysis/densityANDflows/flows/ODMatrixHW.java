@@ -1,22 +1,14 @@
 package analysis.densityANDflows.flows;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import region.Region;
+import region.RegionI;
 import region.RegionMap;
-import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
-import visual.html.ArrowsGoogleMaps;
-import visual.kml.KML;
-import visual.kml.KMLArrow;
 import analysis.densityANDflows.density.UserPlaces;
 
 public class ODMatrixHW {
@@ -45,8 +37,8 @@ public class ODMatrixHW {
 				for(double[] h: homes)
 				for(double[] w: works) {
 					
-					Region rh = rm.get(h[0], h[1]);
-					Region rw = rm.get(w[0], w[1]);
+					RegionI rh = rm.get(h[0], h[1]);
+					RegionI rw = rm.get(w[0], w[1]);
 
 					if(rh!=null && rw!=null) {
 						Move m = new Move(rh,rw);

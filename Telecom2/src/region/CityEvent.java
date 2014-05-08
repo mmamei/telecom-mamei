@@ -21,8 +21,6 @@ import utils.Config;
 
 public class CityEvent {
 	
-	private static Map<String,CityEvent> CITY_EVENTS;
-	
 	private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 								
 	public Placemark spot;
@@ -48,14 +46,30 @@ public class CityEvent {
 		return (int)((et.getTimeInMillis() - st.getTimeInMillis()) / 3600000);
 	}
 	
-	public static Collection<CityEvent> getAllEvents() {
-		if(CITY_EVENTS == null) init();
-		return CITY_EVENTS.values();
+	public static Map<String,CityEvent> getAllEvents() {
+		Map<String,CityEvent> all = new HashMap<String,CityEvent>();		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().events_file));
+			String line;
+			while((line = br.readLine())!=null) {
+				if(line.startsWith("//") || line.trim().length() < 3) continue;
+				String[] el = line.split(",");
+				String placemark = el[0].trim();
+				String start = el[1].trim();
+				String end = el[2].trim();
+				int hc = Integer.parseInt(el[3].trim());
+				CityEvent ce = new CityEvent(Placemark.getPlacemark(placemark),start,end,hc);
+				all.put(placemark+","+start.substring(0, start.indexOf(" ")),ce);
+			}
+			br.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return all;
 	}
 	
 	public static CityEvent getEvent(String event) {
-		if(CITY_EVENTS == null) init();
-		return CITY_EVENTS.get(event);
+		return getAllEvents().get(event);
 	}
 	
 	
@@ -77,10 +91,9 @@ public class CityEvent {
 		//	System.out.println(s+" ==> "+ad.get(s));
 		
 
-		if(CITY_EVENTS == null) init();
 		List<CityEvent> result = new ArrayList<CityEvent>();
 		
-		for(CityEvent ce: CITY_EVENTS.values()) {
+		for(CityEvent ce: getAllEvents().values()) {
 			String[] s = get(ce.st);
 			String[] e = get(ce.et);
 			
@@ -88,7 +101,7 @@ public class CityEvent {
 			//String dir = eff.find("2014-03-10","4","2014-03-10","7",11.2477,43.7629,11.2491,43.7620);
 			// get region
 			EventFilesFinder eff = new EventFilesFinder();
-			String dir = eff.find(ce.st,ce.et,ce.spot.center[1],ce.spot.center[0],ce.spot.center[1],ce.spot.center[0]);
+			String dir = eff.find(ce.st,ce.et,ce.spot.centerLatLon[1],ce.spot.centerLatLon[0],ce.spot.centerLatLon[1],ce.spot.centerLatLon[0]);
 				
 			String key_s = s[0];
 			String key_e = e[0];
@@ -121,26 +134,6 @@ public class CityEvent {
 		return new String[]{date,h};
 	}
 	
-	public static void init() {
-		CITY_EVENTS = new HashMap<String,CityEvent>();		
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().events_file));
-			String line;
-			while((line = br.readLine())!=null) {
-				if(line.startsWith("//") || line.trim().length() < 3) continue;
-				String[] el = line.split(",");
-				String placemark = el[0].trim();
-				String start = el[1].trim();
-				String end = el[2].trim();
-				int hc = Integer.parseInt(el[3].trim());
-				CityEvent ce = new CityEvent(Placemark.getPlacemark(placemark),start,end,hc);
-				CITY_EVENTS.put(placemark+","+start.substring(0, start.indexOf(" ")),ce);
-			}
-			br.close();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
 	
 	/*
 	private static final SimpleDateFormat F2 = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
@@ -227,7 +220,7 @@ public class CityEvent {
 	
 	
 	public static CityEvent expand(CityEvent ce, int time_shift, double space_shift) {
-		Placemark p = new Placemark(ce.spot.name,ce.spot.center,ce.spot.getR()+space_shift);
+		Placemark p = new Placemark(ce.spot.name,ce.spot.centerLatLon,ce.spot.getR()+space_shift);
 		Calendar st = (Calendar)ce.st.clone();
 		st.add(Calendar.HOUR_OF_DAY, -time_shift);
 		Calendar et = (Calendar)ce.et.clone();

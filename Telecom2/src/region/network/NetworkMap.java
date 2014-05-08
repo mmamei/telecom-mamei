@@ -60,7 +60,7 @@ public class NetworkMap {
 		double dist = 0;
 		double count = 0;
 		for(NetworkCell nc : hm.values()) {
-			if(LatLonUtils.getHaversineDistance(nc.getPoint(), c) < radius) {
+			if(LatLonUtils.getHaversineDistance(nc.getCenterPoint(), c) < radius) {
 				dist += nc.getRadius();
 				count++;
 			}
@@ -72,7 +72,7 @@ public class NetworkMap {
 	public int getNumCells(LatLonPoint c, double radius) {
 		int count = 0;
 		for(NetworkCell nc : hm.values()) {
-			if(LatLonUtils.getHaversineDistance(nc.getPoint(), c) < radius) {
+			if(LatLonUtils.getHaversineDistance(nc.getCenterPoint(), c) < radius) {
 				count++;
 			}
 		}
@@ -96,7 +96,7 @@ public class NetworkMap {
 		kml.printHeaderFolder(out, name);
 		Set<NetworkCell> cells = getCellsIn(ll,tr);
 		for(NetworkCell nc : cells)
-			out.println(nc.toKml());
+			out.println(nc.toKml(""));
 		kml.printFooterFolder(out);
 		out.close();
 	}

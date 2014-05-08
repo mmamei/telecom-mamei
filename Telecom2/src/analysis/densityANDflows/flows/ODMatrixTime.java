@@ -6,12 +6,11 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import region.Region;
+import region.RegionI;
 import region.RegionMap;
 import region.network.NetworkCell;
 import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
-import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 
@@ -46,8 +45,8 @@ public class ODMatrixTime {
 				//System.out.print(nc1.getBarycentreLongitude()+","+nc1.getBarycentreLatitude()+" ---> ");
 				//System.out.println(nc2.getBarycentreLongitude()+","+nc2.getBarycentreLatitude());
 				
-				Region r1 = rm.get(nc1.getBarycentreLongitude(), nc1.getBarycentreLatitude());
-				Region r2 = rm.get(nc2.getBarycentreLongitude(), nc2.getBarycentreLatitude());
+				RegionI r1 = rm.get(nc1.getBarycentreLongitude(), nc1.getBarycentreLatitude());
+				RegionI r2 = rm.get(nc2.getBarycentreLongitude(), nc2.getBarycentreLatitude());
 				
 				//if(!r1.getName().equals(r2.getName()))
 				//System.out.println("Movement from: "+r1.getName()+" to "+r2.getName());

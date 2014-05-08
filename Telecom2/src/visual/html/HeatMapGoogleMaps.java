@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import region.Region;
+import region.RegionI;
 import region.RegionMap;
-import utils.Config;
 import utils.Logger;
 
 public class HeatMapGoogleMaps {
@@ -23,7 +22,7 @@ public class HeatMapGoogleMaps {
 		List<double[]> points = new ArrayList<double[]>();
 		List<Double> weights = new ArrayList<Double>();
 		
-		for(Region r: rm.getRegions()) {
+		for(RegionI r: rm.getRegions()) {
 			Double val = density.get(r.getName());
 			System.out.println(r.getName()+" = "+val);
 			if(val != null && val > threshold) {

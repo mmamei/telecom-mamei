@@ -115,6 +115,36 @@ public class GeomUtils {
 		return kml;
 	}
 	
+	
+	
+	public static Geometry openGis2Geom(String opengis) {
+		Geometry g = null;
+		try {
+			g = new WKTReader().read("POLYGON (("+opengis+"))");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return g;
+	}
+	
+	
+	public static String geom2Kml(Geometry g) {
+		Coordinate[] cs = g.getCoordinates();
+		StringBuffer sb = new StringBuffer();
+		for(Coordinate c: cs) 
+			sb.append(c.x+","+c.y+",0 ");
+		return sb.toString();
+	}
+	
+	
+	public static String lonLat2Kml(double[][] borderLonLat) {
+		StringBuffer sb = new StringBuffer();
+		for(double[] ll: borderLonLat) 
+			sb.append(ll[0]+","+ll[1]+",0 ");
+		return sb.toString();
+	} 
+	
+	
 	private static String createPolygon(double c_lon, double c_lat, double radius_form, int skip, int start_angle, int end_angle) {
 		
 		double lat1, long1;
