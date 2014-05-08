@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import region.Placemark;
-import region.network.NetworkMap;
+import region.RegionMap;
 import region.network.NetworkMapFactory;
 import utils.Config;
 
@@ -74,7 +74,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	long timestamp;
 	Calendar cal = new GregorianCalendar();
 	String header = null;
-	NetworkMap nm; 
+	RegionMap nm; 
 	boolean check_users;
 	boolean check_placemark;
 	
@@ -93,7 +93,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 			cal.setTimeInMillis(timestamp);
 			nm= NetworkMapFactory.getNetworkMap(cal);
 			//if the celllac is not in the networkmap, do not process the pls
-			if(nm.get(celllac) == null) return;
+			if(nm.getRegion(celllac) == null) return;
 			
 			
 			check_users = user_list == null || user_list.contains(username);

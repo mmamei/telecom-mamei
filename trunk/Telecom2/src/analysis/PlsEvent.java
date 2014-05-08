@@ -16,14 +16,13 @@ import java.util.Set;
 import org.gps.utils.LatLonUtils;
 
 import region.RegionI;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
+import region.RegionMap;
 import region.network.NetworkMapFactory;
 import utils.Config;
 
 public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
-	static NetworkMap NM = null;
+	static RegionMap NM = null;
 	
 	private String username;
 	private String imsi;
@@ -94,18 +93,18 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	}
 	
 	public String toKml(){
-		RegionI c = NM.get(cellac);
+		RegionI c = NM.getRegion(cellac);
 		return c.toKml("#7f770077");
 	}
 	
 	public String toString(){
-		RegionI nc = NM.get(cellac);
+		RegionI nc = NM.getRegion(cellac);
 		String cn = nc == null ? "null" : nc.getName();
 		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+cn;
 	}
 	
 	public String toCSV(){
-		RegionI nc = NM.get(cellac);
+		RegionI nc = NM.getRegion(cellac);
 		String cn = nc == null ? "null" : nc.getName();
 		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+cn;
 	}
@@ -176,7 +175,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 
 	
 	public double spatialDistance(PlsEvent x) {		
-		return LatLonUtils.getHaversineDistance(NM.get(cellac).getCenterPoint(),NM.get(x.cellac).getCenterPoint());
+		return LatLonUtils.getHaversineDistance(NM.getRegion(cellac).getCenterPoint(),NM.getRegion(x.cellac).getCenterPoint());
 	}
 	
 }

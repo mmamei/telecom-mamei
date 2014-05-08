@@ -7,14 +7,16 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import region.network.NetworkCell;
-import region.network.NetworkMap;
+import org.gps.utils.LatLonPoint;
+import org.gps.utils.LatLonUtils;
+
 import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.CopyAndSerializationUtils;
@@ -29,12 +31,17 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class RegionMap implements Serializable {
 	
-	private String name;
-	private Map<String,RegionI> rm;
+	protected String name;
+	protected Map<String,RegionI> rm;
 	
 	public RegionMap(String name) {
 		this.name = name;
 		rm = new HashMap<String,RegionI>();
+	}
+	
+	
+	public void addAll(Map<String,RegionI> m) {
+		rm.putAll(m);
 	}
 	
 	public void add(RegionI r) {
@@ -89,8 +96,8 @@ public class RegionMap implements Serializable {
 		float[] area_intersection = cache_intersection.get(celllac);
 		if(area_intersection != null) return area_intersection;
 		area_intersection = new float[this.getNumRegions()];
-		NetworkMap nm = NetworkMapFactory.getNetworkMap(time);
-		RegionI nc = nm.get(""+celllac);
+		RegionMap nm = NetworkMapFactory.getNetworkMap(time);
+		RegionI nc = nm.getRegion(""+celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getLatLon()[0], nc.getLatLon()[1], nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
 		int i=0;
@@ -119,8 +126,8 @@ public class RegionMap implements Serializable {
 		
 		RegionI closest = null;
 		float max_intersection = 0;
-		NetworkMap nm = NetworkMapFactory.getNetworkMap(time);
-		RegionI nc = nm.get(""+celllac);
+		RegionMap nm = NetworkMapFactory.getNetworkMap(time);
+		RegionI nc = nm.getRegion(""+celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getLatLon()[1], nc.getLatLon()[0], nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
 		for(RegionI r: this.getRegions()) {
@@ -156,11 +163,22 @@ public class RegionMap implements Serializable {
 	}
 	
 	
+	public Set<RegionI> getRegionsIn(double[] ll, double[] tr) {
+		Set<RegionI> cells = new HashSet<RegionI>();
+		
+		double lon,lat;
+		for(RegionI nc : rm.values()) {
+			lat = nc.getLatLon()[0];
+			lon = nc.getLatLon()[1];
+			if(ll[0] < lat && lat < tr[0] && ll[1] < lon && lon < tr[1])
+				cells.add(nc);
+		}
+		return cells;
+	}
 	
 	
 	public void printKML() throws Exception  {
 		File d = FileUtils.createDir("BASE/RegionMap");
-		
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(d.getAbsolutePath()+"/"+name+".kml")));
 		KML kml = new KML();
 		kml.printHeaderFolder(out, name);
@@ -174,6 +192,26 @@ public class RegionMap implements Serializable {
 		out.close();
 	}
 	
+	public void printKML(String file, double[] ll, double[] tr) throws Exception {
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+		KML kml = new KML();
+		String name = file.substring(file.lastIndexOf("/")+1,file.lastIndexOf("."));
+		kml.printHeaderFolder(out, name);
+		Set<RegionI> cells = getRegionsIn(ll,tr);
+		for(RegionI nc : cells)
+			out.println(nc.toKml(""));
+		kml.printFooterFolder(out);
+		out.close();
+	}
+	
+	
+	// radius in meters
+	public void printKML(String file, double[] center, double radius) throws Exception {
+		double d = Math.toDegrees(radius/1000/earth_radius);
+		double[] ll = new double[]{center[0]-d,center[1]-d};
+		double[] tr = new double[]{center[0]+d,center[1]+d};
+		printKML(file,ll,tr);
+	}
 	
 	public String getKMLBorders() {
 		StringBuffer sb = new StringBuffer();
@@ -197,6 +235,31 @@ public class RegionMap implements Serializable {
 		return sb.toString();
 	}
 	
+	
+	
+	public double getAvgRegionRadiusAround(LatLonPoint c, double radius){
+		
+		double dist = 0;
+		double count = 0;
+		for(RegionI nc : rm.values()) {
+			if(LatLonUtils.getHaversineDistance(nc.getCenterPoint(), c) < radius) {
+				dist += nc.getRadius();
+				count++;
+			}
+		}
+		return dist/count;
+	}
+	
+	
+	public int getNumRegions(LatLonPoint c, double radius) {
+		int count = 0;
+		for(RegionI nc : rm.values()) {
+			if(LatLonUtils.getHaversineDistance(nc.getCenterPoint(), c) < radius) {
+				count++;
+			}
+		}
+		return count;
+	}
 	
 	
 	public static void main(String[] args) throws Exception {

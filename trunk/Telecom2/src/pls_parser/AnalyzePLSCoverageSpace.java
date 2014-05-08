@@ -13,8 +13,6 @@ import java.util.Map;
 import region.Region;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
@@ -30,7 +28,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
 	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
 	String name;
-	NetworkMap nm = null;
+	RegionMap nm = null;
 	RegionMap rm;  
 	
 	Map<String,RegionI> cells = new HashMap<String,RegionI>();
@@ -68,7 +66,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 
 	public void analyze(String line) {
 		String celllac = line.split("\t")[2];
-		RegionI c = nm.get(celllac);
+		RegionI c = nm.getRegion(celllac);
 		if(c!=null) 
 			cells.put(c.getName(), c);			
 	}

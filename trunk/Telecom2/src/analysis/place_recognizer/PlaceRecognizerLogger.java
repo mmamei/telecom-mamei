@@ -17,7 +17,7 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 
 import region.RegionI;
-import region.network.NetworkMap;
+import region.RegionMap;
 import region.network.NetworkMapFactory;
 import utils.FileUtils;
 import visual.kml.KML;
@@ -185,8 +185,8 @@ public class PlaceRecognizerLogger {
 				for(String celllac: clusterByCells.keySet()){
 					String desc = getDescription(clusterEvents, clusterByCells.get(celllac));
 					int cellsize = clusterByCells.get(celllac).size();
-					NetworkMap nm = NetworkMapFactory.getNetworkMap(clusterByCells.get(celllac).get(0).getTimeStamp());
-					RegionI cell = nm.get(celllac);
+					RegionMap nm = NetworkMapFactory.getNetworkMap(clusterByCells.get(celllac).get(0).getTimeStamp());
+					RegionI cell = nm.getRegion(celllac);
 					String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
 					outKml.println(cell.toKml(COLORS[colorIndex % (COLORS.length)],name,desc));
 				}

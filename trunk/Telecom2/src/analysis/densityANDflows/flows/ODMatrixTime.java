@@ -8,8 +8,6 @@ import java.util.Map;
 
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -31,7 +29,7 @@ public class ODMatrixTime {
 		Map<Move,Double> list_od = new HashMap<Move,Double>();
 		
 		String file = "Stadio_Silvio_Piola_(NO)-11_03_2012_18_00-12_03_2012_00_00.txt";//"Torino-11_03_2012_17_00-11_03_2012_19_00.txt";
-		NetworkMap nm = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar("11/03/2012"));
+		RegionMap nm = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar("11/03/2012"));
 		
 		BufferedReader br = new BufferedReader(new FileReader("BASE/LocationsXUserAroundAnEvent/"+file));
 		String line;
@@ -39,8 +37,8 @@ public class ODMatrixTime {
 			line = line.substring(line.indexOf(",")+1).trim();
 			String[] cells = line.split(" ");
 			for(int i=1;i<cells.length;i++) {
-				RegionI nc1 = nm.get(cells[i-1]);
-				RegionI nc2 = nm.get(cells[i]);
+				RegionI nc1 = nm.getRegion(cells[i-1]);
+				RegionI nc2 = nm.getRegion(cells[i]);
 				
 				//System.out.print(nc1.getBarycentreLongitude()+","+nc1.getBarycentreLatitude()+" ---> ");
 				//System.out.println(nc2.getBarycentreLongitude()+","+nc2.getBarycentreLatitude());

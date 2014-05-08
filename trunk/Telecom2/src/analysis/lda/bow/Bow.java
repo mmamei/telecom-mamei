@@ -16,8 +16,6 @@ import org.gps.utils.LatLonUtils;
 
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
 
 public abstract class Bow {
@@ -97,8 +95,8 @@ public abstract class Bow {
 				int h = Integer.parseInt(x[2]);
 				String celllac = x[3];
 				if(rm.getClosest(celllac,DF.parse(x[0]).getTime()).getName().equals(rname)) {
-					NetworkMap nm = NetworkMapFactory.getNetworkMap(DF.parse(x[0]).getTime());
-					RegionI nc = nm.get(celllac);
+					RegionMap nm = NetworkMapFactory.getNetworkMap(DF.parse(x[0]).getTime());
+					RegionI nc = nm.getRegion(celllac);
 					lon += nc.getLatLon()[1];
 					lat += nc.getLatLon()[0];
 					cont ++;

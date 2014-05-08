@@ -1,12 +1,15 @@
 package region.network;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import region.RegionMap;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
@@ -14,7 +17,7 @@ import utils.Logger;
 public class NetworkMapFactory {
 	private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
 	
-	private static Map<String,NetworkMap> mapnet = new HashMap<String,NetworkMap>();
+	private static Map<String,RegionMap> mapnet = new HashMap<String,RegionMap>();
 	
 	
 	private static String getCalString(String f) {
@@ -71,31 +74,36 @@ public class NetworkMapFactory {
 	}
 
 	
-	public static NetworkMap getNetworkMap(long time) {
+	public static RegionMap getNetworkMap(long time) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(time);
 		return getNetworkMap(cal);
 	}
 	
 	
-	public static NetworkMap getNetworkMap(Calendar calendar) {
+	public static RegionMap getNetworkMap(Calendar calendar) {
 		String cal = F.format(calendar.getTime());
 	
 		String file = findClosestNetworkFile(cal);
 		
 		Logger.logln("!!!! Using network file "+file);
 		
-		NetworkMap nm = mapnet.get(file);
+		RegionMap nm = mapnet.get(file);
 		if(nm == null) {
-			nm = new NetworkMap(file);
-			mapnet.put(file, nm);
+			try {
+				ObjectInputStream in_network = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(file))));
+				nm = (RegionMap)in_network.readObject();
+				mapnet.put(file, nm);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 		return nm;
 	}
 	
 	
 	public static void main(String[] args) {
-		NetworkMap nm = getNetworkMap(Config.getInstance().pls_start_time);
+		RegionMap nm = getNetworkMap(Config.getInstance().pls_start_time);
 		System.out.println(nm);
 	}
 }

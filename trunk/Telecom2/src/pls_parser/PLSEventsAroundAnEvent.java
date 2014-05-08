@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
 
 import region.CityEvent;
 import region.RegionI;
-import region.network.NetworkMap;
+import region.RegionMap;
 import region.network.NetworkMapFactory;
 import utils.Logger;
 
@@ -17,7 +17,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 
 	private CityEvent cevent;
 	private PrintWriter out = null;
-	private NetworkMap nm;
+	private RegionMap nm;
 	public PLSEventsAroundAnEvent(CityEvent ce, int time_shift, double space_shift) {
 		String dir = "BASE/"+this.getClass().getSimpleName();
 		File fd = new File(dir);
@@ -66,7 +66,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 		
 		if(!cevent.spot.contains(celllac)) return;
 	
-		RegionI nc = nm.get(celllac);
+		RegionI nc = nm.getRegion(celllac);
 		if(nc == null) out.println(username+","+timestamp+","+imsi+",null");
 		else out.println(username+","+timestamp+","+imsi+","+celllac+","+nc.getName());
 	}

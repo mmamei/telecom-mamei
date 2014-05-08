@@ -11,8 +11,7 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import region.RegionI;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
+import region.RegionMap;
 import region.network.NetworkMapFactory;
 import analysis.PlsEvent;
 
@@ -21,7 +20,7 @@ public class Cluster implements Serializable {
 	private List<PlsEvent> events;
 	private Map<String,Double> weights;
 	
-	private static NetworkMap NM = null;
+	private static RegionMap NM = null;
 	
 	public Cluster() {
 		events = new ArrayList<PlsEvent>();
@@ -80,7 +79,7 @@ public class Cluster implements Serializable {
 		double tot_w = w(weights);
 		double r = 0;
 		for(PlsEvent e: events) {
-			RegionI x = NM.get(e.getCellac());
+			RegionI x = NM.getRegion(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			r += x.getRadius() * f;
 		}
@@ -94,7 +93,7 @@ public class Cluster implements Serializable {
 		
 		double tot_w = w(weights);
 		for(PlsEvent e: events) {
-			RegionI x = NM.get(e.getCellac());
+			RegionI x = NM.getRegion(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			aLat += x.getLatLon()[0] * f;
 			aLon += x.getLatLon()[1] * f;
@@ -112,7 +111,7 @@ public class Cluster implements Serializable {
 		double maxLat=0, maxLon=0;
 		double minLat = Double.MAX_VALUE, minLon = Double.MAX_VALUE;
 		for(PlsEvent e: events){
-			RegionI cell = NM.get(String.valueOf(e.getCellac()));
+			RegionI cell = NM.getRegion(String.valueOf(e.getCellac()));
 			maxLat = Math.max(maxLat, cell.getLatLon()[0]);
 			maxLon = Math.max(maxLon, cell.getLatLon()[1]);
 			minLat = Math.min(minLat, cell.getLatLon()[0]);
