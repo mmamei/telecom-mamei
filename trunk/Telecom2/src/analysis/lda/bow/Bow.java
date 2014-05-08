@@ -46,7 +46,7 @@ public abstract class Bow {
 			// 2013-5-23:Sun:13:4018542484
 			String[] x = events[i].split(":");
 			int h = Integer.parseInt(x[2]);
-			long celllac =Long.parseLong(x[3]);
+			String celllac = x[3];
 			RegionI r = rm.getClosest(celllac, DF.parse(x[0]).getTime());
 			String rname = r == null ? "EXT" : r.getName();
 			tps.add(new TimePlace(x[0],x[1],h,rname,rm,events));
@@ -95,12 +95,12 @@ public abstract class Bow {
 				// 2013-5-23:Sun:13:4018542484
 				String[] x = events[i].split(":");
 				int h = Integer.parseInt(x[2]);
-				long celllac =Long.parseLong(x[3]);
+				String celllac = x[3];
 				if(rm.getClosest(celllac,DF.parse(x[0]).getTime()).getName().equals(rname)) {
 					NetworkMap nm = NetworkMapFactory.getNetworkMap(DF.parse(x[0]).getTime());
-					NetworkCell nc = nm.get(String.valueOf(celllac));
-					lon += nc.getBarycentreLongitude();
-					lat += nc.getBarycentreLatitude();
+					RegionI nc = nm.get(celllac);
+					lon += nc.getLatLon()[1];
+					lat += nc.getLatLon()[0];
 					cont ++;
 				}
 			}

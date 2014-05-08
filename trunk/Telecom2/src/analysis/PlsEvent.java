@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.gps.utils.LatLonUtils;
 
+import region.RegionI;
 import region.network.NetworkCell;
 import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
@@ -93,19 +94,19 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	}
 	
 	public String toKml(){
-		NetworkCell c = NM.get(cellac);
+		RegionI c = NM.get(cellac);
 		return c.toKml("#7f770077");
 	}
 	
 	public String toString(){
-		NetworkCell nc = NM.get(cellac);
-		String cn = nc == null ? "null" : nc.getDescription();
+		RegionI nc = NM.get(cellac);
+		String cn = nc == null ? "null" : nc.getName();
 		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+cn;
 	}
 	
 	public String toCSV(){
-		NetworkCell nc = NM.get(cellac);
-		String cn = nc == null ? "null" : nc.getDescription();
+		RegionI nc = NM.get(cellac);
+		String cn = nc == null ? "null" : nc.getName();
 		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+cn;
 	}
 	

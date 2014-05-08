@@ -1,5 +1,8 @@
 package region.network;
 
+import org.gps.utils.LatLonPoint;
+import org.gps.utils.LatLonUtils;
+
 import region.RegionI;
 import utils.GeomUtils;
 import visual.kml.KMLCircle;
@@ -71,16 +74,6 @@ public class NetworkCell extends RegionI {
 		return nc;
 	}
 	
-
-	public double getBarycentreLatitude(){
-		return getCenterLat();
-	}
-
-	public double getBarycentreLongitude(){
-		return getCenterLon();
-	}
-	
-	
 	public long getCellID(){
 		return cell_id;
 	}
@@ -102,12 +95,19 @@ public class NetworkCell extends RegionI {
 	}
 	
 	
+	public double[][] getBboxLonLat() {
+		LatLonPoint c = this.getCenterPoint();
+		LatLonPoint ll = LatLonUtils.getPointAtDistance(c, 225, radius*Math.sqrt(2));
+		LatLonPoint tr = LatLonUtils.getPointAtDistance(c, 45, radius*Math.sqrt(2));
+		return new double[][]{{ll.getLongitude(),ll.getLatitude()},{tr.getLongitude(),tr.getLatitude()}};
+	}
+	
 	public double getRadius(){
 		return radius;
 	}
 	
 	public String toString(){
 		return celllac+","+description+","+barycentre+","+lac+","+cell_id+","+param5+","+param6+","+param7+","+param8+","+param9+
-				","+getCenterLat()+","+getCenterLon()+","+radius;
+				","+getLatLon()[0]+","+getLatLon()[1]+","+radius;
 	}
 }

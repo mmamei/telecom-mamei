@@ -74,10 +74,10 @@ public class KMLPath {
 				PlsEvent pe1 = evPerDay.get(day).get(i+1);
 				int dmin =  (int)((pe1.getTimeStamp() - pe.getTimeStamp()) / 60000);
 				if(dmin < 180) {
-					double lon1 = nm.get(String.valueOf(pe.getCellac())).getBarycentreLongitude() + jitter(pe);
-					double lat1 = nm.get(String.valueOf(pe.getCellac())).getBarycentreLatitude() + jitter(pe);
-					double lon2 = nm.get(String.valueOf(pe1.getCellac())).getBarycentreLongitude() + jitter(pe1);
-					double lat2 = nm.get(String.valueOf(pe1.getCellac())).getBarycentreLatitude() + jitter(pe1);
+					double lon1 = nm.get(String.valueOf(pe.getCellac())).getLatLon()[1] + jitter(pe);
+					double lat1 = nm.get(String.valueOf(pe.getCellac())).getLatLon()[0] + jitter(pe);
+					double lon2 = nm.get(String.valueOf(pe1.getCellac())).getLatLon()[1] + jitter(pe1);
+					double lat2 = nm.get(String.valueOf(pe1.getCellac())).getLatLon()[0] + jitter(pe1);
 					//out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
 					out.println(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
 				}
@@ -109,8 +109,8 @@ public class KMLPath {
 		for(String day: evPerDay.keySet()) {
 			kml.printFolder(out, day);
 			for(PlsEvent pe: evPerDay.get(day)) {
-				double lon1 = nm.get(pe.getCellac()).getBarycentreLongitude() + jitter(pe);
-				double lat1 = nm.get(pe.getCellac()).getBarycentreLatitude() + jitter(pe);
+				double lon1 = nm.get(pe.getCellac()).getLatLon()[1] + jitter(pe);
+				double lat1 = nm.get(pe.getCellac()).getLatLon()[0] + jitter(pe);
 				out.println("<Placemark>" +
 						    "<name>"+pe.getTime().split(" ")[1]+"</name>" +
 						    "<description>"+pe.getTime()+"</description>" +

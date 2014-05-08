@@ -29,8 +29,6 @@ public class NetworkMapParser {
 			String line;
 			while((line = in.readLine()) != null){
 				String [] splitted = line.split(":");
-				
-				
 				String description = splitted[0];
 				int barycentre = Integer.parseInt(splitted[1]);
 				long lac = Long.parseLong(splitted[2]);

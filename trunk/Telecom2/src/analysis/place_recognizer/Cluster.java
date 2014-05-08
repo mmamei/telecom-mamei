@@ -10,6 +10,7 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import region.RegionI;
 import region.network.NetworkCell;
 import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
@@ -79,7 +80,7 @@ public class Cluster implements Serializable {
 		double tot_w = w(weights);
 		double r = 0;
 		for(PlsEvent e: events) {
-			NetworkCell x = NM.get(String.valueOf(e.getCellac()));
+			RegionI x = NM.get(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			r += x.getRadius() * f;
 		}
@@ -93,10 +94,10 @@ public class Cluster implements Serializable {
 		
 		double tot_w = w(weights);
 		for(PlsEvent e: events) {
-			NetworkCell x = NM.get(String.valueOf(e.getCellac()));
+			RegionI x = NM.get(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
-			aLat += x.getBarycentreLatitude() * f;
-			aLon += x.getBarycentreLongitude() * f;
+			aLat += x.getLatLon()[0] * f;
+			aLon += x.getLatLon()[1] * f;
 		}		
 		
 		double den = tot_w > 0 ? tot_w : size();
@@ -111,11 +112,11 @@ public class Cluster implements Serializable {
 		double maxLat=0, maxLon=0;
 		double minLat = Double.MAX_VALUE, minLon = Double.MAX_VALUE;
 		for(PlsEvent e: events){
-			NetworkCell cell = NM.get(String.valueOf(e.getCellac()));
-			maxLat = Math.max(maxLat, cell.getBarycentreLatitude());
-			maxLon = Math.max(maxLon, cell.getBarycentreLongitude());
-			minLat = Math.min(minLat, cell.getBarycentreLatitude());
-			minLon = Math.min(minLon, cell.getBarycentreLongitude());
+			RegionI cell = NM.get(String.valueOf(e.getCellac()));
+			maxLat = Math.max(maxLat, cell.getLatLon()[0]);
+			maxLon = Math.max(maxLon, cell.getLatLon()[1]);
+			minLat = Math.min(minLat, cell.getLatLon()[0]);
+			minLon = Math.min(minLon, cell.getLatLon()[1]);
 		}
 		LatLonPoint p1 = new LatLonPoint(maxLat, maxLon);
 		LatLonPoint p2 = new LatLonPoint(minLat, minLon);

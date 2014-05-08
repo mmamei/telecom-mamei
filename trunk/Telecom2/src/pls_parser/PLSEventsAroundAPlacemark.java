@@ -7,12 +7,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import region.Placemark;
-import region.network.NetworkCell;
+import region.RegionI;
 import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
 import utils.Config;
@@ -41,8 +39,8 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 			
 			for(Placemark p: ps)
 			for(double r: radii) {
-				outs.add(new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.name+"_"+r+".txt")))));
-				placemarks.add(new Placemark(p.name,p.centerLatLon,r));
+				outs.add(new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.getName()+"_"+r+".txt")))));
+				placemarks.add(new Placemark(p.getName(),p.getLatLon(),r));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -70,12 +68,12 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		imsi = fields[1];
 		celllac = fields[2];
 		timestamp = fields[3];
-		NetworkCell nc = nm.get(celllac);
+		RegionI nc = nm.get(celllac);
 		
 		for(int i=0; i<placemarks.size();i++) {
 			if(placemarks.get(i).contains(celllac)) {
 				if(nc == null) outs.get(i).println(username+","+timestamp+","+imsi+",null");
-				else outs.get(i).println(username+","+timestamp+","+imsi+","+celllac+","+nc.getDescription());
+				else outs.get(i).println(username+","+timestamp+","+imsi+","+celllac+","+nc.getName());
 			}
 		}
 		}catch(Exception e) {
@@ -91,7 +89,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	public static void process(Placemark p) throws Exception {
 		List<Placemark> ps = new ArrayList<Placemark>();
 		ps.add(p);
-		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps, new double[]{p.getR()});
+		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps, new double[]{p.getRadius()});
 		PLSParser.parse(ba);
 		ba.finish();
 	}

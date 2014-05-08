@@ -8,12 +8,10 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import region.CityEvent;
-import region.network.NetworkCell;
+import region.RegionI;
 import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
-import utils.Config;
 import utils.Logger;
-import analysis.PlsEvent;
 
 public class PLSEventsAroundAnEvent extends BufferAnalyzer {	
 
@@ -68,9 +66,9 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 		
 		if(!cevent.spot.contains(celllac)) return;
 	
-		NetworkCell nc = nm.get(celllac);
+		RegionI nc = nm.get(celllac);
 		if(nc == null) out.println(username+","+timestamp+","+imsi+",null");
-		else out.println(username+","+timestamp+","+imsi+","+celllac+","+nc.getDescription());
+		else out.println(username+","+timestamp+","+imsi+","+celllac+","+nc.getName());
 	}
 	
 	public void finish() {

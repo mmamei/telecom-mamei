@@ -25,11 +25,11 @@ public class ODMatrixEventPresence {
 		
 		CityEvent ce = CityEvent.getEvent(event);
 		Map<String,Double> bestR = PlacemarkRadiusExtractor.readBestR(true,true);
-		ce.spot.changeRadius(bestR.get(ce.spot.name));
+		ce.spot.changeRadius(bestR.get(ce.spot.getName()));
 		
 		CityEvent ce_expand = CityEvent.expand(ce, 1, expand);
 		
-		File input_obj_file = new File("BASE/cache/"+ce.spot.name+".ser");
+		File input_obj_file = new File("BASE/cache/"+ce.spot.getName()+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
 			System.exit(0);
@@ -70,13 +70,13 @@ public class ODMatrixEventPresence {
 			
 			boolean before = true;
 			for(int i=1;i<cells.length;i++) {
-				NetworkCell nc1 = nm.get(cells[i-1]);
-				NetworkCell nc2 = nm.get(cells[i]);
+				RegionI nc1 = nm.get(cells[i-1]);
+				RegionI nc2 = nm.get(cells[i]);
 				
-				if(ce.spot.contains(nc1.getCellac()) && !ce.spot.contains(nc2.getCellac())) before = false;
+				if(ce.spot.contains(nc1.getName()) && !ce.spot.contains(nc2.getName())) before = false;
 				
-				RegionI r1 = rm.get(nc1.getBarycentreLongitude(), nc1.getBarycentreLatitude());
-				RegionI r2 = rm.get(nc2.getBarycentreLongitude(), nc2.getBarycentreLatitude());
+				RegionI r1 = rm.get(nc1.getLatLon()[1], nc1.getLatLon()[0]);
+				RegionI r2 = rm.get(nc2.getLatLon()[1], nc2.getLatLon()[0]);
 				
 				Map<Move,Double> list_od = before ? incoming_od : outgoing_od;
 				

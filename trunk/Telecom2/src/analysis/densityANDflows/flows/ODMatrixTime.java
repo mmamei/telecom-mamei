@@ -39,14 +39,14 @@ public class ODMatrixTime {
 			line = line.substring(line.indexOf(",")+1).trim();
 			String[] cells = line.split(" ");
 			for(int i=1;i<cells.length;i++) {
-				NetworkCell nc1 = nm.get(cells[i-1]);
-				NetworkCell nc2 = nm.get(cells[i]);
+				RegionI nc1 = nm.get(cells[i-1]);
+				RegionI nc2 = nm.get(cells[i]);
 				
 				//System.out.print(nc1.getBarycentreLongitude()+","+nc1.getBarycentreLatitude()+" ---> ");
 				//System.out.println(nc2.getBarycentreLongitude()+","+nc2.getBarycentreLatitude());
 				
-				RegionI r1 = rm.get(nc1.getBarycentreLongitude(), nc1.getBarycentreLatitude());
-				RegionI r2 = rm.get(nc2.getBarycentreLongitude(), nc2.getBarycentreLatitude());
+				RegionI r1 = rm.get(nc1.getLatLon()[1], nc1.getLatLon()[0]);
+				RegionI r2 = rm.get(nc2.getLatLon()[1], nc2.getLatLon()[0]);
 				
 				//if(!r1.getName().equals(r2.getName()))
 				//System.out.println("Movement from: "+r1.getName()+" to "+r2.getName());

@@ -101,7 +101,7 @@ public class CityEvent {
 			//String dir = eff.find("2014-03-10","4","2014-03-10","7",11.2477,43.7629,11.2491,43.7620);
 			// get region
 			EventFilesFinder eff = new EventFilesFinder();
-			String dir = eff.find(ce.st,ce.et,ce.spot.centerLatLon[1],ce.spot.centerLatLon[0],ce.spot.centerLatLon[1],ce.spot.centerLatLon[0]);
+			String dir = eff.find(ce.st,ce.et,ce.spot.getLatLon()[1],ce.spot.getLatLon()[0],ce.spot.getLatLon()[1],ce.spot.getLatLon()[0]);
 				
 			String key_s = s[0];
 			String key_e = e[0];
@@ -189,7 +189,7 @@ public class CityEvent {
 	public String toString() {
 		String startTime = F.format(st.getTime());
 		String endTime = F.format(et.getTime());
-		return spot.name.replaceAll("[/\\:\\s]", "_")+"-"+startTime.replaceAll("[/\\:\\s]", "_")+"-"+endTime.replaceAll("[/\\:\\s]", "_");
+		return spot.getName().replaceAll("[/\\:\\s]", "_")+"-"+startTime.replaceAll("[/\\:\\s]", "_")+"-"+endTime.replaceAll("[/\\:\\s]", "_");
 	}
 	
 	
@@ -220,7 +220,7 @@ public class CityEvent {
 	
 	
 	public static CityEvent expand(CityEvent ce, int time_shift, double space_shift) {
-		Placemark p = new Placemark(ce.spot.name,ce.spot.centerLatLon,ce.spot.getR()+space_shift);
+		Placemark p = new Placemark(ce.spot.getName(),ce.spot.getLatLon(),ce.spot.getRadius()+space_shift);
 		Calendar st = (Calendar)ce.st.clone();
 		st.add(Calendar.HOUR_OF_DAY, -time_shift);
 		Calendar et = (Calendar)ce.et.clone();

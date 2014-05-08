@@ -26,7 +26,7 @@ public class HeatMapGoogleMaps {
 			Double val = density.get(r.getName());
 			System.out.println(r.getName()+" = "+val);
 			if(val != null && val > threshold) {
-				points.add(new double[]{r.getCenterLat(),r.getCenterLon()}); // nota qui si potrebbe mettere un po' di scattering e modulare i pesi opportunamente.
+				points.add(new double[]{r.getLatLon()[0],r.getLatLon()[1]}); // nota qui si potrebbe mettere un po' di scattering e modulare i pesi opportunamente.
 				weights.add(val);
 			}
 		}

@@ -56,10 +56,10 @@ public class PresenceCounter {
 		//create a map that associates a Placemark with the list of events happening in there
 		Map<String,List<CityEvent>> placemark_events = new HashMap<String,List<CityEvent>>();
 		for(CityEvent ce: events) {
-			List<CityEvent> l = placemark_events.get(ce.spot.name);
+			List<CityEvent> l = placemark_events.get(ce.spot.getName());
 			if(l==null) {
 					l = new ArrayList<CityEvent>();
-					placemark_events.put(ce.spot.name, l);
+					placemark_events.put(ce.spot.getName(), l);
 			}
 			l.add(ce);
 		}
@@ -77,7 +77,7 @@ public class PresenceCounter {
 			
 			for(CityEvent ce: pevents) {
 				
-				String key = USE_INDIVIDUAL_EVENT ? ce.toString() : ce.spot.name;
+				String key = USE_INDIVIDUAL_EVENT ? ce.toString() : ce.spot.getName();
 				double bestr = bestRadius.get(key);
 				ce.spot.changeRadius(bestr);
 				double c = count(ce,O_RADIUS,DAYS);
@@ -136,7 +136,7 @@ public class PresenceCounter {
 		
 		//Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
 		
-		File file_event = getFile(event.spot.clone(),event.spot.getR());
+		File file_event = getFile(event.spot.clone(),event.spot.getRadius());
 		File file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
@@ -178,11 +178,11 @@ public class PresenceCounter {
 	
 	public static File getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
-		File f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt");
+		File f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt");
 		if(f==null || !f.exists()) {
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
 			PLSEventsAroundAPlacemark.process(p);
-			f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt");
+			f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt");
 		}
 		return f;
 	}

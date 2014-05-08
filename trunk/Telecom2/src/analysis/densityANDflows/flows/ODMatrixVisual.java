@@ -162,10 +162,10 @@ public class ODMatrixVisual {
 		for(Move m: list_od.keySet()) {
 			double weight = list_od.get(m);
 			if(!m.sameSourceAndDestination()) {
-				double[] p1 = new double[]{m.s.getCenterLat(),m.s.getCenterLon()};
-				double[] p2 = new double[]{m.d.getCenterLat(),m.d.getCenterLon()};
+				double[] p1 = new double[]{m.s.getLatLon()[0],m.s.getLatLon()[1]};
+				double[] p2 = new double[]{m.d.getLatLon()[0],m.d.getLatLon()[1]};
 				double[][] route;
-				GHResponse ph = gh.route(new GHRequest(m.s.getCenterLat(),m.s.getCenterLon(),m.d.getCenterLat(),m.d.getCenterLon()));
+				GHResponse ph = gh.route(new GHRequest(m.s.getLatLon()[0],m.s.getLatLon()[1],m.d.getLatLon()[0],m.d.getLatLon()[1]));
 		        
 				if(ph.isFound()) {
 					route = new double[ph.getPoints().getSize()][2];

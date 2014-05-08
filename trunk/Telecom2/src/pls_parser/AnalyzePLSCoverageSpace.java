@@ -33,7 +33,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	NetworkMap nm = null;
 	RegionMap rm;  
 	
-	Map<String,NetworkCell> cells = new HashMap<String,NetworkCell>();
+	Map<String,RegionI> cells = new HashMap<String,RegionI>();
 
 	
 	public AnalyzePLSCoverageSpace() {
@@ -68,18 +68,18 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 
 	public void analyze(String line) {
 		String celllac = line.split("\t")[2];
-		NetworkCell c = nm.get(celllac);
+		RegionI c = nm.get(celllac);
 		if(c!=null) 
-			cells.put(c.getDescription(), c);			
+			cells.put(c.getName(), c);			
 	}
 	
 	
 	public void finish() {
 		try{
 			System.out.println("N. Cells = "+cells.size());
-			for(NetworkCell nc : cells.values()) {
-				String name = nc.getBarycentreLatitude()+","+nc.getBarycentreLongitude()+","+nc.getRadius();
-				rm.add(new Region(name,GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius())));
+			for(RegionI nc : cells.values()) {
+				String name = nc.getLatLon()[0]+","+nc.getLatLon()[1]+","+nc.getRadius();
+				rm.add(new Region(name,GeomUtils.getCircle(nc.getLatLon()[1], nc.getLatLon()[0], nc.getRadius())));
 			}
 			/*
 			KML kml = new KML();

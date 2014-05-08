@@ -74,7 +74,7 @@ public class RunAll {
 				File f = new File(odir+"/"+PlacemarkRadiusExtractor.OFILE);
 				f.delete();
 				
-				File d = new File(odir+"/"+p.name);
+				File d = new File(odir+"/"+p.getName());
 				File[] files = d.listFiles();
 				for(File f1: files) {
 					if(f1.isFile()) f1.delete();
@@ -91,7 +91,7 @@ public class RunAll {
 				files = d.listFiles(new FilenameFilter() {
 				    @Override
 				    public boolean accept(File dir, String name) {
-				        return name.startsWith(p.name+"_");
+				        return name.startsWith(p.getName()+"_");
 				    }
 				});
 				for(File f1: files) 

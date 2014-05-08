@@ -98,7 +98,7 @@ public class PLSBehaviorInAnArea {
 			Placemark p = new Placemark(n,new double[]{lat,lon},r);
 			
 			PLSEventsAroundAPlacemark.process(p);
-			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.name+"_"+p.getR()+".txt";
+			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt";
 			PLSMap plsmap = getPLSMap(file,false).get("all");
 			(new File(file)).delete();
 			DescriptiveStatistics[] stats = getStats(plsmap);
@@ -126,11 +126,11 @@ public class PLSBehaviorInAnArea {
 
 	public void process(Placemark p) throws Exception {
 		
-		Logger.logln("Processing... "+p.name);
+		Logger.logln("Processing... "+p.getName());
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		
-		String file = "BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.name+"_"+p.getR()+".txt";
+		String file = "BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+p.getRadius()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -143,7 +143,7 @@ public class PLSBehaviorInAnArea {
 		Collection<CityEvent> events = CityEvent.getEventsInData();
 		List<CityEvent> relevantEvents = new ArrayList<CityEvent>();
 		for(CityEvent e : events) 
-			if(e.spot.name.equals(p.name)) relevantEvents.add(e);
+			if(e.spot.getName().equals(p.getName())) relevantEvents.add(e);
 		
 		for(CityEvent re : relevantEvents)
 			System.out.println("- "+re.toFileName());
@@ -166,7 +166,7 @@ public class PLSBehaviorInAnArea {
 			//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
 			
 			if(VERBOSE) {
-				PrintWriter out = new PrintWriter(new FileWriter("BASE/PLSBehaviorInAnArea/"+p.name+"_"+p.getR()+".csv"));
+				PrintWriter out = new PrintWriter(new FileWriter("BASE/PLSBehaviorInAnArea/"+p.getName()+"_"+p.getRadius()+".csv"));
 				out.println("time,n_user,z_score");
 				for(int i=0; i<plsmap.getDomain().length;i++) {
 					out.println(plsmap.getDomain()[i]+";"+(int)usr_data[i]+";"+DF.format(z_usr_data[i]));
@@ -174,7 +174,7 @@ public class PLSBehaviorInAnArea {
 				
 				out.close();
 			}
-			drawGraph(p.name+"_"+p.getR()+" Cell = "+cell,plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);
+			drawGraph(p.getName()+"_"+p.getRadius()+" Cell = "+cell,plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);
 		}
 	}
 	

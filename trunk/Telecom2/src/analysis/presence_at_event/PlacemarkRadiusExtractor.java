@@ -74,10 +74,10 @@ public class PlacemarkRadiusExtractor {
 		// divide all the events by placemark
 		Map<String,List<CityEvent>> eventsByPlacemark = new HashMap<String,List<CityEvent>>();
 		for(CityEvent ce: all) {
-			List<CityEvent> l = eventsByPlacemark.get(ce.spot.name);
+			List<CityEvent> l = eventsByPlacemark.get(ce.spot.getName());
 			if(l==null) {
 				l = new ArrayList<CityEvent>();
-				eventsByPlacemark.put(ce.spot.name, l);
+				eventsByPlacemark.put(ce.spot.getName(), l);
 			}
 			l.add(ce);
 		}
@@ -167,7 +167,7 @@ public class PlacemarkRadiusExtractor {
 		List<double[][]> list_valueRadiusDistrib  = null;
 		// restore
 		
-		String n = le.get(0).spot.name;
+		String n = le.get(0).spot.getName();
 		if(ring) n = "ring_"+n;
 		
 		String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
@@ -331,12 +331,12 @@ public class PlacemarkRadiusExtractor {
 		
 		Placemark p = relevantEvents.get(0).spot.clone();
 		p.changeRadius(MAX_R);
-		Logger.logln("Processing events associated to "+p.name);
+		Logger.logln("Processing events associated to "+p.getName());
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		
 		File d = FileUtils.createDir("BASE/PLSEventsAroundAPlacemark/"+subdir);
-		String file = d.getAbsolutePath()+"/"+p.name+"_"+p.getR()+".txt";
+		String file = d.getAbsolutePath()+"/"+p.getName()+"_"+p.getRadius()+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
@@ -370,7 +370,7 @@ public class PlacemarkRadiusExtractor {
 			DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
 			double[] z_usr_data =  PLSBehaviorInAnArea.getZ2(stats[1],plsmap.startTime);
 			
-			if (PLOT) PLSBehaviorInAnArea.drawGraph(p.name+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevantEvents);
+			if (PLOT) PLSBehaviorInAnArea.drawGraph(p.getName()+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevantEvents);
 			Calendar cal = (Calendar)plsmap.startTime.clone();
 			
 			int h = 0;

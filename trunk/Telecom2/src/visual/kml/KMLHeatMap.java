@@ -23,7 +23,7 @@ public class KMLHeatMap {
 		NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 		StringBuffer result = new StringBuffer();
 		for(String celllac: map.keySet()) {
-			NetworkCell nc = nm.get(celllac);
+			RegionI nc = nm.get(celllac);
 			int index = (int)(map.get(celllac) / max * (Colors.HEAT_COLORS.length-1));
 			
 			result.append(nc.toKml(Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]), "", ""));
