@@ -110,13 +110,12 @@ public class PlaceRecognizer {
 	
 	private static String[] KIND_OF_PLACES = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
-	public void runSingle(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
+	public Map<String, List<LatLonPoint>> runSingle(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
+		Map<String, List<LatLonPoint>> results = null;
 		try {
-			
 			EventFilesFinder eff = new EventFilesFinder();
 			String dir = eff.find(sday,"12",eday,"12",lon1,lat1,lon2,lat2);
-			if(dir == null) return;
-			
+			if(dir == null) return null;
 			
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-0"));
@@ -129,7 +128,7 @@ public class PlaceRecognizer {
 			PLSParser.parse(ba);
 			
 			List<PlsEvent> events = ba.get(user).getEvents();
-			Map<String, List<LatLonPoint>> results = new HashMap<String, List<LatLonPoint>>();
+			results = new HashMap<String, List<LatLonPoint>>();
 			PlaceRecognizerLogger.openKMLFile("G:/CODE/Telecom/web/kml/"+user+".kml");
 			for(String kind_of_place:KIND_OF_PLACES)
 				results.put(kind_of_place, analyze(user,kind_of_place,events,0.25,0.25,2000,0.6));
@@ -138,6 +137,7 @@ public class PlaceRecognizer {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		return results;
 	}
 	
 	
@@ -180,8 +180,15 @@ public class PlaceRecognizer {
 		PlaceRecognizer pr = new PlaceRecognizer();
 		
 		
-		pr.runSingle("2012-03-06", "2012-04-30", "362f6cf6e8cfba0e09b922e21d59563d26ae0207744af2de3766c5019415af", 7.6855,45.0713,  7.6855,45.0713);
+		Map<String, List<LatLonPoint>> res = pr.runSingle("2012-03-06", "2012-03-07", "362f6cf6e8cfba0e09b922e21d59563d26ae0207744af2de3766c5019415af", 7.6855,45.0713,  7.6855,45.0713);
 		//pr.runSingle("2012-03-06", "2012-04-30", "7f3e4f68105e863aa369e5c39ab5789975f0788386b45954829346b7ca63", 7.6855,45.0713,  7.6855,45.0713);
+		for(String k: res.keySet()) {
+			System.out.println(k);
+			for(LatLonPoint p: res.get(k))
+				System.out.println(p.getLongitude()+","+p.getLatitude());
+		}
+		
+		
 		Logger.logln("Done!");
 	}
 	

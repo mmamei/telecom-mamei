@@ -93,8 +93,8 @@ public class PLSBehaviorInAnArea {
 			double lat = (lat1+lat2)/2;
 			LatLonPoint p1 = new LatLonPoint(lat1,lon1);
 			LatLonPoint p2 = new LatLonPoint(lat2,lon2);
-			double r = LatLonUtils.getHaversineDistance(p1, p2) / 2;
-			String n = lon+","+lat;
+			int r = (int)LatLonUtils.getHaversineDistance(p1, p2) / 2;
+			String n = "tmp";
 			Placemark p = new Placemark(n,new double[]{lat,lon},r);
 			
 			PLSEventsAroundAPlacemark.process(p);
@@ -372,7 +372,8 @@ public class PLSBehaviorInAnArea {
 		String line;
 		
 		Calendar cal = new GregorianCalendar();
-		BufferedReader in = new BufferedReader(new FileReader(file));
+		
+		BufferedReader in = new BufferedReader(new FileReader(FileUtils.getFile(file)));
 		while((line = in.readLine()) != null){
 			line = line.trim();
 			if(line.length() < 1) continue; // extra line at the end of file
