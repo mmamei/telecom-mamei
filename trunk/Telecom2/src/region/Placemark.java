@@ -28,31 +28,33 @@ import com.vividsolutions.jts.geom.Polygon;
 
 
 
-public class Placemark extends Region {
-	static NetworkMap NM = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
-	private static Map<String,Placemark> PLACEMARKS = null;
+public class Placemark extends RegionI {
 	
-	//public double[] center;
-	//public LatLonPoint center_point;
-	
+	private NetworkMap nm;
 	private double radius;
 	public Set<String> cellsAround;
 	public boolean ring = false;
 	
-	public Placemark(String name, double[] point, double r) {
-		super(name,GeomUtils.getCircle(point[1], point[0], r));
-		//this.center = point;
-		//center_point = new LatLonPoint(center[0],center[1]);
+	public Placemark(String name, double[] centerLatLon, double r) {
+		this.name = name;
+		this.centerLatLon = centerLatLon;
 		this.radius = r;
-		
-		/*
-		System.out.println(point[0]+", "+point[1]);
-		System.out.println(center[0]+", "+center[1]);
-		System.out.println(this.getCenterLat()+", "+this.getCenterLon());
-		System.out.println(this.getCenterPoint().getLatitude()+", "+this.getCenterPoint().getLongitude());
-		*/
+		this.nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 		this.cellsAround = getCellsAround();
 	}
+	
+	
+	public double[][] getBboxLonLat() {
+		LatLonPoint c = this.getCenterPoint();
+		LatLonPoint ll = LatLonUtils.getPointAtDistance(c, 225, radius*Math.sqrt(2));
+		LatLonPoint tr = LatLonUtils.getPointAtDistance(c, 45, radius*Math.sqrt(2));
+		return new double[][]{{ll.getLongitude(),ll.getLatitude()},{tr.getLongitude(),tr.getLatitude()}};
+	}
+	
+	public Geometry getGeom() {
+		return GeomUtils.getCircle(centerLatLon[1], centerLatLon[0], radius);
+	}
+	
 	
 	public String toString() {
 		String n = ring? "ring_"+name : name;
@@ -60,7 +62,7 @@ public class Placemark extends Region {
 	}
 	
 	public Placemark clone() {
-		Placemark c = new Placemark(name,center,radius);
+		Placemark c = new Placemark(name,centerLatLon,radius);
 		if(ring) c.changeRadiusRing(radius);
 		return c;
 	}
@@ -90,7 +92,7 @@ public class Placemark extends Region {
 	public double getArea() {
 		Geometry u = null;
 		for(String c: cellsAround) {
-			NetworkCell nc = NM.get(c);
+			NetworkCell nc = nm.get(c);
 			Polygon p = GeomUtils.getCircle(nc.getBarycentreLongitude(),nc.getBarycentreLatitude(),nc.getRadius());
 			if(u == null) u = p;
 			else u = u.union(p);
@@ -99,14 +101,10 @@ public class Placemark extends Region {
 		return area;
 	}
 	
-	
-	
-	
-	
 	public double getSumRadii() {
 		double a = 0;
 		for(String c: cellsAround) {
-			double r = NM.get(c).getRadius();
+			double r = nm.get(c).getRadius();
 			a = a + r;
 		}
 		return a;
@@ -117,8 +115,8 @@ public class Placemark extends Region {
 		double max_dist = 0;
 		LatLonPoint center_point = getCenterPoint();
 		for(String c: cellsAround) {
-			NetworkCell nc = NM.get(c);
-			double d = LatLonUtils.getHaversineDistance(nc.getPoint(),center_point);
+			NetworkCell nc = nm.get(c);
+			double d = LatLonUtils.getHaversineDistance(nc.getCenterPoint(),center_point);
 			
 			max_dist = Math.max(max_dist, d + nc.getRadius());
 			
@@ -138,46 +136,40 @@ public class Placemark extends Region {
 	
 	
 	
-	
-	
-	public static Placemark getPlacemark(String placemark) {
-		if(PLACEMARKS == null) initPlacemaks();
-		return PLACEMARKS.get(placemark);
-	}
-	
-	public static void initPlacemaks() {
-		PLACEMARKS = new HashMap<String,Placemark>();
+	public static Placemark getPlacemark(String pname) {
+		Placemark p = null;
 		try {
-		BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().placemarks_file));
-		String line;
-		while((line = br.readLine())!=null) {
-			if(line.startsWith("//") || line.trim().length() < 3) continue;
-			String[] el = line.split(",");
-			String name = el[0].trim();
-			double lat = Double.parseDouble(el[1].trim());
-			double lon = Double.parseDouble(el[2].trim());
-			double r = Double.parseDouble(el[3].trim());
-			PLACEMARKS.put(name, new Placemark(name, new double[]{lat,lon},r));
-		}
+			BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().placemarks_file));
+			String line;
+			while((line = br.readLine())!=null) {
+				if(line.startsWith("//") || line.trim().length() < 3) continue;
+				String[] el = line.split(",");
+				String name = el[0].trim();
+				if(name.equals(pname)) {
+					p = new Placemark(pname,new double[]{Double.parseDouble(el[1].trim()), Double.parseDouble(el[2].trim())},Double.parseDouble(el[3].trim()));
+					break;
+				}
+			}
 		br.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		return p;
 	}
 	
 	
 	private Set<String> getCellsAround() { 
 		Set<String> cellsAround = new HashSet<String>();
 		double bbox = 1;
-		double[] ll = new double[]{center[0]-bbox,center[1]-bbox};
-		double[] tr = new double[]{center[0]+bbox,center[1]+bbox};
-		Set<NetworkCell> ncells = NM.getCellsIn(ll, tr);
+		double[] ll = new double[]{centerLatLon[0]-bbox,centerLatLon[1]-bbox};
+		double[] tr = new double[]{centerLatLon[0]+bbox,centerLatLon[1]+bbox};
+		Set<NetworkCell> ncells = nm.getCellsIn(ll, tr);
 		LatLonPoint center_point = getCenterPoint();
-		for(NetworkCell nc: NM.getAll()) {
+		for(NetworkCell nc: nm.getAll()) {
 			//Polygon c = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 			//if(c.getEnvelope().overlaps(this.g.getEnvelope()))
 				//cellsAround.add(String.valueOf(nc.getCellac()));
-			if( (LatLonUtils.getHaversineDistance(nc.getPoint(),center_point) - nc.getRadius()) < radius )
+			if( (LatLonUtils.getHaversineDistance(nc.getCenterPoint(),center_point) - nc.getRadius()) < radius )
 				cellsAround.add(String.valueOf(nc.getCellac()));
 		}
 		return cellsAround;
@@ -187,12 +179,12 @@ public class Placemark extends Region {
 	private Set<String> getCellsAroundRing() { 
 		Set<String> cellsAround = new HashSet<String>();
 		double bbox = 1;
-		double[] ll = new double[]{center[0]-bbox,center[1]-bbox};
-		double[] tr = new double[]{center[0]+bbox,center[1]+bbox};
-		Set<NetworkCell> ncells = NM.getCellsIn(ll, tr);
+		double[] ll = new double[]{centerLatLon[0]-bbox,centerLatLon[1]-bbox};
+		double[] tr = new double[]{centerLatLon[0]+bbox,centerLatLon[1]+bbox};
+		Set<NetworkCell> ncells = nm.getCellsIn(ll, tr);
 		LatLonPoint center_point = getCenterPoint();
 		for(NetworkCell nc: ncells) {
-			double d = LatLonUtils.getHaversineDistance(nc.getPoint(),center_point) - nc.getRadius();
+			double d = LatLonUtils.getHaversineDistance(nc.getCenterPoint(),center_point) - nc.getRadius();
 			if(d < 1500 && d > radius)
 				cellsAround.add(String.valueOf(nc.getCellac()));
 		}
@@ -218,28 +210,8 @@ public class Placemark extends Region {
 		kml.printHeaderFolder(out, name);
 			
 		for(String cell: cellsAround) 
-			out.println(NM.get(cell).toKml());
-		
-		
-		out.println("<Style id=\"placemark\">");
-		out.println("<IconStyle>");
-		out.println("<color>ff00ff00</color>");
-		out.println("<Icon>");
-		out.println("<href>http://maps.google.com/mapfiles/kml/shapes/target.png</href>");
-		out.println("</Icon>");
-		out.println("</IconStyle>");
-		out.println("</Style>");
-			
-		out.println("<Placemark>");
-		String n = ring ? "ring_"+name : name;
-		out.println("<name>"+n+"</name>");
-		out.println("<styleUrl>#placemark</styleUrl>");
-		out.println("<Point>");
-		out.println("<coordinates>"+center[1]+","+center[0]+",0</coordinates>");
-		out.println("</Point>");
-		out.println("</Placemark>");
-		
-		//out.println(NM.get(Long.parseLong("4018584023")).toKml());
+			out.println(nm.get(cell).toKml("#7f770077","#ff770077",""));
+		out.println(super.toKml("ff00ff00"));
 		
 		kml.printFooterFolder(out);
 		out.close();
@@ -262,16 +234,7 @@ public class Placemark extends Region {
 		System.out.println(f);
 		p.printKML(f);
 		
-		
-		KML kml = new KML();
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+p.name+"Region.kml"));
-		kml.printHeaderDocument(out, p.getName());
-	    out.println(p.toKml("#aa0000ff"));
-		kml.printFooterDocument(out);
-		
-		out.close();
-		
-		
+			
 		Logger.logln("Done!");
 	}	
 }

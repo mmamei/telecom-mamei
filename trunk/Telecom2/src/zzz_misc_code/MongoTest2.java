@@ -19,9 +19,9 @@ import com.mongodb.WriteConcern;
 public class MongoTest2 {
 	
 	public static void main(String[] args) throws Exception {
-		//remove();
-		//insert();
-		//addIndexes();
+		remove();
+		insert();
+		addIndexes();
 		query();
 	}
 	
@@ -46,8 +46,8 @@ public class MongoTest2 {
 		
 		DBCursor cursor = net.find(query);
 		while (cursor.hasNext()) {
-			NetworkCell cell = new NetworkCell((BasicDBObject)cursor.next());
-			out.println(cell.toKml());
+			NetworkCell cell = NetworkCell.bson2NetworkCell((BasicDBObject)cursor.next());
+			out.println(cell.toKml("#7f770077"));
 		}
 		
 		kml.printFooterDocument(out);
@@ -80,7 +80,20 @@ public class MongoTest2 {
 		String line;
 		while((line = br.readLine())!=null) {
 			String [] splitted = line.split(":");
-			NetworkCell cell = new NetworkCell(splitted);
+			String description = splitted[0];
+			int barycentre = Integer.parseInt(splitted[1]);
+			long lac = Long.parseLong(splitted[2]);
+			long cell_id = Long.parseLong(splitted[3]);
+			//String param5 = splitted[4];
+			//String param6 = splitted[5];
+			//String param7 = splitted[6];
+			//String param8 = splitted[7];
+			//String param9 = splitted[8];
+			double barycentre_lat = Double.parseDouble(splitted[9]);
+			double barycentre_lon = Double.parseDouble(splitted[10]);
+			double radius = Double.parseDouble(splitted[11]);
+			String celllac = String.valueOf(lac*65536+cell_id);
+			NetworkCell cell = new NetworkCell(celllac,description,barycentre,lac,cell_id,barycentre_lat,barycentre_lon,radius);
 			net.insert(cell.getBSON());
 		}
 		br.close();

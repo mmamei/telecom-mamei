@@ -14,12 +14,11 @@ import java.util.Set;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import region.Region;
+import region.RegionI;
 import region.RegionMap;
 import region.network.NetworkCell;
 import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
-import utils.Config;
 
 public abstract class Bow {
 	
@@ -48,7 +47,7 @@ public abstract class Bow {
 			String[] x = events[i].split(":");
 			int h = Integer.parseInt(x[2]);
 			long celllac =Long.parseLong(x[3]);
-			Region r = rm.getClosest(celllac, DF.parse(x[0]).getTime());
+			RegionI r = rm.getClosest(celllac, DF.parse(x[0]).getTime());
 			String rname = r == null ? "EXT" : r.getName();
 			tps.add(new TimePlace(x[0],x[1],h,rname,rm,events));
 			places.add(rname);

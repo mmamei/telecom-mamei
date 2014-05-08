@@ -13,11 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import region.Region;
+import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkMap;
-import region.network.NetworkMapFactory;
-import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
@@ -131,7 +128,7 @@ public class TouristData4Analysis implements Serializable {
 		if(MAP_LABELS == null) {
 			MAP_LABELS = new String[map.getNumRegions()];
 			int c = 0;
-			for(Region r: map.getRegions()) {
+			for(RegionI r: map.getRegions()) {
 				MAP_LABELS[c] = r.getName().replaceAll(",", "_");
 				c++;
 			}

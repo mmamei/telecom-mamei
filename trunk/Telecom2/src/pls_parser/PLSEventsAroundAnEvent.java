@@ -70,7 +70,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 	
 		NetworkCell nc = nm.get(celllac);
 		if(nc == null) out.println(username+","+timestamp+","+imsi+",null");
-		else out.println(username+","+timestamp+","+imsi+","+celllac+","+nc.getCellName());
+		else out.println(username+","+timestamp+","+imsi+","+celllac+","+nc.getDescription());
 	}
 	
 	public void finish() {

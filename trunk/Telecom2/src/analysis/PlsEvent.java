@@ -94,18 +94,18 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
 	public String toKml(){
 		NetworkCell c = NM.get(cellac);
-		return c.toKml();
+		return c.toKml("#7f770077");
 	}
 	
 	public String toString(){
 		NetworkCell nc = NM.get(cellac);
-		String cn = nc == null ? "null" : nc.getCellName();
+		String cn = nc == null ? "null" : nc.getDescription();
 		return username+","+getCalendar().getTime()+","+imsi+","+cellac+","+cn;
 	}
 	
 	public String toCSV(){
 		NetworkCell nc = NM.get(cellac);
-		String cn = nc == null ? "null" : nc.getCellName();
+		String cn = nc == null ? "null" : nc.getDescription();
 		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+cn;
 	}
 	
@@ -175,7 +175,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 
 	
 	public double spatialDistance(PlsEvent x) {		
-		return LatLonUtils.getHaversineDistance(NM.get(cellac).getPoint(),NM.get(x.cellac).getPoint());
+		return LatLonUtils.getHaversineDistance(NM.get(cellac).getCenterPoint(),NM.get(x.cellac).getCenterPoint());
 	}
 	
 }

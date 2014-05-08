@@ -111,7 +111,7 @@ public class CreatorRegionMapCity {
 			//out.println(Voronoi.geom2Kml(name,(Polygon)x,Colors.RANDOM_COLORS[i % Colors.RANDOM_COLORS.length]));
 			//rm.add(new Region(name,x));
 			
-			for(Region r : base.getRegions()) {
+			for(RegionI r : base.getRegions()) {
 				if(x.intersects(r.getGeom())) {
 				//if(r.getGeom().contains(point)) {
 					Geometry y  = x.intersection(r.getGeom());
@@ -120,7 +120,7 @@ public class CreatorRegionMapCity {
 			}
 		}
 		
-		for(Region b: base.getRegions()) {
+		for(RegionI b: base.getRegions()) {
 			boolean found = false;
 			for(int k=0; k<mpt.getNumPoints();k++) {
 				Geometry point = mpt.getGeometryN(k);

@@ -42,7 +42,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 			for(Placemark p: ps)
 			for(double r: radii) {
 				outs.add(new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.name+"_"+r+".txt")))));
-				placemarks.add(new Placemark(p.name,p.center,r));
+				placemarks.add(new Placemark(p.name,p.centerLatLon,r));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -75,7 +75,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		for(int i=0; i<placemarks.size();i++) {
 			if(placemarks.get(i).contains(celllac)) {
 				if(nc == null) outs.get(i).println(username+","+timestamp+","+imsi+",null");
-				else outs.get(i).println(username+","+timestamp+","+imsi+","+celllac+","+nc.getCellName());
+				else outs.get(i).println(username+","+timestamp+","+imsi+","+celllac+","+nc.getDescription());
 			}
 		}
 		}catch(Exception e) {

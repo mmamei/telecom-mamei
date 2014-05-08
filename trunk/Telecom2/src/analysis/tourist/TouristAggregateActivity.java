@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import region.Region;
+import region.RegionI;
 import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
@@ -148,7 +148,7 @@ public class TouristAggregateActivity {
 		
 		
 		Map<String,Double> sd = new HashMap<String,Double>();
-		for(Region r: rm.getRegions())
+		for(RegionI r: rm.getRegions())
 			sd.put(r.getName(), 0.0);
 		
 		String line;

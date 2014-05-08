@@ -10,60 +10,25 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 
-public class Region implements Serializable {
-	public String name;
-	private String kmlcoordinates;
-	protected double[][] bbox;
-	public double[] center;
-	protected Geometry g;
+public class Region extends RegionI {
+	private double[][] bbox;
+	private Geometry g;
+	
 	
 	public Region(String name, String kmlcoordinates) {
-		this.name = name.replaceAll("\\\\", "");
-		this.kmlcoordinates = kmlcoordinates;
-		process();
+		this(name, GeomUtils.openGis2Geom(GeomUtils.kml2OpenGis(kmlcoordinates)));
 	}
 	
 	public Region(String name, double[][] borderLonLat) {
-		this.name = name.replaceAll("\\\\", "");
-		
-		StringBuffer sb = new StringBuffer();
-		for(double[] ll: borderLonLat) {
-			sb.append(ll[0]+","+ll[1]+",0 ");
-		}
-		this.kmlcoordinates = sb.toString();
-		process();
+		this(name, GeomUtils.openGis2Geom(GeomUtils.kml2OpenGis(GeomUtils.lonLat2Kml(borderLonLat))));
 	}
 	
 	public Region(String name, Geometry g) {
-		this.name = name.replaceAll("\\\\", "");
-		Coordinate[] cs = g.getCoordinates();
-		StringBuffer sb = new StringBuffer();
-		for(Coordinate c: cs) 
-			sb.append(c.x+","+c.y+",0 ");
-		this.kmlcoordinates = sb.toString();	
 		this.g = g;
-		process();
-	}
-	
-	
-	
-	public double getCenterLon() {
-		return center[1];
-	}
-	public double getCenterLat() {
-		return center[0];
-	}
-	
-	public Geometry getGeom() {
-		return g;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	private void process() {
+		this.name = name.replaceAll("\\\\", "");
+		
 		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
+		String kmlcoordinates = GeomUtils.geom2Kml(g);
 		String x = GeomUtils.kml2OpenGis(kmlcoordinates);
 		if(x.equals("")) return;
 		String[] coord = x.split(",");
@@ -77,59 +42,14 @@ public class Region implements Serializable {
 			maxlat = Math.max(maxlat, lat);
 		}
 		
-		bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
-		center = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
+		// questo codice si puù sostituire con get envelope! test
 		
-		if(g == null) {
-			try {
-				g = new WKTReader().read("POLYGON (("+x+"))");
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
+		bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
+		centerLatLon = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
 	}
 	
 	
-	public LatLonPoint getCenterPoint() {
-		return new LatLonPoint(center[0],center[1]);
+	public Geometry getGeom() {
+		return g;
 	}
-	
-	
-
-	public String toKml(String color) {
-		return toKml(color,color,"");
-	}
-	
-	public String toKml(String areacolor, String bordercolor, String description) {
-		String id = areacolor+"-"+bordercolor;
-		return "<Style id=\""+id+"\">" +
-				"<LineStyle>" +
-				"<color>"+bordercolor+"</color>" +
-				"</LineStyle>" +
-				"<PolyStyle>" +
-				"<color>"+areacolor+"</color>" +
-				"</PolyStyle>" +
-				"</Style>" +
-				"<Placemark>" +
-				"<name>"+name+"</name>" +
-				"<description>"+description+"</description>" +
-				"<styleUrl>#"+id+"</styleUrl>" +
-				"<Polygon>" +
-				"<outerBoundaryIs>" +
-				"<LinearRing>" +
-				"<coordinates>"+kmlcoordinates+"</coordinates>" +
-				"</LinearRing>" +
-				"</outerBoundaryIs>" +
-				"</Polygon>" +
-				"</Placemark>";
-	}
-	
-	
-	public boolean equals(Object o) {
-		return name.equals(((Region)o).name);
-	}
-	public int hashCode(){
-		return name.hashCode();
-	}
-	
 }

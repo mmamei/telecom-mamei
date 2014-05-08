@@ -4,18 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import region.Region;
+import region.RegionI;
 
 public class Move {
-	Region s;
-	Region d;
+	RegionI s;
+	RegionI d;
 	boolean directed;
 	
 	
-	public Move(Region s, Region d) {
+	public Move(RegionI s, RegionI d) {
 		this(s, d, true);
 	}
 	
-	public Move(Region s, Region d, boolean directed) {
+	public Move(RegionI s, RegionI d, boolean directed) {
 		this.s = s;
 		this.d = d;
 		this.directed = directed;

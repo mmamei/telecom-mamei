@@ -3,17 +3,15 @@ package analysis.densityANDflows.flows;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import region.CityEvent;
-import region.Region;
+import region.RegionI;
 import region.RegionMap;
 import region.network.NetworkCell;
 import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
-import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
@@ -77,8 +75,8 @@ public class ODMatrixEventPresence {
 				
 				if(ce.spot.contains(nc1.getCellac()) && !ce.spot.contains(nc2.getCellac())) before = false;
 				
-				Region r1 = rm.get(nc1.getBarycentreLongitude(), nc1.getBarycentreLatitude());
-				Region r2 = rm.get(nc2.getBarycentreLongitude(), nc2.getBarycentreLatitude());
+				RegionI r1 = rm.get(nc1.getBarycentreLongitude(), nc1.getBarycentreLatitude());
+				RegionI r2 = rm.get(nc2.getBarycentreLongitude(), nc2.getBarycentreLatitude());
 				
 				Map<Move,Double> list_od = before ? incoming_od : outgoing_od;
 				

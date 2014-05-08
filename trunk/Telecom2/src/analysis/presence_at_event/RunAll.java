@@ -123,8 +123,7 @@ public class RunAll {
 	
 	
 	
-	public static void main(String[] args) throws Exception {
-	
+	public static void main(String[] args) throws Exception {		
 		RunAll ra = new RunAll();
 			
 		//int[] rad_att = ra.radiusAndAttendance("2014-03-02","19","2014-03-03","0",11.28265300110946,43.78066799975202); // partita Fiorentina - Lazio. capienza stadio 47000

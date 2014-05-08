@@ -58,7 +58,7 @@ public class KMLPath {
 		for(String day: evPerDay.keySet()) {
 			kml.printFolder(out, day);
 			for(PlsEvent pe: evPerDay.get(day))
-				out.println(nm.get(String.valueOf(pe.getCellac())).toKml());
+				out.println(nm.get(String.valueOf(pe.getCellac())).toKml("#7f770077"));
 			kml.closeFolder(out);
 		}
 		kml.closeFolder(out);

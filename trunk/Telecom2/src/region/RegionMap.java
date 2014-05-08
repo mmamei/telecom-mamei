@@ -30,14 +30,14 @@ import com.vividsolutions.jts.geom.Polygon;
 public class RegionMap implements Serializable {
 	
 	private String name;
-	private Map<String,Region> rm;
+	private Map<String,RegionI> rm;
 	
 	public RegionMap(String name) {
 		this.name = name;
-		rm = new HashMap<String,Region>();
+		rm = new HashMap<String,RegionI>();
 	}
 	
-	public void add(Region r) {
+	public void add(RegionI r) {
 		rm.put(r.getName(), r);
 	}
 	
@@ -49,16 +49,16 @@ public class RegionMap implements Serializable {
 		return rm.size();
 	}
 	
-	public Region getRegion(String name) {
+	public RegionI getRegion(String name) {
 		return rm.get(name);
 	}
 	
-	private transient Map<Integer,Region> int2region = null;
-	public Region getRegion(int i) {
+	private transient Map<Integer,RegionI> int2region = null;
+	public RegionI getRegion(int i) {
 		if(int2region == null) {
-			int2region = new HashMap<Integer,Region>();
+			int2region = new HashMap<Integer,RegionI>();
 			int k=0;
-			for(Region r: rm.values()) {
+			for(RegionI r: rm.values()) {
 				int2region.put(k, r);
 				k++;
 			}	
@@ -66,7 +66,7 @@ public class RegionMap implements Serializable {
 		return int2region.get(i);
 	}
 	
-	public Collection<Region> getRegions(){
+	public Collection<RegionI> getRegions(){
 		return rm.values();
 	}
 	
@@ -74,9 +74,9 @@ public class RegionMap implements Serializable {
 	public static final double search_radius = 10; // km
 	public static final double deg_radius = Math.toDegrees(search_radius/earth_radius);
 	
-	public Region get(double lon, double lat) {
+	public RegionI get(double lon, double lat) {
 		Geometry p = GeomUtils.getCircle(lon, lat, 100);
-		for(Region r: rm.values()) {
+		for(RegionI r: rm.values()) {
 			if(p.intersects(r.getGeom())) return r;
 		}
 		
@@ -94,7 +94,7 @@ public class RegionMap implements Serializable {
 		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
 		int i=0;
-		for(Region r: this.getRegions()) {
+		for(RegionI r: this.getRegions()) {
 			Geometry a = r.getGeom().intersection(circle);
 			area_intersection[i] = (float)(GeomUtils.geoArea(a)/ca);
 			i++;
@@ -112,18 +112,18 @@ public class RegionMap implements Serializable {
 		return area_intersection;
 	}
 	
-	private static transient Map<Long,Region> cache_closest = new HashMap<Long,Region>();
-	public Region getClosest(long celllac, long time) {
-		Region reg = cache_closest.get(celllac);
+	private static transient Map<Long,RegionI> cache_closest = new HashMap<Long,RegionI>();
+	public RegionI getClosest(long celllac, long time) {
+		RegionI reg = cache_closest.get(celllac);
 		if(reg != null) return reg;
 		
-		Region closest = null;
+		RegionI closest = null;
 		float max_intersection = 0;
 		NetworkMap nm = NetworkMapFactory.getNetworkMap(time);
 		NetworkCell nc = nm.get(""+celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
-		for(Region r: this.getRegions()) {
+		for(RegionI r: this.getRegions()) {
 			Geometry a = r.getGeom().intersection(circle);
 			float area = (float)(GeomUtils.geoArea(a)/ca);
 			if(area > max_intersection) {
@@ -139,16 +139,16 @@ public class RegionMap implements Serializable {
 	
 	public Envelope getEnvelope() {
 		Envelope e = new Envelope();
-		for(Region r: getRegions()) {
+		for(RegionI r: getRegions()) {
 			e.expandToInclude(r.getGeom().getEnvelopeInternal());
 		}
 		return e;
 	}
 	
 	
-	public List<Region> getOverlappingRegions(Geometry g) {
-		List<Region> overlapping_regions = new ArrayList<Region>();
-		for(Region r: rm.values()) {
+	public List<RegionI> getOverlappingRegions(Geometry g) {
+		List<RegionI> overlapping_regions = new ArrayList<RegionI>();
+		for(RegionI r: rm.values()) {
 			if(r.getGeom().intersects(g))
 				overlapping_regions.add(r);
 		}
@@ -165,7 +165,7 @@ public class RegionMap implements Serializable {
 		KML kml = new KML();
 		kml.printHeaderFolder(out, name);
 		int index = 0;
-		for(Region r: rm.values()) {
+		for(RegionI r: rm.values()) {
 			out.println(r.toKml(Colors.RANDOM_COLORS[index],Colors.RANDOM_COLORS[index],r.getName()));
 			index++;
 			if(index >= Colors.RANDOM_COLORS.length) index = 0;
@@ -178,7 +178,7 @@ public class RegionMap implements Serializable {
 	public String getKMLBorders() {
 		StringBuffer sb = new StringBuffer();
 		int index = 0;
-		for(Region r: rm.values()) {
+		for(RegionI r: rm.values()) {
 			sb.append(r.toKml("01ffffff","ffffffff",r.getName())+"\n");
 			index++;
 			if(index >= Colors.RANDOM_COLORS.length) index = 0;
@@ -189,7 +189,7 @@ public class RegionMap implements Serializable {
 	public String toKml(String color) {
 		StringBuffer sb = new StringBuffer();
 		int index = 0;
-		for(Region r: rm.values()) {
+		for(RegionI r: rm.values()) {
 			sb.append(r.toKml(color,color,r.getName())+"\n");
 			index++;
 			if(index >= Colors.RANDOM_COLORS.length) index = 0;

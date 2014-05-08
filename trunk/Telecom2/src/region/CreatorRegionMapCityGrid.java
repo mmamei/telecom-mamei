@@ -43,7 +43,7 @@ public class CreatorRegionMapCityGrid {
 		Placemark p = Placemark.getPlacemark(city);
 		p.changeRadius(p.getR()+1000);
 		int size = 20;
-		double[][] bbox = p.bbox;
+		double[][] bbox = p.getBboxLonLat();
 		SpaceGrid sg = new SpaceGrid(bbox[0][0],bbox[0][1],bbox[1][0],bbox[1][1],size,size);
 		
 		
@@ -58,8 +58,8 @@ public class CreatorRegionMapCityGrid {
 		
 		
 		//intersect all the squares with the boundary
-		for(Region r: rlist) {
-			for(Region b: base.getRegions()) {
+		for(RegionI r: rlist) {
+			for(RegionI b: base.getRegions()) {
 				Geometry inter = r.getGeom().intersection(b.getGeom());
 				if(inter.getNumPoints() > 0) {
 					rm.add(new Region(r.getName(),inter));

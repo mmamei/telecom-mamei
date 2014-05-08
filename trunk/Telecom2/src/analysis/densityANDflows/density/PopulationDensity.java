@@ -1,24 +1,16 @@
 package analysis.densityANDflows.density;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import region.Region;
+import region.RegionI;
 import region.RegionMap;
-import utils.Colors;
-import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
-import visual.html.HeatMapGoogleMaps;
-import visual.kml.KML;
-import visual.kml.KMLHeatMap;
 
 public class PopulationDensity {
 	
@@ -54,7 +46,7 @@ public class PopulationDensity {
 			List<double[]> r = exclude_nopkop(rm,lkop,lnokop);
 			if(r != null)
 			for(double[] ll: r) {
-				Region reg = rm.get(ll[0], ll[1]);
+				RegionI reg = rm.get(ll[0], ll[1]);
 				if(reg == null) 
 					Logger.logln(ll[0]+","+ll[1]+" is outside "+rm.getName());
 				else {
@@ -75,9 +67,9 @@ public class PopulationDensity {
 		List<double[]> r = new ArrayList<double[]>();
 		for(double[] p1: kop) {
 			boolean found = false;
-			Region r1 = rm.get(p1[0],p1[1]);
+			RegionI r1 = rm.get(p1[0],p1[1]);
 			for(double[] p2 : nokop) {
-				Region r2 = rm.get(p2[0],p2[1]);;
+				RegionI r2 = rm.get(p2[0],p2[1]);;
 				if(r1!=null && r2!=null && r1.equals(r2)) found = true;
 			}
 			if(!found) r.add(p1);
