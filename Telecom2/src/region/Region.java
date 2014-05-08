@@ -3,6 +3,7 @@ package region;
 import java.io.Serializable;
 
 import org.gps.utils.LatLonPoint;
+import org.gps.utils.LatLonUtils;
 
 import utils.GeomUtils;
 
@@ -48,6 +49,16 @@ public class Region extends RegionI {
 		centerLatLon = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
 	}
 	
+	
+	public double[][] getBboxLonLat() {
+		return bbox;
+	}
+	
+	public double getRadius() {
+		LatLonPoint p1 = new LatLonPoint(bbox[0][1],bbox[0][0]);
+		LatLonPoint p2 = new LatLonPoint(bbox[1][1],bbox[1][0]);
+		return LatLonUtils.getHaversineDistance(p1, p2);
+	}
 	
 	public Geometry getGeom() {
 		return g;

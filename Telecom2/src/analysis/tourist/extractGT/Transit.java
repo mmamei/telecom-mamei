@@ -26,21 +26,21 @@ public class Transit extends Profile {
 	
 	private boolean isTransit(List<CalCell> list) {
 		CalCell spotted = list.get(0);
-		if(placemark.contains(spotted.nc.getCellac())) return false; 
-		if(placemark.contains(list.get(list.size()-1).nc.getCellac())) return false;
+		if(placemark.contains(spotted.nc.getName())) return false; 
+		if(placemark.contains(list.get(list.size()-1).nc.getName())) return false;
 		
 		boolean outside_placemark = true;		
 		for(int i=1; i<list.size();i++) {
 			CalCell cc = list.get(i);
-			if(outside_placemark && !placemark.contains(cc.nc.getCellac())) 
+			if(outside_placemark && !placemark.contains(cc.nc.getName())) 
 				spotted = cc;
-			if(!outside_placemark && !placemark.contains(cc.nc.getCellac())) {
+			if(!outside_placemark && !placemark.contains(cc.nc.getName())) {
 				int dh = (int)((cc.cal.getTimeInMillis() - spotted.cal.getTimeInMillis()) / (1000 * 3600));
 				if(dh > 4) return false;
 				spotted = cc;
 				outside_placemark = true;
 			}
-			if(placemark.contains(cc.nc.getCellac()))
+			if(placemark.contains(cc.nc.getName()))
 				outside_placemark = false;
 		}
 		return true;

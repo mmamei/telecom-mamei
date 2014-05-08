@@ -2,13 +2,13 @@ package analysis.tourist.extractGT;
 
 import java.util.Calendar;
 
-import region.network.NetworkCell;
+import region.RegionI;
 
 class CalCell {
 	Calendar cal;
-	NetworkCell nc;
+	RegionI nc;
 	
-	CalCell(Calendar cal,NetworkCell nc) {
+	CalCell(Calendar cal,RegionI nc) {
 		this.cal = cal;
 		this.nc = nc;
 	}

@@ -30,7 +30,7 @@ public class Move {
 	}
 	
 	public String toCoordString() {
-		return s.getCenterLat()+" "+s.getCenterLon()+";"+d.getCenterLat()+" "+d.getCenterLon();
+		return s.getLatLon()[0]+" "+s.getLatLon()[1]+";"+d.getLatLon()[0]+" "+d.getLatLon()[1];
 	}
 	
 	

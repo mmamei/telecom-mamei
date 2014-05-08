@@ -52,7 +52,7 @@ public class Placemark extends RegionI {
 	}
 	
 	public Geometry getGeom() {
-		return GeomUtils.getCircle(centerLatLon[1], centerLatLon[0], radius);
+		return GeomUtils.getCircle(getLatLon()[1], getLatLon()[0], radius);
 	}
 	
 	
@@ -72,7 +72,7 @@ public class Placemark extends RegionI {
 		return name.equals(op.name) && radius == op.radius && ring == op.ring;
 	}
 	
-	public double getR() {
+	public double getRadius() {
 		return radius;
 	}
 	
@@ -92,8 +92,8 @@ public class Placemark extends RegionI {
 	public double getArea() {
 		Geometry u = null;
 		for(String c: cellsAround) {
-			NetworkCell nc = nm.get(c);
-			Polygon p = GeomUtils.getCircle(nc.getBarycentreLongitude(),nc.getBarycentreLatitude(),nc.getRadius());
+			RegionI nc = nm.get(c);
+			Polygon p = GeomUtils.getCircle(nc.getLatLon()[1],nc.getLatLon()[0],nc.getRadius());
 			if(u == null) u = p;
 			else u = u.union(p);
 		}
@@ -115,7 +115,7 @@ public class Placemark extends RegionI {
 		double max_dist = 0;
 		LatLonPoint center_point = getCenterPoint();
 		for(String c: cellsAround) {
-			NetworkCell nc = nm.get(c);
+			RegionI nc = nm.get(c);
 			double d = LatLonUtils.getHaversineDistance(nc.getCenterPoint(),center_point);
 			
 			max_dist = Math.max(max_dist, d + nc.getRadius());
@@ -161,16 +161,16 @@ public class Placemark extends RegionI {
 	private Set<String> getCellsAround() { 
 		Set<String> cellsAround = new HashSet<String>();
 		double bbox = 1;
-		double[] ll = new double[]{centerLatLon[0]-bbox,centerLatLon[1]-bbox};
-		double[] tr = new double[]{centerLatLon[0]+bbox,centerLatLon[1]+bbox};
-		Set<NetworkCell> ncells = nm.getCellsIn(ll, tr);
+		double[] ll = new double[]{getLatLon()[0]-bbox,getLatLon()[1]-bbox};
+		double[] tr = new double[]{getLatLon()[0]+bbox,getLatLon()[1]+bbox};
+		Set<RegionI> ncells = nm.getCellsIn(ll, tr);
 		LatLonPoint center_point = getCenterPoint();
-		for(NetworkCell nc: nm.getAll()) {
+		for(RegionI nc: nm.getAll()) {
 			//Polygon c = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 			//if(c.getEnvelope().overlaps(this.g.getEnvelope()))
 				//cellsAround.add(String.valueOf(nc.getCellac()));
 			if( (LatLonUtils.getHaversineDistance(nc.getCenterPoint(),center_point) - nc.getRadius()) < radius )
-				cellsAround.add(String.valueOf(nc.getCellac()));
+				cellsAround.add(String.valueOf(nc.getName()));
 		}
 		return cellsAround;
 	}
@@ -179,14 +179,14 @@ public class Placemark extends RegionI {
 	private Set<String> getCellsAroundRing() { 
 		Set<String> cellsAround = new HashSet<String>();
 		double bbox = 1;
-		double[] ll = new double[]{centerLatLon[0]-bbox,centerLatLon[1]-bbox};
-		double[] tr = new double[]{centerLatLon[0]+bbox,centerLatLon[1]+bbox};
-		Set<NetworkCell> ncells = nm.getCellsIn(ll, tr);
+		double[] ll = new double[]{getLatLon()[0]-bbox,getLatLon()[1]-bbox};
+		double[] tr = new double[]{getLatLon()[0]+bbox,getLatLon()[1]+bbox};
+		Set<RegionI> ncells = nm.getCellsIn(ll, tr);
 		LatLonPoint center_point = getCenterPoint();
-		for(NetworkCell nc: ncells) {
+		for(RegionI nc: ncells) {
 			double d = LatLonUtils.getHaversineDistance(nc.getCenterPoint(),center_point) - nc.getRadius();
 			if(d < 1500 && d > radius)
-				cellsAround.add(String.valueOf(nc.getCellac()));
+				cellsAround.add(String.valueOf(nc.getName()));
 		}
 		return cellsAround;
 	}

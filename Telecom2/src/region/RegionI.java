@@ -9,13 +9,10 @@ import utils.GeomUtils;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class RegionI implements Serializable {
-	public String name;
-	public double[] centerLatLon;
+	protected String name;
+	protected double[] centerLatLon;
 	
 	
-	public LatLonPoint getCenterPoint() {
-		return new LatLonPoint(centerLatLon[0],centerLatLon[1]);
-	}
 	
 	public boolean equals(Object o) {
 		return name.equals(((RegionI)o).name);
@@ -24,20 +21,23 @@ public abstract class RegionI implements Serializable {
 		return name.hashCode();
 	}
 	
-	public double getCenterLon() {
-		return centerLatLon[1];
-	}
-	public double getCenterLat() {
-		return centerLatLon[0];
-	}
-	
-	public abstract Geometry getGeom();
-
 	public String getName() {
 		return name;
 	}
+	public double[] getLatLon() {
+		return centerLatLon;
+	}
+	
+	public LatLonPoint getCenterPoint() {
+		return new LatLonPoint(centerLatLon[0],centerLatLon[1]);
+	}
 	
 	
+	public abstract Geometry getGeom();
+
+	public abstract double getRadius();
+	
+	public abstract double[][] getBboxLonLat();
 	
 	
 	public String toKml(String color) {

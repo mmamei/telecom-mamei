@@ -89,8 +89,8 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	 */
 	public static void trim(Placemark p, int min_size) throws Exception {
 		File dir = FileUtils.createDir("BASE/UserEventCounter");
-		BufferedReader br = new BufferedReader(new FileReader(dir+"/"+p.name+"_cellacXhour.csv"));
-		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+p.name+"_cellacXhour_trim"+min_size+".csv"));
+		BufferedReader br = new BufferedReader(new FileReader(dir+"/"+p.getName()+"_cellacXhour.csv"));
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+p.getName()+"_cellacXhour_trim"+min_size+".csv"));
 		String line;
 		while((line = br.readLine()) != null) {
 			int num_pls = Integer.parseInt(line.split(",")[2]);

@@ -35,7 +35,7 @@ public abstract class Profile {
 			Calendar c = cc.cal;
 			int crit = c.get(cal_field);
 			String day = F.format(c.getTime());
-			if(placemark.contains(cc.nc.getCellac()) && contains(interval,crit)) days.add(day);
+			if(placemark.contains(cc.nc.getName()) && contains(interval,crit)) days.add(day);
 		}
 		return days.size();
 	}

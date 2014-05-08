@@ -15,16 +15,17 @@ import java.util.Set;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import region.RegionI;
 import visual.kml.KML;
 
 
 public class NetworkMap {
-	private HashMap<String, NetworkCell> hm;
+	private HashMap<String, RegionI> hm;
 	
 	NetworkMap(String file) {
 		try {
 			ObjectInputStream in_network = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(file))));
-			hm = (HashMap<String, NetworkCell>)in_network.readObject();
+			hm = (HashMap<String, RegionI>)in_network.readObject();
 			in_network.close();
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -32,22 +33,22 @@ public class NetworkMap {
 	}
 	
 	
-	public NetworkCell get(String cellac) {
+	public RegionI get(String cellac) {
 		return hm.get(cellac);
 	}
 	
-	public Collection<NetworkCell> getAll() {
+	public Collection<RegionI> getAll() {
 		return hm.values();
 	}
 	
 	
-	public Set<NetworkCell> getCellsIn(double[] ll, double[] tr) {
-		Set<NetworkCell> cells = new HashSet<NetworkCell>();
+	public Set<RegionI> getCellsIn(double[] ll, double[] tr) {
+		Set<RegionI> cells = new HashSet<RegionI>();
 		
 		double lon,lat;
-		for(NetworkCell nc : hm.values()) {
-			lat = nc.getBarycentreLatitude();
-			lon = nc.getBarycentreLongitude();
+		for(RegionI nc : hm.values()) {
+			lat = nc.getLatLon()[0];
+			lon = nc.getLatLon()[1];
 			if(ll[0] < lat && lat < tr[0] && ll[1] < lon && lon < tr[1])
 				cells.add(nc);
 		}
@@ -59,7 +60,7 @@ public class NetworkMap {
 		
 		double dist = 0;
 		double count = 0;
-		for(NetworkCell nc : hm.values()) {
+		for(RegionI nc : hm.values()) {
 			if(LatLonUtils.getHaversineDistance(nc.getCenterPoint(), c) < radius) {
 				dist += nc.getRadius();
 				count++;
@@ -71,7 +72,7 @@ public class NetworkMap {
 	
 	public int getNumCells(LatLonPoint c, double radius) {
 		int count = 0;
-		for(NetworkCell nc : hm.values()) {
+		for(RegionI nc : hm.values()) {
 			if(LatLonUtils.getHaversineDistance(nc.getCenterPoint(), c) < radius) {
 				count++;
 			}
@@ -94,8 +95,8 @@ public class NetworkMap {
 		KML kml = new KML();
 		String name = file.substring(file.lastIndexOf("/")+1,file.lastIndexOf("."));
 		kml.printHeaderFolder(out, name);
-		Set<NetworkCell> cells = getCellsIn(ll,tr);
-		for(NetworkCell nc : cells)
+		Set<RegionI> cells = getCellsIn(ll,tr);
+		for(RegionI nc : cells)
 			out.println(nc.toKml(""));
 		kml.printFooterFolder(out);
 		out.close();
