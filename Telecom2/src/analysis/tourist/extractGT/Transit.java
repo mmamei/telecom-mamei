@@ -1,17 +1,8 @@
 package analysis.tourist.extractGT;
 
-import java.io.BufferedReader;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import region.Placemark;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
-import region.network.NetworkMapFactory;
-import utils.FileUtils;
-import utils.Logger;
 
 public class Transit extends Profile {
 	

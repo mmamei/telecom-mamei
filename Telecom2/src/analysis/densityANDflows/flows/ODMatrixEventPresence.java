@@ -9,8 +9,6 @@ import java.util.Map;
 import region.CityEvent;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -59,7 +57,7 @@ public class ODMatrixEventPresence {
 		
 		
 		
-		NetworkMap nm = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(event.substring(event.indexOf(",")+1)));
+		RegionMap nm = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(event.substring(event.indexOf(",")+1)));
 		
 		while((line=br2.readLine())!=null) {
 			String user = line.substring(0, line.indexOf(","));
@@ -70,8 +68,8 @@ public class ODMatrixEventPresence {
 			
 			boolean before = true;
 			for(int i=1;i<cells.length;i++) {
-				RegionI nc1 = nm.get(cells[i-1]);
-				RegionI nc2 = nm.get(cells[i]);
+				RegionI nc1 = nm.getRegion(cells[i-1]);
+				RegionI nc2 = nm.getRegion(cells[i]);
 				
 				if(ce.spot.contains(nc1.getName()) && !ce.spot.contains(nc2.getName())) before = false;
 				

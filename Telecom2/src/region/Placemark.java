@@ -6,16 +6,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import region.network.NetworkCell;
-import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
@@ -30,7 +26,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class Placemark extends RegionI {
 	
-	private NetworkMap nm;
+	private RegionMap nm;
 	private double radius;
 	public Set<String> cellsAround;
 	public boolean ring = false;
@@ -92,7 +88,7 @@ public class Placemark extends RegionI {
 	public double getArea() {
 		Geometry u = null;
 		for(String c: cellsAround) {
-			RegionI nc = nm.get(c);
+			RegionI nc = nm.getRegion(c);
 			Polygon p = GeomUtils.getCircle(nc.getLatLon()[1],nc.getLatLon()[0],nc.getRadius());
 			if(u == null) u = p;
 			else u = u.union(p);
@@ -104,7 +100,7 @@ public class Placemark extends RegionI {
 	public double getSumRadii() {
 		double a = 0;
 		for(String c: cellsAround) {
-			double r = nm.get(c).getRadius();
+			double r = nm.getRegion(c).getRadius();
 			a = a + r;
 		}
 		return a;
@@ -115,7 +111,7 @@ public class Placemark extends RegionI {
 		double max_dist = 0;
 		LatLonPoint center_point = getCenterPoint();
 		for(String c: cellsAround) {
-			RegionI nc = nm.get(c);
+			RegionI nc = nm.getRegion(c);
 			double d = LatLonUtils.getHaversineDistance(nc.getCenterPoint(),center_point);
 			
 			max_dist = Math.max(max_dist, d + nc.getRadius());
@@ -163,9 +159,9 @@ public class Placemark extends RegionI {
 		double bbox = 1;
 		double[] ll = new double[]{getLatLon()[0]-bbox,getLatLon()[1]-bbox};
 		double[] tr = new double[]{getLatLon()[0]+bbox,getLatLon()[1]+bbox};
-		Set<RegionI> ncells = nm.getCellsIn(ll, tr);
+		Set<RegionI> ncells = nm.getRegionsIn(ll, tr);
 		LatLonPoint center_point = getCenterPoint();
-		for(RegionI nc: nm.getAll()) {
+		for(RegionI nc: nm.getRegions()) {
 			//Polygon c = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
 			//if(c.getEnvelope().overlaps(this.g.getEnvelope()))
 				//cellsAround.add(String.valueOf(nc.getCellac()));
@@ -181,7 +177,7 @@ public class Placemark extends RegionI {
 		double bbox = 1;
 		double[] ll = new double[]{getLatLon()[0]-bbox,getLatLon()[1]-bbox};
 		double[] tr = new double[]{getLatLon()[0]+bbox,getLatLon()[1]+bbox};
-		Set<RegionI> ncells = nm.getCellsIn(ll, tr);
+		Set<RegionI> ncells = nm.getRegionsIn(ll, tr);
 		LatLonPoint center_point = getCenterPoint();
 		for(RegionI nc: ncells) {
 			double d = LatLonUtils.getHaversineDistance(nc.getCenterPoint(),center_point) - nc.getRadius();
@@ -210,7 +206,7 @@ public class Placemark extends RegionI {
 		kml.printHeaderFolder(out, name);
 			
 		for(String cell: cellsAround) 
-			out.println(nm.get(cell).toKml("#7f770077","#ff770077",""));
+			out.println(nm.getRegion(cell).toKml("#7f770077","#ff770077",""));
 		out.println(super.toKml("ff00ff00"));
 		
 		kml.printFooterFolder(out);

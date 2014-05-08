@@ -13,7 +13,7 @@ import java.util.Map;
 
 import region.Placemark;
 import region.RegionI;
-import region.network.NetworkMap;
+import region.RegionMap;
 import region.network.NetworkMapFactory;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
@@ -85,8 +85,8 @@ public class GTExtractor {
 					int m = Integer.parseInt(x[1]);
 					int d = Integer.parseInt(x[2]);
 					int h = Integer.parseInt(x[4]);
-					NetworkMap nm = NetworkMapFactory.getNetworkMap(new GregorianCalendar(y,m,d));
-					RegionI nc = nm.get(x[5]);
+					RegionMap nm = NetworkMapFactory.getNetworkMap(new GregorianCalendar(y,m,d));
+					RegionI nc = nm.getRegion(x[5]);
 					list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
 				}
 				

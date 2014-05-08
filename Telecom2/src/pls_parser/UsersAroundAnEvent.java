@@ -4,16 +4,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
 import region.CityEvent;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
-import utils.Config;
 import utils.Logger;
 
 public class UsersAroundAnEvent extends BufferAnalyzer {

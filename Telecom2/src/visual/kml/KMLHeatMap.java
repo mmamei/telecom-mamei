@@ -8,8 +8,6 @@ import java.util.Map;
 
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkCell;
-import region.network.NetworkMap;
 import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
@@ -20,10 +18,10 @@ import utils.Config;
 public class KMLHeatMap {
 	
 	public static String drawHeatMap(String name, Map<String,Double> map, double max) {
-		NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
+		RegionMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 		StringBuffer result = new StringBuffer();
 		for(String celllac: map.keySet()) {
-			RegionI nc = nm.get(celllac);
+			RegionI nc = nm.getRegion(celllac);
 			int index = (int)(map.get(celllac) / max * (Colors.HEAT_COLORS.length-1));
 			
 			result.append(nc.toKml(Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]), "", ""));

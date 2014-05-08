@@ -13,10 +13,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import region.network.NetworkMap;
+import region.RegionMap;
 import region.network.NetworkMapFactory;
 import utils.Colors;
-import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import analysis.PlsEvent;
@@ -44,7 +43,7 @@ public class KMLPath {
 		out.println(kml);
 	}
 	
-	static NetworkMap nm = null;
+	static RegionMap nm = null;
 	public static void print(String username, List<PlsEvent> plsEvents) {
 		nm =  NetworkMapFactory.getNetworkMap(plsEvents.get(0).getCalendar());
 		kml.printFolder(out, username.substring(0,10)+"...");
@@ -58,7 +57,7 @@ public class KMLPath {
 		for(String day: evPerDay.keySet()) {
 			kml.printFolder(out, day);
 			for(PlsEvent pe: evPerDay.get(day))
-				out.println(nm.get(String.valueOf(pe.getCellac())).toKml("#7f770077"));
+				out.println(nm.getRegion(String.valueOf(pe.getCellac())).toKml("#7f770077"));
 			kml.closeFolder(out);
 		}
 		kml.closeFolder(out);
@@ -74,10 +73,10 @@ public class KMLPath {
 				PlsEvent pe1 = evPerDay.get(day).get(i+1);
 				int dmin =  (int)((pe1.getTimeStamp() - pe.getTimeStamp()) / 60000);
 				if(dmin < 180) {
-					double lon1 = nm.get(String.valueOf(pe.getCellac())).getLatLon()[1] + jitter(pe);
-					double lat1 = nm.get(String.valueOf(pe.getCellac())).getLatLon()[0] + jitter(pe);
-					double lon2 = nm.get(String.valueOf(pe1.getCellac())).getLatLon()[1] + jitter(pe1);
-					double lat2 = nm.get(String.valueOf(pe1.getCellac())).getLatLon()[0] + jitter(pe1);
+					double lon1 = nm.getRegion(String.valueOf(pe.getCellac())).getLatLon()[1] + jitter(pe);
+					double lat1 = nm.getRegion(String.valueOf(pe.getCellac())).getLatLon()[0] + jitter(pe);
+					double lon2 = nm.getRegion(String.valueOf(pe1.getCellac())).getLatLon()[1] + jitter(pe1);
+					double lat2 = nm.getRegion(String.valueOf(pe1.getCellac())).getLatLon()[0] + jitter(pe1);
 					//out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
 					out.println(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
 				}
@@ -109,8 +108,8 @@ public class KMLPath {
 		for(String day: evPerDay.keySet()) {
 			kml.printFolder(out, day);
 			for(PlsEvent pe: evPerDay.get(day)) {
-				double lon1 = nm.get(pe.getCellac()).getLatLon()[1] + jitter(pe);
-				double lat1 = nm.get(pe.getCellac()).getLatLon()[0] + jitter(pe);
+				double lon1 = nm.getRegion(pe.getCellac()).getLatLon()[1] + jitter(pe);
+				double lat1 = nm.getRegion(pe.getCellac()).getLatLon()[0] + jitter(pe);
 				out.println("<Placemark>" +
 						    "<name>"+pe.getTime().split(" ")[1]+"</name>" +
 						    "<description>"+pe.getTime()+"</description>" +

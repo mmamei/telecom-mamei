@@ -10,10 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import region.CityEvent;
-import region.Placemark;
-import region.network.NetworkMap;
-import region.network.NetworkMapFactory;
-import utils.Config;
 import utils.Logger;
 
 public class LocationsXUserAroundAnEvent extends BufferAnalyzer {	

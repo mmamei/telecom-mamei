@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
+import region.RegionI;
+import region.RegionMap;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
@@ -25,7 +27,7 @@ public class NetworkMapParser {
 		String[] files = dir.list();
 		for(String file: files) {
 			BufferedReader in = new BufferedReader(new FileReader(dir+"/"+file));
-			HashMap<String, NetworkCell> map = new HashMap<String, NetworkCell>();
+			HashMap<String, RegionI> map = new HashMap<String, RegionI>();
 			String line;
 			while((line = in.readLine()) != null){
 				String [] splitted = line.split(":");
@@ -44,14 +46,15 @@ public class NetworkMapParser {
 				
 				String celllac = String.valueOf(lac*65536+cell_id);
 				
-				NetworkCell cell = new NetworkCell(celllac,description,barycentre,lac,cell_id,barycentre_lat,barycentre_lon,radius);
-				map.put(cell.getCellac(), cell);
+				RegionI cell = new NetworkCell(celllac,description,barycentre,lac,cell_id,barycentre_lat,barycentre_lon,radius);
+				map.put(cell.getName(), cell);
 			}
 			in.close();
 			
-
+			RegionMap nm = new RegionMap(file);
+			nm.addAll(map);
 			ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(FileUtils.getFile("BASE/NetworkMapParser")+"/"+file.substring(0,file.length()-4)+".bin")));
-			out.writeObject(map);
+			out.writeObject(nm);
 			out.close();
 		}
 		
