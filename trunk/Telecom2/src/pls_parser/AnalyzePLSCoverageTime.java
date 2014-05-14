@@ -1,21 +1,25 @@
 package pls_parser;
 
 import java.io.File;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
-import region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.MongoClient;
 
 public class AnalyzePLSCoverageTime {
 	
@@ -24,36 +28,14 @@ public class AnalyzePLSCoverageTime {
 
 	public static void main(String[] args) {
 		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
-		/*
-		Map<String,String> allDays = apc.compute();
-		Logger.logln("Days in the dataset:");
-		for(String d:allDays.keySet()) 
-			Logger.logln(d+" = "+allDays.get(d));
-		System.out.println("TOT = "+allDays.size());
-		*/
-		/*
-		Map<String,Map<String,String>> all =  apc.computeAll();
-		for(String file: all.keySet()) {
-			Map<String,String> allDays = all.get(file);
-			Logger.logln("Days in the dataset "+file+":");
-			for(String d:allDays.keySet()) 
-				Logger.logln(d+" = "+allDays.get(d));
-			System.out.println("TOT = "+allDays.size());
-		}
-		*/
+		
+		
 		Map<String,Map<String,String>> all =  apc.computeAll();
 		for(String key: all.keySet()) 
 			System.out.println(key+" -> "+apc.getNumYears(all.get(key)));
 		
 		
-		Map<String,String> x = all.get("file_pls_lomb");
-		for(String d: x.keySet())
-			System.out.println(d);
-		
-		System.out.println("**************************************************************************");
-		
-		String js = apc.getJSMap(all);
-		//System.out.println(js);
+		System.out.println(apc.getJSMap(all));
 	}
 	
 	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
@@ -72,10 +54,6 @@ public class AnalyzePLSCoverageTime {
 					cal.setTime(f.parse(day));
 					int h = dmap.get(day).split("-").length;
 					String s = "[ new Date("+cal.get(Calendar.YEAR)+", "+cal.get(Calendar.MONTH)+", "+cal.get(Calendar.DAY_OF_MONTH)+"), "+h+" ],\n";
-					
-					if(key.equals("file_pls_lomb"))
-						System.out.print(s);
-					
 					sb.append(s);
 				} catch(Exception e) {
 					e.printStackTrace();
@@ -97,81 +75,54 @@ public class AnalyzePLSCoverageTime {
 		return max_year - min_year + 1;
 	}
 
-	
-	
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	public Map<String,Map<String,String>> computeAll() {
+		Map<String,Map<String,String>> map = new HashMap<String,Map<String,String>>();
+		MongoClient mongo = null;
+		try {
+			mongo = new MongoClient( "localhost" , 27017 );
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		}
+		DB dbt = mongo.getDB("telecom");
+		DBCollection tc = dbt.getCollection("TimeCoverage");
+		DBCursor cursor = tc.find();
 		
-		Map<String,Map<String,String>> all;
-		File odir = FileUtils.createDir("BASE/PLSCoverageTime");
-		File f = new File(odir+"/plsCoverageTime.ser");
-		if(f.exists()) {
-			all = (Map<String,Map<String,String>>)CopyAndSerializationUtils.restore(f);
-		}
-		else {
-			File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
-			all = new HashMap<String,Map<String,String>>();
-			for(File basedir: basedirs) {
-				for(File dir: basedir.listFiles()) {
-					Logger.logln(dir.getAbsolutePath());
-					Map<String,String> val = all.get(dir.getName());
-					if(val == null) {
-						val = new TreeMap<String,String>();
-						all.put(dir.getName(), val);
-					}
-					val.putAll(compute(dir));
-				}
+		while (cursor.hasNext()) {
+			BasicDBObject r = (BasicDBObject)cursor.next();
+			String pls_dir = r.getString("pls_dir");
+			Calendar cal = new GregorianCalendar();
+			cal.setTime(r.getDate("time"));
+			
+			Map<String,String> allDays = map.get(pls_dir);
+			if(allDays == null) {
+				allDays = new TreeMap<String,String>();
+				map.put(pls_dir, allDays);
 			}
-			CopyAndSerializationUtils.save(f, all);
+			
+			int day =  cal.get(Calendar.DAY_OF_MONTH);
+			String sday = day < 10 ? "0"+day : ""+day;
+			
+			String key = cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
+			
+			String h = allDays.get(key);
+			
+			if(h == null) h = "";
+			if(!h.contains(cal.get(Calendar.HOUR_OF_DAY)+"-")) 
+				h =  h + cal.get(Calendar.HOUR_OF_DAY)+"-";
+		
+			allDays.put(key, h);
 		}
-		return all;
+		return map;
 	}
-   
 	
 	
 	public Map<String,String> compute() {
-		File dir = new File(Config.getInstance().pls_folder);
-		return compute(dir);
-	}
-	
-	public Map<String,String> compute(File dir) {	
-		Map<String,String> allDays = new TreeMap<String,String>();
-		try {
-			analyzeDirectory(dir,allDays);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return allDays;
-	}
-	
-	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	private static void analyzeDirectory(File directory, Map<String,String> allDays) throws Exception {
+		String dir = Config.getInstance().pls_folder;
+		dir = dir.substring(dir.indexOf("file_pls/")+9);
+		dir = dir.substring(0,dir.indexOf("/"));
+		return computeAll().get(dir);
 		
-		Logger.logln("\t"+directory.getAbsolutePath());
-		
-		File[] items = directory.listFiles();
-		
-		for(int i=0; i<items.length;i++){
-			File item = items[i];
-			if(item.isFile()) {
-				Calendar cal = new GregorianCalendar();
-				String n = item.getName();
-				cal.setTimeInMillis(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))));
-				
-				int day =  cal.get(Calendar.DAY_OF_MONTH);
-				String sday = day < 10 ? "0"+day : ""+day;
-				
-				String key = cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
-				
-				String h = allDays.get(key);
-				
-				if(h == null) h = "";
-				if(!h.contains(cal.get(Calendar.HOUR_OF_DAY)+"-")) 
-					h =  h + cal.get(Calendar.HOUR_OF_DAY)+"-";
-			
-				allDays.put(key, h);
-			}
-			else if(item.isDirectory())
-				analyzeDirectory(item,allDays);
-		}	
 	}
 }
