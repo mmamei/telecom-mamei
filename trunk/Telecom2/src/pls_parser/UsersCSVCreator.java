@@ -39,7 +39,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	}
 	
 	
-	public UserTrace get(String user) {
+	private UserTrace get(String user) {
 		return traces.get(user);
 	}
 	
@@ -81,7 +81,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 			Logger.logln(file+" Does not exist!");
 			Logger.logln("Running UsersAroundAnEvent.process()");
 			try {
-				UsersAroundAnEvent.process(ce);
+				UsersAroundAnEvent.process(ce,true);
 				file = FileUtils.getFile("BASE/UsersAroundAnEvent/"+ce.toFileName());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -97,6 +97,20 @@ public class UsersCSVCreator extends BufferAnalyzer {
 			ba.finish();
 		}
 		Logger.logln("Done");
+	}
+	
+	
+	public static UserTrace process(String user) {
+		try {
+			Set<String> users = new HashSet<String>();
+			users.add(user);
+			UsersCSVCreator ba = new UsersCSVCreator(users,"");
+			PLSParser.parse(ba);
+			return ba.get(user);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	

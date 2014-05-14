@@ -27,7 +27,7 @@ public class PLSParser {
 	static String dir;
 	static long sTime,eTime;
 	static int mins;
-	public static void parse(BufferAnalyzer ba) throws Exception {
+	static void parse(BufferAnalyzer ba) throws Exception {
 		
 		startTime = ba.getStartTime();
 		endTime = ba.getEndTime();	

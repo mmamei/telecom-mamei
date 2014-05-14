@@ -120,14 +120,7 @@ public class PlaceRecognizer {
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-0"));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-23"));
-			
-			Set<String> users = new HashSet<String>();
-			users.add(user);
-			
-			UsersCSVCreator ba = new UsersCSVCreator(users,"");
-			PLSParser.parse(ba);
-			
-			List<PlsEvent> events = ba.get(user).getEvents();
+			List<PlsEvent> events = UsersCSVCreator.process(user).getEvents(); 
 			results = new HashMap<String, List<LatLonPoint>>();
 			PlaceRecognizerLogger.openKMLFile("G:/CODE/Telecom/web/kml/"+user+".kml");
 			for(String kind_of_place:KIND_OF_PLACES)

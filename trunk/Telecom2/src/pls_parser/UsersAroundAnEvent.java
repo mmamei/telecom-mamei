@@ -77,23 +77,23 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 			e.printStackTrace();
 		}
 	}
+
 	
-	public Set<String> getUsers() {
-		return usersAround;
-	}
-	
-	
-	
-	public static void process(CityEvent ce) throws Exception {
-		UsersAroundAnEvent ba = new UsersAroundAnEvent(ce);
-		//UsersAroundAnEvent ba = new UsersAroundAnEvent(CityEvent.GAME_OLIMPICO_12_3_2012);
-		PLSParser.parse(ba);
-		ba.finish();
-		Logger.logln("Done");
+	public static Set<String> process(CityEvent ce, boolean saveFile) {
+		try {
+			UsersAroundAnEvent ba = new UsersAroundAnEvent(ce);
+			//UsersAroundAnEvent ba = new UsersAroundAnEvent(CityEvent.GAME_OLIMPICO_12_3_2012);
+			PLSParser.parse(ba);
+			if(saveFile) ba.finish();
+		return ba.usersAround;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public static void main(String[] args) throws Exception {
-		process(CityEvent.getEvent("Stadio Olimpico (TO),12/03/2012"));
+		process(CityEvent.getEvent("Stadio Olimpico (TO),12/03/2012"),true);
 	}
 	
 }

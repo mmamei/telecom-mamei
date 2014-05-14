@@ -31,14 +31,8 @@ public class UserPlotter {
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-0"));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-23"));
-			
-			Set<String> users = new HashSet<String>();
-			users.add(user);
-			
-			UsersCSVCreator ba = new UsersCSVCreator(users,"");
-			PLSParser.parse(ba);
-			
-			UserTrace trace = ba.get(user);
+						
+			UserTrace trace = UsersCSVCreator.process(user); 
 		
 			KMLPath.openFile("G:/CODE/Telecom/web/kml/"+user+".kml");
 			KMLPath.print(user,trace.getEvents());
