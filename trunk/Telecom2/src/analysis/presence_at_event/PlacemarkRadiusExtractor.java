@@ -332,14 +332,13 @@ public class PlacemarkRadiusExtractor {
 		String subdir = Config.getInstance().get_pls_subdir();
 		
 		File d = FileUtils.createDir("BASE/PLSEventsAroundAPlacemark/"+subdir);
-		String file = d.getAbsolutePath()+"/"+p.getName()+"_"+p.getRadius()+".txt";
+		String file = d.getAbsolutePath()+"/"+p.getName()+"_"+(double)MAX_R+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
 			PLSEventsAroundAPlacemark.process(p);
 		}
-		
 		
 		
 		List<double[][]> zXradius = new ArrayList<double[][]>();
@@ -352,7 +351,7 @@ public class PlacemarkRadiusExtractor {
 			
 			if(ring) p.changeRadiusRing(max_r);
 			else p.changeRadius(max_r);
-			PLSMap plsmap = getPLSMap(file,p);
+			PLSMap plsmap = PLSEventsAroundAPlacemark.getPLSMap("BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+".txt",p);
 			
 			if(plsmap.startTime == null) {
 				for(int i=0; i<relevantEvents.size();i++) {
@@ -467,75 +466,4 @@ public class PlacemarkRadiusExtractor {
 			y[i] = x[i] / sum;
 		return y;
 	}
-	
-	static PLSMap getPLSMap(String file, Placemark p) {
-		/*	
-		String dir = FileUtils.create("PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()+"/saved_plsmaps").getAbsolutePath();
-		File f = new File(dir+"/PLSMap_"+p.toString()+".ser");
-		if(f.exists()) {
-			Logger.logln("Restoring: "+f.getAbsolutePath());
-			return (PLSMap)CopyAndSerializationUtils.restore(f);
-		}
-		*/
-		PLSMap plsmap = new PLSMap();
-		String[] splitted;
-		String line;
-		Calendar cal = new GregorianCalendar();
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new FileReader(file));			
-			while((line = in.readLine()) != null){
-				line = line.trim();
-				if(line.length() < 1) continue; // extra line at the end of file
-				splitted = line.split(",");
-				if(splitted.length == 5 && !splitted[3].equals("null")) {
-					
-					String username = splitted[0];
-					try{
-						cal.setTimeInMillis(Long.parseLong(splitted[1]));
-						String key = PLSBehaviorInAnArea.getKey(cal);
-						String celllac = splitted[3]; 
-						if(p.contains(celllac)) {
-							if(plsmap.startTime == null || plsmap.startTime.after(cal)) plsmap.startTime = (Calendar)cal.clone();
-							if(plsmap.endTime == null || plsmap.endTime.before(cal)) plsmap.endTime = (Calendar)cal.clone();
-							Set<String> users = plsmap.usr_counter.get(key);
-							if(users == null) users = new TreeSet<String>();
-							users.add(username);
-							plsmap.usr_counter.put(key, users);
-							Integer count = plsmap.pls_counter.get(key);
-							plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
-						}
-					}catch(Exception e) {
-						//System.err.println("bad read: "+line);
-						continue;
-					}
-				}
-			}
-			in.close();
-		}catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				in.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		//CopyAndSerializationUtils.save(f, plsmap);
-		return plsmap;
-	}
-	/*
-	static  DescriptiveStatistics[] clone(DescriptiveStatistics[] x) {
-		DescriptiveStatistics[] y = new DescriptiveStatistics[x.length];
-		
-		for(int i=0; i<y.length;i++) {
-			y[i] = new DescriptiveStatistics();
-			double[] vals = x[i].getValues();
-			for(int j=0; j<vals.length;j++)
-				y[i].addValue(vals[j]);
-		}
-		return y;
-	}
-	*/
 }
