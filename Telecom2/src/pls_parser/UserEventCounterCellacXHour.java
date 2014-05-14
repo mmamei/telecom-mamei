@@ -62,7 +62,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	}
 	
 	//private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
-	void finish() {
+	protected void finish() {
 		try {
 			File dir = FileUtils.createDir("BASE/UserEventCounter");
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+"_cellXHour.csv"));

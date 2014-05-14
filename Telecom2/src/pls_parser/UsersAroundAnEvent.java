@@ -56,7 +56,7 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 	String celllac;
 	Calendar cal = new GregorianCalendar();
 	
-	void analyze(String line) {
+	protected void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
 		celllac = fields[2];
@@ -67,7 +67,7 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 		usersAround.add(username);
 	}
 	
-	void finish() {
+	protected void finish() {
 		try {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(outputfile))));
 		for(String user: usersAround)

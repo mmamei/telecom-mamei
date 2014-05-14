@@ -26,8 +26,8 @@ public abstract class BufferAnalyzer {
 	
 	
 	
-	abstract void analyze(String line);
-	abstract void finish();
+	protected abstract void analyze(String line);
+	protected abstract void finish();
 	
 	
 	void run() {

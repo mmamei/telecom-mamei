@@ -68,7 +68,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
 	
-	void analyze(String line) {
+	protected void analyze(String line) {
 		try {
 		fields = line.split("\t");
 		username = fields[0];
@@ -88,7 +88,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		}
 	}
 	
-	void finish() {
+	protected void finish() {
 		for(PrintWriter out: outs)
 			out.close();
 	}

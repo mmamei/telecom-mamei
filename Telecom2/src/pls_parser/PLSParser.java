@@ -15,18 +15,19 @@ import utils.Logger;
 
 public class PLSParser {
 	
-	static boolean QUIET = false;
+	private static boolean QUIET = false;
 	
-	static Config conf = null;
+	private static Config conf = null;
 	private static final int BUFFER_SIZE = 1048576;
 	
 	
 	private static Calendar startTime = null;
 	private static Calendar endTime = null;
 	
-	static String dir;
-	static long sTime,eTime;
-	static int mins;
+	private static String dir;
+	private static long sTime,eTime;
+	private static int mins;
+	
 	static void parse(BufferAnalyzer ba) throws Exception {
 		
 		startTime = ba.getStartTime();
@@ -43,11 +44,11 @@ public class PLSParser {
 	}
 	
 	
-	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+	private  static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	
 	
 	
-	static Map<String,String> allDays = new TreeMap<String,String>();
+	private static Map<String,String> allDays = new TreeMap<String,String>();
 	
 	private static void analyzeDirectory(File directory, BufferAnalyzer analyzer) throws Exception{	
 		//System.out.println(directory.getAbsolutePath());
@@ -111,11 +112,11 @@ public class PLSParser {
 	}
 	*/
 	
-	static ZipFile zf = null;
-	static InputStreamReader isr = null;
-	static ZipEntry ze;
-	static char[] read_buffer,buffer;
-	static int charRead,x,remainedChars;
+	private static ZipFile zf = null;
+	private static InputStreamReader isr = null;
+	private static ZipEntry ze;
+	private static char[] read_buffer,buffer;
+	private static int charRead,x,remainedChars;
 	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer) {	
 		//System.out.println(plsFile.getAbsolutePath());
 		try {

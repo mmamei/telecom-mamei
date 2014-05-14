@@ -57,7 +57,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
 	
-	void analyze(String line) {
+	protected void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
 		imsi = fields[1];
@@ -71,7 +71,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 		else out.println(username+","+timestamp+","+imsi+","+celllac+","+nc.getName());
 	}
 	
-	void finish() {
+	protected void finish() {
 		out.close();
 	}
 	
