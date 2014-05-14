@@ -1,25 +1,20 @@
 package pls_parser;
 
-import java.io.File;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
 import utils.Config;
-import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
-import utils.Logger;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.MongoClient;
+import com.mongodb.DBObject;
+
+import db.TimeCoverageTable;
 
 public class AnalyzePLSCoverageTime {
 	
@@ -78,22 +73,12 @@ public class AnalyzePLSCoverageTime {
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	public Map<String,Map<String,String>> computeAll() {
 		Map<String,Map<String,String>> map = new HashMap<String,Map<String,String>>();
-		MongoClient mongo = null;
-		try {
-			mongo = new MongoClient( "localhost" , 27017 );
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return null;
-		}
-		DB dbt = mongo.getDB("telecom");
-		DBCollection tc = dbt.getCollection("TimeCoverage");
-		DBCursor cursor = tc.find();
-		
+		Iterator<DBObject> cursor = TimeCoverageTable.query(null);
 		while (cursor.hasNext()) {
-			BasicDBObject r = (BasicDBObject)cursor.next();
-			String pls_dir = r.getString("pls_dir");
+			DBObject r = (DBObject)cursor.next();
+			String pls_dir = (String)r.get("pls_dir");
 			Calendar cal = new GregorianCalendar();
-			cal.setTime(r.getDate("time"));
+			cal.setTime((Date)r.get("time"));
 			
 			Map<String,String> allDays = map.get(pls_dir);
 			if(allDays == null) {

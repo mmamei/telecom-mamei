@@ -22,8 +22,7 @@ import utils.Config;
 
 public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
-	static RegionMap NM = null;
-	
+	private static RegionMap NM = null;
 	private String username;
 	private String imsi;
 	private String cellac;

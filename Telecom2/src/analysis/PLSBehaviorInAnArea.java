@@ -36,7 +36,7 @@ public class PLSBehaviorInAnArea {
 	
 	public static final boolean VERBOSE = false;
 	
-	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+	
 	private static final DecimalFormat DF = new DecimalFormat("#######.####");
 	
 	static String[] pnames = new String[]{
@@ -51,7 +51,6 @@ public class PLSBehaviorInAnArea {
 		//"Piazza Castello (TO)",
 		//"Piazza Vittorio (TO)",
 		"Parco Dora (TO)"
-		
 	};
 	
 	public static void main(String[] args) throws Exception { 
@@ -81,7 +80,6 @@ public class PLSBehaviorInAnArea {
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2) {
 		try {
-			
 			EventFilesFinder eff = new EventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
 			if(dir == null) return null;
@@ -99,7 +97,7 @@ public class PLSBehaviorInAnArea {
 			
 			PLSEventsAroundAPlacemark.process(p);
 			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt";
-			PLSMap plsmap = getPLSMap(file,false).get("all");
+			PLSMap plsmap = PLSEventsAroundAPlacemark.getPLSMap(file,null);
 			(new File(file)).delete();
 			DescriptiveStatistics[] stats = getStats(plsmap);
 			return new Object[]{plsmap.getDomain(),stats[1].getValues()}; // domain, user_stat		
@@ -148,44 +146,39 @@ public class PLSBehaviorInAnArea {
 		for(CityEvent re : relevantEvents)
 			System.out.println("- "+re.toFileName());
 		
-		Map<String,PLSMap> cell_plsmap = getPLSMap(file,false);
+		PLSMap plsmap = PLSEventsAroundAPlacemark.getPLSMap(file,null);
 		
-		for(String cell: cell_plsmap.keySet()) {
-			
-			PLSMap plsmap = cell_plsmap.get(cell);
-			
-			DescriptiveStatistics[] stats = getStats(plsmap);
+		DescriptiveStatistics[] stats = getStats(plsmap);
 				
-			// compute data
-			//double[] pls_data = stats[0].getValues();
-			double[] usr_data = stats[1].getValues();
-			//double[] z_pls_data = getZ(stats[0],plsmap.startTime);
-			double[] z_usr_data =  getZ2(stats[1],plsmap.startTime);
+		// compute data
+		//double[] pls_data = stats[0].getValues();
+		double[] usr_data = stats[1].getValues();
+		//double[] z_pls_data = getZ(stats[0],plsmap.startTime);
+		double[] z_usr_data =  getZ2(stats[1],plsmap.startTime);
 			
-			//StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
-			//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
+		//StatsUtils.checkNormalDistrib(z_pls_data,true,p.name+" hourly z");
+		//StatsUtils.checkNormalDistrib(getZ3(stats[0]),true,p.name+" val z");
 			
-			if(VERBOSE) {
-				PrintWriter out = new PrintWriter(new FileWriter("BASE/PLSBehaviorInAnArea/"+p.getName()+"_"+p.getRadius()+".csv"));
-				out.println("time,n_user,z_score");
-				for(int i=0; i<plsmap.getDomain().length;i++) {
-					out.println(plsmap.getDomain()[i]+";"+(int)usr_data[i]+";"+DF.format(z_usr_data[i]));
-				}
-				
-				out.close();
+		if(VERBOSE) {
+			PrintWriter out = new PrintWriter(new FileWriter("BASE/PLSBehaviorInAnArea/"+p.getName()+"_"+p.getRadius()+".csv"));
+			out.println("time,n_user,z_score");
+			for(int i=0; i<plsmap.getDomain().length;i++) {
+				out.println(plsmap.getDomain()[i]+";"+(int)usr_data[i]+";"+DF.format(z_usr_data[i]));
 			}
-			drawGraph(p.getName()+"_"+p.getRadius()+" Cell = "+cell,plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);
+				
+			out.close();
 		}
+		drawGraph(p.getName()+"_"+p.getRadius(),plsmap.getDomain(),null,usr_data,null,z_usr_data,plsmap,relevantEvents);
 	}
 	
-	
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	public static DescriptiveStatistics[] getStats(PLSMap plsmap) {
 		DescriptiveStatistics pls_stats = new DescriptiveStatistics();
 		DescriptiveStatistics usr_stats = new DescriptiveStatistics();
 		
 		Calendar cal = (Calendar)plsmap.startTime.clone();
 		while(!cal.after(plsmap.endTime)) {
-			String key = getKey(cal);
+			String key = PLSEventsAroundAPlacemark.getKey(cal);
 			Integer pls_count = plsmap.pls_counter.get(key);
 			double pls = pls_count == null ? 0 : (double)pls_count;
 			double usr = plsmap.usr_counter.get(key) == null ? 0 : plsmap.usr_counter.get(key).size();	
@@ -362,56 +355,5 @@ public class PLSBehaviorInAnArea {
 			if(z[i] < 0) z[i] = 0;
 		}
 		return z;
-	}
-
-	
-	public Map<String,PLSMap> getPLSMap(String file, boolean group_by_cells) throws Exception {
-		
-		Map<String,PLSMap> cell_plsmap = new TreeMap<String,PLSMap>();
-		String[] splitted;
-		String line;
-		
-		Calendar cal = new GregorianCalendar();
-		
-		BufferedReader in = new BufferedReader(new FileReader(FileUtils.getFile(file)));
-		while((line = in.readLine()) != null){
-			line = line.trim();
-			if(line.length() < 1) continue; // extra line at the end of file
-			splitted = line.split(",");
-			if(splitted.length == 5 && !splitted[3].equals("null")) {
-				
-				
-				String username = splitted[0];
-				cal.setTimeInMillis(Long.parseLong(splitted[1]));
-				String key = getKey(cal);
-				String celllac = splitted[3]; 
-				
-				if(!group_by_cells) celllac = "all"; // if we do not want to extract pls by cells we just overwrite the key to use always the 'all' key
-				
-				PLSMap plsmap = cell_plsmap.get(celllac);
-				if(plsmap==null) {
-					plsmap = new PLSMap();
-					cell_plsmap.put(celllac,plsmap);
-				}
-				
-				if(plsmap.startTime == null || plsmap.startTime.after(cal)) plsmap.startTime = (Calendar)cal.clone();
-				if(plsmap.endTime == null || plsmap.endTime.before(cal)) plsmap.endTime = (Calendar)cal.clone();
-				Set<String> users = plsmap.usr_counter.get(key);
-				if(users == null) users = new TreeSet<String>();
-				users.add(username);
-				plsmap.usr_counter.put(key, users);
-				Integer count = plsmap.pls_counter.get(key);
-				plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
-			}
-		}
-		in.close();
-		return cell_plsmap;
-	}
-	
-	public static String getKey(Calendar cal) {
-		return cal.get(Calendar.DAY_OF_MONTH)+"-"+
-			 	MONTHS[cal.get(Calendar.MONTH)]+"-"+
-			 	cal.get(Calendar.YEAR)+":"+
-			 	cal.get(Calendar.HOUR_OF_DAY);
 	}
 }

@@ -1,14 +1,21 @@
 package pls_parser;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
+import analysis.PLSMap;
 import region.Placemark;
 import region.RegionI;
 import region.RegionMap;
@@ -98,6 +105,55 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(p, r);
 		PLSParser.parse(ba);
 		ba.finish();
+	}
+	
+	
+	public static PLSMap getPLSMap(String file, Placemark within) {
+		
+		//System.out.println(file);
+		//System.out.println(FileUtils.getFile(file));
+		
+		PLSMap plsmap = new PLSMap();
+		String[] splitted;
+		String line;
+		
+		Calendar cal = new GregorianCalendar();
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(FileUtils.getFile(file)));
+			while((line = in.readLine()) != null){
+				line = line.trim();
+				if(line.length() < 1) continue; // extra line at the end of file
+				splitted = line.split(",");
+				if(splitted.length == 5 && !splitted[3].equals("null")) {
+					
+					String username = splitted[0];
+					cal.setTimeInMillis(Long.parseLong(splitted[1]));
+					String key = getKey(cal);
+					String celllac = splitted[3]; 
+					if(within==null || within.contains(celllac)) {				
+						if(plsmap.startTime == null || plsmap.startTime.after(cal)) plsmap.startTime = (Calendar)cal.clone();
+						if(plsmap.endTime == null || plsmap.endTime.before(cal)) plsmap.endTime = (Calendar)cal.clone();
+						Set<String> users = plsmap.usr_counter.get(key);
+						if(users == null) users = new TreeSet<String>();
+						users.add(username);
+						plsmap.usr_counter.put(key, users);
+						Integer count = plsmap.pls_counter.get(key);
+						plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
+					}
+				}
+			}
+			in.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return plsmap;
+	}
+	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+	public static String getKey(Calendar cal) {
+		return cal.get(Calendar.DAY_OF_MONTH)+"-"+
+			 	MONTHS[cal.get(Calendar.MONTH)]+"-"+
+			 	cal.get(Calendar.YEAR)+":"+
+			 	cal.get(Calendar.HOUR_OF_DAY);
 	}
 	
 	

@@ -3,6 +3,7 @@ package db;
 import java.io.File;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Iterator;
 
 import utils.FileUtils;
 import utils.Logger;
@@ -10,8 +11,16 @@ import utils.Logger;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
+
+
+/*
+ * Table storing for each region (pls_dir) the days-time in which we have data.
+ * This is far more efficient that looking at the pls entries 
+ */
 
 public class TimeCoverageTable {
 	
@@ -59,4 +68,18 @@ public class TimeCoverageTable {
 		}	
 	}
 	
+	public static Iterator<DBObject> query(DBObject q) {
+		DBCursor cursor = null;
+		MongoClient mongo = null;
+		try {
+			mongo = new MongoClient( "localhost" , 27017 );
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		}
+		DB dbt = mongo.getDB("telecom");
+		DBCollection tc = dbt.getCollection("TimeCoverage");
+		cursor = tc.find(q);
+		return cursor;
+	}
 }
