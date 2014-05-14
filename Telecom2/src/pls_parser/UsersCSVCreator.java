@@ -23,7 +23,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	
-	public UsersCSVCreator(Set<String> users, String subdir) {
+	UsersCSVCreator(Set<String> users, String subdir) {
 		this.subdir = subdir;
 		traces = new HashMap<String,UserTrace>();
 		for(String u: users) 
@@ -31,7 +31,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	}
 	
 	String[] fields;
-	public void analyze(String line) {
+	void analyze(String line) {
 		fields = line.split("\t");
 		UserTrace ut = traces.get(fields[0].trim());
 		if(ut != null)
@@ -43,7 +43,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 		return traces.get(user);
 	}
 	
-	public void finish() {
+	void finish() {
 		
 		File dir = FileUtils.getFile("BASE/UsersCSVCreator/"+subdir);
 		if(dir != null) {

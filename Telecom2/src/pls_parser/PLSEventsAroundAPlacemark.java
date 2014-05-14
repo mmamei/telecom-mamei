@@ -30,7 +30,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	private List<Placemark> placemarks;
 	private RegionMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 	
-	public PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
+	PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
 		
 		outs = new ArrayList<PrintWriter>();
 		placemarks = new ArrayList<Placemark>();
@@ -68,7 +68,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
 	
-	public void analyze(String line) {
+	void analyze(String line) {
 		try {
 		fields = line.split("\t");
 		username = fields[0];
@@ -88,7 +88,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		}
 	}
 	
-	public void finish() {
+	void finish() {
 		for(PrintWriter out: outs)
 			out.close();
 	}

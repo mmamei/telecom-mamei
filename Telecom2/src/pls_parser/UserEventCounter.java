@@ -19,17 +19,17 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	
 	private Map<String,Integer> users_events;
 	
-	public UserEventCounter(String placemark_name, String user_list_name) {
+	UserEventCounter(String placemark_name, String user_list_name) {
 		super(placemark_name,user_list_name);
 		users_events = new HashMap<String,Integer>();
 	}
 
-	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal, String header) {
+	void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal, String header) {
 		Integer n = users_events.get(username);
 		users_events.put(username, n == null ? 1 : n+1);
 	}
 	
-	public void finish() {
+	void finish() {
 		try{
 			System.out.println(users_events.size());
 			PrintWriter out = new PrintWriter(new FileWriter(FileUtils.createDir("UserEventCounter")+"/"+this.getString()+"_count.csv"));

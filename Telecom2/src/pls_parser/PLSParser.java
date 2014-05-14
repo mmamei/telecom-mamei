@@ -15,7 +15,7 @@ import utils.Logger;
 
 public class PLSParser {
 	
-	public static boolean QUIET = false;
+	static boolean QUIET = false;
 	
 	static Config conf = null;
 	private static final int BUFFER_SIZE = 1048576;
