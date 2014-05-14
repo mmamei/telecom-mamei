@@ -88,15 +88,9 @@ public class UserFinder {
 	
 	
 	private void addSightseeings(Map<String,Integer> map, Sightseeing s) {
-		UsersAroundAnEvent ba = new UsersAroundAnEvent(s);
-		PLSParser.QUIET = true;
-		try {
-			PLSParser.parse(ba);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		
-		Set<String> users = ba.getUsers();
+		
+		Set<String> users = UsersAroundAnEvent.process(s, false);
 		for(String u: users) {
 			Integer c = map.get(u);
 			if(c == null) c = 0;

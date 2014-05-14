@@ -30,7 +30,7 @@ public abstract class BufferAnalyzer {
 	public abstract void finish();
 	
 	
-	public void run() {
+	void run() {
 		try {
 		PLSParser.parse(this);
 		finish();
