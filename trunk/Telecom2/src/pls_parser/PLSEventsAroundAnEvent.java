@@ -18,7 +18,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 	private CityEvent cevent;
 	private PrintWriter out = null;
 	private RegionMap nm;
-	public PLSEventsAroundAnEvent(CityEvent ce, int time_shift, double space_shift) {
+	PLSEventsAroundAnEvent(CityEvent ce, int time_shift, double space_shift) {
 		String dir = "BASE/"+this.getClass().getSimpleName();
 		File fd = new File(dir);
 		if(!fd.exists()) fd.mkdirs();
@@ -57,7 +57,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
 	
-	public void analyze(String line) {
+	void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
 		imsi = fields[1];
@@ -71,7 +71,7 @@ public class PLSEventsAroundAnEvent extends BufferAnalyzer {
 		else out.println(username+","+timestamp+","+imsi+","+celllac+","+nc.getName());
 	}
 	
-	public void finish() {
+	void finish() {
 		out.close();
 	}
 	

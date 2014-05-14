@@ -23,7 +23,7 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 	Calendar endTime;
 	
 	
-	public UsersAroundAnEvent(CityEvent c) {
+	UsersAroundAnEvent(CityEvent c) {
 		event = c;
 		usersAround = new HashSet<String>();
 		String dir = "BASE/"+this.getClass().getSimpleName();
@@ -56,7 +56,7 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 	String celllac;
 	Calendar cal = new GregorianCalendar();
 	
-	public void analyze(String line) {
+	void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
 		celllac = fields[2];
@@ -67,7 +67,7 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 		usersAround.add(username);
 	}
 	
-	public void finish() {
+	void finish() {
 		try {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(outputfile))));
 		for(String user: usersAround)

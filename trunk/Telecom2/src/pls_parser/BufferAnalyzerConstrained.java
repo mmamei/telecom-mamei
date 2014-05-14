@@ -31,7 +31,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	 * 
 	 */
 	
-	public BufferAnalyzerConstrained(String placemark_name, String user_list_name) {
+	BufferAnalyzerConstrained(String placemark_name, String user_list_name) {
 		
 		this.placemark_name = placemark_name;
 		this.user_list_name = user_list_name;
@@ -56,7 +56,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	
 	Config c = Config.getInstance();
 	String p ;
-	public String getString() {
+	String getString() {
 		p = placemark == null ? c.pls_folder.substring(c.pls_folder.lastIndexOf("/")+1) : placemark_name;
 		if(user_list == null)
 			return p;
@@ -78,7 +78,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	boolean check_users;
 	boolean check_placemark;
 	
-	public void analyze(String line) {
+	void analyze(String line) {
 	
 		if(line.startsWith("//")) {
 		 header = header == null ? line : header + line;
@@ -105,5 +105,5 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 		}
 	}
 	
-	public abstract void analyze(String username, String imsi,String celllac,long timestamp, Calendar cal, String header);
+	abstract void analyze(String username, String imsi,String celllac,long timestamp, Calendar cal, String header);
 }

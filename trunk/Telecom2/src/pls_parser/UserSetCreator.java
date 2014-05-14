@@ -15,17 +15,17 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	
 	private Set<String> users;
 	
-	public UserSetCreator(String placemark_name, String user_list_name) {
+	UserSetCreator(String placemark_name, String user_list_name) {
 		super(placemark_name, user_list_name);
 		users = new HashSet<String>();
 	}
 
 	
-	public void analyze(String username, String imsi, String celllac,long timestamp, Calendar cal,String header) {
+	void analyze(String username, String imsi, String celllac,long timestamp, Calendar cal,String header) {
 		users.add(username);
 	}
 
-	public void finish() {
+	void finish() {
 		try {
 			File dir = FileUtils.createDir("BASE/UserSetCreator");
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+".csv"));

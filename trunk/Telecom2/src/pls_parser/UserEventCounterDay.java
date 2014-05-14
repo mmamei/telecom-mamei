@@ -24,14 +24,14 @@ public class UserEventCounterDay extends BufferAnalyzerConstrained {
 	
 	private Map<String,UserInfo> users_info;
 	
-	public UserEventCounterDay(String placemark_name, String user_list_name) {
+	UserEventCounterDay(String placemark_name, String user_list_name) {
 		super(placemark_name,user_list_name);
 		users_info = new HashMap<String,UserInfo>();
 	}
 	
 	
 	
-	public void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal,String header) {
+	void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal,String header) {
 		UserInfo info = users_info.get(username);
 		if(info == null) {
 			info = new UserInfo();
@@ -50,7 +50,7 @@ public class UserEventCounterDay extends BufferAnalyzerConstrained {
 	}
 	
 	
-	public void finish() {
+	void finish() {
 		try {
 			File dir = FileUtils.createDir("BASE/UserEventCounter");
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+"_day.csv"));
