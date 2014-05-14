@@ -21,11 +21,11 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	}
 
 	
-	void analyze(String username, String imsi, String celllac,long timestamp, Calendar cal,String header) {
+	protected void analyze(String username, String imsi, String celllac,long timestamp, Calendar cal,String header) {
 		users.add(username);
 	}
 
-	void finish() {
+	protected void finish() {
 		try {
 			File dir = FileUtils.createDir("BASE/UserSetCreator");
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+".csv"));

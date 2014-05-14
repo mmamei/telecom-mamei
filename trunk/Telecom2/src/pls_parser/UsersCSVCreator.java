@@ -31,7 +31,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	}
 	
 	String[] fields;
-	void analyze(String line) {
+	protected void analyze(String line) {
 		fields = line.split("\t");
 		UserTrace ut = traces.get(fields[0].trim());
 		if(ut != null)
@@ -43,7 +43,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 		return traces.get(user);
 	}
 	
-	void finish() {
+	protected void finish() {
 		
 		File dir = FileUtils.getFile("BASE/UsersCSVCreator/"+subdir);
 		if(dir != null) {

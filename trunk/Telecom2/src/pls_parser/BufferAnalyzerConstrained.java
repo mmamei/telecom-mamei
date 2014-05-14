@@ -78,7 +78,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	boolean check_users;
 	boolean check_placemark;
 	
-	void analyze(String line) {
+	protected void analyze(String line) {
 	
 		if(line.startsWith("//")) {
 		 header = header == null ? line : header + line;

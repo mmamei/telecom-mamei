@@ -29,7 +29,7 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		users_events.put(username, n == null ? 1 : n+1);
 	}
 	
-	void finish() {
+	protected void finish() {
 		try{
 			System.out.println(users_events.size());
 			PrintWriter out = new PrintWriter(new FileWriter(FileUtils.createDir("UserEventCounter")+"/"+this.getString()+"_count.csv"));

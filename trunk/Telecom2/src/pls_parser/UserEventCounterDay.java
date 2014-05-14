@@ -31,7 +31,7 @@ public class UserEventCounterDay extends BufferAnalyzerConstrained {
 	
 	
 	
-	void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal,String header) {
+	protected void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal,String header) {
 		UserInfo info = users_info.get(username);
 		if(info == null) {
 			info = new UserInfo();
@@ -50,7 +50,7 @@ public class UserEventCounterDay extends BufferAnalyzerConstrained {
 	}
 	
 	
-	void finish() {
+	protected void finish() {
 		try {
 			File dir = FileUtils.createDir("BASE/UserEventCounter");
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+"_day.csv"));

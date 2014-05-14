@@ -64,7 +64,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 
 	
 
-	void analyze(String line) {
+	protected void analyze(String line) {
 		String celllac = line.split("\t")[2];
 		RegionI c = nm.getRegion(celllac);
 		if(c!=null) 
@@ -72,7 +72,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	}
 	
 	
-	void finish() {
+	protected void finish() {
 		try{
 			System.out.println("N. Cells = "+cells.size());
 			for(RegionI nc : cells.values()) {

@@ -43,7 +43,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 	String timestamp;
 	Calendar cal = new GregorianCalendar();
 	StringBuffer sb;
-	void analyze(String line) {
+	protected void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
 		imsi = fields[1];
@@ -61,7 +61,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 		sb.append(celllac);
 	}
 	
-	void finish() {
+	protected void finish() {
 		try {
 			
 			String dir = "BASE/LocationsXUserAroundAnEvent";
