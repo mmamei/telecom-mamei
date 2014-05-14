@@ -26,7 +26,6 @@ public class Test {
 		assertEquals("The number of cells in Venice placemark should be 216", 216, (int)p.getNumCells());
 	}
 	
-	@Ignore
 	@org.junit.Test
 	public void testAttendance() {
 		RunAll ra = new RunAll();
