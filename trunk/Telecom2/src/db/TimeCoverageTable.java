@@ -24,13 +24,8 @@ import com.mongodb.MongoException;
 
 public class TimeCoverageTable {
 	
+	// insert
 	public static void main(String[] args) {
-		insert();
-		Logger.logln("Done!");
-	}
-	
-	
-	public static void insert() {
 		MongoClient mongo = null;
 		try {
 			mongo = new MongoClient( "localhost" , 27017 );
@@ -39,18 +34,19 @@ public class TimeCoverageTable {
 			return;
 		}
 		DB dbt = mongo.getDB("telecom");
-		DBCollection tc = dbt.getCollection("TimeCoverage");
-		tc.createIndex(new BasicDBObject("pls_dir", 1).append("time", 1),new BasicDBObject().append("unique", true).append("dropDups", true));
+		DBCollection t = dbt.getCollection("TimeCoverage");
+		t.createIndex(new BasicDBObject("pls_dir", 1).append("time", 1),new BasicDBObject().append("unique", true).append("dropDups", true));
 		
 		File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
 		for(File bdir: basedirs) 
 		for(File dir: bdir.listFiles()) {
-			analyzeDirectory(dir,tc,dir.getName());
+			analyzeDirectory(dir,t,dir.getName());
 		}
+		Logger.logln("Done!");
 	}
 	
 	
-	private static void analyzeDirectory(File directory, DBCollection tc, String pls_dir) {
+	private static void analyzeDirectory(File directory, DBCollection t, String pls_dir) {
 		Logger.logln(pls_dir+"\t"+directory.getAbsolutePath());
 		File[] items = directory.listFiles();
 		
@@ -59,12 +55,12 @@ public class TimeCoverageTable {
 			if(item.isFile()) {
 				String n = item.getName();
 				try {
-					tc.insert(new BasicDBObject("pls_dir",pls_dir).append("time", new Date(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))))));
+					t.insert(new BasicDBObject("pls_dir",pls_dir).append("time", new Date(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))))));
 				} catch(MongoException e) {
 				}
 			}
 			else if(item.isDirectory())
-				analyzeDirectory(item,tc,pls_dir);
+				analyzeDirectory(item,t,pls_dir);
 		}	
 	}
 	
@@ -78,8 +74,8 @@ public class TimeCoverageTable {
 			return null;
 		}
 		DB dbt = mongo.getDB("telecom");
-		DBCollection tc = dbt.getCollection("TimeCoverage");
-		cursor = tc.find(q);
+		DBCollection t = dbt.getCollection("TimeCoverage");
+		cursor = t.find(q);
 		return cursor;
 	}
 }

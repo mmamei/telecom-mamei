@@ -1,24 +1,19 @@
 package region.network;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import region.RegionMap;
-import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
+import db.NetworkTable;
 
 public class NetworkMapFactory {
 	private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
 	
 	private static Map<String,RegionMap> mapnet = new HashMap<String,RegionMap>();
-	
 	
 	private static String getCalString(String f) {
 		//dfl_network_20130516.bin
@@ -41,39 +36,6 @@ public class NetworkMapFactory {
 		return c;
 	}
 	
-	
-	private static String findClosestNetworkFile(String target_cal_string) {
-		
-		target_cal_string = target_cal_string.split(" ")[0];
-		
-		String best_file = null;
-		
-		File dir = FileUtils.getFile("BASE/NetworkMapParser");
-		
-		try {
-			Calendar target_cal = Calendar.getInstance();
-			target_cal.setTime(F.parse(target_cal_string));
-			
-			
-			String[] files = dir.list();
-			
-			best_file = files[0];
-			
-			for(int i=1; i<files.length;i++) {
-				Calendar cal = getCalendar(files[i]);
-				long dt = Math.abs(cal.getTimeInMillis() - target_cal.getTimeInMillis());
-				long best_dt = Math.abs(getCalendar(best_file).getTimeInMillis() - target_cal.getTimeInMillis());
-				if(dt < best_dt) 
-					best_file = files[i];
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		return dir.getAbsolutePath()+"/"+best_file;
-	}
-
-	
 	public static RegionMap getNetworkMap(long time) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(time);
@@ -82,28 +44,23 @@ public class NetworkMapFactory {
 	
 	
 	public static RegionMap getNetworkMap(Calendar calendar) {
-		String cal = F.format(calendar.getTime());
-	
-		String file = findClosestNetworkFile(cal);
 		
-		Logger.logln("!!!! Using network file "+file);
-		
-		RegionMap nm = mapnet.get(file);
+		String table = NetworkTable.findClosestNetworkTable(calendar);
+		Logger.logln("!!!! Using network table "+table);
+		RegionMap nm = mapnet.get(table);
 		if(nm == null) {
-			try {
-				ObjectInputStream in_network = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(file))));
-				nm = (RegionMap)in_network.readObject();
-				mapnet.put(file, nm);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
+				nm = NetworkTable.getNetworkMap(calendar);
+				mapnet.put(table, nm);
 		}
 		return nm;
 	}
 	
 	
 	public static void main(String[] args) {
-		RegionMap nm = getNetworkMap(Config.getInstance().pls_start_time);
-		System.out.println(nm);
+		
+		Calendar cal = new GregorianCalendar(2013,8,01);
+		RegionMap nm = getNetworkMap(cal);
+		System.out.println(nm.getName());
+		System.out.println(nm.getRegion("4050919751"));
 	}
 }

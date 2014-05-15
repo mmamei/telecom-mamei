@@ -16,24 +16,24 @@ public class NetworkCell extends RegionI {
 	
 	private String celllac;			// Nome Cella (id)
 	private String description;		// Nome Cella
-	private int barycentre;			// Distanza in metri dal sito della cella
+	//private int barycentre;			// Distanza in metri dal sito della cella
 	private long lac;				// LAC: Location Area Code
 	private long cell_id;			// Identifica la cella
-	private String param5;			// Sconosciuto
-	private String param6;			// Sconosciuto
-	private String param7;			// Sconosciuto
-	private String param8;			// Sconosciuto
-	private String param9;			// Sconosciuto
+	//private String param5;			// Sconosciuto
+	//private String param6;			// Sconosciuto
+	//private String param7;			// Sconosciuto
+	//private String param8;			// Sconosciuto
+	//private String param9;			// Sconosciuto
 	//private double barycentre_lat;	// Latitudine del baricentro nel sistema WGS84
 	//private double barycentre_lon;	// Longitudine del baricentro nel sistema WGS84
 	private double radius;			// Raggio in metri della cella, supponendola come un cerchio centrato nel baricentro
 	
 	
-	public NetworkCell(String celllac, String description, int barycentre, long lac, long cell_id, double barycentre_lat, double barycentre_lon, double radius){
+	public NetworkCell(String celllac, String description, long lac, long cell_id, double barycentre_lat, double barycentre_lon, double radius){
 		this.name = celllac;
 		this.centerLatLon = new double[]{barycentre_lat,barycentre_lon};
 		this.description = description;
-		this.barycentre = barycentre;
+		//this.barycentre = barycentre;
 		this.lac = lac;
 		this.cell_id = cell_id;
 		//this.barycentre_lat = barycentre_lat;
@@ -51,14 +51,13 @@ public class NetworkCell extends RegionI {
 	public static NetworkCell bson2NetworkCell (BasicDBObject bson) {
 		String celllac = bson.getString("name");
 		String description = bson.getString("description");
-		int barycentre = bson.getInt("barycentre");
 		long lac = bson.getLong("lac");
 		long cell_id = bson.getLong("cell_id");
 		BasicDBList lonlat = (BasicDBList)((BasicDBObject)bson.get("loc")).get("coordinates");
 		double barycentre_lon = (Double)lonlat.get(0);
 		double barycentre_lat = (Double)lonlat.get(1);
 		double radius = bson.getDouble("radius");
-		return new NetworkCell(celllac,description,barycentre,lac,cell_id,barycentre_lat,barycentre_lon,radius);
+		return new NetworkCell(celllac,description,lac,cell_id,barycentre_lat,barycentre_lon,radius);
 	}
 	
 	
@@ -66,7 +65,6 @@ public class NetworkCell extends RegionI {
 		BasicDBObject nc = new BasicDBObject();
 		nc.append("name", celllac);
 		nc.append("description", description);
-		nc.append("barycentre", barycentre);
 		nc.append("lac", lac);
 		nc.append("cell_id", cell_id);
 		nc.append("loc", new BasicDBObject().append("type", "Point").append("coordinates", new double[]{centerLatLon[1],centerLatLon[0]}));
@@ -107,7 +105,6 @@ public class NetworkCell extends RegionI {
 	}
 	
 	public String toString(){
-		return celllac+","+description+","+barycentre+","+lac+","+cell_id+","+param5+","+param6+","+param7+","+param8+","+param9+
-				","+getLatLon()[0]+","+getLatLon()[1]+","+radius;
+		return celllac+","+description+","+lac+","+cell_id+","+getLatLon()[0]+","+getLatLon()[1]+","+radius;
 	}
 }
