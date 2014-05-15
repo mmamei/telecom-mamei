@@ -93,7 +93,7 @@ public class MongoTest2 {
 			double barycentre_lon = Double.parseDouble(splitted[10]);
 			double radius = Double.parseDouble(splitted[11]);
 			String celllac = String.valueOf(lac*65536+cell_id);
-			NetworkCell cell = new NetworkCell(celllac,description,barycentre,lac,cell_id,barycentre_lat,barycentre_lon,radius);
+			NetworkCell cell = new NetworkCell(celllac,description,lac,cell_id,barycentre_lat,barycentre_lon,radius);
 			net.insert(cell.getBSON());
 		}
 		br.close();

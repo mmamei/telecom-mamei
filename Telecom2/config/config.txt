@@ -7,7 +7,7 @@
 // according to Windows-like systems, to avoid errors.
 
 // File di rete
-network_map_dir = C:/DATASET/PLS/file_rete
+network_map_dir = G:/DATASET/PLS/file_rete
 
 // Cartella con i PLS
 pls_folder = G:/DATASET/PLS/file_pls/file_pls_piem/piem_2013

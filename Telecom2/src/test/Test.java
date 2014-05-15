@@ -23,7 +23,7 @@ public class Test {
 	@org.junit.Test
 	public void testPlacemark() {
 		Placemark p = Placemark.getPlacemark("Venezia");
-		assertEquals("The number of cells in Venice placemark should be 216", 216, (int)p.getNumCells());
+		assertEquals("The number of cells in Venice placemark should be 213", 213, (int)p.getNumCells());
 	}
 	
 	@org.junit.Test
