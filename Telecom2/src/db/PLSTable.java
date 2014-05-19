@@ -3,10 +3,14 @@ package db;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -19,52 +23,66 @@ import utils.Mail;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
-import com.mongodb.WriteConcern;
 
 public class PLSTable {
 	
 	public static void main(String[] args) {
-		
-		MongoClient mongo = null;
 		try {
-			mongo = new MongoClient( "localhost" , 27017 );
-			mongo.setWriteConcern(WriteConcern.UNACKNOWLEDGED);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return;
+			
+			String name = "pls_ve";
+			Map<String,List<File>> filesByDay = new HashMap<String,List<File>>();
+			organizeFilesByDay(new File("G:/DATASET/PLS/file_pls/file_"+name),filesByDay);
+			DB dbt = DBConnection.getDB();
+			for(String day: filesByDay.keySet()) {
+				DBCollection t = dbt.getCollection(name+"_"+day);
+				//t = DBConnection.dropAndRecreate(name);
+				for(File f: filesByDay.get(day))
+					insertFile(f, t);
+				createIndexes(t);
+				Logger.logln(day+" completed!");
+			}
+			
+			Mail.send("completed!");
+			Logger.logln("Done");
+		}catch (Exception e) {
+			Mail.send(e.getMessage());
 		}
-		DB dbt = mongo.getDB("telecom");
-		DBCollection t = dbt.getCollection("PLS");
-		t.drop();
-		t = dbt.getCollection("PLS");
-		insert(new File("G:/DATASET/PLS/file_pls"),t);
-		createIndexes(t);
-		Mail.send("completed!");
-		Logger.logln("Done");
 	}
 	
-	private static void insert(File dir, DBCollection t) {
+	
+	private static void organizeFilesByDay(File dir, Map<String,List<File>> map) {
 		File[] items = dir.listFiles();
 		for(int i=0; i<items.length;i++){
 			File item = items[i];
 			if(item.isFile()) {
-				analyzeFile(item, t);
-				if((i+1) % 100 == 0) Logger.logln(i+"/"+items.length+" done!");
+				String n = item.getName();
+				String day = getDay(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))));
+				List<File> l = map.get(day);
+				if(l == null) {
+					l = new ArrayList<File>();
+					map.put(day, l);
+				}
+				l.add(item);
 			}
 			else if(item.isDirectory())
-				insert(item, t);
+				organizeFilesByDay(item, map);
 		}
 	}
 	
+	private static final SimpleDateFormat F = new SimpleDateFormat("yyyyMMdd");
+	private static String getDay(long time) {
+		return F.format(new Date(time));
+	}
+	
+
+	
 	private static void createIndexes(DBCollection t) {
-		t.createIndex(new BasicDBObject("username", 1).append("time", 1).append("imsi", 1),new BasicDBObject().append("unique", true).append("dropDups", true));
-		t.createIndex(new BasicDBObject("loc", "2dsphere"));
+		t.createIndex(new BasicDBObject("username", 1).append("time", 1).append("imsi", 1).append("loc", "2dsphere"),new BasicDBObject().append("unique", true).append("dropDups", true));
 	}
 	
 	
-	private static void analyzeFile(File plsFile, DBCollection t) {	
+	private static void insertFile(File plsFile, DBCollection t) {	
 		ZipFile zf = null;
 		BufferedReader br = null;
 		try {
@@ -82,7 +100,6 @@ public class PLSTable {
 			double radius;
 			RegionMap nm = null;
 			while((line=br.readLine())!=null)  {
-				
 				fields = line.split("\t");
 				username = fields[0];
 				imsi = fields[1];
@@ -99,7 +116,7 @@ public class PLSTable {
 				if(region == null) { 
 					Calendar cal = new GregorianCalendar();
 					cal.setTimeInMillis(timestamp);
-					Logger.logln(nm.getName()+" has null region --> "+celllac+" at time "+cal.getTime());
+					//Logger.logln(nm.getName()+" has null region --> "+celllac+" at time "+cal.getTime());
 					continue;
 				}
 				

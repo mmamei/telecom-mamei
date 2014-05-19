@@ -38,16 +38,7 @@ public class NetworkTable {
 
 
 	public static void insert() {		
-		MongoClient mongo = null;
-		try {
-			mongo = new MongoClient( "localhost" , 27017 );
-			mongo.setWriteConcern(WriteConcern.UNACKNOWLEDGED);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return;
-		}
-		DB dbt = mongo.getDB("telecom");
-		
+		DB dbt = DBConnection.getDB();
 		File dir = new File(Config.getInstance().network_map_dir);
 		String[] files = dir.list();
 		for(String file: files) {
@@ -57,9 +48,8 @@ public class NetworkTable {
 				int month = Integer.parseInt(time.substring(4,6));
 				int day = Integer.parseInt(time.substring(6,8));
 				String tName = "network"+time;
+				DBConnection.dropAndRecreate(tName);
 				DBCollection t = dbt.getCollection(tName);
-				t.drop();
-				t = dbt.getCollection(tName);
 				t.createIndex(new BasicDBObject("celllac", 1).append("time", 1),new BasicDBObject().append("unique", true).append("dropDups", true));
 				t.createIndex(new BasicDBObject("loc", "2dsphere"));
 				
@@ -97,7 +87,6 @@ public class NetworkTable {
 	}
 	
 	
-	
 	public static RegionMap getNetworkMap(Calendar cal) {
 		String bestTable = findClosestNetworkTable(cal);
 		RegionMap nm = new RegionMap(bestTable);
@@ -118,14 +107,7 @@ public class NetworkTable {
 	
 
 	public static String findClosestNetworkTable(Calendar target_cal) {
-		MongoClient mongo = null;
-		try {
-			mongo = new MongoClient( "localhost" , 27017 );
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return null;
-		}
-		DB dbt = mongo.getDB("telecom");
+		DB dbt = DBConnection.getDB();
 		Set<String> tables = dbt.getCollectionNames();
 		String bestTable = null;
 		for(String tableName : tables){
@@ -150,14 +132,7 @@ public class NetworkTable {
 
 	public static Iterable<DBObject> query(String table, DBObject q) {
 		DBCursor cursor = null;
-		MongoClient mongo = null;
-		try {
-			mongo = new MongoClient( "localhost" , 27017 );
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return null;
-		}
-		DB dbt = mongo.getDB("telecom");
+		DB dbt = DBConnection.getDB();
 		DBCollection t = dbt.getCollection(table);
 		cursor = t.find(q);
 		return cursor;

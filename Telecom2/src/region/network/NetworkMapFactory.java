@@ -46,7 +46,7 @@ public class NetworkMapFactory {
 	public static RegionMap getNetworkMap(Calendar calendar) {
 		
 		String table = NetworkTable.findClosestNetworkTable(calendar);
-		Logger.logln("!!!! Using network table "+table);
+		//Logger.logln("!!!! Using network table "+table);
 		RegionMap nm = mapnet.get(table);
 		if(nm == null) {
 				nm = NetworkTable.getNetworkMap(calendar);

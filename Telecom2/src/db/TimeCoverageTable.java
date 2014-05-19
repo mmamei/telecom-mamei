@@ -26,14 +26,7 @@ public class TimeCoverageTable {
 	
 	// insert
 	public static void main(String[] args) {
-		MongoClient mongo = null;
-		try {
-			mongo = new MongoClient( "localhost" , 27017 );
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return;
-		}
-		DB dbt = mongo.getDB("telecom");
+		DB dbt = DBConnection.getDB();
 		DBCollection t = dbt.getCollection("TimeCoverage");
 		t.createIndex(new BasicDBObject("pls_dir", 1).append("time", 1),new BasicDBObject().append("unique", true).append("dropDups", true));
 		
@@ -66,14 +59,7 @@ public class TimeCoverageTable {
 	
 	public static Iterator<DBObject> query(DBObject q) {
 		DBCursor cursor = null;
-		MongoClient mongo = null;
-		try {
-			mongo = new MongoClient( "localhost" , 27017 );
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return null;
-		}
-		DB dbt = mongo.getDB("telecom");
+		DB dbt = DBConnection.getDB();
 		DBCollection t = dbt.getCollection("TimeCoverage");
 		cursor = t.find(q);
 		return cursor;
