@@ -17,8 +17,7 @@ public class AnalyzePLSCoverageTime {
 
 	public static void main(String[] args) {
 		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
-		
-		
+			
 		Map<String,List<String>> all =  apc.computeAll();
 		for(String key: all.keySet()) 
 			System.out.println(key+" -> "+apc.getNumYears(all.get(key)));
