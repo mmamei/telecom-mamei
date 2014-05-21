@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ import visual.kml.KML;
 
 public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
-	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
+	SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd",Locale.US);
 	String name;
 	RegionMap nm = null;
 	RegionMap rm;  
@@ -46,10 +47,9 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 		name =  plsf.substring(plsf.lastIndexOf("/")+1);
 		rm = new RegionMap(plsf);
 		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
-		Map<String,String> coverage = apc.compute();
+		List<String> coverage = apc.compute();
 		
-		String first = coverage.keySet().iterator().next();
-		first = first.substring(first.indexOf("-")+1);
+		String first = coverage.get(0);
 		try {
 			Config.getInstance().pls_start_time.setTime(f.parse(first));
 			Config.getInstance().pls_end_time = (Calendar)Config.getInstance().pls_start_time.clone();

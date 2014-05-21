@@ -13,7 +13,7 @@
 	<classpathentry kind="lib" path="lib/libsvm.jar"/>
 	<classpathentry kind="lib" path="lib/mallet-deps.jar"/>
 	<classpathentry kind="lib" path="lib/mallet.jar"/>
-	<classpathentry kind="lib" path="lib/mongo-java-driver-2.12.1.jar"/>
 	<classpathentry kind="lib" path="lib/javax.mail.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.30-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

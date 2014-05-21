@@ -85,7 +85,7 @@ public class CityEvent {
 		 * values = 0-0-1-1-2-2-3-3-4-4-5-5-6-6-7-7-8-.... 23
 		 */
 		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
-		Map<String,String> ad = apc.compute();
+		List<String> ad = apc.compute();
 		
 		//for(String s : ad.keySet())
 		//	System.out.println(s+" ==> "+ad.get(s));
@@ -109,8 +109,7 @@ public class CityEvent {
 			//System.out.println(key_s);
 			//System.out.println(key_e);
 			
-			if(ad.get(key_s)!=null && ad.get(key_s).contains(s[1]) &&
-			   ad.get(key_e)!=null && ad.get(key_e).contains(e[1]))
+			if(ad.contains(key_s)  && ad.contains(key_e))
 				result.add(ce);
 		}
 		

@@ -1,5 +1,6 @@
 <html>
 <%@ page import="java.util.Map" %>
+<%@ page import="java.util.List" %>
 <jsp:useBean id="apc" scope="application" class="pls_parser.AnalyzePLSCoverageTime"/>
 <head>
 <%@include file="includes/head.html" %>
@@ -23,7 +24,7 @@
 	  
 	function drawChart() {
 	<%
-	Map<String,Map<String,String>> all =  apc.computeAll();
+	Map<String,List<String>> all =  apc.computeAll();
 	out.println(apc.getJSMap(all));
 	
 	for(String key: all.keySet()) {

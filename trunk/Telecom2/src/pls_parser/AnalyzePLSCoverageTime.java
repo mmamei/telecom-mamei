@@ -1,20 +1,14 @@
 package pls_parser;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import utils.Config;
-
-import com.mongodb.DBObject;
-
-import db.TimeCoverageTable;
+import db.DBConnection;
 
 public class AnalyzePLSCoverageTime {
 	
@@ -25,7 +19,7 @@ public class AnalyzePLSCoverageTime {
 		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
 		
 		
-		Map<String,Map<String,String>> all =  apc.computeAll();
+		Map<String,List<String>> all =  apc.computeAll();
 		for(String key: all.keySet()) 
 			System.out.println(key+" -> "+apc.getNumYears(all.get(key)));
 		
@@ -33,37 +27,39 @@ public class AnalyzePLSCoverageTime {
 		System.out.println(apc.getJSMap(all));
 	}
 	
-	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
-	public String getJSMap(Map<String,Map<String,String>> all) {
+	public String getJSMap(Map<String,List<String>> all) {
 		StringBuffer sb = new StringBuffer();
-		Calendar cal = Calendar.getInstance();
 		for(String key: all.keySet()) {
 			sb.append("var dataTable_"+key+" = new google.visualization.DataTable();");
 			sb.append("dataTable_"+key+".addColumn({ type: 'date', id: 'Date' });");
 			sb.append("dataTable_"+key+".addColumn({ type: 'number', id: 'PLS Coverage' });");
 			sb.append("dataTable_"+key+".addRows([\n");
-			Map<String,String> dmap = all.get(key);
+			List<String> dmap = all.get(key);
 			
-			for(String day: dmap.keySet()) {
+			String one_year = null;
+			for(String d: dmap) {
 				try {
-					cal.setTime(f.parse(day));
-					int h = dmap.get(day).split("-").length;
-					String s = "[ new Date("+cal.get(Calendar.YEAR)+", "+cal.get(Calendar.MONTH)+", "+cal.get(Calendar.DAY_OF_MONTH)+"), "+h+" ],\n";
+					String year = d.substring(0,4);
+					if(one_year == null) one_year = year;
+					int month = Integer.parseInt(d.substring(4,6))-1;
+					String day = d.substring(6,8);
+					String s = "[ new Date("+year+", "+month+", "+day+"), 24 ],\n";
 					sb.append(s);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
+			sb.append("[ new Date("+one_year+", 0, 1), 0 ],\n");
 			sb.append("]);\n");
 		}
 		return sb.toString();
 	}
 	
-	public int getNumYears(Map<String,String> dmap) {
+	public int getNumYears(List<String> dmap) {
 		int min_year = 3000;
 		int max_year = 0;
-		for(String d: dmap.keySet()) {
-			int year = Integer.parseInt(d.substring(0,d.indexOf("/")));
+		for(String d: dmap) {
+			int year = Integer.parseInt(d.substring(0,4));
 			min_year = Math.min(min_year, year);
 			max_year = Math.max(max_year, year);
 		}
@@ -71,39 +67,31 @@ public class AnalyzePLSCoverageTime {
 	}
 
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	public Map<String,Map<String,String>> computeAll() {
-		Map<String,Map<String,String>> map = new HashMap<String,Map<String,String>>();
-		Iterator<DBObject> cursor = TimeCoverageTable.query(null);
-		while (cursor.hasNext()) {
-			DBObject r = (DBObject)cursor.next();
-			String pls_dir = (String)r.get("pls_dir");
-			Calendar cal = new GregorianCalendar();
-			cal.setTime((Date)r.get("time"));
-			
-			Map<String,String> allDays = map.get(pls_dir);
-			if(allDays == null) {
-				allDays = new TreeMap<String,String>();
-				map.put(pls_dir, allDays);
+	public Map<String,List<String>> computeAll() {
+		Map<String,List<String>> map = new HashMap<String,List<String>>();
+		Statement s = DBConnection.getStatement();
+		try {
+			ResultSet r = s.executeQuery("SELECT table_name FROM information_schema.tables");
+			while(r.next()) {
+				String t = r.getString("table_name"); 
+				if(t.startsWith("pls_")) {
+					String key = t.substring(0, t.lastIndexOf("_"));
+					String day = t.substring(t.lastIndexOf("_")+1);
+					List<String> m = map.get(key);
+					if(m == null) {
+						m = new ArrayList<String>();
+						map.put(key, m);
+					}
+					m.add(day);
+				}
 			}
-			
-			int day =  cal.get(Calendar.DAY_OF_MONTH);
-			String sday = day < 10 ? "0"+day : ""+day;
-			
-			String key = cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
-			
-			String h = allDays.get(key);
-			
-			if(h == null) h = "";
-			if(!h.contains(cal.get(Calendar.HOUR_OF_DAY)+"-")) 
-				h =  h + cal.get(Calendar.HOUR_OF_DAY)+"-";
-		
-			allDays.put(key, h);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return map;
 	}
-	
-	
-	public Map<String,String> compute() {
+		
+	public List<String> compute() {
 		String dir = Config.getInstance().pls_folder;
 		dir = dir.substring(dir.indexOf("file_pls/")+9);
 		dir = dir.substring(0,dir.indexOf("/"));
