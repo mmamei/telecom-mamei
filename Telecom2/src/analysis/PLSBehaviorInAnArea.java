@@ -23,6 +23,7 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import pls_parser.PLSEventsAroundAPlacemark;
+import pls_parser.PLSEventsAroundAPlacemarkDB;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
@@ -68,8 +69,10 @@ public class PLSBehaviorInAnArea {
 		}
 		*/
 		
+		
+		
 		PLSBehaviorInAnArea pbia = new PLSBehaviorInAnArea();
-		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672);
+		Object[] plsdata = pbia.process("2014-03-13","0","2014-03-15","10",12.3238,45.4425,12.3238,45.4425);
 		if(plsdata!=null)
 			System.out.println(pbia.getJSMap(plsdata));
 		Logger.logln("Done!");
@@ -95,10 +98,15 @@ public class PLSBehaviorInAnArea {
 			String n = "tmp";
 			Placemark p = new Placemark(n,new double[]{lat,lon},r);
 			
+			
+			/*
 			PLSEventsAroundAPlacemark.process(p);
 			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt";
 			PLSMap plsmap = PLSEventsAroundAPlacemark.getPLSMap(file,null);
 			(new File(file)).delete();
+			*/
+			PLSMap plsmap = PLSEventsAroundAPlacemarkDB.processdb(p);
+			
 			DescriptiveStatistics[] stats = getStats(plsmap);
 			return new Object[]{plsmap.getDomain(),stats[1].getValues()}; // domain, user_stat		
 		} catch(Exception e) {
