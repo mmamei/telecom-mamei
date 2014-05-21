@@ -1,50 +1,67 @@
 package db;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.UnknownHostException;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import utils.Logger;
-
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-import com.mongodb.WriteConcern;
+import utils.CopyAndSerializationUtils;
 
 public class DBConnection {
-	private static final String DB_NAME = "telecom";
-	private static DB db = null;
-	public static DB getDB() {
-		if(db == null) {
-			MongoClient mongo = null;
-			try {
-				mongo = new MongoClient( "localhost" , 27017 );
-				mongo.setWriteConcern(WriteConcern.UNACKNOWLEDGED);
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-				return null;
-			}
-			db = mongo.getDB("telecom");
-		}
-		return db;
-	}
 	
-	public static DBCollection dropAndRecreate(String tableName) {
+	private static final String PW_FILE = "C:/Users/marco/gmailpassword.ser";
+	private static Connection c = null;
+	
+	
+	public static void closeConnection() {
 		try {
-			DB db = getDB();
-			if(db.getCollectionNames().contains(tableName)) {
-				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-				Logger.logln("Drop Table "+tableName+"? yes/no");
-				String confirm = br.readLine().toLowerCase();
-				if(confirm.equals("yes")) {
-					Logger.logln("Dropping "+tableName);
-					DBCollection t = db.getCollection(tableName);
-					t.drop();
-				}
-			}
-		}catch(Exception e) {
+			c.close();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return db.getCollection(tableName);
 	}
+	
+	public static Statement getStatement() {
+		 try {
+			if(c == null || c.isClosed() || !c.isValid(0)) {
+				Class.forName("com.mysql.jdbc.Driver");
+				c = DriverManager.getConnection("jdbc:mysql://localhost/telecom?user=root&password="+(String)CopyAndSerializationUtils.restore(new File(PW_FILE)));
+			}
+			return c.createStatement();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	
+	public static void main(String[] args) {
+		Statement s = getStatement();
+		
+		
+		try {
+			s.executeUpdate("drop table pls_ve_20130529");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			s.executeUpdate("drop table pls_ve_20130725");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			s.executeUpdate("drop table pls_ve_20130724");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			s.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		closeConnection();
+	}
+	
+
 }

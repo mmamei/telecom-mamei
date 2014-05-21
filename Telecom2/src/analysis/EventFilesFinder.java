@@ -2,6 +2,7 @@ package analysis;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class EventFilesFinder {
 	private SimpleDateFormat F2 = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
 	
 	private Map<String,RegionMap> maps;
-	private Map<String,Map<String,String>> mapt;
+	private Map<String,List<String>> mapt;
 	
 	public EventFilesFinder() {
 		maps = new AnalyzePLSCoverageSpace().getPlsCoverage();
@@ -72,21 +73,9 @@ public class EventFilesFinder {
 			}
 			
 			// check temporal constraints
-			
-			boolean okstart = false;
-			boolean okend = false;
-			Map<String,String> dmap = mapt.get(dir);
-			for(String day: dmap.keySet()) {
-				if(day.equals(sday) && dmap.get(day).contains(cs.get(Calendar.HOUR_OF_DAY)+"-")) okstart = true;		
-				if(day.equals(eday) && dmap.get(day).contains(ce.get(Calendar.HOUR_OF_DAY)+"-")) okend = true;		
-			}
-			
-			if(!okstart || !okend) {
-				//Logger.logln("Selected event is out of PLS coverage area in time");
-				return null;
-			}
-						
-			return dir;
+			List<String> dmap = mapt.get(dir);
+			if(dmap.contains(sday) && dmap.contains(eday))
+				return dir;
 			
 		} catch(Exception e) {
 			e.printStackTrace();

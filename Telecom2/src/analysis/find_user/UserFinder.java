@@ -35,7 +35,7 @@ public class UserFinder {
 		
 		Map<String,Integer> map = new HashMap<String,Integer>();
 		
-		Map<String,Map<String,String>> mapt = new AnalyzePLSCoverageTime().computeAll();
+		Map<String,List<String>> mapt = new AnalyzePLSCoverageTime().computeAll();
 		List<Sightseeing> ls = parseInput(q);
 		for(Sightseeing s: ls) {
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+s.dir).toString(); // set right working directory
@@ -46,7 +46,7 @@ public class UserFinder {
 				Calendar start = null;
 				Calendar end = null;
 				SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
-				for(String day: mapt.get(s.dir).keySet()) {
+				for(String day: mapt.get(s.dir)) {
 					try {
 						Calendar cal = Calendar.getInstance();
 						cal.setTime(f.parse(day));

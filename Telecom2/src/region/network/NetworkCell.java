@@ -5,11 +5,7 @@ import org.gps.utils.LatLonUtils;
 
 import region.RegionI;
 import utils.GeomUtils;
-import visual.kml.KMLCircle;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class NetworkCell extends RegionI {
@@ -48,29 +44,7 @@ public class NetworkCell extends RegionI {
 	
 	// the following two methods serialize the object into a bson (binary json) to be saved in mongoDB
 	
-	public static NetworkCell bson2NetworkCell (BasicDBObject bson) {
-		String celllac = bson.getString("name");
-		String description = bson.getString("description");
-		long lac = bson.getLong("lac");
-		long cell_id = bson.getLong("cell_id");
-		BasicDBList lonlat = (BasicDBList)((BasicDBObject)bson.get("loc")).get("coordinates");
-		double barycentre_lon = (Double)lonlat.get(0);
-		double barycentre_lat = (Double)lonlat.get(1);
-		double radius = bson.getDouble("radius");
-		return new NetworkCell(celllac,description,lac,cell_id,barycentre_lat,barycentre_lon,radius);
-	}
 	
-	
-	public DBObject getBSON() {
-		BasicDBObject nc = new BasicDBObject();
-		nc.append("name", celllac);
-		nc.append("description", description);
-		nc.append("lac", lac);
-		nc.append("cell_id", cell_id);
-		nc.append("loc", new BasicDBObject().append("type", "Point").append("coordinates", new double[]{centerLatLon[1],centerLatLon[0]}));
-		nc.append("radius", radius);
-		return nc;
-	}
 	
 	public long getCellID(){
 		return cell_id;
