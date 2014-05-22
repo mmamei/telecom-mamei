@@ -37,7 +37,7 @@ public class PLSTable {
 	public static void main(String[] args) throws Exception {
 		
 			PrintWriter out = new PrintWriter(new FileWriter("badtables.txt"));
-			String name = "pls_ve";
+			String name = "pls_piem";
 			Map<String,List<File>> filesByDay = new HashMap<String,List<File>>();
 			organizeFilesByDay(new File("G:/DATASET/PLS/file_pls/file_"+name),filesByDay);
 			int cont = 0;

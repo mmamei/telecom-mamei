@@ -10,6 +10,8 @@ import utils.CopyAndSerializationUtils;
 
 public class DBConnection {
 	
+	private static final String DBNAME = "telecom";
+	private static final String DBUSER = "root";
 	private static final String PW_FILE = "C:/Users/marco/gmailpassword.ser";
 	private static Connection c = null;
 	
@@ -22,14 +24,23 @@ public class DBConnection {
 		}
 	}
 	
-	public static Statement getStatement() {
+	public static Connection openConnection() {
 		 try {
 			if(c == null || c.isClosed() || !c.isValid(0)) {
 				Class.forName("com.mysql.jdbc.Driver");
-				c = DriverManager.getConnection("jdbc:mysql://localhost/telecom?user=root&password="+(String)CopyAndSerializationUtils.restore(new File(PW_FILE)));
+				c = DriverManager.getConnection("jdbc:mysql://localhost/"+DBNAME+"?user="+DBUSER+"&password="+(String)CopyAndSerializationUtils.restore(new File(PW_FILE)));
 			}
-			return c.createStatement();
+			return c;
 		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static Statement getStatement() {
+		try {
+			return openConnection().createStatement();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -37,23 +48,26 @@ public class DBConnection {
 	
 	
 	public static void main(String[] args) {
+		
 		Statement s = getStatement();
 		
+		String[] tables2Drop = new String[]{
+				"pls_piem_20130709",
+				"pls_piem_20130705",
+				"pls_piem_20140227",
+				"pls_piem_20140208",
+				"pls_piem_20120324",
+				"pls_piem_20140205",
+				"pls_piem_20140206"
+		};
 		
-		try {
-			s.executeUpdate("drop table pls_ve_20130529");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			s.executeUpdate("drop table pls_ve_20130725");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		try {
-			s.executeUpdate("drop table pls_ve_20130724");
-		} catch (SQLException e) {
-			e.printStackTrace();
+		
+		for(String t: tables2Drop) {
+			try {
+				s.executeUpdate("drop table "+t);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		try {
 			s.close();
