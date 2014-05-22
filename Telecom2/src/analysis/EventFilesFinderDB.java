@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import db.query.AnalyzePLSCoverageTime;
 import pls_parser.AnalyzePLSCoverageSpace;
-import pls_parser.AnalyzePLSCoverageTime;
 import region.RegionMap;
 import utils.Logger;
 

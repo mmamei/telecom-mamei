@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import db.query.AnalyzePLSCoverageTime;
 import analysis.EventFilesFinder;
-import pls_parser.AnalyzePLSCoverageTime;
 import utils.Config;
 
 

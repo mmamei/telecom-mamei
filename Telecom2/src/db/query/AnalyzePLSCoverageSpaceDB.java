@@ -1,4 +1,4 @@
-package pls_parser;
+package db.query;
 
 import java.io.File;
 import java.io.FileWriter;

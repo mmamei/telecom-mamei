@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import db.query.AnalyzePLSCoverageTime;
 import region.Region;
 import region.RegionI;
 import region.RegionMap;
