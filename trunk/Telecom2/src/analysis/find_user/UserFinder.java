@@ -15,7 +15,7 @@ import java.util.Set;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import pls_parser.AnalyzePLSCoverageTime;
+import db.query.AnalyzePLSCoverageTime;
 import pls_parser.PLSParser;
 import pls_parser.UsersAroundAnEvent;
 import region.Placemark;

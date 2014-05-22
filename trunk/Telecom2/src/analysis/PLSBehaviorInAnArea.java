@@ -22,8 +22,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import db.query.PLSEventsAroundAPlacemarkDB;
 import pls_parser.PLSEventsAroundAPlacemark;
-import pls_parser.PLSEventsAroundAPlacemarkDB;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;

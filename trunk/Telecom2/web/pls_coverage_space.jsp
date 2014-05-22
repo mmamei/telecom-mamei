@@ -3,7 +3,7 @@
 <%@include file="includes/head.html" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="region.RegionMap" %>
-<jsp:useBean id="apbbox" scope="application" class="pls_parser.AnalyzePLSCoverageSpaceDB"/>
+<jsp:useBean id="apbbox" scope="application" class="db.query.AnalyzePLSCoverageSpaceDB"/>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
 <script>
 

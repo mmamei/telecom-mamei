@@ -1,4 +1,4 @@
-package pls_parser;
+package db.query;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
