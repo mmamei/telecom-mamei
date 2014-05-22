@@ -19,7 +19,7 @@ public class EventFilesFinder {
 	
 	
 	private SimpleDateFormat F1 = new SimpleDateFormat("yyyy-MM-dd-hh");
-	private SimpleDateFormat F2 = new SimpleDateFormat("yyyyMMdd",Locale.US);
+	private SimpleDateFormat F2 = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
 	
 	private Map<String,RegionMap> maps;
 	private Map<String,List<String>> mapt;
@@ -73,9 +73,7 @@ public class EventFilesFinder {
 			}
 			
 			// check temporal constraints
-			System.out.println(dir);			
-			List<String> dmap = mapt.get(dir.substring("file_".length()));
-			
+			List<String> dmap = mapt.get(dir);
 			if(dmap.contains(sday) && dmap.contains(eday))
 				return dir;
 			
@@ -89,8 +87,9 @@ public class EventFilesFinder {
 	
 	
 	public static void main(String[] args) {
+		
 		EventFilesFinder eff = new EventFilesFinder();
-		String dir = eff.find("2014-03-10","4","2014-03-10","7",12.3248,45.4395,12.3248,45.4395);
+		String dir = eff.find("2014-03-10","4","2014-03-10","7",11.2477,43.7629,11.2491,43.7620);
 		System.out.println(dir);
 	}
 }
