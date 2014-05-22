@@ -148,24 +148,30 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
 	public String getJSMap(Map<String,RegionMap> map) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("var citymap = {};\n");
 		
+		
+		sb.append("var heatmaps = new Array();\n");
+	
+		
+		int i = 0;
 		for(String name: map.keySet()) {
 			RegionMap rm = map.get(name);
 			if(rm.getNumRegions() > 0) {
-				sb.append("citymap['"+name+"'] = new Array();\n");
-				System.out.println(rm.getName());
-				//nm = NetworkMapFactory.getNetworkMap(rm.getName());
-				int i = 0;
+				
+				sb.append("data_"+name+" = [\n");
+				           
+				
 				for(RegionI r: rm.getRegions()) {
-					String[] x = r.getName().split(",");
-					double lat = Double.parseDouble(x[0]);
-					double lon = Double.parseDouble(x[1]);
-					double radius = Double.parseDouble(x[2]);
-					sb.append("citymap['"+name+"']["+i+"] = {center: new google.maps.LatLng("+lat+", "+lon+"),radius: "+radius+"};\n");
-					i++;
-					if(i >= 100) break;
+					double lat = r.getLatLon()[0];
+					double lon = r.getLatLon()[1];
+					sb.append("new google.maps.LatLng("+lat+", "+lon+"),\n");
 				}
+				sb.append("];\n");
+				
+				String color = Colors.RANDOM_COLORS_RGBA[i%Colors.RANDOM_COLORS_RGBA.length];
+				
+				sb.append("heatmaps["+i+"] = new google.maps.visualization.HeatmapLayer({data: new google.maps.MVCArray(data_"+name+"),radius:30,gradient: ['rgba(255, 255, 255, 0)','"+color+"']});\n");
+				i++;
 			}
 		}
 		return sb.toString();
