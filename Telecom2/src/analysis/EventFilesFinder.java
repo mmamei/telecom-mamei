@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import pls_parser.AnalyzePLSCoverageSpace;
-import pls_parser.AnalyzePLSCoverageTime;
 import region.RegionMap;
 import utils.Logger;
+import db.query.AnalyzePLSCoverageTime;
 
 /*
  * This class identifies the proper PLS folder (if any) to process the event
