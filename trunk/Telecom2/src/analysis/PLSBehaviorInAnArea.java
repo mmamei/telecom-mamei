@@ -15,7 +15,6 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import pls_parser.PLSEventsAroundAPlacemark;
-import pls_parser.PLSEventsAroundAPlacemarkDB;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
@@ -23,6 +22,7 @@ import utils.FileUtils;
 import utils.Logger;
 import utils.StatsUtils;
 import visual.java.PLSPlotter;
+import db.query.PLSEventsAroundAPlacemarkDB;
 
 public class PLSBehaviorInAnArea {
 	
