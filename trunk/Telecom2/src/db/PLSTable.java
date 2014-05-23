@@ -87,7 +87,7 @@ public class PLSTable {
 	}
 	
 	
-	private static void organizeFilesByDay(File dir, Map<String,List<File>> map) {
+	static void organizeFilesByDay(File dir, Map<String,List<File>> map) {
 		File[] items = dir.listFiles();
 		for(int i=0; i<items.length;i++){
 			File item = items[i];
