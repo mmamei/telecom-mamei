@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.Calendar;
 import java.util.Random;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -108,6 +109,75 @@ public class StatsUtils {
 		for(int i=0; i<x.length;i++)
 			y[i] = x[i];
 		return y;
+	}
+	
+	
+
+	public static double[] getZH(DescriptiveStatistics stat, Calendar startTime) {
+		
+		DescriptiveStatistics[] hstats = new DescriptiveStatistics[24];
+		for(int i=0; i<hstats.length;i++)
+			hstats[i] = new DescriptiveStatistics();
+		
+		
+		Calendar cal = (Calendar)startTime.clone();
+		double[] vals = stat.getValues();
+		for(int i=0; i<vals.length;i++) {
+				hstats[cal.get(Calendar.HOUR_OF_DAY)].addValue(vals[i]);
+			cal.add(Calendar.HOUR_OF_DAY, 1);
+		}
+		
+		double[] hmeans = new double[24];
+		double[] hsigmas = new double[24];
+		
+		for(int i=0; i<hstats.length;i++) {
+			hmeans[i] = hstats[i].getMean();
+			hsigmas[i] = hstats[i].getStandardDeviation();
+		}
+		
+		
+		double[] z = stat.getValues();
+		
+		
+		cal = (Calendar)startTime.clone();
+		for(int i=0; i<vals.length;i++) {
+			
+			if( hsigmas[cal.get(Calendar.HOUR_OF_DAY)] == 0)
+				z[i] = 0;
+			else
+				z[i] = (z[i] - hmeans[cal.get(Calendar.HOUR_OF_DAY)]) / hsigmas[cal.get(Calendar.HOUR_OF_DAY)];
+			cal.add(Calendar.HOUR_OF_DAY, 1);
+		}
+		
+		
+		for(int i=0; i<z.length;i++) {
+			if(z[i] < 0) z[i] = 0;
+		}
+		return z;
+	}
+	
+	
+
+	
+	public static double[] getZ(DescriptiveStatistics stat, Calendar startTime) {
+		
+		DescriptiveStatistics stat2 = new DescriptiveStatistics();
+		Calendar cal = (Calendar)startTime.clone();
+		double[] vals = stat.getValues();
+		for(int i=0; i<vals.length;i++) {
+			if(cal.get(Calendar.HOUR_OF_DAY) > 10 && vals[i] > 0)
+				stat2.addValue(vals[i]);
+			cal.add(Calendar.HOUR_OF_DAY, 1);
+		}
+		
+		double mean = stat2.getMean();
+		double sigma = stat2.getStandardDeviation();
+		double[] z = stat.getValues();
+		for(int i=0; i<z.length;i++) {
+			z[i] = (z[i] - mean) / sigma;
+			if(z[i] < 0) z[i] = 0;
+		}
+		return z;
 	}
 	
 }
