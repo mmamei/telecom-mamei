@@ -3,11 +3,10 @@ package analysis;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import db.query.AnalyzePLSCoverageTime;
 import pls_parser.AnalyzePLSCoverageSpace;
+import pls_parser.AnalyzePLSCoverageTime;
 import region.RegionMap;
 import utils.Logger;
 
@@ -19,7 +18,7 @@ public class EventFilesFinder {
 	
 	
 	private SimpleDateFormat F1 = new SimpleDateFormat("yyyy-MM-dd-hh");
-	private SimpleDateFormat F2 = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
+	private SimpleDateFormat F2 = new SimpleDateFormat("yyyyMMdd");
 	
 	private Map<String,RegionMap> maps;
 	private Map<String,List<String>> mapt;
@@ -61,6 +60,7 @@ public class EventFilesFinder {
 				
 				//System.out.println("testing "+r+", ("+clon+","+clat+")");
 				
+				
 				if(maps.get(r).get(clon, clat) != null) {
 					if(dir==null) dir = r;
 					else Logger.logln("Warning: Multiple matching regions!");
@@ -68,14 +68,18 @@ public class EventFilesFinder {
 			}
 			
 			if(dir == null) {
-				//Logger.logln("Selected event is out of PLS coverage area in space");
+				Logger.logln("Selected event is out of PLS coverage area in space");
 				return null;
 			}
 			
+			
+			
 			// check temporal constraints
 			List<String> dmap = mapt.get(dir);
+			
+			
 			if(dmap.contains(sday) && dmap.contains(eday))
-				return dir;
+				return "file_"+dir;
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -89,7 +93,7 @@ public class EventFilesFinder {
 	public static void main(String[] args) {
 		
 		EventFilesFinder eff = new EventFilesFinder();
-		String dir = eff.find("2014-03-10","4","2014-03-10","7",11.2477,43.7629,11.2491,43.7620);
+		String dir = eff.find("2012-03-20","19","2012-03-20","23",7.641453,45.109536,7.641453,45.109536);
 		System.out.println(dir);
 	}
 }
