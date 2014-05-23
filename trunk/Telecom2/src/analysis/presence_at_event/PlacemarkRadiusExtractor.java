@@ -4,16 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -24,7 +20,9 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
+import utils.StatsUtils;
 import visual.java.GraphPlotter;
+import visual.java.PLSPlotter;
 import analysis.PLSBehaviorInAnArea;
 import analysis.PLSMap;
 
@@ -363,9 +361,9 @@ public class PlacemarkRadiusExtractor {
 			}
 			
 			DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
-			double[] z_usr_data =  PLSBehaviorInAnArea.getZ2(stats[1],plsmap.startTime);
+			double[] z_usr_data =  StatsUtils.getZH(stats[1],plsmap.startTime);
 			
-			if (PLOT) PLSBehaviorInAnArea.drawGraph(p.getName()+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevantEvents);
+			if (PLOT) PLSPlotter.drawGraph(p.getName()+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevantEvents);
 			Calendar cal = (Calendar)plsmap.startTime.clone();
 			
 			int h = 0;
