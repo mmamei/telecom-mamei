@@ -1,4 +1,4 @@
-package db.query;
+package dataset.db.query;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import pls_parser.BufferAnalyzer;
-import pls_parser.PLSParser;
 import region.Placemark;
 import region.RegionI;
 import region.RegionMap;
@@ -28,7 +26,9 @@ import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import analysis.PLSMap;
-import db.DBConnection;
+import dataset.db.DBConnection;
+import dataset.file.BufferAnalyzer;
+import dataset.file.PLSParser;
 
 public class PLSEventsAroundAPlacemarkDB {	
 
