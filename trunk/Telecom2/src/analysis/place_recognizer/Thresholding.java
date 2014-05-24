@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 import analysis.place_recognizer.weight_functions.Weights;
 import utils.FilterAndCounterUtils;
 
@@ -13,13 +13,13 @@ public class Thresholding {
 	
 	public static final String REF_NETWORK_CELLAC = "4044247943";
 	
-	public static List<PlsEvent> buildReferenceTower(List<PlsEvent> events, double[][] weights) {
-		ArrayList<PlsEvent> refEvents = new ArrayList<PlsEvent>();
+	public static List<PLSEvent> buildReferenceTower(List<PLSEvent> events, double[][] weights) {
+		ArrayList<PLSEvent> refEvents = new ArrayList<PLSEvent>();
 		
-		for(PlsEvent e: events) {
+		for(PLSEvent e: events) {
 			Calendar cal = e.getCalendar();
 			if(weights[cal.get(Calendar.DAY_OF_WEEK)-1][cal.get(Calendar.HOUR_OF_DAY)] > 0) {
-				refEvents.add(new PlsEvent(e.getUsername(),e.getIMSI(),REF_NETWORK_CELLAC,""+e.getTimeStamp()));
+				refEvents.add(new PLSEvent(e.getUsername(),e.getIMSI(),REF_NETWORK_CELLAC,""+e.getTimeStamp()));
 			}
 		}
 		return refEvents;

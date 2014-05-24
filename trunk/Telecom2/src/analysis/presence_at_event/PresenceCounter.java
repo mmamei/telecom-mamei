@@ -24,7 +24,7 @@ import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 
 public class PresenceCounter {
 	
@@ -151,8 +151,8 @@ public class PresenceCounter {
 		CityEvent e2 = new CityEvent(event.spot.clone(),start,end,event.head_count);
 		e2.spot.changeRadius(o_radius);
 		
-		Map<String,List<PlsEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
-		Map<String,List<PlsEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
+		Map<String,List<PLSEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
+		Map<String,List<PLSEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
 		
 
 		double prob = 0;
@@ -216,19 +216,19 @@ public class PresenceCounter {
 	}
 	
 	
-	public static Map<String,List<PlsEvent>> getUsersPLS(File file, Set<String> users) throws Exception {
+	public static Map<String,List<PLSEvent>> getUsersPLS(File file, Set<String> users) throws Exception {
 		
-		Map<String,List<PlsEvent>> usr_pls = new HashMap<String,List<PlsEvent>>();
+		Map<String,List<PLSEvent>> usr_pls = new HashMap<String,List<PLSEvent>>();
 		for(String u: users)
-			usr_pls.put(u, new ArrayList<PlsEvent>());
+			usr_pls.put(u, new ArrayList<PLSEvent>());
 		
 		String line;
 		BufferedReader in = new BufferedReader(new FileReader(file));
 		while((line = in.readLine()) != null){
 			String[] splitted = line.split(",");
-			List<PlsEvent> list = usr_pls.get(splitted[0]);
+			List<PLSEvent> list = usr_pls.get(splitted[0]);
 			try{
-			if(list!=null) list.add(new PlsEvent(splitted[0],"imsi",splitted[3],splitted[1]));
+			if(list!=null) list.add(new PLSEvent(splitted[0],"imsi",splitted[3],splitted[1]));
 			}catch(NumberFormatException e) {
 				System.err.println(line);
 				continue;
@@ -240,7 +240,7 @@ public class PresenceCounter {
 	
 	
 	
-	public static double fractionOfTimeInWhichTheUserWasAtTheEvent(List<PlsEvent> plsEvents, CityEvent event, CityEvent exclude, boolean verbose) {
+	public static double fractionOfTimeInWhichTheUserWasAtTheEvent(List<PLSEvent> plsEvents, CityEvent event, CityEvent exclude, boolean verbose) {
 		Calendar first = null;
 		Calendar last = null;
 		boolean inEvent = false;
@@ -250,7 +250,7 @@ public class PresenceCounter {
 			System.err.println("EXCLUDE = "+exclude);
 		}
 		
-		for(PlsEvent pe: plsEvents) {	
+		for(PLSEvent pe: plsEvents) {	
 			
 			Calendar cal = pe.getCalendar();
 			
@@ -319,7 +319,7 @@ public class PresenceCounter {
 	}
 	
 	
-	public static int getAvgInterEventTime(List<PlsEvent> plsEvents, CityEvent e) {
+	public static int getAvgInterEventTime(List<PLSEvent> plsEvents, CityEvent e) {
 		
 		Calendar startTime = e.st;
 		Calendar endTime = e.et;

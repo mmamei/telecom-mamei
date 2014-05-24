@@ -3,7 +3,7 @@ package analysis.place_recognizer.weight_functions;
 import java.util.Calendar;
 
 import utils.FilterAndCounterUtils;
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 import analysis.place_recognizer.Cluster;
 
 public class WeightOnDiversity implements WeightFunction {
@@ -25,7 +25,7 @@ public class WeightOnDiversity implements WeightFunction {
 		
 		double[] prob = new double[7];
 		double den = 0;
-		for(PlsEvent e: c.getEvents()){
+		for(PLSEvent e: c.getEvents()){
 			Calendar cal = e.getCalendar();
 			double w = weights[cal.get(Calendar.DAY_OF_WEEK)-1][cal.get(Calendar.HOUR_OF_DAY)];
 			if(w >= 0) {

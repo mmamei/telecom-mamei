@@ -21,7 +21,7 @@ import region.RegionMap;
 import region.network.NetworkMapFactory;
 import utils.FileUtils;
 import visual.kml.KML;
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 
 
 
@@ -33,8 +33,8 @@ public class PlaceRecognizerLogger {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/eventsXcluster.txt")));	
 		for(int k : clusters.keySet()) {
 			out.println("Cluster "+k+":");
-			List<PlsEvent> events = clusters.get(k).getEvents();
-			for(PlsEvent e: events) {
+			List<PLSEvent> events = clusters.get(k).getEvents();
+			for(PLSEvent e: events) {
 				out.println("\t"+e);
 			}
 		}
@@ -167,15 +167,15 @@ public class PlaceRecognizerLogger {
 				
 				if(k == -1) continue;
 				
-				List<PlsEvent> clusterEvents = clusters.get(k).getEvents();
+				List<PLSEvent> clusterEvents = clusters.get(k).getEvents();
 				
 				kml.printFolder(outKml, "cluster "+k);
 				
-				Map<String, List<PlsEvent>> clusterByCells = new HashMap<String, List<PlsEvent>>();
-				for(PlsEvent e: clusterEvents){
-					List<PlsEvent> l = clusterByCells.get(e.getCellac());
+				Map<String, List<PLSEvent>> clusterByCells = new HashMap<String, List<PLSEvent>>();
+				for(PLSEvent e: clusterEvents){
+					List<PLSEvent> l = clusterByCells.get(e.getCellac());
 					if(l == null) {
-						l = new ArrayList<PlsEvent>();
+						l = new ArrayList<PLSEvent>();
 						clusterByCells.put(e.getCellac(), l);
 					}
 					l.add(e);
@@ -227,7 +227,7 @@ public class PlaceRecognizerLogger {
 	public static final int WIDTH = 200;
 	public static final int HEIGHT = 100;
 	
-	public static String getDescription(List<PlsEvent> cluster, List<PlsEvent> cell) {
+	public static String getDescription(List<PLSEvent> cluster, List<PLSEvent> cell) {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("<table>");
@@ -261,10 +261,10 @@ public class PlaceRecognizerLogger {
 		
 	}
 	
-	public static String getHourDist(List<PlsEvent> x) {
+	public static String getHourDist(List<PLSEvent> x) {
 		int[] counter = new int[24];
 		Calendar c = new GregorianCalendar();
-		for(PlsEvent e: x){
+		for(PLSEvent e: x){
 			c.setTimeInMillis(e.getTimeStamp());
 			//int day_of_week = c.get(Calendar.DAY_OF_WEEK)-1;
 			//int day = c.get(Calendar.DAY_OF_MONTH);
@@ -284,10 +284,10 @@ public class PlaceRecognizerLogger {
 		return "<img src=\"http://chart.googleapis.com/chart?chxl=0:|0|6|12|18|23&chxp=0,0,6,12,18,23&chxr=0,0,23|1,0,"+max+"&chxt=x,y&chbh=a&chs="+WIDTH+"x"+HEIGHT+"&cht=bvs&chco=76A4FB&chds=0,"+max+"&chd=t:"+data+"\" width=\""+WIDTH+"\" height=\""+HEIGHT+"\" alt=\"\" />";
 	}
 	
-	public static String getDayDist(List<PlsEvent> x) {
+	public static String getDayDist(List<PLSEvent> x) {
 		int[] counter = new int[7];
 		Calendar c = new GregorianCalendar();
-		for(PlsEvent e: x){
+		for(PLSEvent e: x){
 			c.setTimeInMillis(e.getTimeStamp());
 			int day_of_week = c.get(Calendar.DAY_OF_WEEK)-1;
 			//int day = c.get(Calendar.DAY_OF_MONTH);

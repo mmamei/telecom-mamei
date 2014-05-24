@@ -20,7 +20,7 @@ import region.RegionMap;
 import region.network.NetworkMapFactory;
 import utils.Config;
 
-public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
+public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 	
 	private static RegionMap NM = null;
 	private String username;
@@ -28,7 +28,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	private String cellac;
 	private long timestamp;
 	
-	public PlsEvent(String username, String imsi, String cellac, String timestamp){
+	public PLSEvent(String username, String imsi, String cellac, String timestamp){
 		this.username = username;
 		this.imsi = imsi;
 		this.cellac = cellac;
@@ -36,15 +36,15 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 		if(NM == null) NM = NetworkMapFactory.getNetworkMap(getCalendar());
 	}
 	
-	public PlsEvent clone(){
+	public PLSEvent clone(){
 		try {
-			return (PlsEvent)super.clone();
+			return (PLSEvent)super.clone();
 		} catch (CloneNotSupportedException e) {
 			return null;
 		}
 	}
 	
-	public int compareTo(PlsEvent e) {
+	public int compareTo(PLSEvent e) {
 		if((timestamp - e.getTimeStamp()) > 0)
 			return 1;
 		if((timestamp - e.getTimeStamp()) < 0)
@@ -55,7 +55,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	}
 	
 	public boolean equals(Object e){
-		PlsEvent o = (PlsEvent) e;
+		PLSEvent o = (PLSEvent) e;
 		return (o.getCellac().equals(cellac) && o.getIMSI().equals(imsi) && o.timestamp==timestamp && o.getUsername().equals(username));
 	}
 	
@@ -108,17 +108,17 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 		return username+","+getCalendar().getTimeInMillis()+","+imsi+","+cellac+","+cn;
 	}
 	
-	public static List<PlsEvent> readEvents(File f) throws Exception {
+	public static List<PLSEvent> readEvents(File f) throws Exception {
 		return readEvents(f,Config.getInstance().pls_start_time,Config.getInstance().pls_end_time);
 		
 	}
 	
-	public static List<PlsEvent> readEvents(File base_f, Calendar start, Calendar end) {
+	public static List<PLSEvent> readEvents(File base_f, Calendar start, Calendar end) {
 		File[] files = null;
 		if(base_f.isFile()) files = new File[]{base_f};
 		if(base_f.isDirectory()) files = base_f.listFiles();
 		
-		List<PlsEvent> events = new ArrayList<PlsEvent>();
+		List<PLSEvent> events = new ArrayList<PLSEvent>();
 		Calendar cal = new GregorianCalendar();
 		for(File fx: files) {
 			String line = null;
@@ -132,7 +132,7 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 						if(splitted[3].equals("null")) continue;
 						cal.setTimeInMillis(Long.parseLong(splitted[1]));
 						if(start.before(cal) && end.after(cal)) {
-							PlsEvent e = new PlsEvent(splitted[0], splitted[2], splitted[3], splitted[1]);
+							PLSEvent e = new PLSEvent(splitted[0], splitted[2], splitted[3], splitted[1]);
 							events.add(e);
 						}
 					}
@@ -151,9 +151,9 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	}
 	
 	
-	public static int countDays(List<PlsEvent> pe) {
+	public static int countDays(List<PLSEvent> pe) {
 		Set<String> days = new HashSet<String>();
-		for(PlsEvent e: pe) {
+		for(PLSEvent e: pe) {
 			int y = e.getCalendar().get(Calendar.YEAR);
 			int m = e.getCalendar().get(Calendar.MONTH);
 			int d = e.getCalendar().get(Calendar.DAY_OF_MONTH);
@@ -165,15 +165,15 @@ public class PlsEvent implements Comparable<PlsEvent>, Cloneable, Serializable {
 	
 	
 	
-	public static List<PlsEvent> clone(List<PlsEvent> pe) {
-		List<PlsEvent> c = new ArrayList<PlsEvent>();
-		for(PlsEvent e: pe)
+	public static List<PLSEvent> clone(List<PLSEvent> pe) {
+		List<PLSEvent> c = new ArrayList<PLSEvent>();
+		for(PLSEvent e: pe)
 			c.add(e.clone());
 		return c;
 	}
 
 	
-	public double spatialDistance(PlsEvent x) {		
+	public double spatialDistance(PLSEvent x) {		
 		return LatLonUtils.getHaversineDistance(NM.getRegion(cellac).getCenterPoint(),NM.getRegion(x.cellac).getCenterPoint());
 	}
 	

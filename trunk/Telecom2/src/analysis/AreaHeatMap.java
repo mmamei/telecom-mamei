@@ -40,10 +40,10 @@ public class AreaHeatMap {
 		
 		CityEvent cevent = CityEvent.expand(ce,10,10000);
 		
-		List<PlsEvent> events = PlsEvent.readEvents(new File(dir),cevent.st,cevent.et);
+		List<PLSEvent> events = PLSEvent.readEvents(new File(dir),cevent.st,cevent.et);
 		Map<String,Map<String,Double>> hms = new TreeMap<String,Map<String,Double>>();
 		
-		for(PlsEvent e: events) {
+		for(PLSEvent e: events) {
 			
 			if(!cevent.spot.contains(e.getCellac())) continue;
 			

@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import utils.FilterAndCounterUtils;
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 import analysis.place_recognizer.Cluster;
 
 
@@ -21,9 +21,9 @@ public class WeightOnTime implements WeightFunction {
 	public void weight(Cluster c) {
 				
 		double w = 0;
-		List<PlsEvent> filtered = FilterAndCounterUtils.filterMultipleEventsInTheSameHour(c.getEvents());
+		List<PLSEvent> filtered = FilterAndCounterUtils.filterMultipleEventsInTheSameHour(c.getEvents());
 		
-		for(PlsEvent e: filtered) {
+		for(PLSEvent e: filtered) {
 			Calendar cal = e.getCalendar();
 			int day_of_week = cal.get(Calendar.DAY_OF_WEEK) - 1;
 			int hour_of_day = cal.get(Calendar.HOUR_OF_DAY);
