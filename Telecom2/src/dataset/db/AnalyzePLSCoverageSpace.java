@@ -20,7 +20,7 @@ import dataset.db.insert.NetworkTable;
 
 
 
-public class AnalyzePLSCoverageSpaceDB {
+public class AnalyzePLSCoverageSpace {
 	
 	public static final SimpleDateFormat F = new SimpleDateFormat("yyyyMMdd");
 	private int MAX_TABLES_PER_REGION = 3; // thus days
@@ -147,7 +147,7 @@ public class AnalyzePLSCoverageSpaceDB {
 	
 	public static void main(String[] args) throws Exception {
 		
-		AnalyzePLSCoverageSpaceDB ba = new AnalyzePLSCoverageSpaceDB();
+		AnalyzePLSCoverageSpace ba = new AnalyzePLSCoverageSpace();
 		
 		Map<String,RegionMap> map = ba.getPlsCoverage();
 	
