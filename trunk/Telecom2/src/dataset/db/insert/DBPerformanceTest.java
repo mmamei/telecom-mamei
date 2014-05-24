@@ -1,4 +1,4 @@
-package dataset.db;
+package dataset.db.insert;
 
 import java.io.BufferedReader;
 import java.io.File;

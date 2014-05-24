@@ -11,12 +11,11 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import dataset.db.query.AnalyzePLSCoverageTime;
-import analysis.EventFilesFinder;
 import utils.Config;
+import analysis.EventFilesFinder;
+import dataset.db.AnalyzePLSCoverageTime;
 
 
 public class CityEvent {
