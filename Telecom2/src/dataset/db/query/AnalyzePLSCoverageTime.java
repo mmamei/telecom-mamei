@@ -1,4 +1,4 @@
-package db.query;
+package dataset.db.query;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import utils.Config;
-import db.DBConnection;
+import dataset.db.DBConnection;
 
 public class AnalyzePLSCoverageTime {
 	

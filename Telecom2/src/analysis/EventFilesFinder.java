@@ -5,10 +5,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import pls_parser.AnalyzePLSCoverageSpace;
 import region.RegionMap;
 import utils.Logger;
-import db.query.AnalyzePLSCoverageTime;
+import dataset.db.query.AnalyzePLSCoverageTime;
+import dataset.file.AnalyzePLSCoverageSpace;
 
 /*
  * This class identifies the proper PLS folder (if any) to process the event

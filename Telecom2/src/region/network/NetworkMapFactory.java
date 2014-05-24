@@ -8,7 +8,7 @@ import java.util.Map;
 
 import region.RegionMap;
 import utils.Logger;
-import db.NetworkTable;
+import dataset.db.NetworkTable;
 
 public class NetworkMapFactory {
 	private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");

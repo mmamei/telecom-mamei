@@ -1,4 +1,4 @@
-package db;
+package dataset.db;
 
 import java.io.File;
 import java.sql.Connection;
@@ -52,13 +52,9 @@ public class DBConnection {
 		Statement s = getStatement();
 		
 		String[] tables2Drop = new String[]{
-				"pls_piem_20130709",
-				"pls_piem_20130705",
-				"pls_piem_20140227",
-				"pls_piem_20140208",
-				"pls_piem_20120324",
-				"pls_piem_20140205",
-				"pls_piem_20140206"
+				"pls_piem_20140215",
+				"pls_piem_20140213"
+
 		};
 		
 		

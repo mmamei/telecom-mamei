@@ -1,4 +1,4 @@
-package db.query;
+package dataset.db.query;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import db.DBConnection;
-import db.NetworkTable;
+import dataset.db.DBConnection;
+import dataset.db.NetworkTable;
 import region.Region;
 import region.RegionI;
 import region.RegionMap;
