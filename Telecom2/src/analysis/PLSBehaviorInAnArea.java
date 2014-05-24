@@ -21,7 +21,7 @@ import utils.FileUtils;
 import utils.Logger;
 import utils.StatsUtils;
 import visual.java.PLSPlotter;
-import dataset.db.query.PLSEventsAroundAPlacemarkDB;
+import dataset.db.PLSEventsAroundAPlacemarkDB;
 import dataset.file.PLSEventsAroundAPlacemark;
 
 public class PLSBehaviorInAnArea {

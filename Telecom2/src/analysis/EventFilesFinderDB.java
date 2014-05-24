@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import dataset.db.query.AnalyzePLSCoverageTime;
-import dataset.file.AnalyzePLSCoverageSpace;
 import region.RegionMap;
 import utils.Logger;
+import dataset.db.AnalyzePLSCoverageTime;
+import dataset.file.AnalyzePLSCoverageSpace;
 
 /*
  * This class identifies the proper PLS folder (if any) to process the event

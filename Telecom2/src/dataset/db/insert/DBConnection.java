@@ -1,4 +1,4 @@
-package dataset.db;
+package dataset.db.insert;
 
 import java.io.File;
 import java.sql.Connection;

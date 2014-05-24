@@ -1,34 +1,18 @@
-package dataset.db.query;
+package dataset.db;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import region.Placemark;
-import region.RegionI;
-import region.RegionMap;
-import region.network.NetworkMapFactory;
 import utils.Config;
-import utils.FileUtils;
-import utils.Logger;
 import analysis.PLSMap;
-import dataset.db.DBConnection;
-import dataset.file.BufferAnalyzer;
-import dataset.file.PLSParser;
+import dataset.db.insert.DBConnection;
 
 public class PLSEventsAroundAPlacemarkDB {	
 

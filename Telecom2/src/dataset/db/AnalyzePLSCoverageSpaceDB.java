@@ -1,32 +1,22 @@
-package dataset.db.query;
+package dataset.db;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import dataset.db.DBConnection;
-import dataset.db.NetworkTable;
-import region.Region;
 import region.RegionI;
 import region.RegionMap;
 import region.network.NetworkCell;
-import region.network.NetworkMapFactory;
 import utils.Colors;
-import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
-import utils.GeomUtils;
 import utils.Logger;
-import visual.kml.KML;
+import dataset.db.insert.DBConnection;
+import dataset.db.insert.NetworkTable;
 
 
 

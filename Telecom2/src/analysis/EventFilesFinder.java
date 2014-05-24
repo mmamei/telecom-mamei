@@ -7,7 +7,7 @@ import java.util.Map;
 
 import region.RegionMap;
 import utils.Logger;
-import dataset.db.query.AnalyzePLSCoverageTime;
+import dataset.db.AnalyzePLSCoverageTime;
 import dataset.file.AnalyzePLSCoverageSpace;
 
 /*

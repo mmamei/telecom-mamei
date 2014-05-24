@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -15,15 +14,14 @@ import java.util.Set;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import dataset.db.query.AnalyzePLSCoverageTime;
-import dataset.file.PLSParser;
-import dataset.file.UsersAroundAnEvent;
 import region.Placemark;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
 import analysis.EventFilesFinder;
+import dataset.db.AnalyzePLSCoverageTime;
+import dataset.file.UsersAroundAnEvent;
 
 public class UserFinder {
 	
