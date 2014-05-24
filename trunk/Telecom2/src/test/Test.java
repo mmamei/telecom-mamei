@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.gps.utils.LatLonPoint;
-import org.junit.Ignore;
 
 import region.Placemark;
-import analysis.PLSBehaviorInAnArea;
+import analysis.PLSTimeCounter;
 import analysis.place_recognizer.PlaceRecognizer;
 import analysis.presence_at_event.RunAll;
 
@@ -38,7 +37,7 @@ public class Test {
 	
 	@org.junit.Test
 	public void testPLSBehaviorInAnArea() {
-		PLSBehaviorInAnArea pbia = new PLSBehaviorInAnArea();
+		PLSTimeCounter pbia = new PLSTimeCounter();
 		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672);
 		String js = pbia.getJSMap(plsdata);
 		String res = "var data = google.visualization.arrayToDataTable([['Day', 'PLS'],['10-Mon:17',  670.0],['10-Mon:18',  3608.0],['10-Mon:19',  3267.0],['10-Mon:20',  2697.0],['10-Mon:21',  2249.0],['10-Mon:22',  2030.0],['10-Mon:23',  1740.0],['11-Tue:0',  1463.0]]);";
