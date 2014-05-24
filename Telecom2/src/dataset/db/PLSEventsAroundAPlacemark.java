@@ -14,10 +14,17 @@ import utils.Config;
 import analysis.PLSMap;
 import dataset.db.insert.DBConnection;
 
-public class PLSEventsAroundAPlacemarkDB {	
+public class PLSEventsAroundAPlacemark {	
 
 	private static SimpleDateFormat F2 = new SimpleDateFormat("yyyyMMdd");
-	public static PLSMap processdb(Placemark p) throws Exception {
+	
+	
+	
+	public static PLSMap getPLSMap(String file, Placemark within) {
+		return null;
+	}
+	
+	public static PLSMap process(Placemark p) throws Exception {
 		
 		Set<String> cells = p.cellsAround;
 		StringBuffer sb = new StringBuffer();

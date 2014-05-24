@@ -13,17 +13,17 @@ import org.gps.utils.LatLonUtils;
 import region.RegionI;
 import region.RegionMap;
 import region.network.NetworkMapFactory;
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 
 
 public class Cluster implements Serializable {
-	private List<PlsEvent> events;
+	private List<PLSEvent> events;
 	private Map<String,Double> weights;
 	
 	private static RegionMap NM = null;
 	
 	public Cluster() {
-		events = new ArrayList<PlsEvent>();
+		events = new ArrayList<PLSEvent>();
 		weights = new HashMap<String,Double>();
 	}
 	
@@ -37,12 +37,12 @@ public class Cluster implements Serializable {
 		if(NM == null) NM = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(c.getEvents().get(0).getTime()));
 	}
 	
-	public void add(PlsEvent e) {
+	public void add(PLSEvent e) {
 		events.add(e);
 		if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
 	} 
 	
-	public List<PlsEvent> getEvents() {
+	public List<PLSEvent> getEvents() {
 		return events;
 	}
 	
@@ -61,7 +61,7 @@ public class Cluster implements Serializable {
 		return weight;
 	}
 	
-	public double w(PlsEvent e, double[][] weights) {
+	public double w(PLSEvent e, double[][] weights) {
 		Calendar c = e.getCalendar();
 		int day = c.get(Calendar.DAY_OF_WEEK) - 1;
 		int h = c.get(Calendar.HOUR_OF_DAY);
@@ -70,7 +70,7 @@ public class Cluster implements Serializable {
 	
 	public double w(double[][] weights) {
 		double w = 0;
-		for(PlsEvent e: events)
+		for(PLSEvent e: events)
 			w += w(e,weights);
 		return w;
 	}
@@ -78,7 +78,7 @@ public class Cluster implements Serializable {
 	public double getAvgCellRadius(double[][] weights) {
 		double tot_w = w(weights);
 		double r = 0;
-		for(PlsEvent e: events) {
+		for(PLSEvent e: events) {
 			if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
 			RegionI x = NM.getRegion(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
@@ -93,7 +93,7 @@ public class Cluster implements Serializable {
 		double aLon = 0;
 		
 		double tot_w = w(weights);
-		for(PlsEvent e: events) {
+		for(PLSEvent e: events) {
 			if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
 			RegionI x = NM.getRegion(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
@@ -112,7 +112,7 @@ public class Cluster implements Serializable {
 	public double calcWidth() {
 		double maxLat=0, maxLon=0;
 		double minLat = Double.MAX_VALUE, minLon = Double.MAX_VALUE;
-		for(PlsEvent e: events){
+		for(PLSEvent e: events){
 			if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
 			RegionI cell = NM.getRegion(String.valueOf(e.getCellac()));
 			maxLat = Math.max(maxLat, cell.getLatLon()[0]);

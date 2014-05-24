@@ -13,18 +13,18 @@ import utils.Logger;
 public class UserTrace {
 	
 	private String username;
-	private List<PlsEvent> events;
+	private List<PLSEvent> events;
 	
 	public UserTrace(String username){
 		this.username = username;
-		events = new ArrayList<PlsEvent>();
+		events = new ArrayList<PLSEvent>();
 	}
 	
 	public void addEvent(String imsi, String cellac, String timestamp){
-		events.add(new PlsEvent(username, imsi, cellac, timestamp));
+		events.add(new PLSEvent(username, imsi, cellac, timestamp));
 	}
 	
-	public List<PlsEvent> getEvents(){
+	public List<PLSEvent> getEvents(){
 		return events;
 	}
 	
@@ -45,7 +45,7 @@ public class UserTrace {
 		
 		Logger.logln("Saving "+folder+username+".csv");
 		PrintWriter out = new PrintWriter(new FileWriter(folder+username+".csv"));
-		Iterator<PlsEvent> i = events.iterator();
+		Iterator<PLSEvent> i = events.iterator();
 		while(i.hasNext())
 			out.println(i.next().toCSV());
 		out.close();

@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 
 public class CopyAndSerializationUtils {
-	public static List<PlsEvent> clone(List<PlsEvent> events) {
-		List<PlsEvent> result = new ArrayList<PlsEvent>();
-		for(PlsEvent e: events)
+	public static List<PLSEvent> clone(List<PLSEvent> events) {
+		List<PLSEvent> result = new ArrayList<PLSEvent>();
+		for(PLSEvent e: events)
 			result.add(e.clone());
 		return result;
 	}

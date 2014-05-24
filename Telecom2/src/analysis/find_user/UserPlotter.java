@@ -12,7 +12,7 @@ import utils.Config;
 import utils.FileUtils;
 import visual.kml.KMLPath;
 import analysis.EventFilesFinder;
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 import analysis.UserTrace;
 
 public class UserPlotter {

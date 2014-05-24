@@ -14,7 +14,7 @@ import org.gps.utils.LatLonUtils;
 
 import utils.CopyAndSerializationUtils;
 import utils.Sort;
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 import analysis.place_recognizer.Cluster;
 import analysis.place_recognizer.weight_functions.WeightOnTime;
 
@@ -42,11 +42,11 @@ public class AgglomerativeClusterer implements Clusterer {
 	
 	
 	private HashMap<Integer, Cluster> clusters;
-	public HashMap<Integer, Cluster> buildCluster(List<PlsEvent> events) {
+	public HashMap<Integer, Cluster> buildCluster(List<PLSEvent> events) {
 		
 		clusters = new HashMap<Integer, Cluster>();
 		
-		List<PlsEvent> sorted = sortByWeight(events);
+		List<PLSEvent> sorted = sortByWeight(events);
 		
 		for(int i=0; i<sorted.size(); i++) {
 			Cluster c = new Cluster();
@@ -148,21 +148,21 @@ public class AgglomerativeClusterer implements Clusterer {
 	}
 	
 	
-	public List<PlsEvent> sortByWeight(List<PlsEvent> events) {
+	public List<PLSEvent> sortByWeight(List<PLSEvent> events) {
 		Collections.sort(events, new EventByWeightComparator(weights));
 		return events;
 	}
 }
 
 
-class EventByWeightComparator implements Comparator<PlsEvent> {
+class EventByWeightComparator implements Comparator<PLSEvent> {
 	private double[][] weights;
 	
 	public EventByWeightComparator(double[][] weights) {
 		this.weights = weights;
 	}
 	
-	public int compare(PlsEvent e1, PlsEvent e2) {
+	public int compare(PLSEvent e1, PLSEvent e2) {
 		if(w(e1) > w(e2))
 			return 1;
 		if(w(e1) < w(e2))
@@ -170,7 +170,7 @@ class EventByWeightComparator implements Comparator<PlsEvent> {
 		return 0;
 	}
 	
-	private double w(PlsEvent e) {
+	private double w(PLSEvent e) {
 		Calendar c = new GregorianCalendar();
 		c.setTimeInMillis(e.getTimeStamp());
 		int day = c.get(Calendar.DAY_OF_WEEK) - 1;

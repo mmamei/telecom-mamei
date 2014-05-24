@@ -20,7 +20,7 @@ import utils.FilterAndCounterUtils;
 import utils.Logger;
 import visual.kml.KMLPath;
 import analysis.EventFilesFinder;
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 import analysis.UserTrace;
 import analysis.place_recognizer.clustering.AgglomerativeClusterer;
 import analysis.place_recognizer.weight_functions.WeightFunction;
@@ -33,18 +33,18 @@ public class PlaceRecognizer {
 	
 	public static boolean VERBOSE = true;
 	
-	public static List<LatLonPoint> analyze(String username, String kind_of_place, List<PlsEvent> events, 
+	public static List<LatLonPoint> analyze(String username, String kind_of_place, List<PLSEvent> events, 
 			                   double alpha, double beta, double delta, double rwf) {
 		
 		
-		List<PlsEvent> workingset = CopyAndSerializationUtils.clone(events);
+		List<PLSEvent> workingset = CopyAndSerializationUtils.clone(events);
 				
 				
 		Logger.logln("Processing "+username.substring(0,5)+" "+kind_of_place);
 		
 		double[][] weights = Weights.get(kind_of_place);
 		
-		List<PlsEvent> refEvents = Thresholding.buildReferenceTower(workingset,weights);
+		List<PLSEvent> refEvents = Thresholding.buildReferenceTower(workingset,weights);
 		workingset.addAll(refEvents);
 		
 		
@@ -120,7 +120,7 @@ public class PlaceRecognizer {
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-0"));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-23"));
-			List<PlsEvent> events = UsersCSVCreator.process(user).getEvents(); 
+			List<PLSEvent> events = UsersCSVCreator.process(user).getEvents(); 
 			results = new HashMap<String, List<LatLonPoint>>();
 			PlaceRecognizerLogger.openKMLFile("G:/CODE/Telecom/web/kml/"+user+".kml");
 			for(String kind_of_place:KIND_OF_PLACES)

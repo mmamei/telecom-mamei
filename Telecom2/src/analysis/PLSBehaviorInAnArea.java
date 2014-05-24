@@ -21,8 +21,7 @@ import utils.FileUtils;
 import utils.Logger;
 import utils.StatsUtils;
 import visual.java.PLSPlotter;
-import dataset.db.PLSEventsAroundAPlacemarkDB;
-import dataset.file.PLSEventsAroundAPlacemark;
+import dataset.db.PLSEventsAroundAPlacemark;
 
 public class PLSBehaviorInAnArea {
 	
@@ -97,7 +96,7 @@ public class PLSBehaviorInAnArea {
 			PLSMap plsmap = PLSEventsAroundAPlacemark.getPLSMap(file,null);
 			(new File(file)).delete();
 			*/
-			PLSMap plsmap = PLSEventsAroundAPlacemarkDB.processdb(p);
+			PLSMap plsmap = PLSEventsAroundAPlacemark.process(p);
 			
 			DescriptiveStatistics[] stats = getStats(plsmap);
 			return new Object[]{plsmap.getDomain(),stats[1].getValues()}; // domain, user_stat		

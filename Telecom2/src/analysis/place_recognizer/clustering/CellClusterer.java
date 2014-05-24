@@ -3,7 +3,7 @@ package analysis.place_recognizer.clustering;
 import java.util.List;
 import java.util.HashMap;
 
-import analysis.PlsEvent;
+import analysis.PLSEvent;
 import analysis.place_recognizer.Cluster;
 
 /**
@@ -17,11 +17,11 @@ public class CellClusterer implements Clusterer {
 	public CellClusterer() {
 	}
 	
-	public HashMap<Integer, Cluster> buildCluster(List<PlsEvent> events)  {
+	public HashMap<Integer, Cluster> buildCluster(List<PLSEvent> events)  {
 		
 		HashMap<Integer, Cluster> result = new HashMap<Integer, Cluster>();
 		
-		for(PlsEvent e: events) {
+		for(PLSEvent e: events) {
 			int cell = Integer.parseInt(e.getCellac());
 			Cluster ce = result.get(cell);
 			if(ce == null) {
