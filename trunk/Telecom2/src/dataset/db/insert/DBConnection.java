@@ -52,9 +52,14 @@ public class DBConnection {
 		Statement s = getStatement();
 		
 		String[] tables2Drop = new String[]{
-				"pls_piem_20140215",
-				"pls_piem_20140213"
-
+				"pls_lomb_20120329",
+				"pls_lomb_20120328",
+				"pls_lomb_20120403",
+				"pls_lomb_20120429",
+				"pls_lomb_20120404",
+				"pls_lomb_20120405",
+				"pls_lomb_20120423",
+				"pls_lomb_20120414",
 		};
 		
 		

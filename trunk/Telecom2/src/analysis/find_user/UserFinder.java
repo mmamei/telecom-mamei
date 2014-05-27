@@ -19,8 +19,8 @@ import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
-import analysis.EventFilesFinder;
-import dataset.db.AnalyzePLSCoverageTime;
+import dataset.DataFactory;
+import dataset.file.EventFilesFinder;
 import dataset.file.UsersAroundAnEvent;
 
 public class UserFinder {
@@ -33,7 +33,8 @@ public class UserFinder {
 		
 		Map<String,Integer> map = new HashMap<String,Integer>();
 		
-		Map<String,List<String>> mapt = new AnalyzePLSCoverageTime().computeAll();
+		
+		Map<String,List<String>> mapt = DataFactory.getPLSCoverageTime().computeAll();
 		List<Sightseeing> ls = parseInput(q);
 		for(Sightseeing s: ls) {
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+s.dir).toString(); // set right working directory

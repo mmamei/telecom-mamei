@@ -8,15 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 import utils.Config;
+import dataset.PLSCoverageTimeI;
 import dataset.db.insert.DBConnection;
 
-public class AnalyzePLSCoverageTime {
+public class PLSCoverageTime implements PLSCoverageTimeI  {
 	
 	static Config conf = null;
 	
 
 	public static void main(String[] args) {
-		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
+		PLSCoverageTime apc = new PLSCoverageTime();
 			
 		Map<String,List<String>> all =  apc.computeAll();
 		for(String key: all.keySet()) 
@@ -24,6 +25,10 @@ public class AnalyzePLSCoverageTime {
 		
 		
 		System.out.println(apc.getJSMap(all));
+	}
+	
+	public PLSCoverageTime() {
+		
 	}
 	
 	public String getJSMap(Map<String,List<String>> all) {
@@ -89,7 +94,7 @@ public class AnalyzePLSCoverageTime {
 		}
 		return map;
 	}
-		
+	/*	
 	public List<String> compute() {
 		String dir = Config.getInstance().pls_folder;
 		dir = dir.substring(dir.indexOf("file_pls/")+9);
@@ -97,4 +102,5 @@ public class AnalyzePLSCoverageTime {
 		return computeAll().get(dir);
 		
 	}
+	*/
 }

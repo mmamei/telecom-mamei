@@ -1,6 +1,6 @@
 <html>
 <head>
-<jsp:useBean id="eff" scope="application" class="analysis.EventFilesFinder"/>
+<jsp:useBean id="eff" scope="application" class="dataset.file.EventFilesFinder"/>
 <%@include file="includes/head.html" %>
 </head>
 <body class="no-sidebar">

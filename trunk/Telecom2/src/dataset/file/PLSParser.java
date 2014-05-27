@@ -66,6 +66,8 @@ public class PLSParser {
 				
 				if(end_cal.before(startTime) || begin_cal.after(endTime)) continue;
 				
+				System.out.print(begin_cal.getTime()+", "+end_cal.getTime());
+				
 				String key = end_cal.get(Calendar.DAY_OF_MONTH)+"/"+MONTHS[end_cal.get(Calendar.MONTH)]+"/"+end_cal.get(Calendar.YEAR);
 				String h = allDays.get(key);
 				allDays.put(key, h==null? end_cal.get(Calendar.HOUR_OF_DAY)+"-" : h+end_cal.get(Calendar.HOUR_OF_DAY)+"-");
@@ -118,7 +120,7 @@ public class PLSParser {
 	private static char[] read_buffer,buffer;
 	private static int charRead,x,remainedChars;
 	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer) {	
-		//System.out.println(plsFile.getAbsolutePath());
+		System.out.println(">>> "+plsFile.getAbsolutePath());
 		try {
 			zf = new ZipFile(plsFile);
 			ze = (ZipEntry) zf.entries().nextElement();

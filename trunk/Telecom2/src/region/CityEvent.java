@@ -14,8 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import utils.Config;
-import analysis.EventFilesFinder;
-import dataset.db.AnalyzePLSCoverageTime;
+import dataset.DataFactory;
+import dataset.PLSCoverageTimeI;
+import dataset.file.EventFilesFinder;
 
 
 public class CityEvent {
@@ -83,8 +84,16 @@ public class CityEvent {
 		 * key = 2013/Jul/18
 		 * values = 0-0-1-1-2-2-3-3-4-4-5-5-6-6-7-7-8-.... 23
 		 */
-		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
-		List<String> ad = apc.compute();
+		
+		
+		
+		PLSCoverageTimeI apc = DataFactory.getPLSCoverageTime();
+		String k = Config.getInstance().pls_folder;
+		k = k.substring(k.indexOf("file_pls/")+9);
+		k = k.substring(0,k.indexOf("/"));
+		List<String> ad = apc.computeAll().get(k);
+		
+	
 		
 		//for(String s : ad.keySet())
 		//	System.out.println(s+" ==> "+ad.get(s));

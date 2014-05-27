@@ -17,7 +17,8 @@ import java.util.Set;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
-import dataset.file.PLSEventsAroundAPlacemark;
+import dataset.DataFactory;
+import dataset.db.PLSEventsAroundAPlacemark;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
@@ -49,7 +50,7 @@ public class PresenceCounter {
 	}
 		
 	public static void process(List<CityEvent> events) throws Exception {
-		Logger.log("Processing: o_radius = "+O_RADIUS+" days = "+DAYS+" ");
+		Logger.logln("Processing: o_radius = "+O_RADIUS+" days = "+DAYS);
 		
 		Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(USE_INDIVIDUAL_EVENT,PlacemarkRadiusExtractor.DIFF);	
 		
@@ -136,7 +137,9 @@ public class PresenceCounter {
 		
 		//Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
 		
+		Logger.logln("PLSAroundAPlacemark with BEST radius....");
 		File file_event = getFile(event.spot.clone(),event.spot.getRadius());
+		Logger.logln("PLSAroundAPlacemark with OTHER radius....");
 		File file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
@@ -181,7 +184,7 @@ public class PresenceCounter {
 		File f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt");
 		if(f==null || !f.exists()) {
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
-			PLSEventsAroundAPlacemark.process(p);
+			DataFactory.getPLSEventsAroundAPlacemark().process(p);
 			f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt");
 		}
 		return f;
@@ -246,8 +249,8 @@ public class PresenceCounter {
 		boolean inEvent = false;
 		
 		if(verbose) { 
-			System.err.println("EVENT = "+event);
-			System.err.println("EXCLUDE = "+exclude);
+			System.out.println("EVENT = "+event);
+			System.out.println("EXCLUDE = "+exclude);
 		}
 		
 		for(PLSEvent pe: plsEvents) {	
@@ -255,7 +258,7 @@ public class PresenceCounter {
 			Calendar cal = pe.getCalendar();
 			
 			if(event.st.before(cal) && event.et.after(cal))
-			if(verbose) System.err.println("-"+pe);
+			if(verbose) System.out.println("-"+pe);
 			
 			if(event.st.before(cal) && event.et.after(cal) && (exclude == null || cal.before(exclude.st) || cal.after(exclude.et))) {
 				
@@ -307,17 +310,16 @@ public class PresenceCounter {
 		double ot_lenght = l - f;
 		double max = ev_lenght - ex_lenght;
 		
-		double f2 = (f < ex_s && l > ex_e) ? (ot_lenght - ex_lenght) / max : ot_lenght / max;
+		double fract = (f < ex_s && l > ex_e) ? (ot_lenght - ex_lenght) / max : ot_lenght / max;
 		
-		if(f2<=0) {
-			System.err.println(event);
-			System.err.println(exclude);
-			System.err.println(first.getTime()+" - "+last.getTime());
+		if(fract<=0) {
+			System.err.println(event+"  "+exclude+"  "+first.getTime()+" - "+last.getTime());
+			for(PLSEvent pe: plsEvents)
+				System.err.println("\t"+pe);
 		}
 		
-		return f2;
+		return fract;
 	}
-	
 	
 	public static int getAvgInterEventTime(List<PLSEvent> plsEvents, CityEvent e) {
 		

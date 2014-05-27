@@ -15,15 +15,20 @@ import utils.Colors;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
+import dataset.PLSCoverageSpaceI;
 import dataset.db.insert.DBConnection;
 import dataset.db.insert.NetworkTable;
 
 
 
-public class AnalyzePLSCoverageSpace {
+public class PLSCoverageSpace implements PLSCoverageSpaceI {
 	
 	public static final SimpleDateFormat F = new SimpleDateFormat("yyyyMMdd");
 	private int MAX_TABLES_PER_REGION = 3; // thus days
+	
+	public PLSCoverageSpace() {
+		
+	}
 	
 	public Map<String,RegionMap> getPlsCoverage() {
 		Map<String,RegionMap> map = new HashMap<String,RegionMap>();
@@ -147,7 +152,7 @@ public class AnalyzePLSCoverageSpace {
 	
 	public static void main(String[] args) throws Exception {
 		
-		AnalyzePLSCoverageSpace ba = new AnalyzePLSCoverageSpace();
+		PLSCoverageSpace ba = new PLSCoverageSpace();
 		
 		Map<String,RegionMap> map = ba.getPlsCoverage();
 	
