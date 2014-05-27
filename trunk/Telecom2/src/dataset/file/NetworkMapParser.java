@@ -33,7 +33,7 @@ public class NetworkMapParser {
                     while((line = in.readLine()) != null){
                             String [] splitted = line.split(":");
                             String description = splitted[0];
-                            int barycentre = Integer.parseInt(splitted[1]);
+                            //int barycentre = Integer.parseInt(splitted[1]);
                             long lac = Long.parseLong(splitted[2]);
                             long cell_id = Long.parseLong(splitted[3]);
                             //String param5 = splitted[4];
