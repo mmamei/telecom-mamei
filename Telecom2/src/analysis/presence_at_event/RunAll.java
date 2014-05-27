@@ -11,11 +11,11 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import dataset.file.EventFilesFinder;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
 import utils.FileUtils;
-import analysis.EventFilesFinder;
 
 /*
  * This class encapsulates all the code required to estimate the attendance to a give event.
@@ -37,7 +37,7 @@ public class RunAll {
 			PresenceCounter.PLOT = false;
 			EventFilesFinder eff = new EventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
-			System.out.println("---> "+dir);
+			//System.out.println("---> "+dir);
 			if(dir == null) return new int[]{0,0};
 			
 			SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");

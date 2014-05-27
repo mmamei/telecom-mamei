@@ -1,31 +1,31 @@
-package analysis;
+package dataset.db;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import region.RegionMap;
 import utils.Logger;
-import dataset.db.AnalyzePLSCoverageTime;
-import dataset.file.AnalyzePLSCoverageSpace;
+import dataset.DataFactory;
 
 /*
  * This class identifies the proper PLS folder (if any) to process the event
  */
 
-public class EventFilesFinder {
+public class EventFilesFinderDB {
 	
 	
 	private SimpleDateFormat F1 = new SimpleDateFormat("yyyy-MM-dd-hh");
-	private SimpleDateFormat F2 = new SimpleDateFormat("yyyyMMdd");
+	private SimpleDateFormat F2 = new SimpleDateFormat("yyyyMMdd",Locale.US);
 	
 	private Map<String,RegionMap> maps;
 	private Map<String,List<String>> mapt;
 	
-	public EventFilesFinder() {
-		maps = new AnalyzePLSCoverageSpace().getPlsCoverage();
-		mapt = new AnalyzePLSCoverageTime().computeAll();
+	public EventFilesFinderDB() {
+		maps = DataFactory.getPLSCoverageSpace().getPlsCoverage();
+		mapt = DataFactory.getPLSCoverageTime().computeAll();
 	}
 	
 	
@@ -60,7 +60,6 @@ public class EventFilesFinder {
 				
 				//System.out.println("testing "+r+", ("+clon+","+clat+")");
 				
-				
 				if(maps.get(r).get(clon, clat) != null) {
 					if(dir==null) dir = r;
 					else Logger.logln("Warning: Multiple matching regions!");
@@ -68,18 +67,16 @@ public class EventFilesFinder {
 			}
 			
 			if(dir == null) {
-				Logger.logln("Selected event is out of PLS coverage area in space");
+				//Logger.logln("Selected event is out of PLS coverage area in space");
 				return null;
 			}
 			
-			
-			
 			// check temporal constraints
-			List<String> dmap = mapt.get(dir);
-			
+			System.out.println(dir);			
+			List<String> dmap = mapt.get(dir.substring("file_".length()));
 			
 			if(dmap.contains(sday) && dmap.contains(eday))
-				return "file_"+dir;
+				return dir;
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -91,9 +88,8 @@ public class EventFilesFinder {
 	
 	
 	public static void main(String[] args) {
-		
-		EventFilesFinder eff = new EventFilesFinder();
-		String dir = eff.find("2012-03-20","19","2012-03-20","23",7.641453,45.109536,7.641453,45.109536);
+		EventFilesFinderDB eff = new EventFilesFinderDB();
+		String dir = eff.find("2014-03-10","4","2014-03-10","7",12.3248,45.4395,12.3248,45.4395);
 		System.out.println(dir);
 	}
 }

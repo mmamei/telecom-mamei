@@ -10,13 +10,20 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import region.RegionMap;
+import utils.Config;
+import utils.CopyAndSerializationUtils;
+import utils.FileUtils;
 import utils.Logger;
 import utils.Mail;
 
@@ -31,13 +38,23 @@ public class PLSTable {
 	 * Sono scoperte le query su imsi perchè comunque abbastanza rare e perchè cmq ritornano molti record (es. se ho metà turisti e metà italiani l'indice mi dimezza al massimo il tempo non me lo riduce enormemente).
 	 * Sono scoperte le query solo sul timestamp che su tutta la regione non sono utilissime. Piuttosto le combino con query doppie coperte dagli indici precedenti.
 	 * Così sembra fare un giorno ogni 2-3 minuti con un occupazione di ram stabile.
-	 * 
+	 * '
 	 */
+	
+	
+	/* NOTA BENE:
+	 * Per come sono organizzati i file pls, ogni tabella conttiene l'ultima mezz'ora del giorno precendte e manca l'ultima mezz'ora del giorno 
+	 * attuale (che è nel file successivo)
+	 */
+	
+	
+	private static final SimpleDateFormat F = new SimpleDateFormat("yyyyMMdd");
+	
 	
 	public static void main(String[] args) throws Exception {
 		
 			PrintWriter out = new PrintWriter(new FileWriter("badtables.txt"));
-			String name = "pls_piem";
+			String name = "pls_lomb";
 			Map<String,List<File>> filesByDay = new HashMap<String,List<File>>();
 			organizeFilesByDay(new File("G:/DATASET/PLS/file_pls/file_"+name),filesByDay);
 			int cont = 0;
@@ -83,7 +100,49 @@ public class PLSTable {
 			}
 			out.close();
 			Mail.send("completed!");
+			
+			// delete the file plsCoverageSpace.ser as new regions might have been added
+			File odir = FileUtils.createDir("BASE/RegionMap");
+			File f = new File(odir+"/plsCoverageSpace.ser");
+			f.delete();
+			
 			Logger.logln("Done");
+	}
+	
+	public static Set<String> getTables(String region,Calendar startTime,Calendar endTime) {
+	
+		
+		// get the right tables
+		Set<String> tables = new HashSet<String>();
+		Calendar c = Calendar.getInstance();
+		try {
+			
+			Calendar st = Calendar.getInstance();
+			Calendar et = Calendar.getInstance();
+			st.setTime(F.parse(F.format(startTime.getTime())));
+			et.setTime(F.parse(F.format(endTime.getTime())));
+			et.add(Calendar.HOUR_OF_DAY, 1); // the data of this day from 23:30 onward are on the next table. Adding 1 allows to consider also that table.
+			
+			Statement s = DBConnection.getStatement();
+		
+			ResultSet r = s.executeQuery("select table_name from information_schema.tables");
+			while(r.next()) {
+				String t = r.getString("table_name"); 
+				
+				if(t.startsWith(region)) {	
+					//System.out.println(t);
+					c.setTime(F.parse(t.substring(t.lastIndexOf("_")+1)));
+					if(!st.after(c) && !et.before(c))
+						tables.add(t);
+				}
+			}
+			r.close();
+			s.close();
+			DBConnection.closeConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tables;
 	}
 	
 	
@@ -106,7 +165,7 @@ public class PLSTable {
 		}
 	}
 	
-	private static final SimpleDateFormat F = new SimpleDateFormat("yyyyMMdd");
+	
 	private static String getDay(long time) {
 		return F.format(new Date(time));
 	}	

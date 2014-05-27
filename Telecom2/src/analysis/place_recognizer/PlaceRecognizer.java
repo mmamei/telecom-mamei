@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.gps.utils.LatLonPoint;
 
+import dataset.file.EventFilesFinder;
 import dataset.file.PLSParser;
 import dataset.file.UsersCSVCreator;
 import utils.Config;
@@ -19,7 +20,6 @@ import utils.FileUtils;
 import utils.FilterAndCounterUtils;
 import utils.Logger;
 import visual.kml.KMLPath;
-import analysis.EventFilesFinder;
 import analysis.PLSEvent;
 import analysis.UserTrace;
 import analysis.place_recognizer.clustering.AgglomerativeClusterer;

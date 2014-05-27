@@ -1,21 +1,14 @@
 package dataset.file;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
-import analysis.PLSMap;
 import region.Placemark;
 import region.RegionI;
 import region.RegionMap;
@@ -23,14 +16,19 @@ import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
+import dataset.PLSEventsAroundAPlacemarkI;
 
-public class PLSEventsAroundAPlacemark extends BufferAnalyzer {	
+public class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroundAPlacemarkI  {	
 
 	private List<PrintWriter> outs;
 	private List<Placemark> placemarks;
 	private RegionMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 	
-	PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
+	public PLSEventsAroundAPlacemark() {
+		
+	}
+	
+	public PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
 		
 		outs = new ArrayList<PrintWriter>();
 		placemarks = new ArrayList<Placemark>();
@@ -93,7 +91,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 			out.close();
 	}
 	
-	public static void process(Placemark p) throws Exception {
+	public void process(Placemark p) throws Exception {
 		List<Placemark> ps = new ArrayList<Placemark>();
 		ps.add(p);
 		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps, new double[]{p.getRadius()});
@@ -101,60 +99,15 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		ba.finish();
 	}
 	
-	public static void process(List<Placemark> p, double[] r) throws Exception {
+	private static void process2(List<Placemark> p, double[] r) throws Exception {
 		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(p, r);
 		PLSParser.parse(ba);
 		ba.finish();
 	}
 	
 	
-	public static PLSMap getPLSMap(String file, Placemark within) {
-		
-		//System.out.println(file);
-		//System.out.println(FileUtils.getFile(file));
-		
-		PLSMap plsmap = new PLSMap();
-		String[] splitted;
-		String line;
-		
-		Calendar cal = new GregorianCalendar();
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(FileUtils.getFile(file)));
-			while((line = in.readLine()) != null){
-				line = line.trim();
-				if(line.length() < 1) continue; // extra line at the end of file
-				splitted = line.split(",");
-				if(splitted.length == 5 && !splitted[3].equals("null")) {
-					
-					String username = splitted[0];
-					cal.setTimeInMillis(Long.parseLong(splitted[1]));
-					String key = getKey(cal);
-					String celllac = splitted[3]; 
-					if(within==null || within.contains(celllac)) {				
-						if(plsmap.startTime == null || plsmap.startTime.after(cal)) plsmap.startTime = (Calendar)cal.clone();
-						if(plsmap.endTime == null || plsmap.endTime.before(cal)) plsmap.endTime = (Calendar)cal.clone();
-						Set<String> users = plsmap.usr_counter.get(key);
-						if(users == null) users = new TreeSet<String>();
-						users.add(username);
-						plsmap.usr_counter.put(key, users);
-						Integer count = plsmap.pls_counter.get(key);
-						plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
-					}
-				}
-			}
-			in.close();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return plsmap;
-	}
-	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	public static String getKey(Calendar cal) {
-		return cal.get(Calendar.DAY_OF_MONTH)+"-"+
-			 	MONTHS[cal.get(Calendar.MONTH)]+"-"+
-			 	cal.get(Calendar.YEAR)+":"+
-			 	cal.get(Calendar.HOUR_OF_DAY);
-	}
+	
+	
 	
 	
 	public static void main(String[] args) throws Exception {
@@ -174,7 +127,7 @@ public class PLSEventsAroundAPlacemark extends BufferAnalyzer {
 		//ps.add(Placemark.getPlacemark("Piazza Vittorio (TO)"));
 		//ps.add(Placemark.getPlacemark("Parco Dora (TO)"));
 		
-		process(ps,rs);
+		process2(ps,rs);
 		Logger.logln("Done");
 	}
 }

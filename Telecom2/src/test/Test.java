@@ -36,11 +36,14 @@ public class Test {
 	}
 	
 	@org.junit.Test
-	public void testPLSBehaviorInAnArea() {
+	public void testPLSTimeCounter() {
 		PLSTimeCounter pbia = new PLSTimeCounter();
 		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672);
 		String js = pbia.getJSMap(plsdata);
 		String res = "var data = google.visualization.arrayToDataTable([['Day', 'PLS'],['10-Mon:17',  670.0],['10-Mon:18',  3608.0],['10-Mon:19',  3267.0],['10-Mon:20',  2697.0],['10-Mon:21',  2249.0],['10-Mon:22',  2030.0],['10-Mon:23',  1740.0],['11-Tue:0',  1463.0]]);";
+		System.out.println(res);
+		System.out.println("--------------------");
+		System.out.println(js);
 		assertEquals("Test the JS result of PLSBehaviorInAnArea", res, js);
 	}
 	

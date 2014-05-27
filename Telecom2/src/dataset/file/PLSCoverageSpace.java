@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import dataset.PLSCoverageSpaceI;
 import region.Region;
 import region.RegionI;
 import region.RegionMap;
@@ -22,11 +23,10 @@ import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
-import dataset.db.AnalyzePLSCoverageTime;
 
 
 
-public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
+ public class PLSCoverageSpace extends BufferAnalyzer implements PLSCoverageSpaceI {
 	
 	SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd",Locale.US);
 	String name;
@@ -36,18 +36,18 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	Map<String,RegionI> cells = new HashMap<String,RegionI>();
 
 	
-	public AnalyzePLSCoverageSpace() {
+	public PLSCoverageSpace() {
 		
 	}
 	
-	public AnalyzePLSCoverageSpace(String plsf) {
+	public PLSCoverageSpace(String plsf) {
 		super();
 		System.out.println("======================> "+plsf);
 		plsf = plsf.replaceAll("\\\\", "/");
 		Config.getInstance().pls_folder = plsf;
 		name =  plsf.substring(plsf.lastIndexOf("/")+1);
 		rm = new RegionMap(plsf);
-		AnalyzePLSCoverageTime apc = new AnalyzePLSCoverageTime();
+		PLSCoverageTime apc = new PLSCoverageTime();
 		List<String> coverage = apc.compute();
 		
 		String first = coverage.get(0);
@@ -112,7 +112,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 				for(File dir: basedir.listFiles()) {
 					if(!map.containsKey(dir.getName())) {
 						
-						AnalyzePLSCoverageSpace ba = new AnalyzePLSCoverageSpace(dir.getAbsolutePath());
+						PLSCoverageSpace ba = new PLSCoverageSpace(dir.getAbsolutePath());
 						ba.run();
 						map.put(dir.getName(),ba.rm);
 					}
@@ -200,7 +200,7 @@ public class AnalyzePLSCoverageSpace extends BufferAnalyzer {
 	
 	public static void main(String[] args) throws Exception {
 		
-		AnalyzePLSCoverageSpace ba = new AnalyzePLSCoverageSpace();
+		PLSCoverageSpace ba = new PLSCoverageSpace();
 		
 	
 		Map<String,RegionMap> map = ba.getPlsCoverage();

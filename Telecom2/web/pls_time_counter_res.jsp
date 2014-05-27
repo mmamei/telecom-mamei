@@ -1,6 +1,6 @@
 <html>
 <head>
-<jsp:useBean id="pbia" scope="application" class="analysis.PLSBehaviorInAnArea"/>
+<jsp:useBean id="pbia" scope="application" class="analysis.PLSTimeCounter"/>
 <%@include file="includes/head.html" %>
 
 

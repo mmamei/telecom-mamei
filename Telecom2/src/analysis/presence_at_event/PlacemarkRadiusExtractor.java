@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import dataset.file.PLSEventsAroundAPlacemark;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
@@ -23,8 +22,9 @@ import utils.Logger;
 import utils.StatsUtils;
 import visual.java.GraphPlotter;
 import visual.java.PLSPlotter;
-import analysis.PLSBehaviorInAnArea;
-import analysis.PLSMap;
+import analysis.PLSTimeCounter;
+import dataset.DataFactory;
+import dataset.db.PLSEventsAroundAPlacemark;
 
 public class PlacemarkRadiusExtractor {
 	
@@ -335,7 +335,7 @@ public class PlacemarkRadiusExtractor {
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
-			PLSEventsAroundAPlacemark.process(p);
+			DataFactory.getPLSEventsAroundAPlacemark().process(p);
 		}
 		
 		
@@ -349,7 +349,7 @@ public class PlacemarkRadiusExtractor {
 			
 			if(ring) p.changeRadiusRing(max_r);
 			else p.changeRadius(max_r);
-			PLSMap plsmap = PLSEventsAroundAPlacemark.getPLSMap("BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+".txt",p);
+			PLSTimeCounter plsmap = PLSTimeCounter.getPLSTimeCounter("BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+".txt",p);
 			
 			if(plsmap.startTime == null) {
 				for(int i=0; i<relevantEvents.size();i++) {
@@ -360,7 +360,7 @@ public class PlacemarkRadiusExtractor {
 				continue;
 			}
 			
-			DescriptiveStatistics[] stats = PLSBehaviorInAnArea.getStats(plsmap);
+			DescriptiveStatistics[] stats = PLSTimeCounter.getStats(plsmap);
 			double[] z_usr_data =  StatsUtils.getZH(stats[1],plsmap.startTime);
 			
 			if (PLOT) PLSPlotter.drawGraph(p.getName()+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevantEvents);
