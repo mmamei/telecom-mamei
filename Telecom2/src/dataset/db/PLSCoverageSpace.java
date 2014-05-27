@@ -50,7 +50,7 @@ import dataset.db.insert.NetworkTable;
 					if(num == null) num = 0;
 					if(num < MAX_TABLES_PER_REGION) {
 						
-						//System.out.println("Processing "+t);
+						System.out.println("Processing "+t);
 						RegionMap rm = map.get(region);
 						if(rm == null) {
 							rm = new RegionMap(region);

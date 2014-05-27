@@ -118,6 +118,6 @@ class NetworkMapFactory implements NetworkMapFactoryI  {
     public static void main(String[] args) {
     		NetworkMapFactory nmf = getInstance();
             RegionMap nm = nmf.getNetworkMap(Config.getInstance().pls_start_time);
-            System.out.println(nm);
+            System.out.println(nm.getName());
     }
 }

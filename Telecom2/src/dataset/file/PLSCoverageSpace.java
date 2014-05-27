@@ -27,7 +27,7 @@ import dataset.PLSCoverageSpaceI;
 
  class PLSCoverageSpace extends BufferAnalyzer implements PLSCoverageSpaceI {
 	
-	SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd",Locale.US);
+	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
 	String name;
 	RegionMap nm = null;
 	RegionMap rm;  
@@ -55,8 +55,8 @@ import dataset.PLSCoverageSpaceI;
 			Config.getInstance().pls_end_time = (Calendar)Config.getInstance().pls_start_time.clone();
 			Config.getInstance().pls_end_time.add(Calendar.DAY_OF_YEAR, 10);
 			nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
+			System.out.println(nm.getName());
 			System.out.println(plsf+" FROM: "+Config.getInstance().pls_start_time.getTime()+" TO: "+Config.getInstance().pls_end_time.getTime());
-			
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
