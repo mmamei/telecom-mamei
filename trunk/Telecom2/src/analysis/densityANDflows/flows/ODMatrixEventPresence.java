@@ -6,13 +6,13 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import dataset.db.NetworkMapFactory;
 import region.CityEvent;
 import region.RegionI;
 import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
+import dataset.file.DataFactory;
 
 public class ODMatrixEventPresence {
 	public static void main(String[] args) throws Exception {
@@ -57,7 +57,7 @@ public class ODMatrixEventPresence {
 		
 		
 		
-		RegionMap nm = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(event.substring(event.indexOf(",")+1)));
+		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(DataFactory.getNetworkMapFactory().getCalendar(event.substring(event.indexOf(",")+1)));
 		
 		while((line=br2.readLine())!=null) {
 			String user = line.substring(0, line.indexOf(","));

@@ -11,8 +11,8 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import dataset.db.NetworkMapFactory;
 import region.RegionMap;
+import dataset.file.DataFactory;
 
 public class PlaceRecognizerEvaluator {
 	
@@ -90,7 +90,7 @@ public class PlaceRecognizerEvaluator {
 		int fp = 0;
 		int fn = 0;
 		
-		RegionMap nm = NetworkMapFactory.getNetworkMap(cal);
+		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(cal);
 		double avg_r = nm.getAvgRegionRadiusAround(ref, 4000);
 		
 		double max_dist = 1.0 * (maxdist + avg_r); // avg_r * UserNew.RESULT_FACTOR; 

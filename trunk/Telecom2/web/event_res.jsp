@@ -1,6 +1,6 @@
+<%@page import="dataset.EventFilesFinderI"%>
 <html>
 <head>
-<jsp:useBean id="eff" scope="application" class="dataset.file.EventFilesFinder"/>
 <%@include file="includes/head.html" %>
 </head>
 <body class="no-sidebar">
@@ -25,6 +25,7 @@
 		out.println("Event Start: "+sd+" at "+st+"<br>");
 		out.println("Event End: "+ed+" at "+et+"<br>");
 		out.println("Event Bbox: ("+lat1+","+lon1+") ("+lat2+","+lon2+")<br>");
+		EventFilesFinderI eff = dataset.DataFactory.getEventFilesFinder();
 		String dir = eff.find(sd,st,ed,et,lon1,lat1,lon2,lat2);
 		out.println("<h3>Response:</h3>");
 		if(dir!=null) out.println("The event is covered in <b>"+dir+"</b>");

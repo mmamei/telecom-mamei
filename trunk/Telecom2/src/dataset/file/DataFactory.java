@@ -1,6 +1,7 @@
 package dataset.file;
 
 import dataset.EventFilesFinderI;
+import dataset.NetworkMapFactoryI;
 import dataset.PLSCoverageSpaceI;
 import dataset.PLSCoverageTimeI;
 import dataset.PLSEventsAroundAPlacemarkI;
@@ -21,5 +22,9 @@ public class DataFactory {
 	
 	public static EventFilesFinderI getEventFilesFinder() {
 		return new EventFilesFinder();
+	}
+	
+	public static NetworkMapFactoryI getNetworkMapFactory() {
+		return NetworkMapFactory.getInstance();
 	}
 }

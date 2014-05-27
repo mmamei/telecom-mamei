@@ -14,9 +14,9 @@ import java.util.Set;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
+import dataset.file.DataFactory;
 
 public abstract class Bow {
 	
@@ -95,7 +95,7 @@ public abstract class Bow {
 				int h = Integer.parseInt(x[2]);
 				String celllac = x[3];
 				if(rm.getClosest(celllac,DF.parse(x[0]).getTime()).getName().equals(rname)) {
-					RegionMap nm = NetworkMapFactory.getNetworkMap(DF.parse(x[0]).getTime());
+					RegionMap nm =  DataFactory.getNetworkMapFactory().getNetworkMap(DF.parse(x[0]).getTime());
 					RegionI nc = nm.getRegion(celllac);
 					lon += nc.getLatLon()[1];
 					lat += nc.getLatLon()[0];

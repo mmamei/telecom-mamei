@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
-import dataset.db.NetworkMapFactory;
+import dataset.file.DataFactory;
 
 public class RegionMap implements Serializable {
 	
@@ -97,7 +97,7 @@ public class RegionMap implements Serializable {
 		float[] area_intersection = cache_intersection.get(celllac);
 		if(area_intersection != null) return area_intersection;
 		area_intersection = new float[this.getNumRegions()];
-		RegionMap nm = NetworkMapFactory.getNetworkMap(time);
+		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(time);
 		RegionI nc = nm.getRegion(""+celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getLatLon()[0], nc.getLatLon()[1], nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
@@ -127,7 +127,7 @@ public class RegionMap implements Serializable {
 		
 		RegionI closest = null;
 		float max_intersection = 0;
-		RegionMap nm = NetworkMapFactory.getNetworkMap(time);
+		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(time);
 		RegionI nc = nm.getRegion(""+celllac);
 		Polygon circle = GeomUtils.getCircle(nc.getLatLon()[1], nc.getLatLon()[0], nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);

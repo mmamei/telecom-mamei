@@ -31,4 +31,10 @@ public class DataFactory {
 		else if(TYPE==DB) return dataset.db.DataFactory.getEventFilesFinder();
 		return null;
 	}
+	
+	public static NetworkMapFactoryI getNetworkMapFactory() {
+		if(TYPE==FILE) return dataset.file.DataFactory.getNetworkMapFactory();
+		else if(TYPE==DB) return dataset.db.DataFactory.getNetworkMapFactory();
+		return null;
+	}
 }

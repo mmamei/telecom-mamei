@@ -15,10 +15,10 @@ import java.util.Set;
 
 import org.gps.utils.LatLonUtils;
 
-import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
 import utils.Config;
+import dataset.file.DataFactory;
 
 public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 	
@@ -33,7 +33,7 @@ public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 		this.imsi = imsi;
 		this.cellac = cellac;
 		this.timestamp = Long.parseLong(timestamp);
-		if(NM == null) NM = NetworkMapFactory.getNetworkMap(getCalendar());
+		if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(getCalendar());
 	}
 	
 	public PLSEvent clone(){

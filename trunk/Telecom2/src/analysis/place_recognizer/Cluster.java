@@ -10,10 +10,10 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
 import analysis.PLSEvent;
+import dataset.file.DataFactory;
 
 
 public class Cluster implements Serializable {
@@ -34,12 +34,12 @@ public class Cluster implements Serializable {
 	
 	public void addAll(Cluster c) {
 		events.addAll(c.getEvents());
-		if(NM == null) NM = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar(c.getEvents().get(0).getTime()));
+		if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(DataFactory.getNetworkMapFactory().getCalendar(c.getEvents().get(0).getTime()));
 	}
 	
 	public void add(PLSEvent e) {
 		events.add(e);
-		if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
+		if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());
 	} 
 	
 	public List<PLSEvent> getEvents() {
@@ -79,7 +79,7 @@ public class Cluster implements Serializable {
 		double tot_w = w(weights);
 		double r = 0;
 		for(PLSEvent e: events) {
-			if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
+			if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());
 			RegionI x = NM.getRegion(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			r += x.getRadius() * f;
@@ -94,7 +94,7 @@ public class Cluster implements Serializable {
 		
 		double tot_w = w(weights);
 		for(PLSEvent e: events) {
-			if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
+			if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());
 			RegionI x = NM.getRegion(e.getCellac());
 			double f = tot_w > 0 ? w(e,weights) : 1;
 			aLat += x.getLatLon()[0] * f;
@@ -113,7 +113,7 @@ public class Cluster implements Serializable {
 		double maxLat=0, maxLon=0;
 		double minLat = Double.MAX_VALUE, minLon = Double.MAX_VALUE;
 		for(PLSEvent e: events){
-			if(NM == null) NM = NetworkMapFactory.getNetworkMap(e.getTimeStamp());
+			if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());
 			RegionI cell = NM.getRegion(String.valueOf(e.getCellac()));
 			maxLat = Math.max(maxLat, cell.getLatLon()[0]);
 			maxLon = Math.max(maxLon, cell.getLatLon()[1]);

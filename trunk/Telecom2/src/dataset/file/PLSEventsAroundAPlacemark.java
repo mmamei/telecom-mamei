@@ -16,13 +16,12 @@ import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import dataset.PLSEventsAroundAPlacemarkI;
-import dataset.db.NetworkMapFactory;
 
 class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroundAPlacemarkI  {	
 
 	private List<PrintWriter> outs;
 	private List<Placemark> placemarks;
-	private RegionMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
+	private RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
 	
 	PLSEventsAroundAPlacemark() {
 		

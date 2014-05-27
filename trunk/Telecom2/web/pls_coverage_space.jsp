@@ -3,20 +3,20 @@
 <%@include file="includes/head.html" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="region.RegionMap" %>
-<jsp:useBean id="apbbox" scope="application" class="db.query.AnalyzePLSCoverageSpaceDB"/>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
 <script>
 
 <% 
-Map<String,RegionMap> map = apbbox.getPlsCoverage();
-out.println(apbbox.getJSMap(map)); 
+dataset.PLSCoverageSpaceI pcs = dataset.DataFactory.getPLSCoverageSpace();
+Map<String,RegionMap> map = pcs.getPlsCoverage();
+out.println(pcs.getJSMap(map)); 
 %>
   
 function initialize() {
   // Create the map.
   var mapOptions = {
     zoom: 4,
-    center: new google.maps.LatLng(<%=apbbox.getJSMapCenterLatLng(map)%>),
+    center: new google.maps.LatLng(<%=pcs.getJSMapCenterLatLng(map)%>),
     mapTypeId: google.maps.MapTypeId.TERRAIN
   };
 
