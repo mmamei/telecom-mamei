@@ -6,11 +6,11 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
+import dataset.file.DataFactory;
 
 public class ODMatrixTime {
 	public static void main(String[] args) throws Exception {
@@ -29,7 +29,7 @@ public class ODMatrixTime {
 		Map<Move,Double> list_od = new HashMap<Move,Double>();
 		
 		String file = "Stadio_Silvio_Piola_(NO)-11_03_2012_18_00-12_03_2012_00_00.txt";//"Torino-11_03_2012_17_00-11_03_2012_19_00.txt";
-		RegionMap nm = NetworkMapFactory.getNetworkMap(NetworkMapFactory.getCalendar("11/03/2012"));
+		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(DataFactory.getNetworkMapFactory().getCalendar("11/03/2012"));
 		
 		BufferedReader br = new BufferedReader(new FileReader("BASE/LocationsXUserAroundAnEvent/"+file));
 		String line;

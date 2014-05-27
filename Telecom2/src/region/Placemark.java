@@ -21,7 +21,7 @@ import visual.kml.KML;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
-import dataset.db.NetworkMapFactory;
+import dataset.file.DataFactory;
 
 
 
@@ -36,7 +36,7 @@ public class Placemark extends RegionI {
 		this.name = name;
 		this.centerLatLon = centerLatLon;
 		this.radius = r;
-		this.nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
+		this.nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
 		this.cellsAround = getCellsAround();
 	}
 	

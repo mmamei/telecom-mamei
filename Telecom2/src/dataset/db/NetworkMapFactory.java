@@ -7,14 +7,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import region.RegionMap;
+import dataset.NetworkMapFactoryI;
 import dataset.db.insert.NetworkTable;
 
-public class NetworkMapFactory {
-	private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
+class NetworkMapFactory implements NetworkMapFactoryI {
 	
+	
+	private static NetworkMapFactory nmf;
+	private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
 	private static Map<String,RegionMap> mapnet = new HashMap<String,RegionMap>();
 	
-	private static String getCalString(String f) {
+	private NetworkMapFactory() {
+	}
+	
+	static NetworkMapFactory getInstance() {
+		if(nmf == null) 
+			nmf = new  NetworkMapFactory();
+		return nmf;
+	}
+	
+	
+	
+	private String getCalString(String f) {
 		//dfl_network_20130516.bin
 		String yyyy = f.substring(12,16);
 		String MM = f.substring(16,18);
@@ -23,7 +37,7 @@ public class NetworkMapFactory {
 	}
 
 	
-	public static Calendar getCalendar(String f) {
+	public Calendar getCalendar(String f) {
 		Calendar c = null;
 		try{
 		    c = Calendar.getInstance();
@@ -35,14 +49,14 @@ public class NetworkMapFactory {
 		return c;
 	}
 	
-	public static RegionMap getNetworkMap(long time) {
+	public RegionMap getNetworkMap(long time) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(time);
 		return getNetworkMap(cal);
 	}
 	
 	
-	public static RegionMap getNetworkMap(Calendar calendar) {
+	public RegionMap getNetworkMap(Calendar calendar) {
 		
 		String table = NetworkTable.findClosestNetworkTable(calendar);
 		//Logger.logln("!!!! Using network table "+table);
@@ -56,9 +70,9 @@ public class NetworkMapFactory {
 	
 	
 	public static void main(String[] args) {
-		
+		NetworkMapFactory nmf = getInstance();
 		Calendar cal = new GregorianCalendar(2013,8,01);
-		RegionMap nm = getNetworkMap(cal);
+		RegionMap nm = nmf.getNetworkMap(cal);
 		System.out.println(nm.getName());
 		System.out.println(nm.getRegion("4050919751"));
 	}

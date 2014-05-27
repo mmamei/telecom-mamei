@@ -8,7 +8,6 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import dataset.db.NetworkMapFactory;
 import region.Placemark;
 import region.RegionMap;
 import utils.Config;
@@ -91,7 +90,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 			celllac = fields[2];
 			timestamp = Long.parseLong(fields[3]);
 			cal.setTimeInMillis(timestamp);
-			nm= NetworkMapFactory.getNetworkMap(cal);
+			nm= DataFactory.getNetworkMapFactory().getNetworkMap(cal);
 			//if the celllac is not in the networkmap, do not process the pls
 			if(nm.getRegion(celllac) == null) return;
 			

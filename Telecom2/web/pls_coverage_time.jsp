@@ -1,7 +1,6 @@
 <html>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.List" %>
-<jsp:useBean id="apc" scope="application" class="pls_parser.AnalyzePLSCoverageTime"/>
 <head>
 <%@include file="includes/head.html" %>
 
@@ -24,11 +23,12 @@
 	  
 	function drawChart() {
 	<%
-	Map<String,List<String>> all =  apc.computeAll();
-	out.println(apc.getJSMap(all));
+	dataset.PLSCoverageTimeI pct = dataset.DataFactory.getPLSCoverageTime();
+	Map<String,List<String>> all =  pct.computeAll();
+	out.println(pct.getJSMap(all));
 	
 	for(String key: all.keySet()) {
-		int y = apc.getNumYears(all.get(key));
+		int y = pct.getNumYears(all.get(key));
 		int h = 20 + y * 150;
 		out.println("drawCalendar(dataTable_"+key+",'calendar_"+key+"','"+key+"',"+h+");");
 	}
@@ -49,7 +49,7 @@
 		
 		<%
 		for(String key: all.keySet()) {
-			int y = apc.getNumYears(all.get(key));
+			int y = pct.getNumYears(all.get(key));
 			int h = 20 + y * 150;
 			out.println("<div id='calendar_"+key+"' style='width: 1000px; height: "+h+"px;'></div><hr>");
 		}

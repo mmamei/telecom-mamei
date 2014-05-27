@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import dataset.PLSCoverageSpaceI;
-import dataset.db.NetworkMapFactory;
 import region.Region;
 import region.RegionI;
 import region.RegionMap;
@@ -23,6 +21,7 @@ import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
+import dataset.PLSCoverageSpaceI;
 
 
 
@@ -55,7 +54,7 @@ import visual.kml.KML;
 			Config.getInstance().pls_start_time.setTime(f.parse(first));
 			Config.getInstance().pls_end_time = (Calendar)Config.getInstance().pls_start_time.clone();
 			Config.getInstance().pls_end_time.add(Calendar.DAY_OF_YEAR, 10);
-			nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
+			nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
 			System.out.println(plsf+" FROM: "+Config.getInstance().pls_start_time.getTime()+" TO: "+Config.getInstance().pls_end_time.getTime());
 			
 		} catch (ParseException e) {

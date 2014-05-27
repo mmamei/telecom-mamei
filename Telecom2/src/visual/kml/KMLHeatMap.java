@@ -6,11 +6,11 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
 import utils.Colors;
 import utils.Config;
+import dataset.file.DataFactory;
 
 
 
@@ -18,7 +18,7 @@ import utils.Config;
 public class KMLHeatMap {
 	
 	public static String drawHeatMap(String name, Map<String,Double> map, double max) {
-		RegionMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
+		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
 		StringBuffer result = new StringBuffer();
 		for(String celllac: map.keySet()) {
 			RegionI nc = nm.getRegion(celllac);

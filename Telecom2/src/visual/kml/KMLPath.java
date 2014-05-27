@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 
-import dataset.db.NetworkMapFactory;
 import region.RegionMap;
 import utils.Colors;
 import utils.FileUtils;
 import utils.Logger;
 import analysis.PLSEvent;
+import dataset.file.DataFactory;
 
 public class KMLPath {
 	public static final boolean JITTER = false;
@@ -45,7 +45,7 @@ public class KMLPath {
 	
 	static RegionMap nm = null;
 	public static void print(String username, List<PLSEvent> plsEvents) {
-		nm =  NetworkMapFactory.getNetworkMap(plsEvents.get(0).getCalendar());
+		nm =  DataFactory.getNetworkMapFactory().getNetworkMap(plsEvents.get(0).getCalendar());
 		kml.printFolder(out, username.substring(0,10)+"...");
 		List<PLSEvent> s = plsEvents;//FilterAndCounterUtils.smooth(plsEvents);
 		Map<String,List<PLSEvent>> evPerDay = splitByDay(s);
