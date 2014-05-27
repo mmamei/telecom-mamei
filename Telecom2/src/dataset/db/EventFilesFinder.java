@@ -14,7 +14,7 @@ import dataset.DataFactory;
  * This class identifies the proper PLS folder (if any) to process the event
  */
 
-public class EventFilesFinderDB {
+public class EventFilesFinder {
 	
 	
 	private SimpleDateFormat F1 = new SimpleDateFormat("yyyy-MM-dd-hh");
@@ -23,7 +23,7 @@ public class EventFilesFinderDB {
 	private Map<String,RegionMap> maps;
 	private Map<String,List<String>> mapt;
 	
-	public EventFilesFinderDB() {
+	public EventFilesFinder() {
 		maps = DataFactory.getPLSCoverageSpace().getPlsCoverage();
 		mapt = DataFactory.getPLSCoverageTime().computeAll();
 	}
@@ -88,7 +88,7 @@ public class EventFilesFinderDB {
 	
 	
 	public static void main(String[] args) {
-		EventFilesFinderDB eff = new EventFilesFinderDB();
+		EventFilesFinder eff = new EventFilesFinder();
 		String dir = eff.find("2014-03-10","4","2014-03-10","7",12.3248,45.4395,12.3248,45.4395);
 		System.out.println(dir);
 	}
