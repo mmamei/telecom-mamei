@@ -11,8 +11,8 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import dataset.db.NetworkMapFactory;
 import region.RegionMap;
-import region.network.NetworkMapFactory;
 
 public class PlaceRecognizerEvaluator {
 	

@@ -12,7 +12,6 @@ import java.util.Set;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
 import utils.GeomUtils;
@@ -21,6 +20,8 @@ import visual.kml.KML;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+
+import dataset.db.NetworkMapFactory;
 
 
 

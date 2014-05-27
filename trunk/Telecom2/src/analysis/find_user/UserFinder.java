@@ -20,7 +20,7 @@ import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
 import dataset.DataFactory;
-import dataset.file.EventFilesFinder;
+import dataset.EventFilesFinderI;
 import dataset.file.UsersAroundAnEvent;
 
 public class UserFinder {
@@ -98,7 +98,7 @@ public class UserFinder {
 	}
 	
 	private List<Sightseeing> parseInput(String q) {
-		EventFilesFinder eff = new EventFilesFinder();
+		EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 		List<Sightseeing> ls = new ArrayList<Sightseeing>();
 		String[] e = q.split(";");
 		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd-HH:mm",Locale.US);

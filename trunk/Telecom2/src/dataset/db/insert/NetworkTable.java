@@ -9,8 +9,8 @@ import java.sql.Statement;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import region.NetworkCell;
 import region.RegionMap;
-import region.network.NetworkCell;
 import utils.Config;
 import utils.Logger;
 

@@ -6,9 +6,9 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
 

@@ -4,30 +4,26 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.gps.utils.LatLonPoint;
 
-import dataset.file.EventFilesFinder;
-import dataset.file.PLSParser;
-import dataset.file.UsersCSVCreator;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.FilterAndCounterUtils;
 import utils.Logger;
-import visual.kml.KMLPath;
 import analysis.PLSEvent;
-import analysis.UserTrace;
 import analysis.place_recognizer.clustering.AgglomerativeClusterer;
 import analysis.place_recognizer.weight_functions.WeightFunction;
 import analysis.place_recognizer.weight_functions.WeightOnDay;
 import analysis.place_recognizer.weight_functions.WeightOnDiversity;
 import analysis.place_recognizer.weight_functions.WeightOnTime;
 import analysis.place_recognizer.weight_functions.Weights;
+import dataset.DataFactory;
+import dataset.EventFilesFinderI;
+import dataset.file.UsersCSVCreator;
 
 public class PlaceRecognizer {
 	
@@ -113,7 +109,7 @@ public class PlaceRecognizer {
 	public Map<String, List<LatLonPoint>> runSingle(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
 		Map<String, List<LatLonPoint>> results = null;
 		try {
-			EventFilesFinder eff = new EventFilesFinder();
+			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,"12",eday,"12",lon1,lat1,lon2,lat2);
 			if(dir == null) return null;
 			

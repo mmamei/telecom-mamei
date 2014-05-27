@@ -17,8 +17,6 @@ import java.util.Set;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
-import dataset.DataFactory;
-import dataset.db.PLSEventsAroundAPlacemark;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
@@ -26,6 +24,7 @@ import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 import analysis.PLSEvent;
+import dataset.DataFactory;
 
 public class PresenceCounter {
 	

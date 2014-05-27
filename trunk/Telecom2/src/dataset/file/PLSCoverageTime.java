@@ -16,7 +16,7 @@ import utils.FileUtils;
 import utils.Logger;
 import dataset.PLSCoverageTimeI;
 
-public class PLSCoverageTime implements PLSCoverageTimeI {
+ class PLSCoverageTime implements PLSCoverageTimeI {
 	
 	static Config conf = null;
 	
@@ -55,16 +55,11 @@ public class PLSCoverageTime implements PLSCoverageTimeI {
 		//System.out.println(js);
 	}
 	
-	public PLSCoverageTime() {
-		
-	}
-	
 	
 	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
 	
 	public String getJSMap(Map<String,List<String>> all) {
 		StringBuffer sb = new StringBuffer();
-		Calendar cal = Calendar.getInstance();
 		for(String key: all.keySet()) {
 			sb.append("var dataTable_"+key+" = new google.visualization.DataTable();");
 			sb.append("dataTable_"+key+".addColumn({ type: 'date', id: 'Date' });");
@@ -72,19 +67,20 @@ public class PLSCoverageTime implements PLSCoverageTimeI {
 			sb.append("dataTable_"+key+".addRows([\n");
 			List<String> dmap = all.get(key);
 			
-			for(String day: dmap) {
+			String one_year = null;
+			for(String d: dmap) {
 				try {
-					cal.setTime(f.parse(day));
-					String s = "[ new Date("+cal.get(Calendar.YEAR)+", "+cal.get(Calendar.MONTH)+", "+cal.get(Calendar.DAY_OF_MONTH)+"), 24],\n";
-					
-					if(key.equals("file_pls_lomb"))
-						System.out.print(s);
-					
+					String year = d.substring(0,4);
+					if(one_year == null) one_year = year;
+					int month = Integer.parseInt(d.substring(4,6))-1;
+					String day = d.substring(6,8);
+					String s = "[ new Date("+year+", "+month+", "+day+"), 24 ],\n";
 					sb.append(s);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
+			sb.append("[ new Date("+one_year+", 0, 1), 0 ],\n");
 			sb.append("]);\n");
 		}
 		return sb.toString();

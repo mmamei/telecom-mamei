@@ -12,10 +12,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import dataset.PLSCoverageSpaceI;
+import dataset.db.NetworkMapFactory;
 import region.Region;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
@@ -26,7 +26,7 @@ import visual.kml.KML;
 
 
 
- public class PLSCoverageSpace extends BufferAnalyzer implements PLSCoverageSpaceI {
+ class PLSCoverageSpace extends BufferAnalyzer implements PLSCoverageSpaceI {
 	
 	SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd",Locale.US);
 	String name;
@@ -36,11 +36,11 @@ import visual.kml.KML;
 	Map<String,RegionI> cells = new HashMap<String,RegionI>();
 
 	
-	public PLSCoverageSpace() {
+	PLSCoverageSpace() {
 		
 	}
 	
-	public PLSCoverageSpace(String plsf) {
+	PLSCoverageSpace(String plsf) {
 		super();
 		System.out.println("======================> "+plsf);
 		plsf = plsf.replaceAll("\\\\", "/");

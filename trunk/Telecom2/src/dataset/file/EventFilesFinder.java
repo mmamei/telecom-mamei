@@ -8,12 +8,13 @@ import java.util.Map;
 import region.RegionMap;
 import utils.Logger;
 import dataset.DataFactory;
+import dataset.EventFilesFinderI;
 
 /*
  * This class identifies the proper PLS folder (if any) to process the event
  */
 
-public class EventFilesFinder {
+  class EventFilesFinder implements EventFilesFinderI {
 	
 	
 	private SimpleDateFormat F1 = new SimpleDateFormat("yyyy-MM-dd-hh");
@@ -22,7 +23,7 @@ public class EventFilesFinder {
 	private Map<String,RegionMap> maps;
 	private Map<String,List<String>> mapt;
 	
-	public EventFilesFinder() {
+	EventFilesFinder() {
 		maps = DataFactory.getPLSCoverageSpace().getPlsCoverage();
 		mapt = DataFactory.getPLSCoverageTime().computeAll();
 	}

@@ -24,7 +24,6 @@ import visual.java.GraphPlotter;
 import visual.java.PLSPlotter;
 import analysis.PLSTimeCounter;
 import dataset.DataFactory;
-import dataset.db.PLSEventsAroundAPlacemark;
 
 public class PlacemarkRadiusExtractor {
 	
