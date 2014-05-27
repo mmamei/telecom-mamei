@@ -17,7 +17,7 @@ import dataset.PLSEventsAroundAPlacemarkI;
 import dataset.db.insert.DBConnection;
 import dataset.db.insert.PLSTable;
 
-public class PLSEventsAroundAPlacemark implements PLSEventsAroundAPlacemarkI {	
+ class PLSEventsAroundAPlacemark implements PLSEventsAroundAPlacemarkI {	
 
 
 	public void process(Placemark p) throws Exception {

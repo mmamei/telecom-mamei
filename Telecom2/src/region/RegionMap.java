@@ -17,7 +17,6 @@ import java.util.Set;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import region.network.NetworkMapFactory;
 import utils.Colors;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
@@ -28,6 +27,8 @@ import visual.kml.KML;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+
+import dataset.db.NetworkMapFactory;
 
 public class RegionMap implements Serializable {
 	

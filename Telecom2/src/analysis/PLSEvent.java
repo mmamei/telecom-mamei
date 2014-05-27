@@ -15,9 +15,9 @@ import java.util.Set;
 
 import org.gps.utils.LatLonUtils;
 
+import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkMapFactory;
 import utils.Config;
 
 public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {

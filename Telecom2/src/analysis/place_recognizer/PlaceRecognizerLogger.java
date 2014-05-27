@@ -16,9 +16,9 @@ import java.util.Map;
 
 import org.gps.utils.LatLonPoint;
 
+import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkMapFactory;
 import utils.FileUtils;
 import visual.kml.KML;
 import analysis.PLSEvent;

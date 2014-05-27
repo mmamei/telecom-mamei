@@ -15,8 +15,8 @@ import java.util.Map;
 
 import utils.Config;
 import dataset.DataFactory;
+import dataset.EventFilesFinderI;
 import dataset.PLSCoverageTimeI;
-import dataset.file.EventFilesFinder;
 
 
 public class CityEvent {
@@ -108,7 +108,10 @@ public class CityEvent {
 			
 			//String dir = eff.find("2014-03-10","4","2014-03-10","7",11.2477,43.7629,11.2491,43.7620);
 			// get region
-			EventFilesFinder eff = new EventFilesFinder();
+			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
+			
+			
+			
 			String dir = eff.find(ce.st,ce.et,ce.spot.getLatLon()[1],ce.spot.getLatLon()[0],ce.spot.getLatLon()[1],ce.spot.getLatLon()[0]);
 				
 			String key_s = s[0];

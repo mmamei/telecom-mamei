@@ -1,19 +1,14 @@
 package analysis.find_user;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import dataset.file.EventFilesFinder;
-import dataset.file.PLSParser;
-import dataset.file.UsersCSVCreator;
 import utils.Config;
 import utils.FileUtils;
 import visual.kml.KMLPath;
-import analysis.PLSEvent;
 import analysis.UserTrace;
+import dataset.DataFactory;
+import dataset.EventFilesFinderI;
+import dataset.file.UsersCSVCreator;
 
 public class UserPlotter {
 
@@ -22,7 +17,7 @@ public class UserPlotter {
 	public void plot(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
 		try {
 			
-			EventFilesFinder eff = new EventFilesFinder();
+			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,"12",eday,"12",lon1,lat1,lon2,lat2);
 			if(dir == null) return;
 			

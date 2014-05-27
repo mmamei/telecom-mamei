@@ -8,9 +8,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import region.NetworkCell;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkCell;
 import utils.Colors;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
@@ -21,14 +21,12 @@ import dataset.db.insert.NetworkTable;
 
 
 
-public class PLSCoverageSpace implements PLSCoverageSpaceI {
+ class PLSCoverageSpace implements PLSCoverageSpaceI {
 	
 	public static final SimpleDateFormat F = new SimpleDateFormat("yyyyMMdd");
 	private int MAX_TABLES_PER_REGION = 3; // thus days
 	
-	public PLSCoverageSpace() {
-		
-	}
+	
 	
 	public Map<String,RegionMap> getPlsCoverage() {
 		Map<String,RegionMap> map = new HashMap<String,RegionMap>();

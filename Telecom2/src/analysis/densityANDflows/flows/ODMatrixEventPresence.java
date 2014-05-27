@@ -6,10 +6,10 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import dataset.db.NetworkMapFactory;
 import region.CityEvent;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkMapFactory;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;

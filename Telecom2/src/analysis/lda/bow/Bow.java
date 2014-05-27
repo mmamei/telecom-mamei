@@ -14,9 +14,9 @@ import java.util.Set;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import dataset.db.NetworkMapFactory;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkMapFactory;
 
 public abstract class Bow {
 	

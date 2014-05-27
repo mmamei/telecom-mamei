@@ -11,7 +11,7 @@ import utils.Config;
 import dataset.PLSCoverageTimeI;
 import dataset.db.insert.DBConnection;
 
-public class PLSCoverageTime implements PLSCoverageTimeI  {
+ class PLSCoverageTime implements PLSCoverageTimeI  {
 	
 	static Config conf = null;
 	
@@ -27,9 +27,7 @@ public class PLSCoverageTime implements PLSCoverageTimeI  {
 		System.out.println(apc.getJSMap(all));
 	}
 	
-	public PLSCoverageTime() {
-		
-	}
+	
 	
 	public String getJSMap(Map<String,List<String>> all) {
 		StringBuffer sb = new StringBuffer();

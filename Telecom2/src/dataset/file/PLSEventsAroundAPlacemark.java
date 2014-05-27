@@ -12,23 +12,23 @@ import java.util.List;
 import region.Placemark;
 import region.RegionI;
 import region.RegionMap;
-import region.network.NetworkMapFactory;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 import dataset.PLSEventsAroundAPlacemarkI;
+import dataset.db.NetworkMapFactory;
 
-public class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroundAPlacemarkI  {	
+class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroundAPlacemarkI  {	
 
 	private List<PrintWriter> outs;
 	private List<Placemark> placemarks;
 	private RegionMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 	
-	public PLSEventsAroundAPlacemark() {
+	PLSEventsAroundAPlacemark() {
 		
 	}
 	
-	public PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
+	PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
 		
 		outs = new ArrayList<PrintWriter>();
 		placemarks = new ArrayList<Placemark>();

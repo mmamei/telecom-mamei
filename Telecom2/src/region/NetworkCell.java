@@ -1,9 +1,8 @@
-package region.network;
+package region;
 
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import region.RegionI;
 import utils.GeomUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
