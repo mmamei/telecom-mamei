@@ -45,21 +45,23 @@ import dataset.PLSCoverageTimeI;
 			System.out.println(key+" -> "+apc.getNumYears(all.get(key)));
 		
 		
-		List<String> x = all.get("file_pls_lomb");
+		List<String> x = all.get("file_pls_ve");
 		for(String d: x)
 			System.out.println(d);
 		
-		System.out.println("**************************************************************************");
+		System.out.println("*********************************FILE************************************");
 		
 		String js = apc.getJSMap(all);
 		//System.out.println(js);
 	}
 	
 	
-	SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
+	private static SimpleDateFormat f = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
 	
 	public String getJSMap(Map<String,List<String>> all) {
+		Calendar cal = Calendar.getInstance();
 		StringBuffer sb = new StringBuffer();
+		
 		for(String key: all.keySet()) {
 			sb.append("var dataTable_"+key+" = new google.visualization.DataTable();");
 			sb.append("dataTable_"+key+".addColumn({ type: 'date', id: 'Date' });");
@@ -67,17 +69,20 @@ import dataset.PLSCoverageTimeI;
 			sb.append("dataTable_"+key+".addRows([\n");
 			List<String> dmap = all.get(key);
 			
-			String one_year = null;
+			int one_year = 0;
 			for(String d: dmap) {
 				try {
-					String year = d.substring(0,4);
-					if(one_year == null) one_year = year;
-					int month = Integer.parseInt(d.substring(4,6))-1;
-					String day = d.substring(6,8);
+					cal.setTime(f.parse(d));
+					int year = cal.get(Calendar.YEAR);
+					if(one_year == 0) one_year = year;
+					int month = cal.get(Calendar.MONTH);
+					int day = cal.get(Calendar.DAY_OF_MONTH);
 					String s = "[ new Date("+year+", "+month+", "+day+"), 24 ],\n";
+					//System.out.println(d+"-->"+s);
 					sb.append(s);
 				} catch(Exception e) {
-					e.printStackTrace();
+					System.err.println(d);
+					//e.printStackTrace();
 				}
 			}
 			sb.append("[ new Date("+one_year+", 0, 1), 0 ],\n");
@@ -143,7 +148,6 @@ import dataset.PLSCoverageTimeI;
 		return allDays;
 	}
 	
-	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	private static void analyzeDirectory(File directory, List<String> allDays) throws Exception {
 		
 		Logger.logln("\t"+directory.getAbsolutePath());
@@ -155,13 +159,14 @@ import dataset.PLSCoverageTimeI;
 			if(item.isFile()) {
 				Calendar cal = new GregorianCalendar();
 				String n = item.getName();
-				
+				try {
 				cal.setTimeInMillis(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))));
-				
-				int day =  cal.get(Calendar.DAY_OF_MONTH);
-				String sday = day < 10 ? "0"+day : ""+day;
-				
-				String key = cal.get(Calendar.YEAR)+"/"+MONTHS[cal.get(Calendar.MONTH)]+"/"+sday;
+				} catch(Exception e) {
+					System.out.println("BAD FILE = "+item);
+				}
+
+
+				String key = f.format(cal.getTime());
 				
 				if(!allDays.contains(key))
 					allDays.add(key);

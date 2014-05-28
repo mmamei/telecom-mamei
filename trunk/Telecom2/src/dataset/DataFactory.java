@@ -5,7 +5,7 @@ package dataset;
 public class DataFactory {
 	public static final int FILE = 0;
 	public static final int DB = 1;
-	public static int TYPE = FILE;
+	public static int TYPE = DB;
 	
 	
 	public static PLSEventsAroundAPlacemarkI getPLSEventsAroundAPlacemark() {

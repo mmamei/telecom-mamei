@@ -53,7 +53,7 @@ import dataset.PLSCoverageSpaceI;
 		try {
 			Config.getInstance().pls_start_time.setTime(f.parse(first));
 			Config.getInstance().pls_end_time = (Calendar)Config.getInstance().pls_start_time.clone();
-			Config.getInstance().pls_end_time.add(Calendar.DAY_OF_YEAR, 10);
+			Config.getInstance().pls_end_time.add(Calendar.DAY_OF_YEAR, 5);
 			nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
 			System.out.println(nm.getName());
 			System.out.println(plsf+" FROM: "+Config.getInstance().pls_start_time.getTime()+" TO: "+Config.getInstance().pls_end_time.getTime());

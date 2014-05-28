@@ -4,7 +4,7 @@
 <%@include file="includes/mapTimeSelectJS.html" %>
 
 <script type="text/javascript">
-jspLocation = "pls_behavior_in_area_res.jsp";
+jspLocation = "pls_time_counter_res.jsp";
 longRun = true;
 </script>
 
