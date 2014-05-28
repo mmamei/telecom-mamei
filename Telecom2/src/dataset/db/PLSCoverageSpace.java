@@ -153,7 +153,10 @@ import dataset.db.insert.NetworkTable;
 		PLSCoverageSpace ba = new PLSCoverageSpace();
 		
 		Map<String,RegionMap> map = ba.getPlsCoverage();
-	
+		
+		for(String k: map.keySet())
+			System.out.println(k);
+		
 		Logger.logln("Done!");
 	}	
 	

@@ -147,7 +147,7 @@ public class PLSTimeCounter implements Serializable {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
 			if(dir == null) return null;
-				
+			System.out.println(dir);
 			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));

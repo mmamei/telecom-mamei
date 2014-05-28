@@ -3,6 +3,7 @@ package dataset.file;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import region.RegionMap;
@@ -18,7 +19,7 @@ import dataset.EventFilesFinderI;
 	
 	
 	private SimpleDateFormat F1 = new SimpleDateFormat("yyyy-MM-dd-hh");
-	private SimpleDateFormat F2 = new SimpleDateFormat("yyyyMMdd");
+	private SimpleDateFormat F2 = new SimpleDateFormat("yyyy/MMM/dd",Locale.US);
 	
 	private Map<String,RegionMap> maps;
 	private Map<String,List<String>> mapt;
@@ -72,14 +73,18 @@ import dataset.EventFilesFinderI;
 				return null;
 			}
 			
-			
+			//System.out.println(dir);
 			
 			// check temporal constraints
 			List<String> dmap = mapt.get(dir);
 			
+			for(String d: dmap)
+				if(d.startsWith("2012"))
+				System.out.println(d);
+			System.out.println(sday+" - "+eday);
 			
 			if(dmap.contains(sday) && dmap.contains(eday))
-				return "file_"+dir;
+				return dir;
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -92,8 +97,13 @@ import dataset.EventFilesFinderI;
 	
 	public static void main(String[] args) {
 		
+		
+
+		
+		
 		EventFilesFinder eff = new EventFilesFinder();
-		String dir = eff.find("2012-03-20","19","2012-03-20","23",7.641453,45.109536,7.641453,45.109536);
+		//String dir = eff.find("2012-03-20","19","2012-03-20","23",7.641453,45.109536,7.641453,45.109536);
+		String dir = eff.find("2012-05-06","19","2012-05-06","23",9.124,45.4781,9.124,45.4781);
 		System.out.println(dir);
 	}
 }
