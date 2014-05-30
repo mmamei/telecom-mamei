@@ -10,12 +10,12 @@
 network_map_dir = G:/DATASET/PLS/file_rete
 
 // Cartella con i PLS
-pls_folder = G:/DATASET/PLS/file_pls/file_pls_piem/piem_2013
+pls_folder = G:/DATASET/PLS/file_pls/file_pls_piem
 
 
 // Filter events on the basis of time
-pls_start_time = 1/07/2013 00:00
-pls_end_time = 31/07/2013 00:00
+pls_start_time = 1/07/2011 00:00
+pls_end_time = 31/07/2015 00:00
 
 
 // File with the placemarks

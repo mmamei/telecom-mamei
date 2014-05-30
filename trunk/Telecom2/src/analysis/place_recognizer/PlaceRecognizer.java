@@ -107,6 +107,11 @@ public class PlaceRecognizer {
 	private static String[] KIND_OF_PLACES = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	public Map<String, List<LatLonPoint>> runSingle(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
+		
+		System.out.println("****** PARAMS");
+		System.out.println(sday+","+eday+","+user+","+lon1+","+lat1+","+lon2+","+lat2);
+		System.out.println("****** PARAMS");
+		
 		Map<String, List<LatLonPoint>> results = null;
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();

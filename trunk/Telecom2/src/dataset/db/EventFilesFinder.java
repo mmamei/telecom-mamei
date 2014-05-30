@@ -73,8 +73,13 @@ import dataset.EventFilesFinderI;
 			}
 			
 			// check temporal constraints
-			System.out.println(dir);			
-			List<String> dmap = mapt.get(dir.substring("file_".length()));
+			
+			
+			if(dir.startsWith("file_")) 
+				dir = dir.substring("file_".length());
+			
+		
+			List<String> dmap = mapt.get(dir);
 			
 			if(dmap.contains(sday) && dmap.contains(eday))
 				return dir;

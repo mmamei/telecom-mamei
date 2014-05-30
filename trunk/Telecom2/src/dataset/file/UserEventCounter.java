@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import utils.Config;
 import utils.FileUtils;
@@ -32,7 +35,7 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	protected void finish() {
 		try{
 			System.out.println(users_events.size());
-			PrintWriter out = new PrintWriter(new FileWriter(FileUtils.createDir("UserEventCounter")+"/"+this.getString()+"_count.csv"));
+			PrintWriter out = new PrintWriter(new FileWriter(FileUtils.createDir("BASE/UserEventCounter")+"/"+this.getString()+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"));
 			for(String user: users_events.keySet())
 				out.println(user+","+users_events.get(user));
 			out.close();
@@ -41,31 +44,70 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		}
 	}
 	
-	public static void extractUsersAboveThreshol(String file, int n) throws Exception {
-		String outfile = file.substring(0,file.indexOf("."))+n+".csv";
+	public static void extractUsersAboveThreshol(File infile, File outfile, int n) throws Exception {
 		PrintWriter out = new PrintWriter(outfile);
-		BufferedReader br = new BufferedReader(new FileReader(file));
+		BufferedReader br = new BufferedReader(new FileReader(infile));
 		String line;
 		while((line=br.readLine())!=null){
-			String[] x = line.split(",");
-			String username = x[0];
-			int n_events = Integer.parseInt(x[1]);
-			if(n_events > n)
-				out.println(username);	
+			try {
+				String[] x = line.split(",");
+				String username = x[0];
+				int n_events = Integer.parseInt(x[1]);
+				if(n_events > n) out.println(username);	
+			} catch(Exception e) {
+				System.out.println("BAD LINE = "+line);
+			}
 		}
 		br.close();
 		out.close();
-		Logger.logln("Done!");
+	}
+	
+	
+	public static void percentAnalysis(File f) throws Exception {
+		
+		
+		
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		BufferedReader br = new BufferedReader(new FileReader(f));
+		String line; 
+		while((line = br.readLine())!=null) {
+			try {
+				double v = Double.parseDouble(line.substring(line.indexOf(",")+1));
+				stats.addValue(v);
+			} catch(Exception e) {
+				System.out.println("BAD LINE = "+line);
+			}
+		}
+		br.close();
+		
+		PLSCoverageTime apc = new PLSCoverageTime();
+		Map<String,List<String>> all =  apc.computeAll();
+		String n = f.getName().substring(0,f.getName().indexOf("_count"));
+		int ndays = all.get(n).size();
+		
+		for(int i=1; i<100;i++)
+			System.out.println(i+","+stats.getPercentile(i)+" ==> "+stats.getPercentile(i)/ndays);
+		System.out.println("TOT DAYS = "+ndays);
 	}
 	
 	
 	
 	
+	
 	public static void main(String[] args) throws Exception {
+		/*
+		Config.getInstance().pls_folder = "G:/DATASET/PLS/file_pls/file_pls_piem";
+		PLSParser.MIN_HOUR = 1;
+		PLSParser.MAX_HOUR = 3;
 		UserEventCounter ba = new UserEventCounter(null,null);
 		ba.run();
+		*/
+		//percentAnalysis(FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_count_timeframe_1_3.csv"));
+		
+		extractUsersAboveThreshol(FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_count_timeframe_1_3.csv"),
+								  new File(FileUtils.getFile("BASE/UserEventCounter")+"/file_pls_piem_bogus.txt"), 100);
+		
 		Logger.logln("Done!");
-		//extractUsersAboveThreshol(FileUtils.getFileS("UserEventCounter")+"/Firenze_count.csv",2000);
 	}
 	
 }

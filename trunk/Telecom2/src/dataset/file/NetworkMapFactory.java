@@ -99,7 +99,7 @@ class NetworkMapFactory implements NetworkMapFactoryI  {
     
             String file = findClosestNetworkFile(cal);
             
-            Logger.logln("!!!! Using network file "+file);
+            //Logger.logln("!!!! Using network file "+file);
             
             RegionMap nm = mapnet.get(file);
             if(nm == null) {

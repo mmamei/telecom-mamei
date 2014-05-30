@@ -117,7 +117,7 @@ import dataset.PLSCoverageTimeI;
 			all = new HashMap<String,List<String>>();
 			for(File basedir: basedirs) {
 				for(File dir: basedir.listFiles()) {
-					Logger.logln(dir.getAbsolutePath());
+					//Logger.logln(dir.getAbsolutePath());
 					List<String> val = all.get(dir.getName());
 					if(val == null) {
 						val = new ArrayList<String>();

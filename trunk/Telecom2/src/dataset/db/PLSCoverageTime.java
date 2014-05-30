@@ -68,7 +68,7 @@ import dataset.db.insert.DBConnection;
 		return max_year - min_year + 1;
 	}
 
-	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+	//static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	public Map<String,List<String>> computeAll() {
 		Map<String,List<String>> map = new HashMap<String,List<String>>();
 		Statement s = DBConnection.getStatement();
