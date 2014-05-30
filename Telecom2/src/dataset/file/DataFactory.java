@@ -5,6 +5,7 @@ import dataset.NetworkMapFactoryI;
 import dataset.PLSCoverageSpaceI;
 import dataset.PLSCoverageTimeI;
 import dataset.PLSEventsAroundAPlacemarkI;
+import dataset.UsersAroundAnEventI;
 
 public class DataFactory {
 	
@@ -26,5 +27,9 @@ public class DataFactory {
 	
 	public static NetworkMapFactoryI getNetworkMapFactory() {
 		return NetworkMapFactory.getInstance();
+	}
+	
+	public static UsersAroundAnEventI getUsersAroundAnEvent() {
+		return new UsersAroundAnEvent();
 	}
 }

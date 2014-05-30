@@ -10,9 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import region.CityEvent;
-import utils.Logger;
+import dataset.UsersAroundAnEventI;
 
-public class UsersAroundAnEvent extends BufferAnalyzer {
+public class UsersAroundAnEvent extends BufferAnalyzer implements UsersAroundAnEventI {
 	
 	
 	private Set<String> usersAround;
@@ -22,6 +22,10 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 	Calendar startTime;
 	Calendar endTime;
 	
+	
+	UsersAroundAnEvent() {
+		
+	}
 	
 	UsersAroundAnEvent(CityEvent c) {
 		event = c;
@@ -79,7 +83,11 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 	}
 
 	
-	public static Set<String> process(CityEvent ce, boolean saveFile) {
+	public Set<String> process(CityEvent ce) {
+		return process(ce,false);
+	}
+		
+	public Set<String> process(CityEvent ce, boolean saveFile) {
 		try {
 			UsersAroundAnEvent ba = new UsersAroundAnEvent(ce);
 			//UsersAroundAnEvent ba = new UsersAroundAnEvent(CityEvent.GAME_OLIMPICO_12_3_2012);
@@ -93,7 +101,8 @@ public class UsersAroundAnEvent extends BufferAnalyzer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		process(CityEvent.getEvent("Stadio Olimpico (TO),12/03/2012"),true);
+		UsersAroundAnEvent uae = new UsersAroundAnEvent();
+		uae.process(CityEvent.getEvent("Stadio Olimpico (TO),12/03/2012"),true);
 	}
 	
 }

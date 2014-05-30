@@ -49,7 +49,7 @@ import dataset.EventFilesFinderI;
 			
 			String sday = F2.format(cs.getTime());
 			String eday = F2.format(ce.getTime());
-	
+			
 			double clat = (lat1 + lat2)/2;
 			double clon = (lon1 + lon2)/2;
 			
@@ -77,12 +77,12 @@ import dataset.EventFilesFinderI;
 			
 			// check temporal constraints
 			List<String> dmap = mapt.get(dir);
-			
+			/*
 			for(String d: dmap)
-				if(d.startsWith("2012"))
+				if(d.startsWith("2014"))
 				System.out.println(d);
 			System.out.println(sday+" - "+eday);
-			
+			*/
 			if(dmap.contains(sday) && dmap.contains(eday))
 				return dir;
 			

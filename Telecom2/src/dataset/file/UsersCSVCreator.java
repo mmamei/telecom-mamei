@@ -81,7 +81,8 @@ public class UsersCSVCreator extends BufferAnalyzer {
 			Logger.logln(file+" Does not exist!");
 			Logger.logln("Running UsersAroundAnEvent.process()");
 			try {
-				UsersAroundAnEvent.process(ce,true);
+				UsersAroundAnEvent uae = new UsersAroundAnEvent();
+				uae.process(ce,true);
 				file = FileUtils.getFile("BASE/UsersAroundAnEvent/"+ce.toFileName());
 			} catch (Exception e) {
 				e.printStackTrace();

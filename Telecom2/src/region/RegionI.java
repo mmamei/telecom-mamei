@@ -56,7 +56,7 @@ public abstract class RegionI implements Serializable {
 				"</Style>" +
 				"<Placemark>" +
 				"<name>"+name+"</name>" +
-				"<description>"+description+"</description>" +
+				"<description><![CDATA["+description+"]]></description>" +
 				"<styleUrl>#"+id+"</styleUrl>" +
 				"<Polygon>" +
 				"<outerBoundaryIs>" +
