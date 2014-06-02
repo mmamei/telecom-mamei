@@ -11,8 +11,8 @@ import org.gps.utils.LatLonPoint;
 
 import region.Placemark;
 import analysis.PLSTimeCounter;
-import analysis.place_recognizer.PlaceRecognizer;
 import analysis.presence_at_event.RunAll;
+import analysis.user_place_recognizer.PlaceRecognizer;
 
 
 // http://www.vogella.com/tutorials/JUnit/article.html

@@ -1,4 +1,4 @@
-package analysis.place_recognizer;
+package analysis.user_place_recognizer;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -15,12 +15,12 @@ import utils.FileUtils;
 import utils.FilterAndCounterUtils;
 import utils.Logger;
 import analysis.PLSEvent;
-import analysis.place_recognizer.clustering.AgglomerativeClusterer;
-import analysis.place_recognizer.weight_functions.WeightFunction;
-import analysis.place_recognizer.weight_functions.WeightOnDay;
-import analysis.place_recognizer.weight_functions.WeightOnDiversity;
-import analysis.place_recognizer.weight_functions.WeightOnTime;
-import analysis.place_recognizer.weight_functions.Weights;
+import analysis.user_place_recognizer.clustering.AgglomerativeClusterer;
+import analysis.user_place_recognizer.weight_functions.WeightFunction;
+import analysis.user_place_recognizer.weight_functions.WeightOnDay;
+import analysis.user_place_recognizer.weight_functions.WeightOnDiversity;
+import analysis.user_place_recognizer.weight_functions.WeightOnTime;
+import analysis.user_place_recognizer.weight_functions.Weights;
 import dataset.DataFactory;
 import dataset.EventFilesFinderI;
 import dataset.file.UsersCSVCreator;

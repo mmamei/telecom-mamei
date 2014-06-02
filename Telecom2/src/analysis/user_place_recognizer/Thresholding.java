@@ -1,11 +1,11 @@
-package analysis.place_recognizer;
+package analysis.user_place_recognizer;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import analysis.PLSEvent;
-import analysis.place_recognizer.weight_functions.Weights;
+import analysis.user_place_recognizer.weight_functions.Weights;
 import utils.FilterAndCounterUtils;
 
 

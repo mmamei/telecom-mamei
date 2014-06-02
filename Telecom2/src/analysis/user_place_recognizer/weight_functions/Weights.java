@@ -1,4 +1,4 @@
-package analysis.place_recognizer.weight_functions;
+package analysis.user_place_recognizer.weight_functions;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;

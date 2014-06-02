@@ -1,4 +1,4 @@
-package analysis.place_recognizer.clustering;
+package analysis.user_place_recognizer.clustering;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,8 +15,8 @@ import org.gps.utils.LatLonUtils;
 import utils.CopyAndSerializationUtils;
 import utils.Sort;
 import analysis.PLSEvent;
-import analysis.place_recognizer.Cluster;
-import analysis.place_recognizer.weight_functions.WeightOnTime;
+import analysis.user_place_recognizer.Cluster;
+import analysis.user_place_recognizer.weight_functions.WeightOnTime;
 
 
 public class AgglomerativeClusterer implements Clusterer {

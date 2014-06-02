@@ -17,7 +17,7 @@ import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 
-public class UserEventCounterDay extends BufferAnalyzerConstrained {
+class UserEventCounterDay extends BufferAnalyzerConstrained {
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	

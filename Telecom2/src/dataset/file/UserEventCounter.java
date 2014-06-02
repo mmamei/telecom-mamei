@@ -1,13 +1,12 @@
 package dataset.file;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,18 +94,22 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	
 	
 	public static void main(String[] args) throws Exception {
-		/*
-		Config.getInstance().pls_folder = "G:/DATASET/PLS/file_pls/file_pls_piem";
+		
+		
+		
+		Config.getInstance().pls_folder = "G:/DATASET/PLS/file_pls/file_pls_lomb";
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,2,1);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,3,30);
 		PLSParser.MIN_HOUR = 1;
 		PLSParser.MAX_HOUR = 3;
 		UserEventCounter ba = new UserEventCounter(null,null);
 		ba.run();
-		*/
-		//percentAnalysis(FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_count_timeframe_1_3.csv"));
+		/*
+		percentAnalysis(FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_count_timeframe_1_3.csv"));
 		
 		extractUsersAboveThreshol(FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_count_timeframe_1_3.csv"),
 								  new File(FileUtils.getFile("BASE/UserEventCounter")+"/file_pls_piem_bogus.txt"), 100);
-		
+		*/
 		Logger.logln("Done!");
 	}
 	
