@@ -1,11 +1,11 @@
-package analysis.place_recognizer.weight_functions;
+package analysis.user_place_recognizer.weight_functions;
 
 import java.util.Calendar;
 import java.util.List;
 
 import utils.FilterAndCounterUtils;
 import analysis.PLSEvent;
-import analysis.place_recognizer.Cluster;
+import analysis.user_place_recognizer.Cluster;
 
 
 public class WeightOnTime implements WeightFunction {

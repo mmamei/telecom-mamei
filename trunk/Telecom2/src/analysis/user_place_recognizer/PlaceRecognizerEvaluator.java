@@ -1,4 +1,4 @@
-package analysis.place_recognizer;
+package analysis.user_place_recognizer;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

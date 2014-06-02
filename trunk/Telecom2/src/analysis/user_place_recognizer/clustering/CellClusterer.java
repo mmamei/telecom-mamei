@@ -1,10 +1,10 @@
-package analysis.place_recognizer.clustering;
+package analysis.user_place_recognizer.clustering;
 
 import java.util.List;
 import java.util.HashMap;
 
 import analysis.PLSEvent;
-import analysis.place_recognizer.Cluster;
+import analysis.user_place_recognizer.Cluster;
 
 /**
  * 

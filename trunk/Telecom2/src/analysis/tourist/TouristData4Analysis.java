@@ -22,20 +22,20 @@ import analysis.tourist.extractGT.GTExtractor;
 
 
 /*
- *This class stores the following information associated to each user
+ * This class stores the following information associated to each user
  * user_id, mnt, num_pls, num,_days, 
- * {7*24*N matrix with the number of pls produced in a given area of the city in a givne day and hour - N are the areas of the city obtained from Voronoi}
+ * {7*24*N matrix with the number of pls produced in a given area of the city in a given day and hour - N are the areas of the city obtained from Voronoi}
  */
 
 public class TouristData4Analysis implements Serializable {
 	
 	public static transient final String TIM_MNT = "22201";
-	
-	
+
 	// d_periods = {0,0,0,0,0,1,1}
 	// mapping weekdays in 0
 	// mapping weekends in 1
 	// h_periods = {3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3}
+	
 	public static transient final String[] DP = new String[]{"W","W","W","W","W","WE","WE"};
 	
 	public static transient final String[] HP1 = new String[]{"N","N","N","N","N","N","N","M", 
