@@ -1,4 +1,4 @@
-package analysis.tourist.extractGT;
+package analysis.tourist;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -1,4 +1,4 @@
-package analysis.tourist.extractGT;
+package analysis.tourist;
 
 import java.util.List;
 
