@@ -16,7 +16,7 @@ import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
 
-public class TouristCounterByMNC {
+public class ZZZ_TouristCounterByMNC {
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	

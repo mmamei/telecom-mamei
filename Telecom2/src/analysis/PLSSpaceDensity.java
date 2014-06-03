@@ -18,7 +18,7 @@ import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
 import utils.Logger;
-import analysis.tourist.extractGT.GTExtractor;
+import analysis.tourist.GTExtractor;
 
 
 /*
