@@ -3,7 +3,6 @@ package analysis.find_user;
 import java.text.SimpleDateFormat;
 
 import utils.Config;
-import utils.FileUtils;
 import visual.kml.KMLPath;
 import analysis.UserTrace;
 import dataset.DataFactory;
@@ -23,7 +22,7 @@ public class UserPlotter {
 			
 			
 			
-			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
+			Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+dir; 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-0"));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-23"));
 						

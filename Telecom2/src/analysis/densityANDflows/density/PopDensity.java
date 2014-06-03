@@ -3,25 +3,15 @@ package analysis.densityANDflows.density;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import region.RegionI;
 import region.RegionMap;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
-import visual.java.GraphPlotter;
 import visual.kml.KMLHeatMap;
 
 public class PopDensity {
@@ -38,7 +28,7 @@ public class PopDensity {
 	
 	public static void main(String[] args) throws Exception {
 		String city = "Torino";
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("BASE/RegionMap/"+city+".ser"));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
 		Map<String,Double> space_density = computeSpaceDensity(rm);
 		plotSpaceDensity(city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], space_density, rm,0);
 		Logger.logln("Done!");
@@ -46,7 +36,7 @@ public class PopDensity {
 		
 	
 	public static void plotSpaceDensity(String city, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
-		File d = FileUtils.createDir("BASE/TouristActivity");
+		File d = new File(Config.getInstance().base_folder+"/TouristActivity");
 		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+city+".kml",space_density,rm,city,false);
 		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+city+".html", city, space_density, rm, threshold);
 	}
@@ -55,7 +45,7 @@ public class PopDensity {
 	public static Map<String,Double> computeSpaceDensity(RegionMap rm) throws Exception {
 		String city = rm.getName();
 		
-		File f = FileUtils.getFile("BASE/Tourist/"+city+".txt");
+		File f = new File(Config.getInstance().base_folder+"/Tourist/"+city+".txt");
 		if(f == null) {
 			Logger.logln("Run PLSSpaceDensity first!");
 			System.exit(0);

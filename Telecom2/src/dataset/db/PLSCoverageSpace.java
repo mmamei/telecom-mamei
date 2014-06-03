@@ -12,8 +12,8 @@ import region.NetworkCell;
 import region.RegionI;
 import region.RegionMap;
 import utils.Colors;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import dataset.PLSCoverageSpaceI;
 import dataset.db.insert.DBConnection;
@@ -31,7 +31,8 @@ import dataset.db.insert.NetworkTable;
 	public Map<String,RegionMap> getPlsCoverage() {
 		Map<String,RegionMap> map = new HashMap<String,RegionMap>();
 		
-		File odir = FileUtils.createDir("BASE/RegionMap");
+		File odir = new File(Config.getInstance().base_folder+"/RegionMap");
+		odir.mkdirs();
 		File f = new File(odir+"/plsCoverageSpace.ser");
 		if(f.exists()) {
 			return (Map<String,RegionMap>)CopyAndSerializationUtils.restore(f);

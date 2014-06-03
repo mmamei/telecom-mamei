@@ -7,9 +7,8 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
-import utils.GeomUtils;
 import utils.Logger;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -68,7 +67,8 @@ public class CreatorRegionMapCityGrid {
 		}
 		
 			
-		File dir = FileUtils.createDir("BASE/RegionMap");
+		File dir = new File(Config.getInstance().base_folder+"/RegionMap");
+		dir.mkdirs();
 		CopyAndSerializationUtils.save(new File(dir.getAbsolutePath()+"/"+city+".ser"), rm);
 	}
 }

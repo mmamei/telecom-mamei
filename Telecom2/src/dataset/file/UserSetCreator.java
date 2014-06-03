@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import utils.FileUtils;
+import utils.Config;
 import utils.Logger;
 
 
@@ -27,7 +27,8 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 
 	protected void finish() {
 		try {
-			File dir = FileUtils.createDir("BASE/UserSetCreator");
+			File dir = new File(Config.getInstance().base_folder+"/UserSetCreator");
+			dir.mkdirs();
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+".csv"));
 			for(String u: users)
 				out.println(u);

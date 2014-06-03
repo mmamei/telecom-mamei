@@ -17,7 +17,6 @@ import region.RegionMap;
 import utils.Colors;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
@@ -99,15 +98,16 @@ import dataset.PLSCoverageSpaceI;
 	
 	public Map<String,RegionMap> getPlsCoverage() {
 		Map<String,RegionMap> map = null;
-		File odir = FileUtils.createDir("BASE/RegionMap");
+		File odir = new File(Config.getInstance().base_folder+"/RegionMap");
+		odir.mkdirs();
 		File f = new File(odir+"/plsCoverageSpace.ser");
 		if(f.exists()) {
 			map = (Map<String,RegionMap>)CopyAndSerializationUtils.restore(f);
 		}
 		else {
-			File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
+			File basedir = new File(Config.getInstance().base_folder);
 			map = new HashMap<String,RegionMap>();
-			for(File basedir: basedirs) {
+			
 				for(File dir: basedir.listFiles()) {
 					if(!map.containsKey(dir.getName())) {
 						
@@ -115,7 +115,7 @@ import dataset.PLSCoverageSpaceI;
 						ba.run();
 						map.put(dir.getName(),ba.rm);
 					}
-				}
+				
 			}
 			CopyAndSerializationUtils.save(f, map);
 		}
@@ -125,7 +125,8 @@ import dataset.PLSCoverageSpaceI;
 	
 	public void printKml(Map<String,RegionMap> map) throws Exception {
 		KML kml = new KML();
-		File dir = FileUtils.createDir("BASE/RegionMap");
+		File dir = new File(Config.getInstance().base_folder+"/RegionMap");
+		dir.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+"plsCoverage.kml"));
 		
 		kml.printHeaderDocument(out, "plsCoverage");

@@ -13,7 +13,6 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import utils.Config;
-import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
@@ -226,7 +225,8 @@ public class Placemark extends RegionI {
 		//System.out.println(p.getNumCells());
 		//System.out.println(p.contains("4018584023"));
 		//System.out.println(nm.get(Long.parseLong("4018584023")));
-		File dir = FileUtils.createDir("BASE/Placemark");
+		File dir =new File(Config.getInstance().base_folder+"/Placemark");
+		dir.mkdirs();
 		String f = dir+"/"+p.name+".kml";
 		System.out.println(f);
 		p.printKML(f);

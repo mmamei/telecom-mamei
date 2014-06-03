@@ -9,8 +9,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import visual.kml.KML;
 
@@ -60,7 +60,7 @@ public class CreatorRegionMapCity {
 	
 		
 		// print the kml placemarks in kml
-		PrintWriter out = new PrintWriter(new FileWriter(FileUtils.getFile("BASE/RegionMap")+"/"+city+"_places.kml"));
+		PrintWriter out = new PrintWriter(new FileWriter(new File(Config.getInstance().base_folder+"/RegionMap")+"/"+city+"_places.kml"));
 		KML kml = new KML();
 		kml.printHeaderDocument(out, city+"_places");
 		for(int i=0; i<names.size();i++) {
@@ -130,7 +130,7 @@ public class CreatorRegionMapCity {
 		}
 		
 
-		File f = FileUtils.getFile("RegionMap");
+		File f = new File(Config.getInstance().base_folder+"/RegionMap");
 		CopyAndSerializationUtils.save(new File(f.getAbsolutePath()+"/"+city+".ser"), rm);
 	}
 }

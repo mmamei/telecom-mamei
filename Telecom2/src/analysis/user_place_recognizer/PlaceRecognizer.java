@@ -11,7 +11,6 @@ import org.gps.utils.LatLonPoint;
 
 import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.FilterAndCounterUtils;
 import utils.Logger;
 import analysis.PLSEvent;
@@ -48,7 +47,8 @@ public class PlaceRecognizer {
 		
 		Map<Integer, Cluster> clusters = null;
 		
-		File dir = FileUtils.createDir("BASE/PlaceRecognizer/Clusters");
+		File dir = new File(Config.getInstance().base_folder+"/PlaceRecognizer/Clusters");
+		dir.mkdirs();
 		File f = new File(dir+"/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
 		if(f.exists()) 
 			clusters = (Map<Integer, Cluster>)CopyAndSerializationUtils.restore(f);
@@ -118,7 +118,7 @@ public class PlaceRecognizer {
 			String dir = eff.find(sday,"12",eday,"12",lon1,lat1,lon2,lat2);
 			if(dir == null) return null;
 			
-			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
+			Config.getInstance().pls_folder = new File(Config.getInstance().pls_root_folder+"/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-0"));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-23"));
 			List<PLSEvent> events = UsersCSVCreator.process(user).getEvents(); 

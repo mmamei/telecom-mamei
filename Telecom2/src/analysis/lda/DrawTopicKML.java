@@ -11,13 +11,13 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import utils.FileUtils;
+import utils.Config;
 import visual.kml.KML;
 import visual.kml.KMLArrowCurved;
 
 public class DrawTopicKML {
 	 public static void main(String[] args) {
-		 File maind = FileUtils.getFile("Topic");
+		File maind = new File(Config.getInstance().base_folder+"/Topic");
 		for(File d: maind.listFiles()) {
 			System.out.println("Processing user "+d.getName()+" ...");
 			try {
@@ -34,7 +34,7 @@ public class DrawTopicKML {
 	 static final double PROB = 0.2;
 	 public static void processUser(String user) throws Exception {
 		 
-		 File dir = FileUtils.createDir("BASE/Topic/"+user);
+		 File dir = new File(Config.getInstance().base_folder+"/Topic/"+user);
 		 
 		 PrintWriter out = new PrintWriter(new FileWriter(dir+"/topics.kml"));
 		 KML kml = new KML();

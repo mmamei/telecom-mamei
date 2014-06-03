@@ -14,7 +14,6 @@ import org.gps.utils.LatLonUtils;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
-import utils.FileUtils;
 import dataset.DataFactory;
 import dataset.EventFilesFinderI;
 
@@ -38,11 +37,11 @@ public class RunAll {
 			PresenceCounter.PLOT = false;
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
-			//System.out.println("---> "+dir);
+			System.out.println("---> "+dir);
 			if(dir == null) return new int[]{0,0};
 			
 			SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
-			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
+			Config.getInstance().pls_folder = new File(Config.getInstance().pls_root_folder+"/"+dir).toString(); 
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));
 			
@@ -71,7 +70,8 @@ public class RunAll {
 			
 			if(CLEANUP) {
 				// clean up
-				String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+				File odir = new File(Config.getInstance().base_folder+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir());
+				odir.mkdirs();
 				File f = new File(odir+"/"+PlacemarkRadiusExtractor.OFILE);
 				f.delete();
 				
@@ -88,7 +88,7 @@ public class RunAll {
 				f.delete();
 				
 				
-				d = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir());
+				d = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir());
 				files = d.listFiles(new FilenameFilter() {
 				    @Override
 				    public boolean accept(File dir, String name) {

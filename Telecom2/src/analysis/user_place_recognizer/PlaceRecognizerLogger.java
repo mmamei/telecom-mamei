@@ -18,7 +18,7 @@ import org.gps.utils.LatLonPoint;
 
 import region.RegionI;
 import region.RegionMap;
-import utils.FileUtils;
+import utils.Config;
 import visual.kml.KML;
 import analysis.PLSEvent;
 import dataset.file.DataFactory;
@@ -29,7 +29,8 @@ public class PlaceRecognizerLogger {
 	
 	public static void log(String username, String kind_of_place, Map<Integer, Cluster> clusters) {
 		try {
-		File dir = FileUtils.createDir("BASE/PlaceRecognizerLogger/"+username+"/"+kind_of_place);
+		File dir = new File(Config.getInstance().base_folder+"/PlaceRecognizerLogger/"+username+"/"+kind_of_place);
+		dir.mkdirs();
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/eventsXcluster.txt")));	
 		for(int k : clusters.keySet()) {
 			out.println("Cluster "+k+":");

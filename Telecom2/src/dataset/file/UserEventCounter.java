@@ -14,7 +14,6 @@ import java.util.Map;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
 
 public class UserEventCounter extends BufferAnalyzerConstrained {
@@ -34,7 +33,9 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	protected void finish() {
 		try{
 			System.out.println(users_events.size());
-			PrintWriter out = new PrintWriter(new FileWriter(FileUtils.createDir("BASE/UserEventCounter")+"/"+this.getString()+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"));
+			File d = new File(Config.getInstance().base_folder+"/UserEventCounter");
+			d.mkdirs();
+			PrintWriter out = new PrintWriter(new FileWriter(d+"/"+this.getString()+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"));
 			for(String user: users_events.keySet())
 				out.println(user+","+users_events.get(user));
 			out.close();
@@ -97,7 +98,7 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		
 		
 		
-		Config.getInstance().pls_folder = "G:/DATASET/PLS/file_pls/file_pls_lomb";
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_lomb";
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,2,1);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,3,30);
 		PLSParser.MIN_HOUR = 1;

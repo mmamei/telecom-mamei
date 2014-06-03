@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import analysis.PLSSpaceDensity;
 import region.RegionMap;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
+import analysis.PLSSpaceDensity;
 
 public class ZZZ_TouristCounterByMNC {
 	
@@ -30,8 +30,8 @@ public class ZZZ_TouristCounterByMNC {
 	private static void process(String city, int month) throws Exception {
 		
 		
-		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/UserEventCounter/"+city+"_cellacXhour.csv")));
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("BASE/RegionMap/"+city+".ser"));
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/UserEventCounter/"+city+"_cellacXhour.csv")));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
 		
 		Map<String,String> mncT = mncT();
 		
@@ -57,7 +57,7 @@ public class ZZZ_TouristCounterByMNC {
 		}
 		br.close();
 		
-		File f = FileUtils.getFile("BASE/TouristData");
+		File f = new File(Config.getInstance().base_folder+"/TouristData");
 		PrintWriter out = new PrintWriter(new FileWriter(f+"/"+city+"_"+MONTHS[month]+"_count.csv"));
 	
 		LinkedHashMap<String, Integer> ordered = Sort.sortHashMapByValuesD(count,null);

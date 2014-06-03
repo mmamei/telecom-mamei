@@ -20,10 +20,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import region.RegionMap;
 import utils.Config;
-import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import utils.Mail;
 
@@ -102,7 +99,7 @@ public class PLSTable {
 			Mail.send("completed!");
 			
 			// delete the file plsCoverageSpace.ser as new regions might have been added
-			File odir = FileUtils.createDir("BASE/RegionMap");
+			File odir = new File(Config.getInstance().base_folder+"/RegionMap");
 			File f = new File(odir+"/plsCoverageSpace.ser");
 			f.delete();
 			

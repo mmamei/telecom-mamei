@@ -1,10 +1,11 @@
 package zzz_misc_code;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
 import utils.Colors;
-import utils.FileUtils;
+import utils.Config;
 import utils.Logger;
 import visual.kml.KML;
 
@@ -36,7 +37,9 @@ public class Voronoi {
 		
 		
 		Geometry voronoi = v.getDiagram(fact);
-		PrintWriter out = new PrintWriter(new FileWriter(FileUtils.createDir("BASE/Voronoi")+"/test.kml"));
+		File dir = new File(Config.getInstance().base_folder+"/Voronoi");
+		dir.mkdirs();
+		PrintWriter out = new PrintWriter(new FileWriter(dir+"/test.kml"));
 		KML kml = new KML();
 		kml.printHeaderDocument(out, "test");
 		for(int i=0; i<voronoi.getNumGeometries();i++) {

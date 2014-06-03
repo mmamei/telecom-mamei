@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import region.RegionMap;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import visual.kml.KMLPath;
 import analysis.lda.bow.Bow;
@@ -32,8 +32,8 @@ public class CreateBagOfWords {
 		String user_id;
 		int num_pls;
 		int num_days;
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("BASE/RegionMap/"+city+".ser"));
-		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/UserEventCounter/"+city+"_cellXHour.csv")));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/UserEventCounter/"+city+"_cellXHour.csv")));
 		
 		int n_users_processed = 0;
 		
@@ -68,10 +68,10 @@ public class CreateBagOfWords {
 	
 	public static void processUser(String user_id,Map<String,List<String>> docs,String line,RegionMap rm) {
 		
-		File dir = FileUtils.getFile("BASE/Topic/"+user_id);
-		if(dir != null) return;
+		File dir = new File(Config.getInstance().base_folder+"/Topic/"+user_id);
+		if(dir.exists()) return;
 		// create user directory
-		dir = FileUtils.createDir("BASE/Topic/"+user_id);
+		dir.mkdirs();
 		
 		
 		// create kml file

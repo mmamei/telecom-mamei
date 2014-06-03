@@ -17,7 +17,6 @@ import region.CityEvent;
 import region.Placemark;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import utils.StatsUtils;
 import visual.java.GraphPlotter;
@@ -56,7 +55,7 @@ public class PlacemarkRadiusExtractor {
 	}
 		
 	public static void process(List<CityEvent> all) throws Exception {
-		String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+		String odir = new File(Config.getInstance().base_folder+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
 		new File(odir).mkdirs();
 		File f = new File(odir+"/"+OFILE);
 		if(f.exists() && f.length() > 0) {
@@ -164,7 +163,7 @@ public class PlacemarkRadiusExtractor {
 		String n = le.get(0).spot.getName();
 		if(ring) n = "ring_"+n;
 		
-		String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+		String odir = new File(Config.getInstance().base_folder+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
 		File dir = MAX ? new File(odir+"/"+placemark+"/zXr_ser_computed_with_max") : new File(odir+"/"+placemark+"/zXr_ser_computed_with_sum");
 		File f = new File(dir+"/"+n+"_zXradius.ser");
 		
@@ -331,7 +330,8 @@ public class PlacemarkRadiusExtractor {
 		
 		String subdir = Config.getInstance().get_pls_subdir();
 		PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark(); 
-		File d = FileUtils.createDir("BASE/PLSEventsAroundAPlacemark/"+subdir);
+		File d = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+subdir);
+		d.mkdirs();
 		String file = d.getAbsolutePath()+"/"+p.getName()+"_"+(double)MAX_R+pap.getFileSuffix(constraints)+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
@@ -351,7 +351,7 @@ public class PlacemarkRadiusExtractor {
 			
 			if(ring) p.changeRadiusRing(max_r);
 			else p.changeRadius(max_r);
-			PLSTimeDensity plsmap = PLSTimeDensity.getPLSTimeCounter("BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+pap.getFileSuffix(constraints)+".txt",p);
+			PLSTimeDensity plsmap = PLSTimeDensity.getPLSTimeCounter(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+pap.getFileSuffix(constraints)+".txt",p);
 			
 			if(plsmap.startTime == null) {
 				for(int i=0; i<relevantEvents.size();i++) {
@@ -401,7 +401,8 @@ public class PlacemarkRadiusExtractor {
 	public static Map<String,Double> readBestR(boolean individual,boolean diff) throws Exception {
 		String im = individual ? "individual" : "multiple";
 		String sdiff = diff ? "_diff" : "";
-		String odir = FileUtils.createDir("BASE/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir()).toString();
+		File odir = new File(Config.getInstance().base_folder+"/PlacemarkRadiusExtractor/"+Config.getInstance().get_pls_subdir());
+		odir.mkdirs();
 		return readBestR(odir+"/result_"+im+sdiff+".csv");
 	}
 
