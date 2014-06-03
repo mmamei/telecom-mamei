@@ -68,7 +68,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+"_cellXHour.csv"));
 			out.println("// TOT. DAYS = "+getTotDays());
 			for(String user: users_info.keySet())
-				if(users_info.get(user).getNumDays() >= 14)
+				//if(users_info.get(user).getNumDays() >= 14)
 					out.println(user+","+users_info.get(user));
 			out.close();
 		}catch(Exception e) {
@@ -102,6 +102,12 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		Logger.logln("Done!");
 	}
 	
+	/*
+	public static String[] process(String line) {
+		
+	}
+	*/
+	
 	/***********************************************************************************************************************/
 	/* USER INFO INNER CLASS */
 	
@@ -112,7 +118,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		
 		String s;
 		public void add(String day, String dayw, int h, String cellac) {
-			s = day+":"+dayw+":"+h+":"+celllac;
+			s = day+":"+dayw+":"+h+": "+celllac;
 			if(!pls.contains(s)) pls.add(s);
 		}
 		

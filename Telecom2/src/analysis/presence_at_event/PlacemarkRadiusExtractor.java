@@ -22,8 +22,9 @@ import utils.Logger;
 import utils.StatsUtils;
 import visual.java.GraphPlotter;
 import visual.java.PLSPlotter;
-import analysis.PLSTimeCounter;
+import analysis.PLSTimeDensity;
 import dataset.DataFactory;
+import dataset.PLSEventsAroundAPlacemarkI;
 
 public class PlacemarkRadiusExtractor {
 	
@@ -320,6 +321,8 @@ public class PlacemarkRadiusExtractor {
 	}
 	*/
 	
+	public static Map<String, Object> constraints = null;
+	
 	public static List<double[][]> computeZXRadius(List<CityEvent> relevantEvents, boolean ring) throws Exception {
 		
 		Placemark p = relevantEvents.get(0).spot.clone();
@@ -327,14 +330,14 @@ public class PlacemarkRadiusExtractor {
 		Logger.logln("Processing events associated to "+p.getName());
 		
 		String subdir = Config.getInstance().get_pls_subdir();
-		
+		PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark(); 
 		File d = FileUtils.createDir("BASE/PLSEventsAroundAPlacemark/"+subdir);
-		String file = d.getAbsolutePath()+"/"+p.getName()+"_"+(double)MAX_R+".txt";
+		String file = d.getAbsolutePath()+"/"+p.getName()+"_"+(double)MAX_R+pap.getFileSuffix(constraints)+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
-			DataFactory.getPLSEventsAroundAPlacemark().process(p);
+			pap.process(p,constraints);
 		}
 		
 		
@@ -348,7 +351,7 @@ public class PlacemarkRadiusExtractor {
 			
 			if(ring) p.changeRadiusRing(max_r);
 			else p.changeRadius(max_r);
-			PLSTimeCounter plsmap = PLSTimeCounter.getPLSTimeCounter("BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+".txt",p);
+			PLSTimeDensity plsmap = PLSTimeDensity.getPLSTimeCounter("BASE/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+pap.getFileSuffix(constraints)+".txt",p);
 			
 			if(plsmap.startTime == null) {
 				for(int i=0; i<relevantEvents.size();i++) {
@@ -359,7 +362,7 @@ public class PlacemarkRadiusExtractor {
 				continue;
 			}
 			
-			DescriptiveStatistics[] stats = PLSTimeCounter.getStats(plsmap);
+			DescriptiveStatistics[] stats = PLSTimeDensity.getStats(plsmap);
 			double[] z_usr_data =  StatsUtils.getZH(stats[1],plsmap.startTime);
 			
 			if (PLOT) PLSPlotter.drawGraph(p.getName()+"_"+max_r,plsmap.getDomain(),z_usr_data,plsmap,relevantEvents);

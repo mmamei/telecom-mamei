@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Set;
 
 import region.Placemark;
@@ -20,7 +21,7 @@ import dataset.db.insert.PLSTable;
  class PLSEventsAroundAPlacemark implements PLSEventsAroundAPlacemarkI {	
 
 
-	public void process(Placemark p) throws Exception {
+	public void process(Placemark p, Map<String,Object> constraints) throws Exception {
 				
 		String dir = FileUtils.createDir("BASE/PLSEventsAroundAPlacemark").getAbsolutePath();
 		dir = dir+"/"+Config.getInstance().get_pls_subdir();
@@ -68,5 +69,9 @@ import dataset.db.insert.PLSTable;
 		s.close();
 		DBConnection.closeConnection();
 		out.close();
+	}
+	
+	public String getFileSuffix(Map<String,Object> constraints) {
+		return "";
 	}
 }

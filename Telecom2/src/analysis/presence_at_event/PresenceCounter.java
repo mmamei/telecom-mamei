@@ -25,6 +25,7 @@ import utils.Logger;
 import visual.java.GraphScatterPlotter;
 import analysis.PLSEvent;
 import dataset.DataFactory;
+import dataset.PLSEventsAroundAPlacemarkI;
 
 public class PresenceCounter {
 	
@@ -180,11 +181,15 @@ public class PresenceCounter {
 	
 	public static File getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
-		File f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt");
+		
+		PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
+		Map<String,Object> constraints = PlacemarkRadiusExtractor.constraints;
+		
+		File f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
 		if(f==null || !f.exists()) {
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
-			DataFactory.getPLSEventsAroundAPlacemark().process(p);
-			f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt");
+			pap.process(p,constraints);
+			f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
 		}
 		return f;
 	}
@@ -196,7 +201,7 @@ public class PresenceCounter {
 		BufferedReader in = new BufferedReader(new FileReader(file));
 		while((line = in.readLine()) != null){
 			String[] splitted = line.split(",");
-			if(splitted.length == 5) {
+			//if(splitted.length == 5) {
 				try {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
 				} catch(NumberFormatException e) {
@@ -210,8 +215,8 @@ public class PresenceCounter {
 						users.add(splitted[0]);
 					}
 				}
-			}
-			else System.out.println("Problems: "+line);
+			//}
+			//else System.out.println("Problems: "+line);
 		}
 		in.close();
 		return users;
@@ -230,7 +235,7 @@ public class PresenceCounter {
 			String[] splitted = line.split(",");
 			List<PLSEvent> list = usr_pls.get(splitted[0]);
 			try{
-			if(list!=null) list.add(new PLSEvent(splitted[0],"imsi",splitted[3],splitted[1]));
+			if(list!=null) list.add(new PLSEvent(splitted[0],splitted[2],splitted[3],splitted[1]));
 			}catch(NumberFormatException e) {
 				System.err.println(line);
 				continue;

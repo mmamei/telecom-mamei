@@ -15,7 +15,7 @@ import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
 
-public class TouristCounter {
+public class TouristCounterByMNC {
 	
 	static final String[] MONTHS = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	
@@ -26,7 +26,7 @@ public class TouristCounter {
 		
 	}
 	
-	public static void process(String city, int month) throws Exception {
+	private static void process(String city, int month) throws Exception {
 		
 		
 		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/UserEventCounter/"+city+"_cellacXhour.csv")));
@@ -69,7 +69,7 @@ public class TouristCounter {
 	}
 	
 	
-	public static Map<String,String> mncT() throws Exception {
+	private static Map<String,String> mncT() throws Exception {
 		Map<String,String> mncT = new HashMap<String,String>();
 		
 		BufferedReader br = new BufferedReader(new FileReader("G:/DATASET/PLS/MCC-MNC.csv"));
