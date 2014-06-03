@@ -1,6 +1,7 @@
 package analysis;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -21,16 +22,17 @@ import utils.FileUtils;
 import utils.Logger;
 import dataset.DataFactory;
 import dataset.EventFilesFinderI;
+import dataset.PLSEventsAroundAPlacemarkI;
 
 
 
-public class PLSTimeCounter implements Serializable {
+public class PLSTimeDensity implements Serializable {
 	public Map<String,Set<String>> usr_counter;
 	public Map<String,Integer> pls_counter;
 	public Calendar startTime = null;
 	public Calendar endTime = null;
 	
-	public PLSTimeCounter() {
+	public PLSTimeDensity() {
 		this.usr_counter = new TreeMap<String,Set<String>>();
 		this.pls_counter  = new TreeMap<String,Integer>();
 	}
@@ -59,12 +61,12 @@ public class PLSTimeCounter implements Serializable {
 	
 	
 	
-	public static PLSTimeCounter getPLSTimeCounter(String file, Placemark within) {
+	public static PLSTimeDensity getPLSTimeCounter(String file, Placemark within) {
 		
 		//System.out.println(file);
 		//System.out.println(FileUtils.getFile(file));
 		
-		PLSTimeCounter plsmap = new PLSTimeCounter();
+		PLSTimeDensity plsmap = new PLSTimeDensity();
 		String[] splitted;
 		String line;
 		
@@ -75,7 +77,7 @@ public class PLSTimeCounter implements Serializable {
 				line = line.trim();
 				if(line.length() < 1) continue; // extra line at the end of file
 				splitted = line.split(",");
-				if(splitted.length == 5 && !splitted[3].equals("null")) {
+				//if(splitted.length == 5 && !splitted[3].equals("null")) {
 					
 					String username = splitted[0];
 					cal.setTimeInMillis(Long.parseLong(splitted[1]));
@@ -91,7 +93,7 @@ public class PLSTimeCounter implements Serializable {
 						Integer count = plsmap.pls_counter.get(key);
 						plsmap.pls_counter.put(key, count == null ? 0 : count+1);	
 					}
-				}
+				//}
 			}
 			in.close();
 		} catch(Exception e) {
@@ -101,7 +103,7 @@ public class PLSTimeCounter implements Serializable {
 	}
 	
 	
-	public static DescriptiveStatistics[] getStats(PLSTimeCounter plsmap) {
+	public static DescriptiveStatistics[] getStats(PLSTimeDensity plsmap) {
 		DescriptiveStatistics pls_stats = new DescriptiveStatistics();
 		DescriptiveStatistics usr_stats = new DescriptiveStatistics();
 		
@@ -142,7 +144,7 @@ public class PLSTimeCounter implements Serializable {
 	
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
-	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2) {
+	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, Map<String, Object> constraints) {
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
@@ -160,10 +162,10 @@ public class PLSTimeCounter implements Serializable {
 			String n = "tmp";
 			Placemark p = new Placemark(n,new double[]{lat,lon},r);
 			
-			
-			DataFactory.getPLSEventsAroundAPlacemark().process(p);
-			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt";
-			PLSTimeCounter plsmap = getPLSTimeCounter(file,null);
+			PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
+			pap.process(p,constraints);
+			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt";
+			PLSTimeDensity plsmap = getPLSTimeCounter(file,null);
 			//(new File(file)).delete();
 			
 			
@@ -188,10 +190,9 @@ public class PLSTimeCounter implements Serializable {
 	
 	public static void main(String[] args) throws Exception { 
 		
-		PLSTimeCounter pbia = new PLSTimeCounter();
+		PLSTimeDensity pbia = new PLSTimeDensity();
 		//Object[] plsdata = pbia.process("2014-03-13","0","2014-03-15","10",12.3238,45.4425,12.3238,45.4425);
-		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672);
-		
+		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,null);
 		
 		
 		if(plsdata!=null)

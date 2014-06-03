@@ -4,10 +4,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import region.Placemark;
 import region.RegionI;
@@ -18,17 +22,16 @@ import utils.Logger;
 import dataset.PLSEventsAroundAPlacemarkI;
 
 class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroundAPlacemarkI  {	
-
+	private Map<String,Object> constraints;
 	private List<PrintWriter> outs;
 	private List<Placemark> placemarks;
 	private RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
 	
 	PLSEventsAroundAPlacemark() {
-		
 	}
 	
-	PLSEventsAroundAPlacemark(List<Placemark> ps, double[] radii) {
-		
+	PLSEventsAroundAPlacemark(List<Placemark> ps, Map<String,Object> constraints) {
+		this.constraints = constraints;
 		outs = new ArrayList<PrintWriter>();
 		placemarks = new ArrayList<Placemark>();
 		
@@ -41,10 +44,9 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 			File fd = new File(dir);
 			if(!fd.exists()) fd.mkdirs();	
 			
-			for(Placemark p: ps)
-			for(double r: radii) {
-				outs.add(new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.getName()+"_"+r+".txt")))));
-				placemarks.add(new Placemark(p.getName(),p.getLatLon(),r));
+			for(Placemark p: ps) {
+				outs.add(new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.getName()+"_"+p.getRadius()+getFileSuffix(constraints)+".txt")))));
+				placemarks.add(new Placemark(p.getName(),p.getLatLon(),p.getRadius()));
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -63,7 +65,6 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 	String imsi;
 	String celllac;
 	String timestamp;
-	Calendar cal = new GregorianCalendar();
 	
 	protected void analyze(String line) {
 		try {
@@ -72,13 +73,9 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 		imsi = fields[1];
 		celllac = fields[2];
 		timestamp = fields[3];
-		RegionI nc = nm.getRegion(celllac);
-		
 		for(int i=0; i<placemarks.size();i++) {
-			if(placemarks.get(i).contains(celllac)) {
-				if(nc == null) outs.get(i).println(username+","+timestamp+","+imsi+",null");
-				else outs.get(i).println(username+","+timestamp+","+imsi+","+celllac+","+nc.getName());
-			}
+			if(placemarks.get(i).contains(celllac)) 
+				outs.get(i).println(username+","+timestamp+","+imsi+","+celllac);
 		}
 		}catch(Exception e) {
 			System.err.println(line);
@@ -90,28 +87,35 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 			out.close();
 	}
 	
-	public void process(Placemark p) throws Exception {
+	public void process(Placemark p, Map<String,Object> constraints) throws Exception {
 		List<Placemark> ps = new ArrayList<Placemark>();
 		ps.add(p);
-		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps, new double[]{p.getRadius()});
+		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps,constraints);
 		PLSParser.parse(ba);
 		ba.finish();
 	}
 	
-	private static void process2(List<Placemark> p, double[] r) throws Exception {
-		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(p, r);
+	private void process(List<Placemark> p, Map<String,Object> constraints) throws Exception {
+		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(p,constraints);
 		PLSParser.parse(ba);
 		ba.finish();
 	}
 	
-	
+	public String getFileSuffix(Map<String,Object> constraints) {
+		String suffix = "A";
+		if(constraints != null) {
+			for(String key: constraints.keySet())
+				suffix += "_"+key+"_"+constraints.get(key);
+		}
+		return suffix;
+	}
 	
 	
 	
 	
 	public static void main(String[] args) throws Exception {
 		
-		double[] rs = new double[]{1500,1400,1300,1200,1100,1000,900,800,700,600,500,400,300,200,100,0,-100,-200,-300,-400,-500};
+		
 		List<Placemark> ps = new ArrayList<Placemark>();
 		ps.add(Placemark.getPlacemark("Stadio San Siro (MI)"));
 		ps.add(Placemark.getPlacemark("Stadio Atleti Azzurri d'Italia (BG)"));
@@ -126,7 +130,81 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 		//ps.add(Placemark.getPlacemark("Piazza Vittorio (TO)"));
 		//ps.add(Placemark.getPlacemark("Parco Dora (TO)"));
 		
-		process2(ps,rs);
+		Map<String,Object> constraints = null;
+		PLSEventsAroundAPlacemark pap = new PLSEventsAroundAPlacemark();
+		pap.process(ps,constraints);
 		Logger.logln("Done");
 	}
+	
+	
+	
+	
+	/***********************************************************************************************************************/
+	/* USER INFO INNER CLASS */
+	private static SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
+	private static Calendar cal = Calendar.getInstance();
+	private class UserInfo {
+		private String usrname;
+		private String imsi;
+		private List<String> pls;
+		
+		UserInfo(String username, String imsi) {
+			this.usrname = username;
+			this.imsi = imsi;
+			pls = new ArrayList<String>();
+		}
+		
+		
+		public void add(String timestamp, String cellac) {
+			pls.add(timestamp+":"+celllac);
+		}
+		
+		public int getNumDays() {
+			return getDays().size();
+		}
+		
+		
+		public Set<String> getDays() {
+			Set<String> days = new HashSet<String>();
+			for(String p:pls) {
+				cal.setTimeInMillis(Long.parseLong(p.substring(0,p.indexOf(":"))));
+				days.add(sd.format(cal.getTime()));
+			}
+			return days;
+		}
+		
+		public int getDaysInterval() {
+			Calendar[] min_max = getTimeRange();
+			Calendar min = min_max[0];
+			Calendar max = min_max[1];
+			return 1+(int)Math.floor((max.getTimeInMillis() - min.getTimeInMillis())/(1000*3600*24));
+		}
+		
+		public Calendar[] getTimeRange() {
+			Calendar min = null;
+			Calendar max = null;
+			for(String p:pls) {
+				String[] day = p.substring(0, p.indexOf(":")).split("-"); // cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH);
+				int year = Integer.parseInt(day[0]);
+				int month = Integer.parseInt(day[1]);
+				int d = Integer.parseInt(day[2]);
+				Calendar c = new GregorianCalendar(year,month,d);
+				if(min == null || c.before(min)) min = c;
+				if(max == null || c.after(max)) max = c;
+			}
+			return new Calendar[]{min,max};
+		}
+	
+		
+		public String toString() {			
+			StringBuffer sb = new StringBuffer();
+			for(String p:pls) {
+				String[] tc = p.split(":"); 
+				sb.append(username+","+tc[0]+","+imsi+","+tc[1]+"\n");
+			}
+			return sb.toString();
+			
+		}
+	}
+
 }
