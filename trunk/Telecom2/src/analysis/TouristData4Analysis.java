@@ -1,4 +1,4 @@
-package analysis.tourist;
+package analysis;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -107,12 +107,12 @@ public class TouristData4Analysis implements Serializable {
 	
 	public static transient String[] MAP_LABELS = null;	
 	
-	String user_id;
-	String mnt;
-	int num_pls;
-	int num_days;
-	int days_interval;
-	float[][][] plsMatrix;
+	public String user_id;
+	public String mnt;
+	public int num_pls;
+	public int num_days;
+	public int days_interval;
+	public float[][][] plsMatrix;
 	
 	/* String events is in the form:
 	 * user_id, mnt, num_pls, num,_days, 2013-5-23:Sun:cellac,....
