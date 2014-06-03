@@ -201,7 +201,7 @@ public class PresenceCounter {
 		BufferedReader in = new BufferedReader(new FileReader(file));
 		while((line = in.readLine()) != null){
 			String[] splitted = line.split(",");
-			//if(splitted.length == 5) {
+			if(splitted.length == 4) {
 				try {
 				cal.setTimeInMillis(Long.parseLong(splitted[1]));
 				} catch(NumberFormatException e) {
@@ -215,7 +215,7 @@ public class PresenceCounter {
 						users.add(splitted[0]);
 					}
 				}
-			//}
+			}
 			//else System.out.println("Problems: "+line);
 		}
 		in.close();

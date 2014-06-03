@@ -13,7 +13,7 @@ public class PLSPlotter {
 	
 public static GraphPlotter drawGraph(String title, String[] domain, double[] data, PLSTimeDensity plsmap, List<CityEvent> relevantEvents) {
 		
-		GraphPlotter gps =  GraphPlotter.drawGraph("events around "+title, "", "hour", "n.", "", domain, data);
+		GraphPlotter gps =  GraphPlotter.drawGraph(title, "", "hour", "n.", "", domain, data);
 		
 		if(relevantEvents!=null) {
 			// draw events' annotations 
@@ -80,7 +80,7 @@ public static GraphPlotter drawGraph(String title, String[] domain, double[] dat
 			ncols = 2;
 		}
 	
-		GraphPlotter[] gps =  GraphPlotter.drawMultiGraph(nrows, ncols, "events around "+title, titles, "hour", "n.", labels, domains, data);
+		GraphPlotter[] gps =  GraphPlotter.drawMultiGraph(nrows, ncols, title, titles, "hour", "n.", labels, domains, data);
 		
 		if(relevantEvents!=null) {
 			// draw events' annotations 

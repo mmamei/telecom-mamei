@@ -48,8 +48,8 @@ public class TouristAggregateActivity {
 		Map<String,Double> space_density = computeSpaceDensity(rm);
 		plotSpaceDensity(city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], space_density, rm,0);
 		
-		Map<String,Double> time_density = computeTimeDensity(rm);
-		plotTimeDensity(city,time_density);
+		//Map<String,Double> time_density = computeTimeDensity(rm);
+		//plotTimeDensity(city,time_density);
 	}
 	
 	public static void plotSpaceDensity(String city, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
@@ -57,7 +57,7 @@ public class TouristAggregateActivity {
 		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+city+".kml",space_density,rm,city,false);
 		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+city+".html", city, space_density, rm, threshold);
 	}
-	
+	/*
 	public static void plotTimeDensity(String city, Map<String,Double> time_density) {
 		 
 		DescriptiveStatistics[] hstats = new DescriptiveStatistics[24];
@@ -133,7 +133,7 @@ public class TouristAggregateActivity {
 		gp = GraphPlotter.drawGraph(""+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], ""+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], "", "time", "z_num pls", domain, val);			
 		gp.save(FileUtils.getFile("BASE/TouristActivity")+"/"+city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG]+"_z_day.png");
 	}
-	
+	*/
 	
 	public static Map<String,Double> computeSpaceDensity(RegionMap rm) throws Exception {
 		String city = rm.getName();
@@ -174,7 +174,7 @@ public class TouristAggregateActivity {
 	}
 	
 	
-	
+	/*
 	public static Map<String,Double> computeTimeDensity(RegionMap rm) throws Exception {
 		String city = rm.getName();
 		
@@ -204,12 +204,13 @@ public class TouristAggregateActivity {
 		br.close();
 		return td;
 	}
-	
+	*/
 	public static boolean skip(String mnt, int num_pls, int num_days) {
 		if(U_SEG == TIM && !mnt.equals("22201")) return true;
 		if(U_SEG == ROAMING && mnt.equals("22201")) return true;
 		if(num_days < MIN_DAYS || num_days > MAX_DAYS) return true;
 		return false;
 	}
+	
 	
 }

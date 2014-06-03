@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import analysis.TouristData4Analysis;
 import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;

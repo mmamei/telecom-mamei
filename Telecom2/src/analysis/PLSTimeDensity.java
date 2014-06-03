@@ -1,12 +1,12 @@
 package analysis;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -20,6 +20,7 @@ import region.Placemark;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
+import visual.java.PLSPlotter;
 import dataset.DataFactory;
 import dataset.EventFilesFinderI;
 import dataset.PLSEventsAroundAPlacemarkI;
@@ -36,8 +37,6 @@ public class PLSTimeDensity implements Serializable {
 		this.usr_counter = new TreeMap<String,Set<String>>();
 		this.pls_counter  = new TreeMap<String,Integer>();
 	}
-	
-	 
 	
 	public int getHours() {
 		return (int)Math.ceil((1.0*(endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 3600000));
@@ -107,15 +106,17 @@ public class PLSTimeDensity implements Serializable {
 		DescriptiveStatistics pls_stats = new DescriptiveStatistics();
 		DescriptiveStatistics usr_stats = new DescriptiveStatistics();
 		
-		Calendar cal = (Calendar)plsmap.startTime.clone();
-		while(!cal.after(plsmap.endTime)) {
-			String key = getKey(cal);
-			Integer pls_count = plsmap.pls_counter.get(key);
-			double pls = pls_count == null ? 0 : (double)pls_count;
-			double usr = plsmap.usr_counter.get(key) == null ? 0 : plsmap.usr_counter.get(key).size();	
-			pls_stats.addValue(pls);
-			usr_stats.addValue(usr);
-			cal.add(Calendar.HOUR, 1);
+		if(plsmap.startTime!=null) {
+			Calendar cal = (Calendar)plsmap.startTime.clone();
+			while(!cal.after(plsmap.endTime)) {
+				String key = getKey(cal);
+				Integer pls_count = plsmap.pls_counter.get(key);
+				double pls = pls_count == null ? 0 : (double)pls_count;
+				double usr = plsmap.usr_counter.get(key) == null ? 0 : plsmap.usr_counter.get(key).size();	
+				pls_stats.addValue(pls);
+				usr_stats.addValue(usr);
+				cal.add(Calendar.HOUR, 1);
+			}
 		}
 		return new DescriptiveStatistics[]{pls_stats,usr_stats};
 	}
@@ -168,8 +169,7 @@ public class PLSTimeDensity implements Serializable {
 			PLSTimeDensity plsmap = getPLSTimeCounter(file,null);
 			//(new File(file)).delete();
 			
-			
-			
+		
 			DescriptiveStatistics[] stats = getStats(plsmap);
 			
 			/*
@@ -180,7 +180,7 @@ public class PLSTimeDensity implements Serializable {
 			double[] z_usr_data =  StatsUtils.getZH(stats[1],plsmap.startTime);
 			*/
 			
-			
+			if(stats[0].getN() == 0) return null;
 			return new Object[]{plsmap.getDomain(),stats[1].getValues()}; // domain, user_stat		
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -190,13 +190,16 @@ public class PLSTimeDensity implements Serializable {
 	
 	public static void main(String[] args) throws Exception { 
 		
+		Map<String,Object> constraints = new HashMap<String,Object>();
+		constraints.put("mnt", "!22201");
+		
 		PLSTimeDensity pbia = new PLSTimeDensity();
 		//Object[] plsdata = pbia.process("2014-03-13","0","2014-03-15","10",12.3238,45.4425,12.3238,45.4425);
-		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,null);
-		
-		
-		if(plsdata!=null)
+		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,constraints);
+		if(plsdata!=null) {
 			System.out.println(pbia.getJSMap(plsdata));
+			PLSPlotter.drawGraph("Test", (String[])plsdata[0], (double[])plsdata[1], pbia, null);
+		}
 		Logger.logln("Done!");
 	}
 	
