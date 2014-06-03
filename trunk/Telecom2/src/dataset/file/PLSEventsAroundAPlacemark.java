@@ -101,23 +101,25 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 	}
 	
 	private boolean okConstraints(UserInfo ui) {
-		String mnt  = (String)constraints.get("mnt");
-		if(mnt!=null) {
-			if(mnt.startsWith("!")) { 
-				//System.err.println(ui.mnt+"VS"+mnt.substring(1));
-				if(ui.mnt.equals(mnt.substring(1))) return false;
+		if(constraints!=null) {
+			String mnt  = (String)constraints.get("mnt");
+			if(mnt!=null) {
+				if(mnt.startsWith("!")) { 
+					//System.err.println(ui.mnt+"VS"+mnt.substring(1));
+					if(ui.mnt.equals(mnt.substring(1))) return false;
+				}
+				else
+					if(!ui.mnt.equals(mnt)) return false;
 			}
-			else
-				if(!ui.mnt.equals(mnt)) return false;
+			Integer mindays = (Integer)constraints.get("mindays");
+			if(mindays!=null) 
+				if(ui.getNumDays() < mindays) return false;
+			
+			
+			Integer maxdays = (Integer)constraints.get("maxdays");
+			if(maxdays!=null) 
+				if(ui.getNumDays() > maxdays) return false;
 		}
-		Integer mindays = (Integer)constraints.get("mindays");
-		if(mindays!=null) 
-			if(ui.getNumDays() < mindays) return false;
-		
-		
-		Integer maxdays = (Integer)constraints.get("maxdays");
-		if(maxdays!=null) 
-			if(ui.getNumDays() > maxdays) return false;
 		return true;
 	}
 	

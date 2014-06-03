@@ -6,7 +6,7 @@ import java.util.List;
 
 public class FileUtils {
 		
-	public static final File[] DISKS = File.listRoots();
+	private static final File[] DISKS = File.listRoots();
 
 	public static File getFile(String fpath) {
 		File[] files = getFiles(fpath);
@@ -51,13 +51,13 @@ public class FileUtils {
 		return file;
 	}
 	
-
+	/*
 	public static void main(String[] args) {
 		File f = getFile("BASE/UserSetCreator/Firenze.csv");
 		System.out.println(f.getAbsolutePath());
 		f = getFile("BASE/UserEventCounter/Venezia_cellXHour.csv");
 		System.out.println(f.getAbsolutePath());
 	}
-	
+	*/
 	
 }

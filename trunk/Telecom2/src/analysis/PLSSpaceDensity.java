@@ -62,7 +62,7 @@ public class PLSSpaceDensity implements Serializable {
 	public static transient int[] HP_INT;
 	
 	
-	public static transient final boolean COMPACT_SPACE = true;
+	public static transient final boolean COMPACT_SPACE = false;
 	
 	static {
 		if(DP != null) { DP_LABELS = changePeriodLables(DP); DP_INT = toNum(DP);}
@@ -148,12 +148,13 @@ public class PLSSpaceDensity implements Serializable {
 				String[] x = p[i].split(":");
 				int day = DM.get(x[1]);
 				int h = Integer.parseInt(x[2]);
-				long celllac =Long.parseLong(x[3]);
+				long celllac =Long.parseLong(x[3].trim());
 				ai = map.computeAreaIntersection(celllac,F.parse(x[0]).getTime());
 				for(int k=0; k<ai.length;k++) 
 					plsMatrix[day][h][k] += ai[k];
 			} catch(Exception e) {
 				System.out.println("Problems with "+p[i]);
+				e.printStackTrace();
 			}
 		}
 		
@@ -305,10 +306,6 @@ public class PLSSpaceDensity implements Serializable {
 
 	
 	
-	
-	
-	
-	
 	// d_periods = {0,0,0,0,0,1,1}
 	// mapping weekdays in 0
 	// mapping weekends in 1
@@ -318,8 +315,8 @@ public class PLSSpaceDensity implements Serializable {
 	
 	public static void main(String[] args) throws Exception {
 		
-		String city = "Firenze";
-		String cellXHourFile = "file_pls_fi_Firenze_cellXHour.csv";
+		String city = "Torino";
+		String cellXHourFile = "Torino_cellXHour.csv";
 		String gt_ser_file = "Firenze_gt_profiles.ser";
 		
 		/*
@@ -339,15 +336,15 @@ public class PLSSpaceDensity implements Serializable {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
 		}
-		
+		/*
 		Map<String,String> user_gt_prof = null;
 		if(gt_ser_file != null)
 			user_gt_prof = (Map<String,String>)CopyAndSerializationUtils.restore(FileUtils.getFile("Tourist/"+gt_ser_file));
-		
+		*/
 		String s = max == null ? "" : "_"+max;
 	
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".txt"))));
-		PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".arff"))));
+		//PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".arff"))));
 		
 		int i=0;
 		String line;
@@ -363,11 +360,11 @@ public class PLSSpaceDensity implements Serializable {
 				continue;
 			}
 			
-			if(i==0) weka_out.println(td.wekaHeader(city));
+			//if(i==0) weka_out.println(td.wekaHeader(city));
 			
 			out.println(td);
-			String clazz = user_gt_prof == null ? null : user_gt_prof.get(td.user_id);
-			weka_out.println(td.toWEKAString(clazz));
+			//String clazz = user_gt_prof == null ? null : user_gt_prof.get(td.user_id);
+			//weka_out.println(td.toWEKAString(clazz));
 			
 			i++;
 			if(i % 10000 == 0) {
@@ -376,7 +373,7 @@ public class PLSSpaceDensity implements Serializable {
 		}
 		br.close();
 		out.close();
-		weka_out.close();
+		//weka_out.close();
 	}
 	
 }

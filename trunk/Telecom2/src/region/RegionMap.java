@@ -99,10 +99,16 @@ public class RegionMap implements Serializable {
 		area_intersection = new float[this.getNumRegions()];
 		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(time);
 		RegionI nc = nm.getRegion(""+celllac);
-		Polygon circle = GeomUtils.getCircle(nc.getLatLon()[0], nc.getLatLon()[1], nc.getRadius());
+		
+		//System.out.println(nc);
+		
+		Polygon circle = GeomUtils.getCircle(nc.getLatLon()[1], nc.getLatLon()[0], nc.getRadius());
 		double ca = Math.PI * Math.pow(nc.getRadius(),2);
 		int i=0;
 		for(RegionI r: this.getRegions()) {
+			
+			//System.out.println(r.getGeom()+" ==> "+nc.getLatLon()[1]+","+nc.getLatLon()[0]);
+			
 			Geometry a = r.getGeom().intersection(circle);
 			area_intersection[i] = (float)(GeomUtils.geoArea(a)/ca);
 			i++;
@@ -112,8 +118,11 @@ public class RegionMap implements Serializable {
 		float sum = 0;
 		for(float f: area_intersection)
 			sum += f;
-		for(i=0; i<area_intersection.length;i++)
+		for(i=0; i<area_intersection.length;i++) {
 			area_intersection[i] = area_intersection[i] / sum;
+			//if(area_intersection[i] > 0) System.out.println(area_intersection[i]);
+		}
+		
 		
 		cache_intersection.put(celllac, area_intersection);
 		
