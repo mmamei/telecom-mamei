@@ -27,7 +27,7 @@ import analysis.tourist.extractGT.GTExtractor;
  * {7*24*N matrix with the number of pls produced in a given area of the city in a given day and hour - N are the areas of the city obtained from Voronoi}
  */
 
-public class TouristData4Analysis implements Serializable {
+public class PLSSpaceDensity implements Serializable {
 	
 	public static transient final String TIM_MNT = "22201";
 
@@ -121,7 +121,7 @@ public class TouristData4Analysis implements Serializable {
 	*/
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-mm-HH");
-	public TouristData4Analysis(String events, RegionMap map) throws Exception {
+	public PLSSpaceDensity(String events, RegionMap map) throws Exception {
 		
 		//if(events == null) return; // need for a null construcutor for testing
 		
@@ -351,13 +351,13 @@ public class TouristData4Analysis implements Serializable {
 		
 		int i=0;
 		String line;
-		TouristData4Analysis td;
+		PLSSpaceDensity td;
 		while((line=br.readLine())!=null) {
 			if(line.startsWith("//")) continue;
 			if(max != null && i > max) break;
 			
 			try {
-			td = new TouristData4Analysis(line,rm);
+			td = new PLSSpaceDensity(line,rm);
 			} catch(Exception e) {
 				System.err.println(line);
 				continue;

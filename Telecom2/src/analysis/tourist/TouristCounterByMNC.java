@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import analysis.TouristData4Analysis;
+import analysis.PLSSpaceDensity;
 import region.RegionMap;
 import utils.CopyAndSerializationUtils;
 import utils.FileUtils;
@@ -37,13 +37,13 @@ public class TouristCounterByMNC {
 		
 		Map<String,Integer> count = new HashMap<String,Integer>();
 		
-		TouristData4Analysis td;
+		PLSSpaceDensity td;
 		String line;
 		while((line=br.readLine())!=null) {
 			
 			if(!line.contains("2013-"+month)) continue;
 			
-			td = new TouristData4Analysis(line,rm);
+			td = new PLSSpaceDensity(line,rm);
 			
 			if(td.num_days < 4 && td.days_interval < 3 * td.num_days) {
 				String country = mncT.get(td.mnt.substring(0,3));
