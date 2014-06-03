@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import region.Placemark;
+import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
 
@@ -78,6 +79,12 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	
 	public static void main(String[] args) throws Exception {
 		//BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,FileUtils.getFileS("UserSetCreator/Firenze.csv"));
+		
+	
+		Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/file_pls_piem").toString(); 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.FEBRUARY,16,18,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.FEBRUARY,16,23,0,0);
+		
 		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour("Torino",null);
 		ba.run();
 		Logger.logln("Done!");
@@ -118,7 +125,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		
 		String s;
 		public void add(String day, String dayw, int h, String cellac) {
-			s = day+":"+dayw+":"+h+": "+celllac;
+			s = day+":"+dayw+":"+h+":"+celllac;
 			if(!pls.contains(s)) pls.add(s);
 		}
 		

@@ -108,11 +108,14 @@ import dataset.PLSCoverageTimeI;
 		
 		Map<String,List<String>> all;
 		File odir = FileUtils.createDir("BASE/PLSCoverageTime");
+		//File f = new File(odir+"/plsCoverageTimeD4D1.ser");
 		File f = new File(odir+"/plsCoverageTime.ser");
 		if(f.exists()) {
 			all = (Map<String,List<String>>)CopyAndSerializationUtils.restore(f);
 		}
 		else {
+			
+			//File[] basedirs = FileUtils.getFiles("DATASET/D4D1/file_pls");
 			File[] basedirs = FileUtils.getFiles("DATASET/PLS/file_pls");
 			all = new HashMap<String,List<String>>();
 			for(File basedir: basedirs) {

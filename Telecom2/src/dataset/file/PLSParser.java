@@ -24,7 +24,7 @@ public class PLSParser {
 	
 	public static boolean REMOVE_BOGUS = true;
 	
-	private static boolean QUIET = true;
+	private static boolean QUIET = false;
 	
 	private static Config conf = null;
 	private static final int BUFFER_SIZE = 1048576;

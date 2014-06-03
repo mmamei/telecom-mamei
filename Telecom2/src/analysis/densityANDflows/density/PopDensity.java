@@ -37,8 +37,8 @@ public class PopDensity {
 	public static final int U_SEG = ROAMING;
 	
 	public static void main(String[] args) throws Exception {
-		String city = "Venezia";
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/"+city+".ser"));
+		String city = "Torino";
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("BASE/RegionMap/"+city+".ser"));
 		Map<String,Double> space_density = computeSpaceDensity(rm);
 		plotSpaceDensity(city+"_"+MIN_DAYS+"_"+MAX_DAYS+"_"+U_SEGMENT[U_SEG], space_density, rm,0);
 		Logger.logln("Done!");
@@ -55,10 +55,9 @@ public class PopDensity {
 	public static Map<String,Double> computeSpaceDensity(RegionMap rm) throws Exception {
 		String city = rm.getName();
 		
-		
-		File f = FileUtils.getFile("BASE/Tourist/"+city+".csv");
+		File f = FileUtils.getFile("BASE/Tourist/"+city+".txt");
 		if(f == null) {
-			Logger.logln("Run TouristData4Analysis first!");
+			Logger.logln("Run PLSSpaceDensity first!");
 			System.exit(0);
 		}
 		BufferedReader br = new BufferedReader(new FileReader(f));
@@ -71,8 +70,8 @@ public class PopDensity {
 		String line;
 		while((line=br.readLine())!=null) {
 			String[] p = line.split(",");
-			if(skip(p[1],Integer.parseInt(p[2]),Integer.parseInt(p[3]))) continue;
-			for(int i=4;i<p.length;i++) {
+			//if(skip(p[1],Integer.parseInt(p[2]),Integer.parseInt(p[3]))) continue;
+			for(int i=5;i<p.length;i++) {
 				String[] x = p[i].split(":");
 				String rname = rm.getRegion(Integer.parseInt(x[2])).getName();
 				double v = Double.parseDouble(x[3]);	

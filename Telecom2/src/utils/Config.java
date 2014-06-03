@@ -49,6 +49,7 @@ public class Config {
 	
 	public String network_map_dir = null;
 	public String pls_folder = null;
+	public String base_folder = null;
 	public Calendar pls_start_time = null;
 	public Calendar	pls_end_time = null;
 	public String placemarks_file = null;
@@ -60,6 +61,9 @@ public class Config {
 		}
 		else if(name.equals("pls_folder")) {
 			pls_folder = value;
+		}
+		else if(name.equals("base_folder")) {
+			base_folder = value;
 		}
 		else if(name.equals("pls_start_time")) {
 			SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy HH:mm");
