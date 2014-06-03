@@ -16,7 +16,6 @@ import java.util.Set;
 
 import region.Placemark;
 import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
 import dataset.PLSEventsAroundAPlacemarkI;
 
@@ -78,17 +77,15 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 	
 	protected void finish() {
 		try {
-			String dir = FileUtils.createDir("BASE/PLSEventsAroundAPlacemark").getAbsolutePath();
-			dir = dir+"/"+Config.getInstance().get_pls_subdir();
+			File fd = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir());
+			fd.mkdirs();
 			
-			System.out.println("Output Dir = "+dir);
+			System.out.println("Output Dir = "+fd);
 			
-			File fd = new File(dir);
-			if(!fd.exists()) fd.mkdirs();	
 			
 			for(int i=0; i<placemarks.size();i++) {
 				Placemark p = placemarks.get(i);
-				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+p.getName()+"_"+p.getRadius()+getFileSuffix(constraints)+".txt"))));
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(fd+"/"+p.getName()+"_"+p.getRadius()+getFileSuffix(constraints)+".txt"))));
 				
 				for(UserInfo ui: userInfos.get(i).values())
 					if(okConstraints(ui)) out.println(ui);

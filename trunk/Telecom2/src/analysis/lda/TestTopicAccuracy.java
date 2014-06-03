@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import utils.FileUtils;
+import utils.Config;
 
 public class TestTopicAccuracy {
 	
@@ -25,11 +25,12 @@ public class TestTopicAccuracy {
 	
 	public static void main(String[] args) throws Exception  {
 		
-		File dir = FileUtils.createDir("BASE/Topic");
+		File dir = new File(Config.getInstance().base_folder+"/Topic");
+		dir.mkdirs();
 		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/accuracy.csv"));
 		
 		int cont = 0;
-		File maind = FileUtils.getFile("Topic");
+		File maind = new File(Config.getInstance().base_folder+"/Topic");
 		File[] dirs = maind.listFiles();
 		for(File d: dirs) {
 			try {
@@ -48,7 +49,7 @@ public class TestTopicAccuracy {
 	public static double[] process(String user) throws Exception  {
 		
 		// read p_w_z ****************************************************************************************************
-		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/Topic/"+user+"/p_w_z.txt")));
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/Topic/"+user+"/p_w_z.txt")));
 		String line;
 		// Topic_0,n,7.666,45.0713-n,7.6529,45.055,0.27,n,7.6529,45.055-n,7.666,45.0713,0.2,m,7.6529,45.055-e,7.6587,45.0707,0.13,m,7.666,45.0713-a,7.6529,45.055,0.07
 		Map<Integer,List<WordProb>> topics = new TreeMap<Integer,List<WordProb>>();
@@ -77,7 +78,7 @@ public class TestTopicAccuracy {
 		
 		// read p_z_d *******************************************************************************************************
 		Map<String,double[]> pzd = new TreeMap<String,double[]>();
-		br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/Topic/"+user+"/p_z_d.txt")));
+		br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/Topic/"+user+"/p_z_d.txt")));
 		while((line = br.readLine()) != null) {
 			String[] e = line.split(",");
 			String day = e[0];
@@ -100,7 +101,7 @@ public class TestTopicAccuracy {
 		// read the user trace ************************************************************************************************
 		
 		Map<String,Set<String>> trace = new TreeMap<String,Set<String>>();
-		br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/Topic/"+user+"/"+user+".txt")));
+		br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/Topic/"+user+"/"+user+".txt")));
 		while((line=br.readLine())!=null) {
 			String[] e = line.split(" |\\t");
 			String day = e[0];

@@ -12,7 +12,6 @@ import region.NetworkCell;
 import region.RegionI;
 import region.RegionMap;
 import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
 
 
@@ -21,7 +20,7 @@ public class NetworkMapParser {
     public static void main(String[] args) throws Exception {
             
             
-            FileUtils.createDir("BASE/NetworkMapParser");
+    		new File(Config.getInstance().base_folder+"/NetworkMapParser").mkdirs();
             
             
             File dir = new File(Config.getInstance().network_map_dir);
@@ -54,7 +53,7 @@ public class NetworkMapParser {
                     
                     RegionMap nm = new RegionMap(file);
                     nm.addAll(map);
-                    ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(FileUtils.getFile("BASE/NetworkMapParser")+"/"+file.substring(0,file.length()-4)+".bin")));
+                    ObjectOutputStream out=new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(Config.getInstance().base_folder+"/NetworkMapParser")+"/"+file.substring(0,file.length()-4)+".bin")));
                     out.writeObject(nm);
                     out.close();
             }

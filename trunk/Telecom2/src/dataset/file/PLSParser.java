@@ -12,7 +12,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
 
 public class PLSParser {
@@ -65,10 +64,12 @@ public class PLSParser {
 		
 		
 		if(REMOVE_BOGUS) {
-			String d = directory.getAbsolutePath().substring("G:/DATASET/PLS/file_pls/".length());
+			System.out.println(directory.getAbsolutePath());
+			System.out.println(Config.getInstance().pls_folder);
+			String d = directory.getAbsolutePath().substring(Config.getInstance().pls_root_folder.length()+1);
 			if(d.indexOf("\\") > 0) d = d.substring(0,d.indexOf("\\"));
-			File f = FileUtils.getFile("BASE/UserEventCounter/"+d+"_bogus.txt");
-			if(f!=null) {
+			File f = new File(Config.getInstance().base_folder+"/UserEventCounter/"+d+"_bogus.txt");
+			if(f.exists()) {
 				BufferedReader br = new BufferedReader(new FileReader(f));
 				String line;
 				while((line=br.readLine())!=null) 
@@ -76,11 +77,11 @@ public class PLSParser {
 				br.close();
 			}
 			else {
-				System.err.println("BASE/UserEventCounter/"+d+"_bogus.txt NOT FOUND");
+				System.err.println(Config.getInstance().base_folder+"/UserEventCounter/"+d+"_bogus.txt NOT FOUND");
 			}
 		}
 		
-
+		System.out.println(directory);
 		File[] items = directory.listFiles();
 		for(int i=0; i<items.length;i++){
 			File item = items[i];

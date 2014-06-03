@@ -5,12 +5,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import utils.FileUtils;
+import utils.Config;
 import utils.Logger;
 
 public class Tourist_EXP_ResidentOtherRegions {
@@ -37,13 +35,14 @@ public class Tourist_EXP_ResidentOtherRegions {
 		Map<String,Map<String,Integer>> users = new HashMap<String,Map<String,Integer>>();
 		
 		for(String o: other) 
-			run(users,o,FileUtils.getFile("BASE/UserEventCounter/"+city+R2F_SUFFIX.get(o)),true);
-		run(users,city,FileUtils.getFile("BASE/UserEventCounter/"+city+"_day.csv"),false);
+			run(users,o,new File(Config.getInstance().base_folder+"/UserEventCounter/"+city+R2F_SUFFIX.get(o)),true);
+		run(users,city,new File(Config.getInstance().base_folder+"/UserEventCounter/"+city+"_day.csv"),false);
 		
 		String of = city;
 		for(String o: other) of = of+"_"+o;
 		
-		File dir = FileUtils.createDir("BASE/UserEventCounter");
+		File dir = new File(Config.getInstance().base_folder+"/UserEventCounter");
+		dir.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+of+".csv"));
 		for(String un: users.keySet()) {
 			Map<String,Integer> m = users.get(un);

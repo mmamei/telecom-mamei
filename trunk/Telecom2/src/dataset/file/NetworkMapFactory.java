@@ -11,8 +11,6 @@ import java.util.Map;
 
 import region.RegionMap;
 import utils.Config;
-import utils.FileUtils;
-import utils.Logger;
 import dataset.NetworkMapFactoryI;
 
 class NetworkMapFactory implements NetworkMapFactoryI  {
@@ -60,7 +58,7 @@ class NetworkMapFactory implements NetworkMapFactoryI  {
             
             String best_file = null;
             
-            File dir = FileUtils.getFile("BASE/NetworkMapParser");
+            File dir = new File(Config.getInstance().base_folder+"//NetworkMapParser");
             
             try {
                     Calendar target_cal = Calendar.getInstance();

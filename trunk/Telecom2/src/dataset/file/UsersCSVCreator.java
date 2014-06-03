@@ -3,13 +3,12 @@ package dataset.file;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import region.CityEvent;
-import utils.FileUtils;
+import utils.Config;
 import utils.Logger;
 import analysis.UserTrace;
 
@@ -45,13 +44,13 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	protected void finish() {
 		
-		File dir = FileUtils.getFile("BASE/UsersCSVCreator/"+subdir);
+		File dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/"+subdir);
 		if(dir != null) {
 			Logger.logln(dir+" is already there! Manually remove before proceeding");
 			System.exit(0);
 		}
-		dir = FileUtils.createDir("BASE/UsersCSVCreator/"+subdir);
-		
+		dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/"+subdir);
+		dir.mkdirs();
 		for(UserTrace ut: traces.values()) 
 			try {
 				ut.saveToCSV(dir.getAbsolutePath());
@@ -76,14 +75,14 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	public static void create(CityEvent ce) throws Exception {
-		File file = FileUtils.getFile("BASE/UsersAroundAnEvent/"+ce.toFileName());
+		File file = new File(Config.getInstance().base_folder+"/UsersAroundAnEvent/"+ce.toFileName());
 		if(file == null) {
 			Logger.logln(file+" Does not exist!");
 			Logger.logln("Running UsersAroundAnEvent.process()");
 			try {
 				UsersAroundAnEvent uae = new UsersAroundAnEvent();
 				uae.process(ce,true);
-				file = FileUtils.getFile("BASE/UsersAroundAnEvent/"+ce.toFileName());
+				file = new File(Config.getInstance().base_folder+"/UsersAroundAnEvent/"+ce.toFileName());
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(0);
@@ -116,7 +115,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	public static void main(String[] args) throws Exception {
-		File file = FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_users_above_2000.txt");
+		File file = new File(Config.getInstance().base_folder+"/UserEventCounter/file_pls_piem_users_above_2000.txt");
 		if(file == null) {
 			Logger.logln(file+" Does not exist!");
 			System.exit(0);

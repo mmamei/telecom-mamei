@@ -15,8 +15,8 @@ import java.util.Map;
 
 import region.RegionI;
 import region.RegionMap;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import analysis.tourist.GTExtractor;
 
@@ -330,8 +330,8 @@ public class PLSSpaceDensity implements Serializable {
 	
 	public static void process(String city, String cellXHourFile, String gt_ser_file, Integer max) throws Exception {
 		
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("BASE/RegionMap/"+city+".ser"));
-		BufferedReader br = new BufferedReader(new FileReader(FileUtils.getFile("BASE/UserEventCounter/"+cellXHourFile)));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/UserEventCounter/"+cellXHourFile)));
 		if(br == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
@@ -343,7 +343,9 @@ public class PLSSpaceDensity implements Serializable {
 		*/
 		String s = max == null ? "" : "_"+max;
 	
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".txt"))));
+		File dir = new File(Config.getInstance().base_folder+"/Tourist");
+		dir.mkdirs();
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+city+s+".txt"))));
 		//PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".arff"))));
 		
 		int i=0;

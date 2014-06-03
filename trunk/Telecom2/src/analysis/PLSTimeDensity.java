@@ -1,6 +1,7 @@
 package analysis;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -18,7 +19,6 @@ import org.gps.utils.LatLonUtils;
 
 import region.Placemark;
 import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
 import visual.java.PLSPlotter;
 import dataset.DataFactory;
@@ -71,7 +71,7 @@ public class PLSTimeDensity implements Serializable {
 		
 		Calendar cal = new GregorianCalendar();
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(FileUtils.getFile(file)));
+			BufferedReader in = new BufferedReader(new FileReader(new File(file)));
 			while((line = in.readLine()) != null){
 				line = line.trim();
 				if(line.length() < 1) continue; // extra line at the end of file
@@ -151,7 +151,7 @@ public class PLSTimeDensity implements Serializable {
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
 			if(dir == null) return null;
 			System.out.println(dir);
-			Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/"+dir).toString(); 
+			Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+dir;
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));
 			Config.getInstance().pls_end_time.add(Calendar.HOUR_OF_DAY, 1); // add one to take into account minutes and seconds
@@ -165,7 +165,7 @@ public class PLSTimeDensity implements Serializable {
 			
 			PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
 			pap.process(p,constraints);
-			String file = "BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt";
+			String file = Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt";
 			PLSTimeDensity plsmap = getPLSTimeCounter(file,null);
 			//(new File(file)).delete();
 			

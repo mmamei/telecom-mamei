@@ -14,8 +14,8 @@ import java.util.Map;
 import region.Placemark;
 import region.RegionI;
 import region.RegionMap;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Logger;
 import dataset.file.DataFactory;
 
@@ -28,14 +28,14 @@ public class GTExtractor {
 	//static final String PLACEMARK = "Firenze";
 	
 	
-	static final String FILE = "BASE/UserEventCounter/file_pls_ve_Venezia_cellXHour.csv";
+	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour.csv";
 	static final String PLACEMARK = "Venezia";
 	
 	public static void main(String[] args) throws Exception {
 		
 		String line;
 		
-		File f = FileUtils.getFile(FILE);
+		File f = new File(FILE);
 		if(f == null) {
 			Logger.logln("Run UserEventCounterCellacXHour first!");
 			System.exit(0);
@@ -109,14 +109,14 @@ public class GTExtractor {
 			Logger.logln(prof+" = "+mcont.get(prof)+"/"+n_total);
 		
 		
-		File dir = FileUtils.createDir("BASE/Tourist");
-		
+		File dir = new File(Config.getInstance().base_folder+"/ourist");
+		dir.mkdirs();
 		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/"+PLACEMARK+"_gt_profiles.csv"));
 		for(String user: mu.keySet())
 			pw.println(user+","+mu.get(user));
 		pw.close();
 		
-		CopyAndSerializationUtils.save(FileUtils.getFile("BASE/Tourist/"+PLACEMARK+"_gt_profiles.ser"), mu);
+		CopyAndSerializationUtils.save(new File(Config.getInstance().base_folder+"/Tourist/"+PLACEMARK+"_gt_profiles.ser"), mu);
 		
 		Logger.logln("Done!");
 	}	

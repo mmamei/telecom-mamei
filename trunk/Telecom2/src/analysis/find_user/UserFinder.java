@@ -17,7 +17,6 @@ import org.gps.utils.LatLonUtils;
 
 import region.Placemark;
 import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
 import utils.Sort;
 import dataset.DataFactory;
@@ -42,7 +41,7 @@ public class UserFinder {
 			Map<String,Integer> map = new HashMap<String,Integer>();
 			
 			
-			File file = FileUtils.getFile("DATASET/PLS/file_pls/"+s.dir);
+			File file = new File(Config.getInstance().pls_root_folder+"/"+s.dir);
 			if(file!=null) {
 				Config.getInstance().pls_folder = file.toString(); // set right working directory
 				//System.out.println(Config.getInstance().pls_folder);

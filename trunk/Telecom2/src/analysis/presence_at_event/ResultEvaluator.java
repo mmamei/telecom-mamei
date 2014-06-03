@@ -16,7 +16,7 @@ import java.util.Map;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
-import utils.FileUtils;
+import utils.Config;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 
@@ -43,9 +43,9 @@ public class ResultEvaluator {
 	private static String type = USE_INDIVIDUAL_EVENT ? "individual" : "multiple";
 	private static String sdiff = DIFF ? "_diff" : "";
 	
-	private static File lomb = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_"+type+"_0.0_3"+sdiff+".csv");
-	private static File piem2012 = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
-	private static File piem2013 = FileUtils.getFile("BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
+	private static File lomb = new File(Config.getInstance().base_folder+"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/result_"+type+"_0.0_3"+sdiff+".csv");
+	private static File piem2012 = new File(Config.getInstance().base_folder+"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2012/result_"+type+"_0.0_3"+sdiff+".csv");
+	private static File piem2013 = new File(Config.getInstance().base_folder+"/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_piem_2013/result_"+type+"_0.0_3"+sdiff+".csv");
 	//private static String piem2013_openair = FileUtils.getFileS("PresenceCounter/C_DATASET_PLS_file_pls_file_pls_piem_2013/result_openair_"+type+"_0.0_3"+sdiff+".csv");
 
 	

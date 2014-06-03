@@ -16,7 +16,6 @@ import java.util.Set;
 
 import region.Placemark;
 import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
 
 public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
@@ -65,7 +64,8 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	//private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
 	protected void finish() {
 		try {
-			File dir = FileUtils.createDir("BASE/UserEventCounter");
+			File dir = new File(Config.getInstance().base_folder+"/UserEventCounter");
+			dir.mkdirs();
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+"_cellXHour.csv"));
 			out.println("// TOT. DAYS = "+getTotDays());
 			for(String user: users_info.keySet())
@@ -80,8 +80,8 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	public static void main(String[] args) throws Exception {
 		//BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,FileUtils.getFileS("UserSetCreator/Firenze.csv"));
 		
-	
-		Config.getInstance().pls_folder = FileUtils.getFile("DATASET/PLS/file_pls/file_pls_piem").toString(); 
+		
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem"; 
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.FEBRUARY,16,18,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.FEBRUARY,16,23,0,0);
 		
@@ -95,7 +95,8 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	 * This main is places here for convenience. It just read the file and remove all the users producing few events
 	 */
 	public static void trim(Placemark p, int min_size) throws Exception {
-		File dir = FileUtils.createDir("BASE/UserEventCounter");
+		File dir = new File(Config.getInstance().base_folder+"/UserEventCounter");
+		dir.mkdirs();
 		BufferedReader br = new BufferedReader(new FileReader(dir+"/"+p.getName()+"_cellacXhour.csv"));
 		PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+p.getName()+"_cellacXhour_trim"+min_size+".csv"));
 		String line;

@@ -18,8 +18,8 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import utils.Colors;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.GeomUtils;
 import utils.Logger;
 import visual.kml.KML;
@@ -188,7 +188,8 @@ public class RegionMap implements Serializable {
 	
 	
 	public void printKML() throws Exception  {
-		File d = FileUtils.createDir("BASE/RegionMap");
+		File d = new File(Config.getInstance().base_folder+"/RegionMap");
+		d.mkdirs();
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(d.getAbsolutePath()+"/"+name+".kml")));
 		KML kml = new KML();
 		kml.printHeaderFolder(out, name);
@@ -279,7 +280,7 @@ public class RegionMap implements Serializable {
 	
 	public static void process(String region) throws Exception {
 		
-		File input_obj_file = FileUtils.getFile("RegionMap/"+region+".ser");
+		File input_obj_file = new File(Config.getInstance().base_folder+"/RegionMap/"+region+".ser");
 		if(!input_obj_file.exists()) {
 			System.out.println(input_obj_file+" does not exist... run the region parser first!");
 			System.exit(0);

@@ -24,8 +24,8 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import region.RegionMap;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.FileUtils;
 import utils.Sort;
 import cc.mallet.pipe.CharSequence2TokenSequence;
 import cc.mallet.pipe.CharSequenceLowercase;
@@ -50,7 +50,7 @@ public class CreateTopicModel {
 	public static final double beta = 1; // the higher the more word per topic
 	
 	
-	static RegionMap RM = (RegionMap)CopyAndSerializationUtils.restore(FileUtils.getFile("RegionMap/Torino.ser"));
+	static RegionMap RM = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/Torino.ser"));
 	
 	static final DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
     
@@ -59,7 +59,7 @@ public class CreateTopicModel {
     	
     	//String user = "1d8b3e9f864579645d3d7e165f956681fc5c4deb345d1145a2e93cee387d91f5";
     	
-    	File maind = FileUtils.getFile("Topic");
+    	File maind = new File(Config.getInstance().base_folder+"/Topic");
 		for(File d: maind.listFiles()) {
 			System.out.println("Processing user "+d.getName()+" ...");
 			processUser(d.getName());
@@ -71,8 +71,8 @@ public class CreateTopicModel {
     
     public static void processUser(String user) {
     	try {
-    		if(FileUtils.getFile("Topic/"+user+"/p_w_z.txt") != null) return;
-	    	File file = FileUtils.getFile("Topic/"+user+"/"+user+".txt");
+    		File file = new File(Config.getInstance().base_folder+"/Topic/"+user+"/p_w_z.txt");
+    		if(file.exists()) return;
 	    	String[] stop = new String[1]; //getStopWords(file);
 	    	run(file,stop);
     	}catch(Exception e) {

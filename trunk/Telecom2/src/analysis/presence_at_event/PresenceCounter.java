@@ -20,7 +20,6 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
-import utils.FileUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
 import analysis.PLSEvent;
@@ -38,7 +37,7 @@ public class PresenceCounter {
 	private static int DAYS = 3;
 	
 	
-	public static File ODIR = FileUtils.createDir("BASE/PresenceCounter/"+Config.getInstance().get_pls_subdir());
+	public static File ODIR = new File(Config.getInstance().base_folder+"/PresenceCounter/"+Config.getInstance().get_pls_subdir());
 	public static String IM = PlacemarkRadiusExtractor.USE_INDIVIDUAL_EVENT? "individual" : "multiple";
 	public static String SDIFF = PlacemarkRadiusExtractor.DIFF ? "_diff" : "";
 	public static String OFILE = "result_"+IM+"_"+O_RADIUS+"_"+DAYS+SDIFF+".csv";
@@ -102,7 +101,7 @@ public class PresenceCounter {
 		
 		
 
-		
+		ODIR.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(ODIR+"/"+OFILE));
 		out.println("event,estimated,groundtruth");
 		
@@ -185,11 +184,11 @@ public class PresenceCounter {
 		PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
 		Map<String,Object> constraints = PlacemarkRadiusExtractor.constraints;
 		
-		File f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
+		File f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
 		if(f==null || !f.exists()) {
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
 			pap.process(p,constraints);
-			f = FileUtils.getFile("BASE/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
+			f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
 		}
 		return f;
 	}

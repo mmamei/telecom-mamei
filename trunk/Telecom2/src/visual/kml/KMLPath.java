@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import region.RegionMap;
 import utils.Colors;
-import utils.FileUtils;
+import utils.Config;
 import utils.Logger;
 import analysis.PLSEvent;
 import dataset.file.DataFactory;
@@ -172,7 +172,7 @@ public class KMLPath {
 		
 		List<PLSEvent> l = null;
 		
-		File f = FileUtils.getFile("BASE/UserEventCounter/"+file);
+		File f = new File(Config.getInstance().base_folder+"/UserEventCounter/"+file);
 		if(f == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
@@ -214,10 +214,11 @@ public class KMLPath {
 	
 	
 	public static void main(String[] args) throws Exception {
-		openFile(FileUtils.createDir("BASE/TouristData").getAbsolutePath()+"/test.kml");
+		openFile(new File(Config.getInstance().base_folder+"/TouristData").getAbsolutePath()+"/test.kml");
 		
 		String user = "feaf164623aa5fcac0512b3b4a62496c34458ac017141a808dfe306b62759f";
-		File dir = FileUtils.createDir("BASE/UsersCSVCreator/test");
+		File dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/test");
+		dir.mkdirs();
 		List<PLSEvent> data = PLSEvent.readEvents(new File(dir+"/"+user+".csv"));
 		
 		/*
