@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 import region.Placemark;
-import region.RegionMap;
 import utils.Config;
 import utils.FileUtils;
 import utils.Logger;
