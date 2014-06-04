@@ -38,7 +38,7 @@ public class Test {
 	@org.junit.Test
 	public void testPLSTimeCounter() {
 		PLSTimeDensity pbia = new PLSTimeDensity();
-		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,null);
+		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,"");
 		String js = pbia.getJSMap(plsdata);
 		String res = "var data = google.visualization.arrayToDataTable([['Day', 'PLS'],['10-Mon:17',  733.0],['10-Mon:18',  3965.0],['10-Mon:19',  3592.0],['10-Mon:20',  2965.0],['10-Mon:21',  2488.0],['10-Mon:22',  2227.0],['10-Mon:23',  1874.0],['11-Tue:0',  1553.0],['11-Tue:1',  1315.0]]);";
 		System.out.println(res);

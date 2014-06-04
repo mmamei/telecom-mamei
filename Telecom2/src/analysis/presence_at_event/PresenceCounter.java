@@ -182,7 +182,7 @@ public class PresenceCounter {
 		p.changeRadius(radius);
 		
 		PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
-		Map<String,Object> constraints = PlacemarkRadiusExtractor.constraints;
+		Map<String,String> constraints = PlacemarkRadiusExtractor.constraints;
 		
 		File f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
 		if(f==null || !f.exists()) {

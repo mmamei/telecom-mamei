@@ -23,10 +23,10 @@ public class PLSParser {
 	
 	public static boolean REMOVE_BOGUS = true;
 	
-	private static boolean QUIET = false;
+	private static boolean QUIET = true;
 	
-	private static Config conf = null;
-	private static final int BUFFER_SIZE = 1048576;
+	//private static Config conf = null;
+	//private static final int BUFFER_SIZE = 1048576;
 	
 	
 	private static Calendar startTime = null;
@@ -88,6 +88,7 @@ public class PLSParser {
 			if(item.isFile()) {
 				Calendar end_cal = new GregorianCalendar();
 				String n = item.getName();
+				System.out.println(n);
 				end_cal.setTimeInMillis(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))));
 				
 				Calendar begin_cal = (Calendar)end_cal.clone();
@@ -124,7 +125,7 @@ public class PLSParser {
 	}
 	
 	
-	private static void analyzeFileSLOW(File plsFile, BufferAnalyzer analyzer, Set<String> bogus) {	
+	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer, Set<String> bogus) {	
 		//System.out.println(plsFile.getAbsolutePath());
 		ZipFile zf = null;
 		BufferedReader br = null;
@@ -150,12 +151,14 @@ public class PLSParser {
 		}
 	}
 	
-	
+	/*
 	private static ZipFile zf = null;
 	private static InputStreamReader isr = null;
 	private static ZipEntry ze;
 	private static char[] read_buffer,buffer;
 	private static int charRead,x,remainedChars;
+	
+	
 	private static void analyzeFile(File plsFile, BufferAnalyzer analyzer, Set<String> bogus) {	
 		
 		//System.out.println(">>> "+plsFile.getAbsolutePath());
@@ -200,7 +203,7 @@ public class PLSParser {
 		int start = 0;
 		String s,u;
 		for(int i=0; i<length; i++){
-			if(buffer[i]=='\n'){
+			if(buffer[i]=='\n'){ // QUESTO A VOLTE GENERA UN BUG NEL CASO LA LINEA TERMINA CON CR-LF PIUTTOSTO CHE SOLO LF
 				s = new String(buffer, start, i-start);
 				try {
 					u = s.substring(0,s.indexOf("\t"));
@@ -214,4 +217,5 @@ public class PLSParser {
 		}
 		return start;
 	}
+	*/
 }

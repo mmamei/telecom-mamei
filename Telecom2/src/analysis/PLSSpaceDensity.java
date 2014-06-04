@@ -343,7 +343,7 @@ public class PLSSpaceDensity implements Serializable {
 		*/
 		String s = max == null ? "" : "_"+max;
 	
-		File dir = new File(Config.getInstance().base_folder+"/Tourist");
+		File dir = new File(Config.getInstance().base_folder+"/PLSSpaceDensity");
 		dir.mkdirs();
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+city+s+".txt"))));
 		//PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".arff"))));

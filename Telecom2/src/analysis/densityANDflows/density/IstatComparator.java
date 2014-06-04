@@ -38,8 +38,8 @@ public class IstatComparator {
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
 		Map<String,UserPlaces> up = UserPlaces.readUserPlaces("G:/BASE/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
 		
-		
-		Map<String,Double> density = PopulationDensity.process(rm,up,kind_of_place,exclude_kind_of_place);
+		PopulationDensity pd = new PopulationDensity();
+		Map<String,Double> density = pd.computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place);
 		
 		compareWithISTAT(density,region);
 	}

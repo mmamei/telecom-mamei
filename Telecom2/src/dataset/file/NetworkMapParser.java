@@ -47,6 +47,7 @@ public class NetworkMapParser {
                             String celllac = String.valueOf(lac*65536+cell_id);
                             
                             RegionI cell = new NetworkCell(celllac,description,lac,cell_id,barycentre_lat,barycentre_lon,radius);
+                            //System.out.println(cell);
                             map.put(cell.getName(), cell);
                     }
                     in.close();
