@@ -1,6 +1,6 @@
 <html>
 <head>
-<jsp:useBean id="pbia" scope="application" class="analysis.PLSTimeCounter"/>
+<jsp:useBean id="pbia" scope="application" class="analysis.PLSTimeDensity"/>
 <%@include file="includes/head.html" %>
 
 
@@ -28,7 +28,8 @@ function drawChart() {
 	double lon1 = Double.parseDouble(request.getParameter("lon1"));
 	double lat2 = Double.parseDouble(request.getParameter("lat2"));
 	double lon2 = Double.parseDouble(request.getParameter("lon2"));
-	Object[] plsdata = pbia.process(sd,st,ed,et,lon1,lat1,lon2,lat2);
+	String constraints= request.getParameter("constraints");
+	Object[] plsdata = pbia.process(sd,st,ed,et,lon1,lat1,lon2,lat2,constraints);
 	if(plsdata != null)
 		out.println(pbia.getJSMap(plsdata));
 	%>
@@ -62,7 +63,8 @@ function drawChart() {
 		out.println("Start Period: "+sd+" at "+st+"<br>");
 		out.println("End Period: "+ed+" at "+et+"<br>");
 		out.println("Area: ("+lat1+","+lon1+") ("+lat2+","+lon2+")<br>");	
-	
+		if(constraints.contains("="))
+			out.println("Constraints: "+constraints+"<br>");
 		if(plsdata == null) {
 			out.println("<h3>Response:</h3>");
 			out.println("The requested area/time is outside the PLS coverage");

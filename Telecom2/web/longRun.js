@@ -7,5 +7,7 @@ function longRunF(page) {
 		var newDoc = document.open("text/html", "replace");
 		newDoc.write(response);
 		newDoc.close();
+	}).fail(function() {
+	    alert("Error");
 	});
 }

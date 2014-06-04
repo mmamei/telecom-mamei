@@ -1,7 +1,7 @@
 <html>
 <head>
 <%@include file="includes/head.html" %>
-<jsp:useBean id="pr" scope="application" class="analysis.place_recognizer.PlaceRecognizer"/>
+<jsp:useBean id="pr" scope="application" class="analysis.user_place_recognizer.PlaceRecognizer"/>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 <script type="text/javascript" src="js/geoxmlfull_v3.js"></script>
 <script>
