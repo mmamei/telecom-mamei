@@ -6,12 +6,20 @@
 // If you need to insert a path to a file or a folder you must use the slash / separator inside the path, according to Unix-like systems, instead of backslash \,
 // according to Windows-like systems, to avoid errors.
 
-// File di rete
+// File Telecom
 network_map_dir = G:/DATASET/PLS/file_rete
+pls_folder = G:/DATASET/PLS/file_pls
+base_folder = C:/BASE
 
-// Cartella con i PLS
-pls_folder = G:/DATASET/PLS/file_pls/file_pls_piem
+// File Ivory Coast SET2
+//network_map_dir = G:/DATASET/D4D1/file_rete
+//pls_folder = G:/DATASET/D4D1/file_pls
+//base_folder = C:/BASE_D4D1
 
+// File Ivory Coast SET3
+//network_map_dir = G:/DATASET/D4D2/file_rete
+//pls_folder = G:/DATASET/D4D2/file_pls
+//base_folder = C:/BASE_D4D2
 
 // Filter events on the basis of time
 pls_start_time = 1/07/2011 00:00
