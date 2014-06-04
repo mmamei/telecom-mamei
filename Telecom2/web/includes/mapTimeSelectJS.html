@@ -103,11 +103,23 @@ function process() {
 	var st = document.getElementById("start_time").value;
 	var ed = document.getElementById("end_day").value;
 	var et = document.getElementById("end_time").value;
+	
+	if(!marker1) {
+		alert("Select the target area!");
+		return;
+	}
+	
+	var constraints = "";
+	var ao = document.getElementById("adv_op");
+	if(ao.style.display=="block") constraints = document.getElementById("constraints").value;
+	
 	var p1 = marker1.getPosition();
 	var p2 = marker2.getPosition();
+	
 	var url = jspLocation+"?sd="+sd+"&st="+st+"&ed="+ed+"&et="+et+
 			  "&lat1="+p1.lat().toFixed(4)+"&lon1="+p1.lng().toFixed(4)+
-			  "&lat2="+p2.lat().toFixed(4)+"&lon2="+p2.lng().toFixed(4);
+			  "&lat2="+p2.lat().toFixed(4)+"&lon2="+p2.lng().toFixed(4)+
+			  "&constraints="+constraints;
 	if(longRun) longRunF(url)
 	else window.open(url);
 }
