@@ -20,7 +20,7 @@ import dataset.db.insert.PLSTable;
  class PLSEventsAroundAPlacemark implements PLSEventsAroundAPlacemarkI {	
 
 
-	public void process(Placemark p, Map<String,Object> constraints) throws Exception {
+	public void process(Placemark p, Map<String,String> constraints) throws Exception {
 				
 		File dir = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark");
 		dir.mkdirs();
@@ -70,7 +70,7 @@ import dataset.db.insert.PLSTable;
 		out.close();
 	}
 	
-	public String getFileSuffix(Map<String,Object> constraints) {
+	public String getFileSuffix(Map<String,String> constraints) {
 		return "";
 	}
 }

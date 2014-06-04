@@ -9,6 +9,7 @@ import java.util.Map;
 import region.CityEvent;
 import region.RegionI;
 import region.RegionMap;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import analysis.presence_at_event.PlacemarkRadiusExtractor;
@@ -39,7 +40,7 @@ public class ODMatrixEventPresence {
 		
 		// READ INFORMATION ABOUT EVENT ATTENDANCE
 		Map<String,Double> user_pres_prob = new HashMap<String,Double>();
-		BufferedReader br1 = new BufferedReader(new FileReader(new File("BASE/PresenceCounterProbability/ProbScores/"+ce.toFileName())));
+		BufferedReader br1 = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/PresenceCounterProbability/ProbScores/"+ce.toFileName())));
 		String line;
 		//c1a4c67ec172ae1554e9856db5358fcb1664fcbff4b0222a1d86c093a32736b;0.8324594444444444
 		while((line=br1.readLine())!=null) {

@@ -97,13 +97,14 @@ import dataset.EventFilesFinderI;
 	
 	public static void main(String[] args) {
 		
-		
 
-		
 		
 		EventFilesFinder eff = new EventFilesFinder();
 		//String dir = eff.find("2012-03-20","19","2012-03-20","23",7.641453,45.109536,7.641453,45.109536);
-		String dir = eff.find("2012-05-06","19","2012-05-06","23",9.124,45.4781,9.124,45.4781);
+		//String dir = eff.find("2012-05-06","19","2012-05-06","23",9.124,45.4781,9.124,45.4781);
+		String dir = eff.find("2011-12-06","19","2011-12-06","23",-3.9808,5.2927,-3.9808,5.2927); // abidjan
+		
+		
 		System.out.println(dir);
 	}
 }

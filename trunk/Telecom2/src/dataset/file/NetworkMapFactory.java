@@ -58,7 +58,7 @@ class NetworkMapFactory implements NetworkMapFactoryI  {
             
             String best_file = null;
             
-            File dir = new File(Config.getInstance().base_folder+"//NetworkMapParser");
+            File dir = new File(Config.getInstance().base_folder+"/NetworkMapParser");
             
             try {
                     Calendar target_cal = Calendar.getInstance();

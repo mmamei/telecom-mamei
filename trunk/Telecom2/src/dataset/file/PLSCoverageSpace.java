@@ -105,12 +105,11 @@ import dataset.PLSCoverageSpaceI;
 			map = (Map<String,RegionMap>)CopyAndSerializationUtils.restore(f);
 		}
 		else {
-			File basedir = new File(Config.getInstance().base_folder);
+			File basedir = new File(Config.getInstance().pls_root_folder);
 			map = new HashMap<String,RegionMap>();
 			
 				for(File dir: basedir.listFiles()) {
 					if(!map.containsKey(dir.getName())) {
-						
 						PLSCoverageSpace ba = new PLSCoverageSpace(dir.getAbsolutePath());
 						ba.run();
 						map.put(dir.getName(),ba.rm);
@@ -187,9 +186,8 @@ import dataset.PLSCoverageSpaceI;
 		for(String name: map.keySet()) {
 			RegionMap rm = map.get(name);
 			for(RegionI r: rm.getRegions()) {
-				String[] x = r.getName().split(",");
-				lat += Double.parseDouble(x[0]);
-				lng += Double.parseDouble(x[1]);
+				lat += r.getLatLon()[0];
+				lng += r.getLatLon()[1];
 				cont ++;
 			}
 		}

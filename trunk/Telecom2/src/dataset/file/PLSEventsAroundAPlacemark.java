@@ -20,7 +20,7 @@ import utils.Logger;
 import dataset.PLSEventsAroundAPlacemarkI;
 
 class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroundAPlacemarkI  {	
-	private Map<String,Object> constraints;
+	private Map<String,String> constraints;
 	
 	private List<Placemark> placemarks;
 	private List<Map<String,UserInfo>> userInfos;
@@ -30,7 +30,7 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 	PLSEventsAroundAPlacemark() {
 	}
 	
-	PLSEventsAroundAPlacemark(List<Placemark> ps, Map<String,Object> constraints) {
+	PLSEventsAroundAPlacemark(List<Placemark> ps, Map<String,String> constraints) {
 		this.constraints = constraints;
 		userInfos = new ArrayList<Map<String,UserInfo>>();
 		placemarks = new ArrayList<Placemark>();
@@ -87,8 +87,10 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 				Placemark p = placemarks.get(i);
 				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(fd+"/"+p.getName()+"_"+p.getRadius()+getFileSuffix(constraints)+".txt"))));
 				
-				for(UserInfo ui: userInfos.get(i).values())
+				for(UserInfo ui: userInfos.get(i).values()) {
 					if(okConstraints(ui)) out.println(ui);
+				}
+				
 				out.close();
 			}
 			
@@ -99,7 +101,7 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 	
 	private boolean okConstraints(UserInfo ui) {
 		if(constraints!=null) {
-			String mnt  = (String)constraints.get("mnt");
+			String mnt  = constraints.get("mnt");
 			if(mnt!=null) {
 				if(mnt.startsWith("!")) { 
 					//System.err.println(ui.mnt+"VS"+mnt.substring(1));
@@ -108,19 +110,19 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 				else
 					if(!ui.mnt.equals(mnt)) return false;
 			}
-			Integer mindays = (Integer)constraints.get("mindays");
+			String mindays = constraints.get("mindays");
 			if(mindays!=null) 
-				if(ui.getNumDays() < mindays) return false;
+				if(ui.getNumDays() < Integer.parseInt(mindays)) return false;
 			
 			
-			Integer maxdays = (Integer)constraints.get("maxdays");
+			String maxdays = constraints.get("maxdays");
 			if(maxdays!=null) 
-				if(ui.getNumDays() > maxdays) return false;
+				if(ui.getNumDays() > Integer.parseInt(maxdays)) return false;
 		}
 		return true;
 	}
 	
-	public void process(Placemark p, Map<String,Object> constraints) throws Exception {
+	public void process(Placemark p, Map<String,String> constraints) throws Exception {
 		List<Placemark> ps = new ArrayList<Placemark>();
 		ps.add(p);
 		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps,constraints);
@@ -128,13 +130,13 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 		ba.finish();
 	}
 	
-	private void process(List<Placemark> p, Map<String,Object> constraints) throws Exception {
+	private void process(List<Placemark> p, Map<String,String> constraints) throws Exception {
 		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(p,constraints);
 		PLSParser.parse(ba);
 		ba.finish();
 	}
 	
-	public String getFileSuffix(Map<String,Object> constraints) {
+	public String getFileSuffix(Map<String,String> constraints) {
 		String suffix = "";
 		if(constraints != null) {
 			for(String key: constraints.keySet())
@@ -163,7 +165,7 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 		//ps.add(Placemark.getPlacemark("Piazza Vittorio (TO)"));
 		//ps.add(Placemark.getPlacemark("Parco Dora (TO)"));
 		
-		Map<String,Object> constraints = null;
+		Map<String,String> constraints = null;
 		PLSEventsAroundAPlacemark pap = new PLSEventsAroundAPlacemark();
 		pap.process(ps,constraints);
 		Logger.logln("Done");
@@ -235,6 +237,9 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 				String[] tc = p.split(":"); 
 				sb.append(username+","+tc[0]+","+mnt+","+tc[1]+"\n");
 			}
+			
+			
+			
 			return sb.toString();
 			
 		}

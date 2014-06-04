@@ -145,7 +145,20 @@ public class PLSTimeDensity implements Serializable {
 	
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
-	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, Map<String, Object> constraints) {
+	
+	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String sconstraints) {
+		Map<String,String> constraints = new HashMap<String,String>();
+		if(sconstraints.contains("=")) {
+			String[] elements = sconstraints.split(";");
+			for(String e: elements) {
+				String[] nameval = e.split("=");
+				constraints.put(nameval[0],nameval[1]);
+			}
+		}
+		return process(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,constraints);
+	}
+	
+	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, Map<String, String> constraints) {
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
@@ -188,14 +201,12 @@ public class PLSTimeDensity implements Serializable {
 		return null;
 	}
 	
-	public static void main(String[] args) throws Exception { 
-		
-		Map<String,Object> constraints = new HashMap<String,Object>();
-		constraints.put("mnt", "!22201");
-		
+	public static void main(String[] args) throws Exception { 		
 		PLSTimeDensity pbia = new PLSTimeDensity();
 		//Object[] plsdata = pbia.process("2014-03-13","0","2014-03-15","10",12.3238,45.4425,12.3238,45.4425);
-		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,constraints);
+		//Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,"mnt=!22201");
+		Object[] plsdata = pbia.process("2011-12-06","19","2011-12-06","23",-3.9808,5.2927,-3.9808,5.2927,""); // Abidjan
+		
 		if(plsdata!=null) {
 			System.out.println(pbia.getJSMap(plsdata));
 			PLSPlotter.drawGraph("Test", (String[])plsdata[0], (double[])plsdata[1], pbia, null);

@@ -320,7 +320,7 @@ public class PlacemarkRadiusExtractor {
 	}
 	*/
 	
-	public static Map<String, Object> constraints = null;
+	public static Map<String, String> constraints = null;
 	
 	public static List<double[][]> computeZXRadius(List<CityEvent> relevantEvents, boolean ring) throws Exception {
 		
