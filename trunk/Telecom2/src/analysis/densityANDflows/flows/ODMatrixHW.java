@@ -51,7 +51,7 @@ public class ODMatrixHW {
 		}
 		
 		// prepare for drawing
-		ODMatrixVisual.draw("ODMatrixHW_"+region,list_od,false);
+		ODMatrixVisual.draw("ODMatrixHW_"+region,list_od,false,"piem");
 		
 		Logger.log("Done!");
 	}

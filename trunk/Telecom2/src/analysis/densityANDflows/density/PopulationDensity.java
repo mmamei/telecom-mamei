@@ -13,8 +13,7 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
-import dataset.DataFactory;
-import dataset.EventFilesFinderI;
+import region.CreatorRegionMapGrid;
 import region.Placemark;
 import region.RegionI;
 import region.RegionMap;
@@ -23,6 +22,10 @@ import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
 import visual.kml.KMLHeatMap;
+import analysis.PLSSpaceDensity;
+import dataset.DataFactory;
+import dataset.EventFilesFinderI;
+import dataset.file.UserEventCounterCellacXHour;
 
 public class PopulationDensity {
 	
@@ -47,6 +50,8 @@ public class PopulationDensity {
 		Map<String,Double> density = computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place);
 		String title = rm.getName()+"-"+kind_of_place+"-"+exclude_kind_of_place;	
 		*/
+		
+		/*
 		PopulationDensity pd = new PopulationDensity();
 		String city = "Torino";
 		Map<String,String> constraints = null;
@@ -54,13 +59,17 @@ public class PopulationDensity {
 		File pls_space_density_file = new File(Config.getInstance().base_folder+"/PLSSpaceDensity/"+city+".txt");
 		Map<String,Double> space_density = pd.computeSpaceDensity(pls_space_density_file,rm,constraints);
 		pd.plotSpaceDensity(city+pd.getFileSuffix(constraints), space_density, rm,0);
-		Logger.logln("Done!");
+		*/
+		PopulationDensity pd = new PopulationDensity();
+		String js = pd.runAll("2014-04-20", "00", "2014-04-21", "00", 7.6203,45.0945,7.6969,45.0774, "FIX_Piemonte.ser", "");
+		System.out.println(js);
 		
+		Logger.logln("Done!");
 	}
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	
-	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String sconstraints) {
+	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, String sconstraints) {
 		Map<String,String> constraints = new HashMap<String,String>();
 		if(sconstraints.contains("=")) {
 			String[] elements = sconstraints.split(";");
@@ -69,10 +78,10 @@ public class PopulationDensity {
 				constraints.put(nameval[0],nameval[1]);
 			}
 		}
-		return runAll(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,constraints);
+		return runAll(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,regionMap,constraints);
 	}
 	
-	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, Map<String, String> constraints) {
+	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, Map<String, String> constraints) {
 		
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
@@ -88,16 +97,31 @@ public class PopulationDensity {
 			LatLonPoint p1 = new LatLonPoint(lat1,lon1);
 			LatLonPoint p2 = new LatLonPoint(lat2,lon2);
 			int r = (int)LatLonUtils.getHaversineDistance(p1, p2) / 2;
-			String n = "tmp";
-			Placemark p = new Placemark(n,new double[]{lat,lon},r);
-			
+			Placemark p = new Placemark("tmp",new double[]{lat,lon},r);
 			
 			PopulationDensity pd = new PopulationDensity();
-			String city = "Torino";
-			RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
-			File pls_space_density_file = new File(Config.getInstance().base_folder+"/PLSSpaceDensity/"+city+".txt");
+			
+			// load the region map
+			
+			RegionMap rm = null;
+			if(regionMap.startsWith("grid")) {
+				if(lon1 != lon2 && lat1 != lat2) {
+					double[][] lonlat_bbox = new double[][]{{lon1,lat1},{lon2,lat2}};
+					int size = Integer.parseInt(regionMap.substring("grid".length()));
+					rm = CreatorRegionMapGrid.process("grid", lonlat_bbox, size);
+				}
+			}
+			else rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));
+			
+			// Create UserEventCounterCellacXHour and PLSSpaceDenstiy files
+			// Then compute the population density.
+			
+			UserEventCounterCellacXHour.process(p); // file name is called as the placemark
+			PLSSpaceDensity.process(rm, Config.getInstance().base_folder+"/UserEventCounter/"+p.getName()+"_cellXHour.csv", null, null);
+			File pls_space_density_file = new File(Config.getInstance().base_folder+"/PLSSpaceDensity/"+p.getName()+"_"+rm.getName()+".csv");
 			Map<String,Double> space_density = pd.computeSpaceDensity(pls_space_density_file,rm,constraints);
 			
+			plotSpaceDensity(p.getName()+getFileSuffix(constraints), space_density, rm,0);
 			
 			StringBuffer sb = new StringBuffer();
 			sb.append("var heatMapData = [\n");
@@ -127,10 +151,10 @@ public class PopulationDensity {
 	}
 	
 	public void plotSpaceDensity(String city, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
-		File d = new File(Config.getInstance().base_folder+"/PopDensity");
+		File d = new File(Config.getInstance().web_kml_folder);
 		d.mkdirs();
-		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+city+".kml",space_density,rm,city,false);
-		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+city+".html", city, space_density, rm, threshold);
+		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+city+"_"+rm.getName()+".kml",space_density,rm,city,false);
+		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+city+"_"+rm.getName()+".html", city, space_density, rm, threshold);
 	}
 	
 	
@@ -170,6 +194,8 @@ public class PopulationDensity {
 			double area = rm.getRegion(k).getGeom().getArea();
 			sd.put(k, val/area);
 		}
+		
+		
 		
 		return sd;
 	}

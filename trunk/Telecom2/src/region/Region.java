@@ -27,26 +27,27 @@ public class Region extends RegionI {
 	public Region(String name, Geometry g) {
 		this.g = g;
 		this.name = name.replaceAll("\\\\", "");
-		
-		double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
-		String kmlcoordinates = GeomUtils.geom2Kml(g);
-		String x = GeomUtils.kml2OpenGis(kmlcoordinates);
-		if(x.equals("")) return;
-		String[] coord = x.split(",");
-		for(String c: coord) {
-			double lat = Double.parseDouble(c.substring(0,c.indexOf(" ")));
-			double lon = Double.parseDouble(c.substring(c.indexOf(" ")+1));
+		if(g!=null) {
+			double minlon = Double.MAX_VALUE, maxlon = -Double.MAX_VALUE, minlat = Double.MAX_VALUE, maxlat = -Double.MAX_VALUE;
+			String kmlcoordinates = GeomUtils.geom2Kml(g);
+			String x = GeomUtils.kml2OpenGis(kmlcoordinates);
+			if(x.equals("")) return;
+			String[] coord = x.split(",");
+			for(String c: coord) {
+				double lat = Double.parseDouble(c.substring(0,c.indexOf(" ")));
+				double lon = Double.parseDouble(c.substring(c.indexOf(" ")+1));
+				
+				minlon = Math.min(minlon, lon);
+				minlat = Math.min(minlat, lat);
+				maxlon = Math.max(maxlon, lon);
+				maxlat = Math.max(maxlat, lat);
+			}
 			
-			minlon = Math.min(minlon, lon);
-			minlat = Math.min(minlat, lat);
-			maxlon = Math.max(maxlon, lon);
-			maxlat = Math.max(maxlat, lat);
+			// questo codice si puù sostituire con get envelope! test
+			
+			bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
+			centerLatLon = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
 		}
-		
-		// questo codice si puù sostituire con get envelope! test
-		
-		bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
-		centerLatLon = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
 	}
 	
 	

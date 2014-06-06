@@ -13,8 +13,7 @@ import region.RegionMap;
 import utils.Config;
 
 public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
-	
-	private String placemark_name; 
+
 	private String user_list_name;
 	private Placemark placemark = null;
 	private Set<String> user_list = null;
@@ -30,13 +29,11 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	 * 
 	 */
 	
-	BufferAnalyzerConstrained(String placemark_name, String user_list_name) {
+	BufferAnalyzerConstrained(Placemark placemark, String user_list_name) {
 		
-		this.placemark_name = placemark_name;
+		this.placemark = placemark;
 		this.user_list_name = user_list_name;
-		
-		if(placemark_name != null)
-			placemark= Placemark.getPlacemark(placemark_name);
+			
 		if(user_list_name != null) {
 			
 			user_list = new HashSet<String>();
@@ -56,7 +53,7 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 	Config c = Config.getInstance();
 	String p ;
 	String getString() {
-		p = placemark == null ? c.pls_folder.substring(c.pls_folder.lastIndexOf("/")+1) : placemark_name;
+		p = placemark == null ? c.pls_folder.substring(c.pls_folder.lastIndexOf("/")+1) : placemark.getName();
 		if(user_list == null)
 			return p;
 		else {

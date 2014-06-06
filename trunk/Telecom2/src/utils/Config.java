@@ -45,8 +45,7 @@ public class Config {
 		}
 	}
 	
-	
-	
+	public String web_kml_folder = null;
 	public String network_map_dir = null;
 	public String pls_root_folder = null;
 	public String pls_folder = null;
@@ -59,6 +58,9 @@ public class Config {
 	private void parse(String name, String value) {
 		if(name.equals("network_map_dir")) {
 			network_map_dir = value;
+		}
+		else if(name.equals("web_kml_folder")) {
+			web_kml_folder = value;
 		}
 		else if(name.equals("pls_folder")) {
 			pls_root_folder = value;

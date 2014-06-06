@@ -90,7 +90,7 @@ public class ODMatrixEventPresence {
 		br2.close();
 		
 		
-		ODMatrixVisual.draw("ODMatrixEventPresence_"+ce.toFileName(), incoming_od, outgoing_od, true);
+		ODMatrixVisual.draw("ODMatrixEventPresence_"+ce.toFileName(), incoming_od, outgoing_od, true,"piem");
 		
 		Logger.logln("Done");
 	}

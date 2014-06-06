@@ -30,14 +30,15 @@ public class CreatorRegionMapComuni {
 	
 	
 	public static void main(String[] args) throws Exception {
-		String region = "Piemonte";
+		String region = "Lombardia";
 		String input_kml_file="C:/DATASET/GEO/"+region+".kml";
-		String output_obj_file="BASE/cache/"+region+".ser";
+		String output_obj_file=Config.getInstance().base_folder+"/RegionMap/FIX_"+region+".ser";
 		process(region, input_kml_file,output_obj_file);
+		Logger.logln("Done!");
 	}
 	
 	
-	public static void process(String name, String input_kml_file, String output_obj_file) throws Exception {
+	public static RegionMap process(String name, String input_kml_file, String output_obj_file) throws Exception {
 		
 		RegionMap rm = new RegionMap(name);
 		
@@ -57,7 +58,7 @@ public class CreatorRegionMapComuni {
 		}
 		
 		CopyAndSerializationUtils.save(new File(output_obj_file), rm);
-		Logger.logln("Done!");
+		return rm;
 	}
 	
 	

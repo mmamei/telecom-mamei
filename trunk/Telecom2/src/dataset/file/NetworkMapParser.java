@@ -26,6 +26,7 @@ public class NetworkMapParser {
             File dir = new File(Config.getInstance().network_map_dir);
             String[] files = dir.list();
             for(String file: files) {
+            		System.out.println(dir+"/"+file);
                     BufferedReader in = new BufferedReader(new FileReader(dir+"/"+file));
                     HashMap<String, RegionI> map = new HashMap<String, RegionI>();
                     String line;

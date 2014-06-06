@@ -6,6 +6,10 @@
 // If you need to insert a path to a file or a folder you must use the slash / separator inside the path, according to Unix-like systems, instead of backslash \,
 // according to Windows-like systems, to avoid errors.
 
+
+web_kml_folder = G:/CODE/Telecom/web/kml
+
+
 // File Telecom
 network_map_dir = G:/DATASET/PLS/file_rete
 pls_folder = G:/DATASET/PLS/file_pls

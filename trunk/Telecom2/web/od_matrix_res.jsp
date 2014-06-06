@@ -3,7 +3,7 @@
 <%@include file="includes/head.html" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="region.RegionMap" %>
-<jsp:useBean id="pd" scope="application" class="analysis.densityANDflows.density.PopulationDensity"/>
+<jsp:useBean id="od" scope="application" class="analysis.densityANDflows.flows.ODMatrixTime"/>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
 <script>
 
@@ -18,9 +18,7 @@ double lat2 = Double.parseDouble(request.getParameter("lat2"));
 double lon2 = Double.parseDouble(request.getParameter("lon2"));
 String regionMap= request.getParameter("region_map");
 String constraints= request.getParameter("constraints");
-String jsData = pd.runAll(sd,st,ed,et,lon1,lat1,lon2,lat2,regionMap,constraints);
-out.println(jsData);
-
+String jsData = od.runAll(sd,st,ed,et,lon1,lat1,lon2,lat2,regionMap,constraints);
 
 String kml_file = "tmp_"+ (regionMap.startsWith("grid") ? "grid" : regionMap.substring("FIX_".length(), regionMap.lastIndexOf(".")));
 
@@ -33,12 +31,12 @@ center: cp,
 zoom: 11,
 mapTypeId: google.maps.MapTypeId.NORMAL
 });
-var heatmap = new google.maps.visualization.HeatmapLayer({
-data: heatMapData,
-radius: 100.0,
-opacity: 0.6
-});
-heatmap.setMap(map);
+
+var lineSymbol = {path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW};
+
+
+<%=jsData%>
+
 }
 google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -54,7 +52,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 <div class="container">
 	<article id="main" class="special">
 		<header>
-		<h2>Population Density</h2>
+		<h2>Population Flow (OD Matrix)</h2>
 		</header>
 		
 		<h3>Request:</h3>
@@ -73,7 +71,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 		
 	</article>
 	<div style="height: 600px" id="map-canvas"></div>
-	<a href="kml/<%=kml_file%>.kml">Download the KML file!</a>
+	<a href="kml/od_tmp.kml">Download the KML file!</a>
 </div>
 </div>
 

@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import region.CityEvent;
+import region.Placemark;
+import utils.Config;
 import utils.Logger;
 
 public class LocationsXUserAroundAnEvent extends BufferAnalyzer {	
@@ -64,7 +66,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 	protected void finish() {
 		try {
 			
-			String dir = "BASE/LocationsXUserAroundAnEvent";
+			String dir = Config.getInstance().base_folder+"/LocationsXUserAroundAnEvent";
 			File fd = new File(dir);
 			if(!fd.exists()) fd.mkdirs();
 			
@@ -81,19 +83,31 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 			e.printStackTrace();
 		}
 	}
+
+	
+	public static String getOutputFile(Placemark p, Calendar st, Calendar et) throws Exception {
+		//"Stadio_Silvio_Piola_(NO)-11_03_2012_18_00-12_03_2012_00_00.txt";//"Torino-11_03_2012_17_00-11_03_2012_19_00.txt";
+		return Config.getInstance().base_folder+"/LocationsXUserAroundAnEvent/"+new CityEvent(p,st,et,0).toFileName();
+	}
 	
 	
-	public static void main(String[] args) throws Exception {
-		
-		CityEvent ce = CityEvent.getEvent("Juventus Stadium (TO),20/03/2012");
-		ce = CityEvent.expand(ce, 1, 10000);
-		
-		//Placemark p = new Placemark("Torino",new double[]{45.073036,7.679733},5000);
-		//CityEvent ce = new CityEvent(p,"11/03/2012 17:00","11/03/2012 19:00",-1);
-		
+	public static void process(Placemark p, Calendar st, Calendar et) throws Exception {
+		CityEvent ce = new CityEvent(p,st,et,0);
+		process(ce);
+	}
+	
+	private static void process(CityEvent ce) throws Exception {
 		LocationsXUserAroundAnEvent ba = new LocationsXUserAroundAnEvent(ce);
 		PLSParser.parse(ba);
 		ba.finish();
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem";
+		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
+		ce = CityEvent.expand(ce, 1, 10000);
+		process(ce);	
 		Logger.logln("Done");
 	}
 }

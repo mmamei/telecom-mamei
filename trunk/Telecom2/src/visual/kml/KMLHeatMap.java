@@ -24,7 +24,7 @@ public class KMLHeatMap {
 			RegionI nc = nm.getRegion(celllac);
 			int index = (int)(map.get(celllac) / max * (Colors.HEAT_COLORS.length-1));
 			
-			result.append(nc.toKml(Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]), "", ""));
+			result.append(nc.toKml(Colors.rgb2kmlstring(Colors.HEAT_COLORS[index]), ""));
 		}
 		return result.toString();
 	}
@@ -54,8 +54,10 @@ public class KMLHeatMap {
 		
 		for(RegionI r: rm.getRegions()) {
 			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
-			String description = desc+" DENSITY = "+(logscale ? Math.pow(10, val) : val);
-			out.println(r.toKml(Colors.val01_to_color(val/max),"44aaaaaa",description));
+			if(val > 0) {
+				r.setDescription(desc+" DENSITY = "+(logscale ? Math.pow(10, val) : val));
+				out.println(r.toKml(Colors.val01_to_color(val/max),"44aaaaaa"));
+			}
 		}
 	
 		

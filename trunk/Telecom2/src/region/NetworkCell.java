@@ -10,7 +10,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class NetworkCell extends RegionI {
 	
 	private String celllac;			// Nome Cella (id)
-	private String description;		// Nome Cella
+	
 	//private int barycentre;			// Distanza in metri dal sito della cella
 	private long lac;				// LAC: Location Area Code
 	private long cell_id;			// Identifica la cella

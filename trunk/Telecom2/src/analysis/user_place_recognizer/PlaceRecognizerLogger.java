@@ -189,7 +189,8 @@ public class PlaceRecognizerLogger {
 					RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(clusterByCells.get(celllac).get(0).getTimeStamp());
 					RegionI cell = nm.getRegion(celllac);
 					String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
-					outKml.println(cell.toKml(COLORS[colorIndex % (COLORS.length)],name,desc));
+					cell.setDescription(name+". "+desc);
+					outKml.println(cell.toKml(COLORS[colorIndex % (COLORS.length)]));
 				}
 				colorIndex++;
 				kml.closeFolder(outKml);
