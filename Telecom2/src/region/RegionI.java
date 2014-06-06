@@ -10,6 +10,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class RegionI implements Serializable {
 	protected String name;
+	protected String description;		
 	protected double[] centerLatLon;
 	
 	
@@ -24,6 +25,15 @@ public abstract class RegionI implements Serializable {
 	public String getName() {
 		return name;
 	}
+	
+	public String getDescription(){
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	public double[] getLatLon() {
 		return centerLatLon;
 	}
@@ -41,10 +51,10 @@ public abstract class RegionI implements Serializable {
 	
 	
 	public String toKml(String color) {
-		return toKml(color,color,"");
+		return toKml(color,color);
 	}
 	
-	public String toKml(String areacolor, String bordercolor, String description) {
+	public String toKml(String areacolor, String bordercolor) {
 		String id = areacolor+"-"+bordercolor;
 		return "<Style id=\""+id+"\">" +
 				"<LineStyle>" +

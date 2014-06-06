@@ -27,8 +27,8 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	private Map<String,UserInfo> users_info;
 
 	
-	UserEventCounterCellacXHour(String placemark_name, String user_list_name) {
-		super(placemark_name,user_list_name);
+	UserEventCounterCellacXHour(Placemark placemark, String user_list_name) {
+		super(placemark,user_list_name);
 		users_info = new HashMap<String,UserInfo>();
 	}
 	
@@ -77,6 +77,14 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		}
 	}
 	
+
+	public static void process(Placemark placemark) {
+		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(placemark,null);
+		ba.run();
+	}
+	
+	
+	
 	public static void main(String[] args) throws Exception {
 		//BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,FileUtils.getFileS("UserSetCreator/Firenze.csv"));
 		
@@ -84,9 +92,8 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem"; 
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.FEBRUARY,16,18,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.FEBRUARY,16,23,0,0);
-		
-		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour("Torino",null);
-		ba.run();
+		Placemark placemark= Placemark.getPlacemark("Torino");
+		process(placemark);
 		Logger.logln("Done!");
 	}	
 	
@@ -110,11 +117,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		Logger.logln("Done!");
 	}
 	
-	/*
-	public static String[] process(String line) {
-		
-	}
-	*/
+
 	
 	/***********************************************************************************************************************/
 	/* USER INFO INNER CLASS */

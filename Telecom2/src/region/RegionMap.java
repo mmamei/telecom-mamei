@@ -195,7 +195,7 @@ public class RegionMap implements Serializable {
 		kml.printHeaderFolder(out, name);
 		int index = 0;
 		for(RegionI r: rm.values()) {
-			out.println(r.toKml(Colors.RANDOM_COLORS[index],Colors.RANDOM_COLORS[index],r.getName()));
+			out.println(r.toKml(Colors.RANDOM_COLORS[index],Colors.RANDOM_COLORS[index]));
 			index++;
 			if(index >= Colors.RANDOM_COLORS.length) index = 0;
 		}
@@ -228,7 +228,7 @@ public class RegionMap implements Serializable {
 		StringBuffer sb = new StringBuffer();
 		int index = 0;
 		for(RegionI r: rm.values()) {
-			sb.append(r.toKml("01ffffff","ffffffff",r.getName())+"\n");
+			sb.append(r.toKml("01ffffff","ffffffff")+"\n");
 			index++;
 			if(index >= Colors.RANDOM_COLORS.length) index = 0;
 		}
@@ -239,7 +239,7 @@ public class RegionMap implements Serializable {
 		StringBuffer sb = new StringBuffer();
 		int index = 0;
 		for(RegionI r: rm.values()) {
-			sb.append(r.toKml(color,color,r.getName())+"\n");
+			sb.append(r.toKml(color,color)+"\n");
 			index++;
 			if(index >= Colors.RANDOM_COLORS.length) index = 0;
 		}
@@ -274,7 +274,7 @@ public class RegionMap implements Serializable {
 	
 	
 	public static void main(String[] args) throws Exception {
-		process("Venezia");
+		process("FIX_IvoryCoast");
 		Logger.logln("Done!");
 	}
 	

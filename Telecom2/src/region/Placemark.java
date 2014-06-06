@@ -206,7 +206,7 @@ public class Placemark extends RegionI {
 		kml.printHeaderFolder(out, name);
 			
 		for(String cell: cellsAround) 
-			out.println(nm.getRegion(cell).toKml("#7f770077","#ff770077",""));
+			out.println(nm.getRegion(cell).toKml("#7f770077","#ff770077"));
 		out.println(super.toKml("ff00ff00"));
 		
 		kml.printFooterFolder(out);

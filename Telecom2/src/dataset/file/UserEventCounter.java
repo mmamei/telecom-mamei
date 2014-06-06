@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import region.Placemark;
 import utils.Config;
 import utils.Logger;
 
@@ -20,8 +21,8 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	
 	private Map<String,Integer> users_events;
 	
-	UserEventCounter(String placemark_name, String user_list_name) {
-		super(placemark_name,user_list_name);
+	UserEventCounter(Placemark placemark, String user_list_name) {
+		super(placemark,user_list_name);
 		users_events = new HashMap<String,Integer>();
 	}
 
@@ -44,7 +45,7 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		}
 	}
 	
-	public static void extractUsersAboveThreshol(File infile, File outfile, int n) throws Exception {
+	public static void extractUsersAboveThreshold(File infile, File outfile, int n) throws Exception {
 		PrintWriter out = new PrintWriter(outfile);
 		BufferedReader br = new BufferedReader(new FileReader(infile));
 		String line;
@@ -96,21 +97,22 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	
 	public static void main(String[] args) throws Exception {
 		
+		String region = "file_pls_ve";
 		
-		
-		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_lomb";
+		/*
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+region;
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,2,1);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,3,30);
 		PLSParser.MIN_HOUR = 1;
 		PLSParser.MAX_HOUR = 3;
 		UserEventCounter ba = new UserEventCounter(null,null);
 		ba.run();
-		/*
-		percentAnalysis(FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_count_timeframe_1_3.csv"));
-		
-		extractUsersAboveThreshol(FileUtils.getFile("BASE/UserEventCounter/file_pls_piem_count_timeframe_1_3.csv"),
-								  new File(FileUtils.getFile("BASE/UserEventCounter")+"/file_pls_piem_bogus.txt"), 100);
 		*/
+		percentAnalysis(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_1_3.csv"));
+		
+		extractUsersAboveThreshold(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_1_3.csv"),
+								   new File(Config.getInstance().base_folder+"/UserEventCounter"+"/"+region+"_bogus.txt"), 60);
+	
 		Logger.logln("Done!");
 	}
 	

@@ -22,7 +22,7 @@ import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 
 
-public class CreatorRegionMapCity {
+public class CreatorRegionMapVoronoi {
 	
 	
 	public static void main(String[] args) throws Exception {

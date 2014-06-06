@@ -4,7 +4,7 @@
 <%@include file="includes/mapTimeSelectRegionMapJS.html" %>
 
 <script type="text/javascript">
-jspLocation = "population_density_res.jsp";
+jspLocation = "od_matrix_res.jsp";
 longRun = false;
 </script>
 
@@ -13,7 +13,7 @@ longRun = false;
 <%@include file="includes/header.html" %>
 <div class="wrapper style1">
 <div class="container">
-<h2>Population Density</h2>
+<h2>Population Flow (OD Matrix)</h2>
 
 <%@include file="includes/mapTimeSelectRegionMapHTML.jsp" %>
 

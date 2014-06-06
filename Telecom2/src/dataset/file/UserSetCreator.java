@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import region.Placemark;
 import utils.Config;
 import utils.Logger;
 
@@ -15,8 +16,8 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	
 	private Set<String> users;
 	
-	UserSetCreator(String placemark_name, String user_list_name) {
-		super(placemark_name, user_list_name);
+	UserSetCreator(Placemark placemark, String user_list_name) {
+		super(placemark, user_list_name);
 		users = new HashSet<String>();
 	}
 
@@ -40,7 +41,8 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	
 	
 	public static void main(String[] args) {
-		BufferAnalyzerConstrained ba = new UserSetCreator("Firenze",null);
+		Placemark placemark= Placemark.getPlacemark("Firenze");
+		BufferAnalyzerConstrained ba = new UserSetCreator(placemark,null);
 		ba.run();
 		Logger.logln("Done!");
 	}

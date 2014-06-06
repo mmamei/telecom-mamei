@@ -26,12 +26,13 @@ import com.graphhopper.util.PointList;
 public class ODMatrixVisual {
 		
 
-	private static final String ghLoc = "C:/DATASET/graph_hopper";
-    private static final String testOsm = "C:/DATASET/graph_hopper/piemonte.pbf";
+	
 	
     
     // main for testing purposes
     public static void main(String[] args) throws Exception {
+    	String ghLoc = "C:/DATASET/osm/piem";
+	    String testOsm = "C:/DATASET/osm/piem/piem.pbf";
     	GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager("CAR")).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
 		gh.setPreciseIndexResolution(10000); // to be set about the grid size
 		gh.importOrLoad();
@@ -57,18 +58,23 @@ public class ODMatrixVisual {
     
     
     
-    public static void draw(String title, Map<Move,Double> list_od, boolean directed) throws Exception {
-    	Map<String,Double> map = getSegmentOD(list_od,directed);
+    public static String draw(String title, Map<Move,Double> list_od, boolean directed, String region) throws Exception {
     	
-    	DescriptiveStatistics stats = new DescriptiveStatistics();
+    	List<double[][]> points = new ArrayList<double[][]>();
+		List<Double> w = new ArrayList<Double>();	
+		List<String> colors = new ArrayList<String>();
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		
+    	
+    	Map<String,Double> map = getSegmentOD(list_od,directed,region);
+    	
+    	
 		for(Double x: map.values()) 
 			stats.addValue(x);
 		double p25 = stats.getPercentile(25); 
 		double max = stats.getMax();
 		
-		List<double[][]> points = new ArrayList<double[][]>();
-		List<Double> w = new ArrayList<Double>();	
-		List<String> colors = new ArrayList<String>();
+		
 		
 		for(String k: map.keySet()) {
 			double weight = map.get(k);
@@ -80,19 +86,20 @@ public class ODMatrixVisual {
 		}
 		
 		
-		String dir = "BASE/ODMatrix";
+		String dir = Config.getInstance().web_kml_folder;
 		File d = new File(dir);
 		if(!d.exists()) d.mkdirs();
 		
-		ArrowsGoogleMaps.draw(dir+"/"+title+".html",title,points,w,colors,false);
-		printKML(dir+"/"+title+".kml",title,points,w,colors,false);
+	
+		printKML(dir+"/od_tmp.kml",title,points,w,colors,false);
+		return ArrowsGoogleMaps.draw(dir+"/"+title+".html",title,points,w,colors,false);
     }
     
     
     // this is the same method as before but changes color for incoming/outgoing routes
-    public static void draw(String title, Map<Move,Double> incoming_od, Map<Move,Double> outgoing_od, boolean directed) throws Exception {
-    	Map<String,Double> in_map = getSegmentOD(incoming_od,directed);
-    	Map<String,Double> out_map = getSegmentOD(outgoing_od,directed);
+    public static void draw(String title, Map<Move,Double> incoming_od, Map<Move,Double> outgoing_od, boolean directed, String region) throws Exception {
+    	Map<String,Double> in_map = getSegmentOD(incoming_od,directed,region);
+    	Map<String,Double> out_map = getSegmentOD(outgoing_od,directed,region);
     	
     	DescriptiveStatistics stats = new DescriptiveStatistics();
 		for(Double x: in_map.values()) 
@@ -134,7 +141,11 @@ public class ODMatrixVisual {
     
     
     
-	private static Map<String,Double> getSegmentOD(Map<Move,Double> list_od, boolean directed) throws Exception {
+	private static Map<String,Double> getSegmentOD(Map<Move,Double> list_od, boolean directed, String region) throws Exception {
+		
+		String n = region.substring("file_pls_".length());
+		String ghLoc = "C:/DATASET/osm/"+n;
+	    String testOsm = "C:/DATASET/osm/"+n+"/"+n+".pbf";
 		
 		GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager("CAR")).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
 		gh.setPreciseIndexResolution(10000); // to be set about the grid size

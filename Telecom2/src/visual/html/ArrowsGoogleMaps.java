@@ -12,7 +12,7 @@ public class ArrowsGoogleMaps {
 	
 	public static int zoom = 12;
 	
-	public static void draw(String file,String title,List<double[][]> points,List<Double> w, List<String> colors, boolean directed) throws Exception {
+	public static String draw(String file,String title,List<double[][]> points,List<Double> w, List<String> colors, boolean directed) throws Exception {
 		PrintWriter out = new PrintWriter(new FileWriter(file));
 		out.println("<html>");
 		out.println("<head>");
@@ -55,10 +55,10 @@ public class ArrowsGoogleMaps {
 		out.println("var lineSymbol = {");
 		out.println("path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW");
 		out.println("};");
-
-		for(int i=0;i<points.size();i++) {
-			drawArrow(out,points.get(i),w.get(i),colors.get(i),directed);
-		}
+		
+		
+		String allArrows = drawAllArrow(points,w,colors,directed);
+		out.println(allArrows);
 
 		out.println("}");
 
@@ -72,33 +72,49 @@ public class ArrowsGoogleMaps {
 		
 		
 		out.close();
+		
+		return allArrows;
 	}
 	
 	
-	public static void drawArrow(PrintWriter out, double[][] p, double w, String color, boolean directed){
-		out.println("var line = new google.maps.Polyline({");
-		out.println("path: [");
+	public static String drawAllArrow(List<double[][]> points,List<Double> w, List<String> colors, boolean directed) {
+		StringBuffer sb = new StringBuffer();
+
+		for(int i=0;i<points.size();i++) {
+			sb.append(drawArrow(points.get(i),w.get(i),colors.get(i),directed));
+		}
+		return sb.toString();
+	}
+	
+	
+	public static String drawArrow(double[][] p, double w, String color, boolean directed) {
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("var line = new google.maps.Polyline({\n");
+		sb.append("path: [\n");
 		
 		
 		double jitter = color.equals("#0000ff") ? 0.0001 * w : 0;
 		
 		for(int i=0; i<p.length-1;i++)
-			out.println("new google.maps.LatLng("+(p[i][0]+jitter)+","+(p[i][1]+jitter)+"),");
-		out.println("new google.maps.LatLng("+(p[p.length-1][0]+jitter)+","+(p[p.length-1][1]+jitter)+")");
-		out.println("],");
+			sb.append("new google.maps.LatLng("+(p[i][0]+jitter)+","+(p[i][1]+jitter)+"),\n");
+		sb.append("new google.maps.LatLng("+(p[p.length-1][0]+jitter)+","+(p[p.length-1][1]+jitter)+")\n");
+		sb.append("],\n");
 		
-		out.println("strokeColor: '"+color+"',");
+		sb.append("strokeColor: '"+color+"',\n");
 		//out.println("strokeOpacity: 0.8,");
-		out.println("strokeWeight: "+w+",");
+		sb.append("strokeWeight: "+w+",\n");
 		
 		if(directed) {
-			out.println("icons: [{");
-			out.println("icon: lineSymbol,");
-			out.println("offset: '100%'");
-			out.println("}],");
+			sb.append("icons: [{\n");
+			sb.append("icon: lineSymbol,\n");
+			sb.append("offset: '100%'\n");
+			sb.append("}],\n");
 		}
-		out.println("map: map");
-		out.println("});");
+		sb.append("map: map\n");
+		sb.append("});\n");
+		
+		return sb.toString();
 	}
 	
 	

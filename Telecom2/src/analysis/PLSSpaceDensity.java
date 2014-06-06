@@ -316,7 +316,7 @@ public class PLSSpaceDensity implements Serializable {
 	public static void main(String[] args) throws Exception {
 		
 		String city = "Torino";
-		String cellXHourFile = "Torino_cellXHour.csv";
+		String cellXHourFile = Config.getInstance().base_folder+"/UserEventCounter/Torino_cellXHour.csv";
 		String gt_ser_file = "Firenze_gt_profiles.ser";
 		
 		/*
@@ -324,18 +324,22 @@ public class PLSSpaceDensity implements Serializable {
 		String cellXHourFile = "file_pls_ve_Venezia_cellXHour.csv";
 		String gt_ser_file = "Venezia_gt_profiles.ser";
 		*/
-		process(city,cellXHourFile,gt_ser_file,null);
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
+		process(rm,cellXHourFile,gt_ser_file,null);
 		Logger.logln("Done");
 	}
 	
-	public static void process(String city, String cellXHourFile, String gt_ser_file, Integer max) throws Exception {
-		
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/UserEventCounter/"+cellXHourFile)));
+	public static void process(RegionMap rm, String cellXHourFile, String gt_ser_file, Integer max) throws Exception {
+	
+		BufferedReader br = new BufferedReader(new FileReader(new File(cellXHourFile)));
 		if(br == null) {
 			Logger.logln("Launch UserEventCounterCellacXHour first!");
 			System.exit(0);
 		}
+		
+		
+		String placemark_name = cellXHourFile.substring(cellXHourFile.lastIndexOf("/")+1,cellXHourFile.lastIndexOf("_cellXHour.csv"));
+		
 		/*
 		Map<String,String> user_gt_prof = null;
 		if(gt_ser_file != null)
@@ -345,7 +349,7 @@ public class PLSSpaceDensity implements Serializable {
 	
 		File dir = new File(Config.getInstance().base_folder+"/PLSSpaceDensity");
 		dir.mkdirs();
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+city+s+".txt"))));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+placemark_name+"_"+rm.getName()+s+".csv"))));
 		//PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".arff"))));
 		
 		int i=0;

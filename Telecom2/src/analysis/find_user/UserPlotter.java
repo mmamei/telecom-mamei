@@ -28,7 +28,7 @@ public class UserPlotter {
 						
 			UserTrace trace = UsersCSVCreator.process(user); 
 		
-			KMLPath.openFile("G:/CODE/Telecom/web/kml/"+user+".kml");
+			KMLPath.openFile(Config.getInstance().web_kml_folder+"/"+user+".kml");
 			KMLPath.print(user,trace.getEvents());
 			KMLPath.closeFile();		
 			
