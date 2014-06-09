@@ -190,7 +190,7 @@ public class PlaceRecognizerLogger {
 					RegionI cell = nm.getRegion(celllac);
 					String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
 					cell.setDescription(name+". "+desc);
-					outKml.println(cell.toKml(COLORS[colorIndex % (COLORS.length)]));
+					outKml.println(cell.toKml("aa"+COLORS[colorIndex % (COLORS.length)]));
 				}
 				colorIndex++;
 				kml.closeFolder(outKml);

@@ -9,18 +9,18 @@ import java.util.Map;
 
 public class UserPlaces {
 	public String username;
-	public Map<String,List<double[]>> places;
+	public Map<String,List<double[]>> lonlat_places;
 	
 	UserPlaces(String username) {
 		this.username = username;
-		places = new HashMap<String,List<double[]>>();
+		lonlat_places = new HashMap<String,List<double[]>>();
 	}
 	
 	void add(String kop, double lon, double lat) {
-		List<double[]> p = places.get(kop);
+		List<double[]> p = lonlat_places.get(kop);
 		if(p==null) {
 			p = new ArrayList<double[]>();
-			places.put(kop, p);
+			lonlat_places.put(kop, p);
 		}
 		p.add(new double[]{lon,lat});
 	}

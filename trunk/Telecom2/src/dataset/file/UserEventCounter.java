@@ -16,6 +16,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import region.Placemark;
 import utils.Config;
 import utils.Logger;
+import utils.Mail;
 
 public class UserEventCounter extends BufferAnalyzerConstrained {
 	
@@ -45,16 +46,23 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		}
 	}
 	
-	public static void extractUsersAboveThreshold(File infile, File outfile, int n) throws Exception {
+	public static void extractUsersAboveThreshold(File infile, File outfile, int threshold, int max_n_users) throws Exception {
 		PrintWriter out = new PrintWriter(outfile);
 		BufferedReader br = new BufferedReader(new FileReader(infile));
 		String line;
+		int count = 0;
 		while((line=br.readLine())!=null){
 			try {
 				String[] x = line.split(",");
 				String username = x[0];
 				int n_events = Integer.parseInt(x[1]);
-				if(n_events > n) out.println(username);	
+				if(n_events > threshold) {
+					out.println(username);	
+					count ++;
+				}
+				if(max_n_users > 0 && count > max_n_users)
+					break;
+					
 			} catch(Exception e) {
 				System.out.println("BAD LINE = "+line);
 			}
@@ -81,39 +89,40 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		}
 		br.close();
 		
-		PLSCoverageTime apc = new PLSCoverageTime();
-		Map<String,List<String>> all =  apc.computeAll();
-		String n = f.getName().substring(0,f.getName().indexOf("_count"));
-		int ndays = all.get(n).size();
+		int ndays = (int)((Config.getInstance().pls_end_time.getTimeInMillis() - Config.getInstance().pls_start_time.getTimeInMillis()) / (1000 * 3600 * 24)); 
+		
 		
 		for(int i=1; i<100;i++)
 			System.out.println(i+","+stats.getPercentile(i)+" ==> "+stats.getPercentile(i)/ndays);
 		System.out.println("TOT DAYS = "+ndays);
+		System.out.println("TOT USERS = "+stats.getN());
 	}
 	
 	
 	
-	
+
 	
 	public static void main(String[] args) throws Exception {
 		
-		String region = "file_pls_ve";
-		
-		/*
+		String region = "file_pls_piem";
 		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+region;
-		Config.getInstance().pls_start_time = new GregorianCalendar(2014,2,1);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2014,3,30);
-		PLSParser.MIN_HOUR = 1;
-		PLSParser.MAX_HOUR = 3;
-		UserEventCounter ba = new UserEventCounter(null,null);
-		ba.run();
-		*/
-		percentAnalysis(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_1_3.csv"));
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,30);
+		//PLSParser.MIN_HOUR = 1;
+		//PLSParser.MAX_HOUR = 3;
 		
-		extractUsersAboveThreshold(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_1_3.csv"),
-								   new File(Config.getInstance().base_folder+"/UserEventCounter"+"/"+region+"_bogus.txt"), 60);
+		//new UserEventCounter(null,null).run();
+		
+		
+		//percentAnalysis(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"));
+		int threshold = 200;
+		int max_users_retrieved = 100;
+		//String filename = region+"_bogus.txt";
+		String filename = region+"_users_"+threshold+"_"+max_users_retrieved+".txt";
+		extractUsersAboveThreshold(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"),new File(Config.getInstance().base_folder+"/UserEventCounter"+"/"+filename), threshold,max_users_retrieved);
 	
 		Logger.logln("Done!");
+		Mail.send("UserEventCounter completed!");
 	}
 	
 }

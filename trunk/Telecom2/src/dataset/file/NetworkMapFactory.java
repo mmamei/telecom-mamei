@@ -92,7 +92,7 @@ class NetworkMapFactory implements NetworkMapFactoryI  {
     }
     
     
-    public RegionMap getNetworkMap(Calendar calendar) {
+    public synchronized RegionMap getNetworkMap(Calendar calendar) {
             String cal = F.format(calendar.getTime());
     
             String file = findClosestNetworkFile(cal);

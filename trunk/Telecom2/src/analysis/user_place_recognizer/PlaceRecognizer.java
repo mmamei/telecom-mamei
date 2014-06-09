@@ -28,7 +28,7 @@ public class PlaceRecognizer {
 	
 	public static boolean VERBOSE = true;
 	
-	public static List<LatLonPoint> analyze(String username, String kind_of_place, List<PLSEvent> events, 
+	public static Object[] analyze(String username, String kind_of_place, List<PLSEvent> events, 
 			                   double alpha, double beta, double delta, double rwf) {
 		
 		
@@ -94,17 +94,13 @@ public class PlaceRecognizer {
 				LatLonPoint p = c.getCenter(weights);
 				placemarks.add(p);
 			}
-		}
-		 
-		if(VERBOSE) PlaceRecognizerLogger.log(username, kind_of_place, clusters);
-		PlaceRecognizerLogger.logkml(kind_of_place, clusters, placemarks);
-		PlaceRecognizerLogger.logcsv(username,kind_of_place,placemarks);
-		
-		return placemarks;
+		}		
+		return new Object[]{clusters, placemarks};
 	}
 	
 	
-	private static String[] KIND_OF_PLACES = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
+	
+	private static final String[] KIND_OF_PLACES = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	public Map<String, List<LatLonPoint>> runSingle(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
 		
@@ -124,8 +120,16 @@ public class PlaceRecognizer {
 			List<PLSEvent> events = UsersCSVCreator.process(user).getEvents(); 
 			results = new HashMap<String, List<LatLonPoint>>();
 			PlaceRecognizerLogger.openKMLFile(Config.getInstance().web_kml_folder+"/"+user+".kml");
-			for(String kind_of_place:KIND_OF_PLACES)
-				results.put(kind_of_place, analyze(user,kind_of_place,events,0.25,0.25,2000,0.6));
+			for(String kind_of_place:KIND_OF_PLACES) {
+				Object[] clusters_points = analyze(user,kind_of_place,events,0.25,0.25,2000,0.6);
+				Map<Integer, Cluster> clusters = (Map<Integer, Cluster>)clusters_points[0];
+				List<LatLonPoint> points = (List<LatLonPoint>)clusters_points[1];
+				results.put(kind_of_place, points);
+				
+				if(VERBOSE) PlaceRecognizerLogger.log(user, kind_of_place, clusters);
+				PlaceRecognizerLogger.logcsv(user,kind_of_place,points);
+				PlaceRecognizerLogger.logkml(kind_of_place, clusters, points);
+			}
 			PlaceRecognizerLogger.closeKMLFile();
 			
 		} catch(Exception e) {
@@ -135,14 +139,40 @@ public class PlaceRecognizer {
 	}
 	
 	
+	// USED IN BATCH RUN *****
 	
+	static Map<String, List<LatLonPoint>> allResults = new HashMap<String, List<LatLonPoint>>();
+	
+	public static synchronized void process(Map<String, Object[]> res) {
+		
+		String username = res.keySet().iterator().next().split("_")[0];
+		PlaceRecognizerLogger.openUserFolderKML(username);
+		for(String k: res.keySet()) {
+			String[] user_kop = k.split("_");
+			String user = user_kop[0];
+			String kind_of_place = user_kop[1];
+			Object[] clusters_points = res.get(k);
+			Map<Integer, Cluster> clusters = (Map<Integer, Cluster>)clusters_points[0];
+			List<LatLonPoint> points = (List<LatLonPoint>)clusters_points[1];
+			allResults.put(k, points);
+			if(VERBOSE) PlaceRecognizerLogger.log(user, kind_of_place, clusters);
+			PlaceRecognizerLogger.logcsv(user,kind_of_place,points);
+			PlaceRecognizerLogger.logkml(kind_of_place, clusters, points);
+			
+		}
+		PlaceRecognizerLogger.closeUserFolderKML();
+	}
 	
 	
 	public static void main(String[] args) throws Exception {
-		/*
-		String dir = "file_pls_piem_users_above_2000";
-		String in_dir = "BASE/UsersCSVCreator/"+dir;
-		String out_dir = "BASE/PlaceRecognizer/"+dir;
+		
+		/**************************************************************************************************************************/
+		/**************************************   				 BATCH RUN 					***************************************/
+		/**************************************************************************************************************************/
+		
+		String dir = "file_pls_piem_users_200_100";
+		String in_dir = Config.getInstance().base_folder+"/UsersCSVCreator/"+dir;
+		String out_dir = Config.getInstance().base_folder+"/PlaceRecognizer/"+dir;
 		File d = new File(out_dir);
 		if(!d.exists()) d.mkdirs();
 		
@@ -150,30 +180,40 @@ public class PlaceRecognizer {
 		PlaceRecognizerLogger.openKMLFile(out_dir+"/results.kml");
 		File[] files = new File(in_dir).listFiles();
 		
-		Map<String, List<LatLonPoint>> allResults = new HashMap<String, List<LatLonPoint>>();
 		
-		for(int i=0; i<files.length; i++){
-			File f = files[i];	
-			if(!f.isFile()) continue;
-			String filename = f.getName();
-			String username = filename.substring(0, filename.indexOf(".csv"));
-			List<PlsEvent> events = PlsEvent.readEvents(f);
-			PlaceRecognizerLogger.openUserFolderKML(username);
-			
-			for(String kind_of_place:KIND_OF_PLACES)
-				allResults.put(username+"_"+kind_of_place, analyze(username,kind_of_place,events,0.25,0.25,2000,0.6));
-				
-			PlaceRecognizerLogger.closeUserFolderKML();
+		int total_size = 20; //files.length;
+		int n_thread = 4;
+		int size = total_size / n_thread;
+		Worker[] w = new Worker[n_thread];
+		for(int t = 0; t < n_thread;t++) {
+			int start = t*size;
+			int end = t == (n_thread-1) ? total_size : (t+1)*size;
+			w[t] = new Worker(KIND_OF_PLACES,files,start,end);		
 		}
+		
+		for(int t = 0; t < n_thread;t++) 
+			w[t].start();
+
+		for(int t = 0; t < n_thread;t++) 
+			w[t].join();
+		
+		System.out.println("All thread completed!");
+		
+		
+		
 		PlaceRecognizerLogger.closeKMLFile();
 		PlaceRecognizerLogger.closeTotalCSVFile();
 		
 		//PlaceRecognizerEvaluator rs = new PlaceRecognizerEvaluator(2000);
 		//rs.evaluate(allResults);
-		*/
+		
+		
+		/**************************************************************************************************************************/
+		/**************************************   				SINGLE RUN 					***************************************/
+		/**************************************************************************************************************************/
+		
+		/*
 		PlaceRecognizer pr = new PlaceRecognizer();
-		
-		
 		Map<String, List<LatLonPoint>> res = pr.runSingle("2012-03-06", "2012-03-07", "362f6cf6e8cfba0e09b922e21d59563d26ae0207744af2de3766c5019415af", 7.6855,45.0713,  7.6855,45.0713);
 		//pr.runSingle("2012-03-06", "2012-04-30", "7f3e4f68105e863aa369e5c39ab5789975f0788386b45954829346b7ca63", 7.6855,45.0713,  7.6855,45.0713);
 		for(String k: res.keySet()) {
@@ -181,12 +221,43 @@ public class PlaceRecognizer {
 			for(LatLonPoint p: res.get(k))
 				System.out.println(p.getLongitude()+","+p.getLatitude());
 		}
-		
-		
 		Logger.logln("Done!");
+		*/
 	}
-	
-	
-	
-	
+}
+
+
+// USED IN BATCH RUN *****
+
+class Worker extends Thread {
+	String[] KIND_OF_PLACES;
+	File[] files;
+	int start;
+	int end;
+	Worker(String[] KIND_OF_PLACES,File[] files,int start,int end) {
+		this.KIND_OF_PLACES = KIND_OF_PLACES;
+		this.files = files;
+		this.start = start;
+		this.end = end;
+	}
+	public void run() {
+		System.out.println("Thread "+start+"-"+end+" starting!");
+		for(int i=start;i<end;i++) {
+			try {
+				File f = files[i];
+				if(!f.isFile()) continue;
+				String filename = f.getName();
+				String username = filename.substring(0, filename.indexOf(".csv"));
+				List<PLSEvent> events = PLSEvent.readEvents(f);
+				
+				Map<String, Object[]> res = new HashMap<String, Object[]>();
+				for(String kind_of_place:KIND_OF_PLACES)
+					res.put(username+"_"+kind_of_place, PlaceRecognizer.analyze(username,kind_of_place,events,0.25,0.25,2000,0.6));
+				PlaceRecognizer.process(res);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Thread "+start+"-"+end+" completed!");
+	}
 }

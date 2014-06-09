@@ -30,8 +30,8 @@ public class ODMatrixHW {
 		Map<Move,Double> list_od = new HashMap<Move,Double>();
 		
 		for(UserPlaces p: up.values()) {
-			List<double[]> homes = p.places.get("HOME");
-			List<double[]> works = p.places.get("WORK");
+			List<double[]> homes = p.lonlat_places.get("HOME");
+			List<double[]> works = p.lonlat_places.get("WORK");
 			if(homes != null && works !=null) {
 				double z = 1.0 / homes.size() * works.size();
 				for(double[] h: homes)
