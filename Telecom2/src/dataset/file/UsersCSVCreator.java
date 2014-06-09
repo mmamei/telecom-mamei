@@ -3,6 +3,8 @@ package dataset.file;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +12,7 @@ import java.util.Set;
 import region.CityEvent;
 import utils.Config;
 import utils.Logger;
+import utils.Mail;
 import analysis.UserTrace;
 
 
@@ -24,6 +27,14 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	UsersCSVCreator(Set<String> users, String subdir) {
 		this.subdir = subdir;
+		
+		File dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/"+subdir);
+		if(dir.exists()) {
+			Logger.logln(dir+" is already there! Manually remove before proceeding");
+			System.exit(0);
+		}
+		
+		
 		traces = new HashMap<String,UserTrace>();
 		for(String u: users) 
 			traces.put(u, new UserTrace(u));
@@ -43,13 +54,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	}
 	
 	protected void finish() {
-		
 		File dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/"+subdir);
-		if(dir != null) {
-			Logger.logln(dir+" is already there! Manually remove before proceeding");
-			System.exit(0);
-		}
-		dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/"+subdir);
 		dir.mkdirs();
 		for(UserTrace ut: traces.values()) 
 			try {
@@ -76,7 +81,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	public static void create(CityEvent ce) throws Exception {
 		File file = new File(Config.getInstance().base_folder+"/UsersAroundAnEvent/"+ce.toFileName());
-		if(file == null) {
+		if(!file.exists()) {
 			Logger.logln(file+" Does not exist!");
 			Logger.logln("Running UsersAroundAnEvent.process()");
 			try {
@@ -96,9 +101,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 			PLSParser.parse(ba);
 			ba.finish();
 		}
-		Logger.logln("Done");
 	}
-	
 	
 	public static UserTrace process(String user) {
 		try {
@@ -115,16 +118,24 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	public static void main(String[] args) throws Exception {
-		File file = new File(Config.getInstance().base_folder+"/UserEventCounter/file_pls_piem_users_above_2000.txt");
-		if(file == null) {
+		
+		String region = "file_pls_piem";
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+region;
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,30);
+		
+		String filename = "file_pls_piem_users_200_100.txt";
+		File file = new File(Config.getInstance().base_folder+"/UserEventCounter/"+filename);
+		if(!file.exists()) {
 			Logger.logln(file+" Does not exist!");
 			System.exit(0);
 		}
-		UsersCSVCreator ba = new UsersCSVCreator(getUserListFromFile(file),"file_pls_piem_users_above_2000");
+		UsersCSVCreator ba = new UsersCSVCreator(getUserListFromFile(file),filename.substring(0,filename.indexOf(".")));
 		if(ba.traces.size() > 0) {
 			PLSParser.parse(ba);
 			ba.finish();
 		}
+		Mail.send("UsersCSVCreator completed!");
 		Logger.logln("Done");
 	}
 	

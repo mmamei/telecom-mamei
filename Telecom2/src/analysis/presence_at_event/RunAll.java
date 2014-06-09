@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,12 +27,26 @@ public class RunAll {
 	
 	public static boolean CLEANUP = true;
 	
-	
-	public int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1,Map<String,Object> constraints) {
+	public int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1,String sconstraints) {
+		
+		Map<String,String> constraints = new HashMap<String,String>();
+		if(sconstraints.contains("=")) {
+			String[] elements = sconstraints.split(";");
+			for(String e: elements) {
+				String[] nameval = e.split("=");
+				constraints.put(nameval[0],nameval[1]);
+			}
+		}
+		
 		return radiusAndAttendance(sday,shour,eday, ehour, lon1, lat1, lon1, lat1,constraints);
 	}
 	
-	public int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2,Map<String,Object> constraints) {
+	
+	private int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1,Map<String,String> constraints) {
+		return radiusAndAttendance(sday,shour,eday, ehour, lon1, lat1, lon1, lat1,constraints);
+	}
+	
+	private int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2,Map<String,String> constraints) {
 		try {
 			PlacemarkRadiusExtractor.PLOT = false;
 			PresenceCounter.PLOT = false;
@@ -128,7 +143,7 @@ public class RunAll {
 		RunAll ra = new RunAll();
 			
 		//int[] rad_att = ra.radiusAndAttendance("2014-03-02","19","2014-03-03","0",11.28265300110946,43.78066799975202); // partita Fiorentina - Lazio. capienza stadio 47000
-		int[] rad_att = ra.radiusAndAttendance("2012-04-01","13","2012-04-01","18",9.123845,45.478068,null); // San Siro
+		int[] rad_att = ra.radiusAndAttendance("2012-04-01","13","2012-04-01","18",9.123845,45.478068,""); // San Siro
 		//int[] rad_att = ra.radiusAndAttendance("2012-03-20","19","2012-03-20","23",7.641453,45.109536); // Juventus Stadium
 		
 		System.out.println("RADIUS = "+rad_att[0]);

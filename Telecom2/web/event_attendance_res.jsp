@@ -22,11 +22,14 @@
 		double lon1 = Double.parseDouble(request.getParameter("lon1"));
 		double lat2 = Double.parseDouble(request.getParameter("lat2"));
 		double lon2 = Double.parseDouble(request.getParameter("lon2"));
+		String constraints= request.getParameter("constraints");
 		out.println("Event Start: "+sd+" at "+st+"<br>");
 		out.println("Event End: "+ed+" at "+et+"<br>");
 		out.println("Event Bbox: ("+lat1+","+lon1+") ("+lat2+","+lon2+")<br>");
+		if(constraints.contains("="))
+			out.println("Constraints: "+constraints+"<br>");
 		out.println("<h3>Response:</h3>");
-		int[] rad_att = ra.radiusAndAttendance(sd,st,ed,et,lon1,lat1,lon2,lat2);
+		int[] rad_att = ra.radiusAndAttendance(sd,st,ed,et,lon1,lat1,constraints);
 		%>
 		Best Radius: <span style="margin-left:20px; font-size:24px;"><%=rad_att[0]%></span><br>
 		Estimated Attendance: <span style="margin-left:20px; font-size:72px; color:#dd0000"><%=rad_att[1]%></span>

@@ -45,12 +45,26 @@ for(String rm: regionMaps) {
 %>
 </select>
 
+
+
+
 <input style="padding: 0em 2em 0em 2em" class="button" type="button" value="Go!" onclick="process()">
 
 <span onclick="showAdvOp()" style="color:gray;font-size:70%">Adv. Opts</span>
 
 <div id="adv_op" style="display:none">
-Constraints: <input id="constraints" type="text" name="constraints" size="100" value="es. mnt=!22201;maxdays=4"> 
+Constraints: <input id="constraints" type="text" name="constraints" value="es. mnt=!22201;maxdays=4"> 
+Weight By Event Attendance
+<select id="weight_by_event_attendance">
+<option value="null"><span>null</option>
+<%
+analysis.presence_at_event.ProbScoresFinder psf = new analysis.presence_at_event.ProbScoresFinder();
+String[] pscores = psf.getAvailableProbScores();
+for(String ps: pscores) {
+	out.println("<option value=\""+ps+"\"><span>"+ps.substring(ps.lastIndexOf("\\")+1,ps.lastIndexOf("."))+"</option>");
+}
+%>
+</select>
 </div>
 
 <input style="margin-top: 25px; padding: 0 11px 0 13px; width: 400px; font-family: Roboto; font-size: 15px; font-weight: 300; text-overflow: ellipsis;" id="search_address" type="text" onChange="go2Address()">
