@@ -55,7 +55,7 @@ for(String rm: regionMaps) {
 <div id="adv_op" style="display:none">
 Constraints: <input id="constraints" type="text" name="constraints" value="es. mnt=!22201;maxdays=4"> 
 Weight By Event Attendance
-<select id="weight_by_event_attendance">
+<select id="users_event_probscores">
 <option value="null"><span>null</option>
 <%
 analysis.presence_at_event.ProbScoresFinder psf = new analysis.presence_at_event.ProbScoresFinder();
