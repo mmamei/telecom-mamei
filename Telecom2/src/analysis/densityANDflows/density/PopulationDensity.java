@@ -20,6 +20,7 @@ import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
 import visual.kml.KMLHeatMap;
+import analysis.Constraints;
 import analysis.PLSSpaceDensity;
 import dataset.DataFactory;
 import dataset.EventFilesFinderI;
@@ -39,27 +40,18 @@ public class PopulationDensity {
 		pd.plotSpaceDensity(city+pd.getFileSuffix(constraints), space_density, rm,0);
 		*/
 		PopulationDensity pd = new PopulationDensity();
-		String js = pd.runAll("2014-04-20", "00", "2014-04-21", "00", 7.6203,45.0945,7.6969,45.0774, "FIX_Piemonte.ser", "");
+		String js = pd.runAll("2014-04-20", "00", "2014-04-20", "03", 7.6203,45.0945,7.6969,45.0774, "FIX_Piemonte.ser","");
 		System.out.println(js);
-		
 		Logger.logln("Done!");
 	}
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	
 	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, String sconstraints) {
-		Map<String,String> constraints = new HashMap<String,String>();
-		if(sconstraints.contains("=")) {
-			String[] elements = sconstraints.split(";");
-			for(String e: elements) {
-				String[] nameval = e.split("=");
-				constraints.put(nameval[0],nameval[1]);
-			}
-		}
-		return runAll(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,regionMap,constraints);
+		return runAll(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,regionMap,new Constraints(sconstraints));
 	}
 	
-	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, Map<String, String> constraints) {
+	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, Constraints constraints) {
 		
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
@@ -99,7 +91,7 @@ public class PopulationDensity {
 			File pls_space_density_file = new File(Config.getInstance().base_folder+"/PLSSpaceDensity/"+p.getName()+"_"+rm.getName()+".csv");
 			Map<String,Double> space_density = pd.computeSpaceDensity(pls_space_density_file,rm,constraints);
 			
-			plotSpaceDensity(p.getName()+getFileSuffix(constraints), space_density, rm,0);
+			plotSpaceDensity(p.getName()+constraints.getFileSuffix(), space_density, rm,0);
 			
 			StringBuffer sb = new StringBuffer();
 			sb.append("var heatMapData = [\n");
@@ -136,7 +128,7 @@ public class PopulationDensity {
 	}
 	
 	
-	public Map<String,Double> computeSpaceDensity(File pls_space_density_file, RegionMap rm, Map<String,String> constraints) throws Exception {
+	public Map<String,Double> computeSpaceDensity(File pls_space_density_file, RegionMap rm, Constraints constraints) throws Exception {
 		String city = rm.getName();
 		
 		BufferedReader br = new BufferedReader(new FileReader(pls_space_density_file));
@@ -156,11 +148,11 @@ public class PopulationDensity {
 			int days_interval = Integer.parseInt(p[4]);
 			
 			
-			if(okConstraints(mnt,num_days,constraints)) {
+			if(constraints.okConstraints(mnt,num_days)) {
 				for(int i=5;i<p.length;i++) {
 					String[] x = p[i].split(":");
 					String rname = rm.getRegion(Integer.parseInt(x[2])).getName();
-					double v = Double.parseDouble(x[3]);	
+					double v = constraints.weight(username) * Double.parseDouble(x[3]);	
 					sd.put(rname,sd.get(rname)+v);
 				}
 			}
@@ -176,29 +168,5 @@ public class PopulationDensity {
 		
 		
 		return sd;
-	}
-	
-	
-	private boolean okConstraints(String ui_mnt, int ui_num_days, Map<String,String> constraints) {
-		if(constraints!=null) {
-			String mnt  = constraints.get("mnt");
-			if(mnt!=null) {
-				if(mnt.startsWith("!")) { 
-					//System.err.println(ui.mnt+"VS"+mnt.substring(1));
-					if(ui_mnt.equals(mnt.substring(1))) return false;
-				}
-				else
-					if(!ui_mnt.equals(mnt)) return false;
-			}
-			String mindays = constraints.get("mindays");
-			if(mindays!=null) 
-				if(ui_num_days < Integer.parseInt(mindays)) return false;
-			
-			
-			String maxdays = constraints.get("maxdays");
-			if(maxdays!=null) 
-				if(ui_num_days > Integer.parseInt(maxdays)) return false;
-		}
-		return true;
 	}
 }

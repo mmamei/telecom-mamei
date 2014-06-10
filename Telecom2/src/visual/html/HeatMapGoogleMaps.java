@@ -23,7 +23,7 @@ public class HeatMapGoogleMaps {
 		List<Double> weights = new ArrayList<Double>();
 		
 		for(RegionI r: rm.getRegions()) {
-			Double val = density.get(r.getName());
+			Double val = density.get(r.getName().toLowerCase());
 			System.out.println(r.getName()+" = "+val);
 			if(val != null && val > threshold) {
 				points.add(new double[]{r.getLatLon()[0],r.getLatLon()[1]}); // nota qui si potrebbe mettere un po' di scattering e modulare i pesi opportunamente.

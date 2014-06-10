@@ -9,6 +9,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import analysis.Constraints;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
@@ -18,9 +19,10 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 
 	private CityEvent cevent;
 	private Map<String,StringBuffer> user_locations;
-	
-	public LocationsXUserAroundAnEvent(CityEvent cevent) {
+	private Constraints constraints;;
+	public LocationsXUserAroundAnEvent(CityEvent cevent, Constraints constraints) {
 		this.cevent = cevent;
+		this.constraints = constraints;
 		user_locations = new HashMap<String,StringBuffer>();
 	}
 	
@@ -53,6 +55,8 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 		timestamp = fields[3];
 		
 		if(!cevent.spot.contains(celllac)) return;
+		
+		
 		
 		sb = user_locations.get(username);
 		if(sb == null) {
@@ -91,13 +95,13 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 	}
 	
 	
-	public static void process(Placemark p, Calendar st, Calendar et) throws Exception {
+	public static void process(Placemark p, Calendar st, Calendar et, Constraints constraints) throws Exception {
 		CityEvent ce = new CityEvent(p,st,et,0);
-		process(ce);
+		process(ce, constraints);
 	}
 	
-	private static void process(CityEvent ce) throws Exception {
-		LocationsXUserAroundAnEvent ba = new LocationsXUserAroundAnEvent(ce);
+	private static void process(CityEvent ce, Constraints constraints) throws Exception {
+		LocationsXUserAroundAnEvent ba = new LocationsXUserAroundAnEvent(ce, constraints);
 		PLSParser.parse(ba);
 		ba.finish();
 	}
@@ -107,7 +111,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem";
 		CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),11/03/2012");
 		ce = CityEvent.expand(ce, 1, 10000);
-		process(ce);	
+		process(ce,null);	
 		Logger.logln("Done");
 	}
 }

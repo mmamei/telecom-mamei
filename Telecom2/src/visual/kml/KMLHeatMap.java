@@ -34,12 +34,13 @@ public class KMLHeatMap {
 		
 		Map<String,Double> density = new HashMap<String,Double>();
 		for(String r: den.keySet())
-			density.put(r, den.get(r).doubleValue());
+			density.put(r.toLowerCase(), den.get(r).doubleValue());
 		
 		// convert to the log scale,
 		if(logscale) 
 			for(String name: density.keySet()) 
 				density.put(name, Math.max(0, Math.log10(density.get(name))));	
+		
 		
 		
 		//compute the maximum value in density
@@ -53,7 +54,9 @@ public class KMLHeatMap {
 		kml.printHeaderFolder(out, rm.getName());
 		
 		for(RegionI r: rm.getRegions()) {
-			double val = density.get(r.getName())==null? 0 : density.get(r.getName());
+			double val = density.get(r.getName().toLowerCase())==null? 0 : density.get(r.getName().toLowerCase());
+			//System.out.println(val);
+			
 			if(val > 0) {
 				r.setDescription(desc+" DENSITY = "+(logscale ? Math.pow(10, val) : val));
 				out.println(r.toKml(Colors.val01_to_color(val/max),"44aaaaaa"));

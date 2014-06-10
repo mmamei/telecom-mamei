@@ -147,18 +147,10 @@ public class PLSTimeDensity implements Serializable {
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	
 	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String sconstraints) {
-		Map<String,String> constraints = new HashMap<String,String>();
-		if(sconstraints.contains("=")) {
-			String[] elements = sconstraints.split(";");
-			for(String e: elements) {
-				String[] nameval = e.split("=");
-				constraints.put(nameval[0],nameval[1]);
-			}
-		}
-		return process(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,constraints);
+		return process(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,new Constraints(sconstraints));
 	}
 	
-	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, Map<String, String> constraints) {
+	public Object[] process(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, Constraints constraints) {
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
@@ -178,7 +170,7 @@ public class PLSTimeDensity implements Serializable {
 			
 			PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
 			pap.process(p,constraints);
-			String file = Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt";
+			String file = Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+constraints.getFileSuffix()+".txt";
 			PLSTimeDensity plsmap = getPLSTimeCounter(file,null);
 			//(new File(file)).delete();
 			
@@ -203,9 +195,9 @@ public class PLSTimeDensity implements Serializable {
 	
 	public static void main(String[] args) throws Exception { 		
 		PLSTimeDensity pbia = new PLSTimeDensity();
-		//Object[] plsdata = pbia.process("2014-03-13","0","2014-03-15","10",12.3238,45.4425,12.3238,45.4425);
+		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,"");
 		//Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,"mnt=!22201");
-		Object[] plsdata = pbia.process("2011-12-06","19","2011-12-06","23",-3.9808,5.2927,-3.9808,5.2927,""); // Abidjan
+		//Object[] plsdata = pbia.process("2011-12-06","19","2011-12-06","23",-3.9808,5.2927,-3.9808,5.2927,""); // Abidjan
 		
 		if(plsdata!=null) {
 			System.out.println(pbia.getJSMap(plsdata));

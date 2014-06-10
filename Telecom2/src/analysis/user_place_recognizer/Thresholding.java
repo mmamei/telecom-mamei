@@ -3,10 +3,10 @@ package analysis.user_place_recognizer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
-import analysis.PLSEvent;
-import analysis.user_place_recognizer.weight_functions.Weights;
 import utils.FilterAndCounterUtils;
+import analysis.PLSEvent;
 
 
 public class Thresholding {
