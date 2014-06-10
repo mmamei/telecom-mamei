@@ -32,6 +32,7 @@ public class UserPlaces {
 		String[] elements;
 		Map<String,UserPlaces> up = new HashMap<String,UserPlaces>();
 		while((line = br.readLine())!=null) {
+			//System.out.println(line);
 			elements = line.split(",");
 			String username = elements[0];
 			UserPlaces places = up.get(username);

@@ -15,10 +15,10 @@ import utils.Config;
 
 public class ParserDatiISTAT {
 	public static void main(String[] args) throws Exception {
-		String dir = "C:/DATASET/ISTAT/DatiDemografici/Piemonte";
+		String dir = "G:/DATASET/ISTAT/DatiDemografici/Piemonte";
 		Map<String,Integer> data = parse(dir);
 		
-		File out_dir = new File("BASE/ParserDatiISTAT");
+		File out_dir = new File(Config.getInstance().base_folder+"/ParserDatiISTAT");
 		out_dir.mkdirs();
 		PrintWriter out = new PrintWriter(new FileWriter(out_dir+"/Piemonte.csv"));
 		
@@ -28,8 +28,8 @@ public class ParserDatiISTAT {
 	}
 	
 	
-	public static Map<String,Integer> load(String region) throws Exception {
-		File f = new File("BASE/ParserDatiISTAT/"+region+".csv");
+	public static Map<String,Integer> load(File f) throws Exception {
+
 		BufferedReader br = new BufferedReader(new FileReader(f));
 		
 		Map<String,Integer> istat = new HashMap<String,Integer>();
@@ -37,7 +37,7 @@ public class ParserDatiISTAT {
 		String line;
 		while((line=br.readLine())!=null) {
 			String[] e = line.split(",");
-			istat.put(e[0], Integer.parseInt(e[1]));
+			istat.put(e[0].toLowerCase(), Integer.parseInt(e[1]));
 		}
 		br.close();
 		return istat;
@@ -100,7 +100,7 @@ public class ParserDatiISTAT {
 		zf.close();
 		
 		for(String cod: cod_name.keySet()) 
-			data.put(cod_name.get(cod),cod_pop.get(cod));
+			data.put(cod_name.get(cod).toLowerCase(),cod_pop.get(cod));
 		return data;
 	}
 	

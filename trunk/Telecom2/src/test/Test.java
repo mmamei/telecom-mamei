@@ -36,7 +36,7 @@ public class Test {
 	}
 	
 	@org.junit.Test
-	public void testPLSTimeCounter() {
+	public void testPLSTimeDensity() {
 		PLSTimeDensity pbia = new PLSTimeDensity();
 		Object[] plsdata = pbia.process("2014-03-10","18","2014-03-11","1",11.2523,43.7687,11.2545,43.7672,"");
 		String js = pbia.getJSMap(plsdata);
@@ -44,7 +44,7 @@ public class Test {
 		System.out.println(res);
 		System.out.println("--------------------");
 		System.out.println(js);
-		assertEquals("Test the JS result of PLSBehaviorInAnArea", res, js);
+		assertEquals("Test the JS result of PLSTimeDensity", res, js);
 	}
 	
 	

@@ -25,45 +25,41 @@ public class IstatComparator {
 	
 	public static void main(String[] args) throws Exception {
 		
-		String region = "Piemonte";
+		String regionMap = "FIX_Piemonte.ser";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
 		
-		File input_obj_file = new File("G:/BASE/cache/"+region+".ser");
-		if(!input_obj_file.exists()) {
-			System.out.println(input_obj_file+" does not exist... run the region parser first!");
-			System.exit(0);
-		}
 		
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
-		Map<String,UserPlaces> up = UserPlaces.readUserPlaces("G:/BASE/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
+		RegionMap rm = (RegionMap)(RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));
+		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv");
 		
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
 		Map<String,Double> density = pdp.computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place);
 		
-		compareWithISTAT(density,region);
+		String region = regionMap.substring("FIX_".length(),regionMap.indexOf("."));
+		Map<String,Integer> istat = ParserDatiISTAT.parse("G:/DATASET/ISTAT/DatiDemografici/"+region);
+		compareWithISTAT(region,density,istat);
 	}
 	
 	
-	
-	public static void compareWithISTAT(Map<String,Double> density, String region) throws Exception {
-		Map<String,Integer> istat = ParserDatiISTAT.load(region);
+	public static int THRESHOLD = 10;
+	public static void compareWithISTAT(String title, Map<String,Double> density, Map<String,Integer> istat) throws Exception {
+				
 		int size = 0;
 		for(String r: density.keySet()) {
 			int estimated = density.get(r).intValue();
 			Integer groundtruth = istat.get(r);
-			if(groundtruth != null && estimated>10) {
+			if(groundtruth != null && estimated > THRESHOLD) {
 				size++;
-				//System.out.println(r+","+estimated+","+groundtruth);
+				System.out.println(r+","+estimated+","+groundtruth);
 			}
 		}
 		
-		
-		String dir = "BASE/PopulationDensity";
-		File d = new File(dir);
+	
+		File d = new File(Config.getInstance().base_folder+"/IstatComparator");
 		if(!d.exists()) d.mkdirs();
 		
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(dir+"/"+region+"_hist.csv")));
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(d+"/"+title+"_hist.csv")));
 		out.println("estimated;groundtruth");
 		
 		
@@ -95,7 +91,7 @@ public class IstatComparator {
 		List<String> labels = new ArrayList<String>();
 		labels.add("population density");
 		
-		new GraphScatterPlotter("Result: "+region,"Estimated (log10)","GroundTruth (log10)",ldata,labels);
+		new GraphScatterPlotter("Result: "+title,"Estimated (log10)","GroundTruth (log10)",ldata,labels);
 	}
 	
 	public static void printInfo(SimpleRegression sr) {

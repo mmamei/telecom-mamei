@@ -32,8 +32,9 @@ public class PopulationDensityPlaces {
 	
 	public static void main(String[] args) throws Exception {
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
-		pdp.runAll("BASE/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv", "FIX_Piemonte.ser", "HOME", "SATURDAY_NIGHT");
-		pdp.runAll("BASE/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv", "FIX_Piemonte.ser", "HOME", null);
+		
+		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", "SATURDAY_NIGHT");
+		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", null);
 		Logger.logln("Done!");
 	}
 	
@@ -69,6 +70,8 @@ public class PopulationDensityPlaces {
 	
 		
 		Map<String,Double> space_density = computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place);
+		
+		
 		String title = rm.getName()+"-"+kind_of_place+"-"+exclude_kind_of_place;	
 		plotSpaceDensity(title, space_density, rm,0);
 		
@@ -79,11 +82,11 @@ public class PopulationDensityPlaces {
 	}
 	
 	
-	public void plotSpaceDensity(String city, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
+	public void plotSpaceDensity(String title, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
 		File d = new File(Config.getInstance().web_kml_folder);
 		d.mkdirs();
-		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+city+"_"+rm.getName()+".kml",space_density,rm,city,false);
-		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+city+"_"+rm.getName()+".html", city, space_density, rm, threshold);
+		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+title+".kml",space_density,rm,title,false);
+		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+title+".html", title, space_density, rm, threshold);
 	}
 	
 	
@@ -106,7 +109,7 @@ public class PopulationDensityPlaces {
 					Double val = density.get(reg.getName());
 					if(val == null) val = 0.0;
 					val += 1.0;
-					density.put(reg.getName(), val);
+					density.put(reg.getName().toLowerCase(), val);
 				}
 			}
 		}

@@ -22,6 +22,7 @@ import region.Placemark;
 import utils.Config;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
+import analysis.Constraints;
 import analysis.PLSEvent;
 import dataset.DataFactory;
 import dataset.PLSEventsAroundAPlacemarkI;
@@ -182,13 +183,13 @@ public class PresenceCounter {
 		p.changeRadius(radius);
 		
 		PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
-		Map<String,String> constraints = PlacemarkRadiusExtractor.constraints;
+		Constraints constraints = PlacemarkRadiusExtractor.constraints;
 		
-		File f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
+		File f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+constraints.getFileSuffix()+".txt");
 		if(f==null || !f.exists()) {
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
 			pap.process(p,constraints);
-			f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+pap.getFileSuffix(constraints)+".txt");
+			f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+constraints.getFileSuffix()+".txt");
 		}
 		return f;
 	}
@@ -202,7 +203,7 @@ public class PresenceCounter {
 			String[] splitted = line.split(",");
 			if(splitted.length == 4) {
 				try {
-				cal.setTimeInMillis(Long.parseLong(splitted[1]));
+					cal.setTimeInMillis(Long.parseLong(splitted[1]));
 				} catch(NumberFormatException e) {
 					System.err.println(line);
 					continue;

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import region.RegionI;
 import region.RegionMap;
+import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import analysis.densityANDflows.density.UserPlaces;
@@ -14,17 +15,14 @@ import analysis.densityANDflows.density.UserPlaces;
 public class ODMatrixHW {
 	public static void main(String[] args) throws Exception {
 		
-		String region = "Piemonte";//"TorinoGrid20";
-		File input_obj_file = new File("BASE/cache/"+region+".ser");
-		if(!input_obj_file.exists()) {
-			System.out.println(input_obj_file+" does not exist... run the region parser first!");
-			System.exit(0);
-		}
 		
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(input_obj_file); 
+		String regionMap = "FIX_Piemonte.ser";
+		String region = regionMap.substring("FIX_".length(),regionMap.indexOf("."));
+		
+		RegionMap rm = (RegionMap)(RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));
+		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv");
 		
 		
-		Map<String,UserPlaces> up = UserPlaces.readUserPlaces("BASE/PlaceRecognizer/file_pls_piem_users_above_2000/results.csv");
 		
 		
 		Map<Move,Double> list_od = new HashMap<Move,Double>();
@@ -51,7 +49,7 @@ public class ODMatrixHW {
 		}
 		
 		// prepare for drawing
-		ODMatrixVisual.draw("ODMatrixHW_"+region,list_od,false,"piem");
+		ODMatrixVisual.draw("ODMatrixHW_"+region,list_od,false,"file_pls_piem");
 		
 		Logger.log("Done!");
 	}

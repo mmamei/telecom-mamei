@@ -8,9 +8,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import region.RegionMap;
@@ -45,7 +47,10 @@ public class KMLPath {
 	
 	static RegionMap nm = null;
 	public static void print(String username, List<PLSEvent> plsEvents) {
-		nm =  DataFactory.getNetworkMapFactory().getNetworkMap(plsEvents.get(0).getCalendar());
+		
+		
+		
+		nm =  DataFactory.getNetworkMapFactory().getNetworkMap(plsEvents.iterator().next().getCalendar());
 		kml.printFolder(out, username.substring(0,10)+"...");
 		List<PLSEvent> s = plsEvents;//FilterAndCounterUtils.smooth(plsEvents);
 		Map<String,List<PLSEvent>> evPerDay = splitByDay(s);

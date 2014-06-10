@@ -5,7 +5,6 @@ import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +14,7 @@ import org.gps.utils.LatLonUtils;
 import region.CityEvent;
 import region.Placemark;
 import utils.Config;
+import analysis.Constraints;
 import dataset.DataFactory;
 import dataset.EventFilesFinderI;
 
@@ -28,25 +28,15 @@ public class RunAll {
 	public static boolean CLEANUP = true;
 	
 	public int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1,String sconstraints) {
-		
-		Map<String,String> constraints = new HashMap<String,String>();
-		if(sconstraints.contains("=")) {
-			String[] elements = sconstraints.split(";");
-			for(String e: elements) {
-				String[] nameval = e.split("=");
-				constraints.put(nameval[0],nameval[1]);
-			}
-		}
-		
-		return radiusAndAttendance(sday,shour,eday, ehour, lon1, lat1, lon1, lat1,constraints);
+		return radiusAndAttendance(sday,shour,eday, ehour, lon1, lat1, lon1, lat1,new Constraints(sconstraints));
 	}
 	
 	
-	private int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1,Map<String,String> constraints) {
+	private int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, Constraints constraints) {
 		return radiusAndAttendance(sday,shour,eday, ehour, lon1, lat1, lon1, lat1,constraints);
 	}
 	
-	private int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2,Map<String,String> constraints) {
+	private int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, Constraints constraints) {
 		try {
 			PlacemarkRadiusExtractor.PLOT = false;
 			PresenceCounter.PLOT = false;

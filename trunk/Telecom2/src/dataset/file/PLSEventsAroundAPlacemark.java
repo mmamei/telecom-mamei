@@ -4,39 +4,36 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import region.Placemark;
 import utils.Config;
 import utils.Logger;
+import analysis.Constraints;
+import analysis.UserTrace;
 import dataset.PLSEventsAroundAPlacemarkI;
 
 class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroundAPlacemarkI  {	
-	private Map<String,String> constraints;
+	private Constraints constraints;
 	
 	private List<Placemark> placemarks;
-	private List<Map<String,UserInfo>> userInfos;
+	private List<Map<String,UserTrace>> userInfos;
 	
 	//private RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
 	
 	PLSEventsAroundAPlacemark() {
 	}
 	
-	PLSEventsAroundAPlacemark(List<Placemark> ps, Map<String,String> constraints) {
+	PLSEventsAroundAPlacemark(List<Placemark> ps, Constraints constraints) {
 		this.constraints = constraints;
-		userInfos = new ArrayList<Map<String,UserInfo>>();
+		userInfos = new ArrayList<Map<String,UserTrace>>();
 		placemarks = new ArrayList<Placemark>();
 		for(Placemark p: ps)  {
 			placemarks.add(new Placemark(p.getName(),p.getLatLon(),p.getRadius()));
-			userInfos.add(new HashMap<String,UserInfo>());
+			userInfos.add(new HashMap<String,UserTrace>());
 		}
 	}
 	
@@ -62,12 +59,12 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 		timestamp = fields[3];
 		for(int i=0; i<placemarks.size();i++) {
 			if(placemarks.get(i).contains(celllac)) {
-				UserInfo ui = userInfos.get(i).get(username);
+				UserTrace ui = userInfos.get(i).get(username);
 				if(ui == null) {
-					ui = new UserInfo(username,mnt);
+					ui = new UserTrace(username,false);
 					userInfos.get(i).put(username, ui);
 				}
-				ui.add(timestamp, celllac);
+				ui.addEvent(mnt,celllac,timestamp);
 			}
 		}
 		}catch(Exception e) {
@@ -85,10 +82,10 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 			
 			for(int i=0; i<placemarks.size();i++) {
 				Placemark p = placemarks.get(i);
-				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(fd+"/"+p.getName()+"_"+p.getRadius()+getFileSuffix(constraints)+".txt"))));
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(fd+"/"+p.getName()+"_"+p.getRadius()+constraints.getFileSuffix()+".txt"))));
 				
-				for(UserInfo ui: userInfos.get(i).values()) {
-					if(okConstraints(ui)) out.println(ui);
+				for(UserTrace ui: userInfos.get(i).values()) {
+					if(constraints.okConstraints(ui.mnt, ui.getNumDays())) out.println(ui);
 				}
 				
 				out.close();
@@ -99,30 +96,7 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 		}
 	}
 	
-	private boolean okConstraints(UserInfo ui) {
-		if(constraints!=null) {
-			String mnt  = constraints.get("mnt");
-			if(mnt!=null) {
-				if(mnt.startsWith("!")) { 
-					//System.err.println(ui.mnt+"VS"+mnt.substring(1));
-					if(ui.mnt.equals(mnt.substring(1))) return false;
-				}
-				else
-					if(!ui.mnt.equals(mnt)) return false;
-			}
-			String mindays = constraints.get("mindays");
-			if(mindays!=null) 
-				if(ui.getNumDays() < Integer.parseInt(mindays)) return false;
-			
-			
-			String maxdays = constraints.get("maxdays");
-			if(maxdays!=null) 
-				if(ui.getNumDays() > Integer.parseInt(maxdays)) return false;
-		}
-		return true;
-	}
-	
-	public void process(Placemark p, Map<String,String> constraints) throws Exception {
+	public void process(Placemark p, Constraints constraints) throws Exception {
 		List<Placemark> ps = new ArrayList<Placemark>();
 		ps.add(p);
 		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(ps,constraints);
@@ -130,20 +104,12 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 		ba.finish();
 	}
 	
-	private void process(List<Placemark> p, Map<String,String> constraints) throws Exception {
+	private void process(List<Placemark> p, Constraints constraints) throws Exception {
 		PLSEventsAroundAPlacemark ba = new PLSEventsAroundAPlacemark(p,constraints);
 		PLSParser.parse(ba);
 		ba.finish();
 	}
 	
-	public String getFileSuffix(Map<String,String> constraints) {
-		String suffix = "";
-		if(constraints != null) {
-			for(String key: constraints.keySet())
-				suffix += "_"+key+"_"+constraints.get(key);
-		}
-		return suffix;
-	}
 	
 	
 	
@@ -165,84 +131,9 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 		//ps.add(Placemark.getPlacemark("Piazza Vittorio (TO)"));
 		//ps.add(Placemark.getPlacemark("Parco Dora (TO)"));
 		
-		Map<String,String> constraints = null;
+		Constraints constraints = null;
 		PLSEventsAroundAPlacemark pap = new PLSEventsAroundAPlacemark();
 		pap.process(ps,constraints);
 		Logger.logln("Done");
 	}
-	
-	
-	
-	
-	/***********************************************************************************************************************/
-	/* USER INFO INNER CLASS */
-	private static SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
-	private static Calendar cal = Calendar.getInstance();
-	private class UserInfo {
-		private String username;
-		private String mnt;
-		private List<String> pls;
-		
-		UserInfo(String username, String mnt) {
-			this.username = username;
-			this.mnt = mnt;
-			pls = new ArrayList<String>();
-		}
-		
-		
-		public void add(String timestamp, String cellac) {
-			pls.add(timestamp+":"+celllac);
-		}
-		
-		public int getNumDays() {
-			return getDays().size();
-		}
-		
-		
-		public Set<String> getDays() {
-			Set<String> days = new HashSet<String>();
-			for(String p:pls) {
-				cal.setTimeInMillis(Long.parseLong(p.substring(0,p.indexOf(":"))));
-				days.add(sd.format(cal.getTime()));
-			}
-			return days;
-		}
-		
-		public int getDaysInterval() {
-			Calendar[] min_max = getTimeRange();
-			Calendar min = min_max[0];
-			Calendar max = min_max[1];
-			return 1+(int)Math.floor((max.getTimeInMillis() - min.getTimeInMillis())/(1000*3600*24));
-		}
-		
-		public Calendar[] getTimeRange() {
-			Calendar min = null;
-			Calendar max = null;
-			for(String p:pls) {
-				String[] day = p.substring(0, p.indexOf(":")).split("-"); // cal.get(Calendar.YEAR)+"-"+cal.get(Calendar.MONTH)+"-"+cal.get(Calendar.DAY_OF_MONTH);
-				int year = Integer.parseInt(day[0]);
-				int month = Integer.parseInt(day[1]);
-				int d = Integer.parseInt(day[2]);
-				Calendar c = new GregorianCalendar(year,month,d);
-				if(min == null || c.before(min)) min = c;
-				if(max == null || c.after(max)) max = c;
-			}
-			return new Calendar[]{min,max};
-		}
-	
-		
-		public String toString() {			
-			StringBuffer sb = new StringBuffer();
-			for(String p:pls) {
-				String[] tc = p.split(":"); 
-				sb.append(username+","+tc[0]+","+mnt+","+tc[1]+"\n");
-			}
-			
-			
-			
-			return sb.toString();
-			
-		}
-	}
-
 }

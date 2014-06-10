@@ -304,8 +304,6 @@ public class PLSSpaceDensity implements Serializable {
 			plsMatrix[i][j][k] = plsMatrix[i][j][k] / num_pls;
 	}
 
-	
-	
 	// d_periods = {0,0,0,0,0,1,1}
 	// mapping weekdays in 0
 	// mapping weekends in 1
@@ -332,11 +330,6 @@ public class PLSSpaceDensity implements Serializable {
 	public static void process(RegionMap rm, String cellXHourFile, String gt_ser_file, Integer max) throws Exception {
 	
 		BufferedReader br = new BufferedReader(new FileReader(new File(cellXHourFile)));
-		if(br == null) {
-			Logger.logln("Launch UserEventCounterCellacXHour first!");
-			System.exit(0);
-		}
-		
 		
 		String placemark_name = cellXHourFile.substring(cellXHourFile.lastIndexOf("/")+1,cellXHourFile.lastIndexOf("_cellXHour.csv"));
 		

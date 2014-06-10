@@ -28,16 +28,9 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	UsersCSVCreator(Set<String> users, String subdir) {
 		this.subdir = subdir;
 		
-		File dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/"+subdir);
-		if(dir.exists()) {
-			Logger.logln(dir+" is already there! Manually remove before proceeding");
-			System.exit(0);
-		}
-		
-		
 		traces = new HashMap<String,UserTrace>();
 		for(String u: users) 
-			traces.put(u, new UserTrace(u));
+			traces.put(u, new UserTrace(u,false));
 	}
 	
 	String[] fields;

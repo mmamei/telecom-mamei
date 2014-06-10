@@ -1,10 +1,8 @@
 package dataset;
 
-import java.util.Map;
-
 import region.Placemark;
+import analysis.Constraints;
 
 public interface PLSEventsAroundAPlacemarkI {
-	public void process(Placemark p, Map<String,String> constraints) throws Exception;
-	public String getFileSuffix(Map<String,String> constraints);
+	public void process(Placemark p, Constraints constraints) throws Exception;
 }

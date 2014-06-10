@@ -88,7 +88,7 @@ public class PLSParser {
 			if(item.isFile()) {
 				Calendar end_cal = new GregorianCalendar();
 				String n = item.getName();
-				System.out.println(n);
+				
 				end_cal.setTimeInMillis(Long.parseLong(n.substring(n.lastIndexOf("_")+1, n.indexOf(".zip"))));
 				
 				Calendar begin_cal = (Calendar)end_cal.clone();
@@ -101,7 +101,7 @@ public class PLSParser {
 				if(end_cal.get(Calendar.HOUR_OF_DAY) < MIN_HOUR || begin_cal.get(Calendar.HOUR_OF_DAY) > MAX_HOUR) continue;
 				
 				
-				//System.out.print(begin_cal.getTime()+", "+end_cal.getTime());
+				System.out.println(n+" ==> "+begin_cal.getTime()+", "+end_cal.getTime());
 				
 				//String key = end_cal.get(Calendar.DAY_OF_MONTH)+"/"+MONTHS[end_cal.get(Calendar.MONTH)]+"/"+end_cal.get(Calendar.YEAR);
 				//String h = allDays.get(key);

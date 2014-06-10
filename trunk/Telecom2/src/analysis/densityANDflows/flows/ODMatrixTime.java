@@ -17,6 +17,7 @@ import region.RegionI;
 import region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
+import analysis.Constraints;
 import dataset.EventFilesFinderI;
 import dataset.file.DataFactory;
 import dataset.file.LocationsXUserAroundAnEvent;
@@ -29,20 +30,12 @@ public class ODMatrixTime {
 	}
 	
 	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, String sconstraints) {
-		Map<String,String> constraints = new HashMap<String,String>();
-		if(sconstraints.contains("=")) {
-			String[] elements = sconstraints.split(";");
-			for(String e: elements) {
-				String[] nameval = e.split("=");
-				constraints.put(nameval[0],nameval[1]);
-			}
-		}
-		return runAll(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,regionMap,constraints);
+		return runAll(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,regionMap,new Constraints(sconstraints));
 	}
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	
-	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, Map<String, String> constraints) {	
+	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, Constraints constraints) {	
 		String allRoads = null;
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
@@ -78,13 +71,15 @@ public class ODMatrixTime {
 			Map<Move,Double> list_od = new HashMap<Move,Double>();
 			
 			
-			LocationsXUserAroundAnEvent.process(p, Config.getInstance().pls_start_time, Config.getInstance().pls_end_time);
+			LocationsXUserAroundAnEvent.process(p, Config.getInstance().pls_start_time, Config.getInstance().pls_end_time, constraints);
 			File file = new File(LocationsXUserAroundAnEvent.getOutputFile(p, Config.getInstance().pls_start_time, Config.getInstance().pls_end_time));
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line;
 			while((line=br.readLine())!=null) {
-				line = line.substring(line.indexOf(",")+1).trim();
-				String[] cells = line.split(" ");
+				String[] user_locations = line.split(",");
+				String user = user_locations[0];
+				String locations = user_locations[1];
+				String[] cells = locations.split(" ");
 				for(int i=1;i<cells.length;i++) {
 					RegionI nc1 = nm.getRegion(cells[i-1]);
 					RegionI nc2 = nm.getRegion(cells[i]);
@@ -100,7 +95,7 @@ public class ODMatrixTime {
 					if(r1!=null && r2!=null) {
 						Move m = new Move(r1,r2);
 						Double c = list_od.get(m);
-						c = c == null ? 1 : c+1;
+						c = c == null ? 1 : c + constraints.weight(user);
 						list_od.put(m, c);
 						//System.err.println(m);
 					}	

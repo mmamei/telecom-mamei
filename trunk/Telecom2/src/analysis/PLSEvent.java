@@ -22,19 +22,41 @@ import dataset.file.DataFactory;
 
 public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 	
+	
+	
 	private static RegionMap NM = null;
+	
+	
 	private String username;
 	private String imsi;
 	private String cellac;
 	private long timestamp;
 	
+	
 	public PLSEvent(String username, String imsi, String cellac, String timestamp){
+		this(username,imsi,cellac,timestamp,false);
+	}
+	
+	
+	private static Calendar cal = Calendar.getInstance();
+	public PLSEvent(String username, String imsi, String cellac, String timestamp, boolean trim_min_sec){
 		this.username = username;
 		this.imsi = imsi;
 		this.cellac = cellac;
 		this.timestamp = Long.parseLong(timestamp);
-		if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(getCalendar());
+		
+		if(trim_min_sec) {
+			cal.setTimeInMillis(this.timestamp);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			this.timestamp = cal.getTimeInMillis();
+		}
+		
+		if(NM == null) 
+			NM = DataFactory.getNetworkMapFactory().getNetworkMap(getCalendar());
 	}
+	
 	
 	public PLSEvent clone(){
 		try {
@@ -56,7 +78,15 @@ public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 	
 	public boolean equals(Object e){
 		PLSEvent o = (PLSEvent) e;
-		return (o.getCellac().equals(cellac) && o.getIMSI().equals(imsi) && o.timestamp==timestamp && o.getUsername().equals(username));
+		return o.timestamp==timestamp && o.getUsername().equals(username);
+	}
+	
+	
+	public int hashCode() {
+		StringBuilder builder = new StringBuilder();
+	    builder.append(username);
+	    builder.append(timestamp);
+	    return builder.toString().hashCode();
 	}
 	
 
@@ -176,5 +206,25 @@ public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 	public double spatialDistance(PLSEvent x) {		
 		return LatLonUtils.getHaversineDistance(NM.getRegion(cellac).getCenterPoint(),NM.getRegion(x.cellac).getCenterPoint());
 	}
+	
+	
+	
+	public static void main(String[] args) throws Exception {
+		Set<PLSEvent> pe = new HashSet<PLSEvent>();
+		PLSEvent p1 = new PLSEvent("user1","mnt","cell1",""+new GregorianCalendar(2012,10,2,4,1,2).getTimeInMillis(),true);
+		PLSEvent p2 = new PLSEvent("user1","mnt","cell1",""+new GregorianCalendar(2012,10,2,4,10,2).getTimeInMillis(),true);
+		PLSEvent p3 = new PLSEvent("user1","mnt","cell1",""+new GregorianCalendar(2012,10,2,4,1,20).getTimeInMillis(),true);
+		
+		pe.add(p1);
+		pe.add(p2);
+		pe.add(p3);
+		
+		
+		for(PLSEvent p: pe)
+			System.out.println(p);
+		
+		
+	}
+	
 	
 }
