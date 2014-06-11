@@ -99,10 +99,11 @@ var jspLocation;
 var longRun = false;
 
 function process() {
-	var sd = document.getElementById("start_day").value;
-	var st = document.getElementById("start_time").value;
-	var ed = document.getElementById("end_day").value;
-	var et = document.getElementById("end_time").value;
+	
+	var pf = document.getElementById("places_file").value;
+	var kop = document.getElementById("kop").value;
+	var exclude_kop = document.getElementById("exclude_kop").value;
+	
 	var rm = document.getElementById("region_map").value;
 	var ueps = document.getElementById("users_event_probscores").value;
 
@@ -118,10 +119,10 @@ function process() {
 	var p1 = marker1.getPosition();
 	var p2 = marker2.getPosition();
 	
-	var url = jspLocation+"?sd="+sd+"&st="+st+"&ed="+ed+"&et="+et+
+	var url = jspLocation+"?places_file="+pf+"&kop="+kop+"&exclude_kop="+exclude_kop+
 			  "&lat1="+p1.lat().toFixed(4)+"&lon1="+p1.lng().toFixed(4)+
 			  "&lat2="+p2.lat().toFixed(4)+"&lon2="+p2.lng().toFixed(4)+
-			  "&region_map="+rm+"&weight_by_event_attendance="+eatt+"&constraints="+constraints+";users_event_probscores="+ueps;
+			  "&region_map="+rm+"&constraints="+constraints+";users_event_probscores="+ueps;
 	if(longRun) longRunF(url)
 	else window.open(url);
 }
