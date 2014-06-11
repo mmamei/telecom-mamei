@@ -63,12 +63,12 @@ public class Constraints {
 					if(!ui_mnt.equals(mnt)) return false;
 			}
 			String mindays = constraints.get("mindays");
-			if(mindays!=null) 
+			if(mindays!=null && ui_num_days>0) 
 				if(ui_num_days < Integer.parseInt(mindays)) return false;
 			
 			
 			String maxdays = constraints.get("maxdays");
-			if(maxdays!=null) 
+			if(maxdays!=null && ui_num_days>0) 
 				if(ui_num_days > Integer.parseInt(maxdays)) return false;
 		}
 		return true;

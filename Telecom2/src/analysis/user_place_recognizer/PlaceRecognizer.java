@@ -165,6 +165,18 @@ public class PlaceRecognizer {
 	}
 	
 	
+	public String[] getComputedResults() {
+		List<String> results = new ArrayList<String>();
+		File dir = new File(Config.getInstance().base_folder+"/PlaceRecognizer");
+		for(File subdir: dir.listFiles()) {
+			File f = new File(subdir+"/results.csv");
+			if(f.exists())
+				results.add(f.getAbsolutePath());
+		}
+		return results.toArray(new String[results.size()]);
+	}
+	
+	
 	public static void main(String[] args) throws Exception {
 		
 		/**************************************************************************************************************************/

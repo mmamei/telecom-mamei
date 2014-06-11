@@ -1,20 +1,12 @@
 package analysis.densityANDflows.density;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gps.utils.LatLonPoint;
-import org.gps.utils.LatLonUtils;
-
 import region.CreatorRegionMapGrid;
-import region.Placemark;
 import region.RegionI;
 import region.RegionMap;
 import utils.Config;
@@ -22,10 +14,7 @@ import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.html.HeatMapGoogleMaps;
 import visual.kml.KMLHeatMap;
-import analysis.PLSSpaceDensity;
-import dataset.DataFactory;
-import dataset.EventFilesFinderI;
-import dataset.file.UserEventCounterCellacXHour;
+import analysis.Constraints;
 
 public class PopulationDensityPlaces {
 	
@@ -33,13 +22,16 @@ public class PopulationDensityPlaces {
 	public static void main(String[] args) throws Exception {
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
 		
-		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", "SATURDAY_NIGHT");
-		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", null);
+		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", "SATURDAY_NIGHT","");
+		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", null,"");
 		Logger.logln("Done!");
 	}
 	
+	public String runAll(String places_file, String regionMap, String kind_of_place, String exclude_kind_of_place, String sconstraints) {
+		return runAll(places_file,regionMap,kind_of_place,exclude_kind_of_place,new Constraints(sconstraints));
+	}
 	
-	public String runAll(String places_file, String regionMap, String kind_of_place, String exclude_kind_of_place) {
+	public String runAll(String places_file, String regionMap, String kind_of_place, String exclude_kind_of_place, Constraints constraints) {
 		try {
 		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(places_file);
 		
@@ -69,16 +61,33 @@ public class PopulationDensityPlaces {
 		
 	
 		
-		Map<String,Double> space_density = computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place);
+		Map<String,Double> space_density = computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place,constraints);
 		
 		
 		String title = rm.getName()+"-"+kind_of_place+"-"+exclude_kind_of_place;	
 		plotSpaceDensity(title, space_density, rm,0);
 		
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("var heatMapData = [\n");
+		for(String key: space_density.keySet()) {
+			System.err.println(key);
+			double[] latlon = rm.getRegion(key.toUpperCase()).getLatLon();
+			sb.append("{location: new google.maps.LatLng("+latlon[0]+", "+latlon[1]+"), weight: "+space_density.get(key)+"},");
+		}
+		sb.append("];\n");
+		
+		
+		return sb.toString();
+		
+		
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 		return null;
+		
+		
 	}
 	
 	
@@ -92,11 +101,12 @@ public class PopulationDensityPlaces {
 	
 	
 	
-	public Map<String,Double> computeSpaceDensity(RegionMap rm, Map<String,UserPlaces> up, String kind_of_place, String exclude_kind_of_place) {
+	public Map<String,Double> computeSpaceDensity(RegionMap rm, Map<String,UserPlaces> up, String kind_of_place, String exclude_kind_of_place,Constraints constraints) {
 		
 		Map<String,Double> density = new HashMap<String,Double>();
 		
 		for(UserPlaces p: up.values()) {
+			
 			List<double[]> lkop = p.lonlat_places.get(kind_of_place);
 			List<double[]> lnokop = p.lonlat_places.get(exclude_kind_of_place);
 			List<double[]> r = exclude_nopkop(rm,lkop,lnokop);
@@ -108,7 +118,7 @@ public class PopulationDensityPlaces {
 				else {
 					Double val = density.get(reg.getName());
 					if(val == null) val = 0.0;
-					val += 1.0;
+					val += constraints.weight(p.username);
 					density.put(reg.getName().toLowerCase(), val);
 				}
 			}

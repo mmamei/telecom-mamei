@@ -34,7 +34,7 @@ public class IstatComparator {
 		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv");
 		
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
-		Map<String,Double> density = pdp.computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place);
+		Map<String,Double> density = pdp.computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place,null);
 		
 		String region = regionMap.substring("FIX_".length(),regionMap.indexOf("."));
 		Map<String,Integer> istat = ParserDatiISTAT.parse("G:/DATASET/ISTAT/DatiDemografici/"+region);
@@ -49,7 +49,7 @@ public class IstatComparator {
 		for(String r: density.keySet()) {
 			int estimated = density.get(r).intValue();
 			Integer groundtruth = istat.get(r);
-			if(groundtruth != null && estimated > THRESHOLD) {
+			if(groundtruth != null && estimated>0) {
 				size++;
 				System.out.println(r+","+estimated+","+groundtruth);
 			}

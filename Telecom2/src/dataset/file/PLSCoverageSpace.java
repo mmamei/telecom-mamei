@@ -198,6 +198,8 @@ import dataset.PLSCoverageSpaceI;
 	
 	public static void main(String[] args) throws Exception {
 		
+		Config.getInstance().changeDataset("ivory-set3");
+		
 		PLSCoverageSpace ba = new PLSCoverageSpace();
 		
 	
