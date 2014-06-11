@@ -1,7 +1,7 @@
 <html>
 <head>
 <%@include file="includes/head.html" %>
-<%@include file="includes/mapTimeSelectJS.html" %>
+<%@include file="includes/mapTimeSelect.js" %>
 
 <script type="text/javascript">
 jspLocation = "user_trace_res.jsp";

@@ -10,7 +10,7 @@
 <div class="container">
 	<article id="main" class="special">
 		<header>
-		<h2>Event Analysis</h2>
+		<h2>ECheck Event Availability</h2>
 		</header>
 		<h3>Request:</h3>
 		<%
