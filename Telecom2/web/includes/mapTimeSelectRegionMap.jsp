@@ -60,6 +60,7 @@ Weight By Event Attendance
 <%
 analysis.presence_at_event.ProbScoresFinder psf = new analysis.presence_at_event.ProbScoresFinder();
 String[] pscores = psf.getAvailableProbScores();
+if(pscores!=null)
 for(String ps: pscores) {
 	out.println("<option value=\""+ps+"\"><span>"+ps.substring(ps.lastIndexOf("\\")+1,ps.lastIndexOf("."))+"</option>");
 }
