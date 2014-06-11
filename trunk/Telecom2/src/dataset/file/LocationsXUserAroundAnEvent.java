@@ -55,7 +55,7 @@ public class LocationsXUserAroundAnEvent extends BufferAnalyzer {
 		timestamp = fields[3];
 		
 		if(!cevent.spot.contains(celllac)) return;
-		
+		if(!constraints.okConstraints(imsi, -1)) return;
 		
 		
 		sb = user_locations.get(username);
