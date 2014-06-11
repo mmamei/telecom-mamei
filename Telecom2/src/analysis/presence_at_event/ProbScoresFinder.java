@@ -12,6 +12,7 @@ public class ProbScoresFinder {
 		try {
 			List<String> prob_scores = new ArrayList<String>();
 			File bdir = new File(Config.getInstance().base_folder+"/PresenceCounter");
+			
 			for(File dir: bdir.listFiles()) {
 				File prob_scores_dir = new File(dir+"/ProbScores");
 				if(prob_scores_dir.exists())

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dataset.EventFilesFinderI;
+import dataset.file.DataFactory;
+import region.CreatorRegionMapGrid;
 import region.RegionI;
 import region.RegionMap;
 import utils.Config;
@@ -15,10 +18,12 @@ import analysis.densityANDflows.density.UserPlaces;
 
 public class ODMatrixHW {
 	public static void main(String[] args) throws Exception {
-		String regionMap = "FIX_Piemonte.ser";
+		//String regionMap = "FIX_Piemonte.ser";
+		String regionMap = "grid5";
 		String places_file = Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv";
 		ODMatrixHW od = new ODMatrixHW();
-		od.runAll(places_file, regionMap, "");
+		String js = od.runAll(places_file, regionMap, "");
+		System.out.println(js);
 		Logger.log("Done!");
 	}
 	
@@ -29,11 +34,37 @@ public class ODMatrixHW {
 	public String runAll(String places_file, String regionMap, Constraints constraints) {
 		
 		try {
-			String region = regionMap.substring("FIX_".length(),regionMap.indexOf("."));
 			
-			RegionMap rm = (RegionMap)(RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));
+			
+			
+			String region = places_file.substring("C:/BASE/PlaceRecognizer/".length(),places_file.indexOf("_users"));
+			
 			Map<String,UserPlaces> up = UserPlaces.readUserPlaces(places_file);
 			
+			
+			// load the region map
+			RegionMap rm = null;
+			if(regionMap.startsWith("grid")) {
+				
+				double minlon = Double.MAX_VALUE;
+				double minlat = Double.MAX_VALUE;
+				double maxlon = -Double.MAX_VALUE;
+				double maxlat = -Double.MAX_VALUE;
+				// get user places bbox
+				for(UserPlaces x: up.values()) 
+				for(List<double[]> l: x.lonlat_places.values()) 
+				for(double[] lonlat: l) {
+					minlon = Math.min(minlon, lonlat[0]);
+					minlat = Math.min(minlat, lonlat[1]);
+					maxlon = Math.max(maxlon, lonlat[0]);
+					maxlat = Math.max(maxlat, lonlat[1]);
+				}			
+				double[][] lonlat_bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
+				int size = Integer.parseInt(regionMap.substring("grid".length()));
+				rm = CreatorRegionMapGrid.process("grid", lonlat_bbox, size);
+			}
+			else rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));
+						
 			
 			Map<Move,Double> list_od = new HashMap<Move,Double>();
 			
@@ -59,7 +90,7 @@ public class ODMatrixHW {
 			}
 			
 			// prepare for drawing
-			return ODMatrixVisual.draw("ODMatrixHW_"+region,list_od,false,"file_pls_piem");
+			return ODMatrixVisual.draw("ODMatrixHW_"+region,list_od,false,region);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
