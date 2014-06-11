@@ -13,12 +13,16 @@ public class Constraints {
 	
 	public Constraints(String sconstraints) {
 		
+		System.out.println("**** CONSTRAINTS = "+sconstraints);
+		
 		constraints = new HashMap<String,String>();
 		if(sconstraints!=null && sconstraints.contains("=")) {
 			String[] elements = sconstraints.split(";");
 			for(String e: elements) {
-				String[] nameval = e.split("=");
-				constraints.put(nameval[0],nameval[1]);
+				if(e.contains("=")) {
+					String[] nameval = e.split("=");
+					constraints.put(nameval[0],nameval[1]);
+				}
 			}
 		}
 		
@@ -31,7 +35,7 @@ public class Constraints {
 				BufferedReader br = new BufferedReader(new FileReader(f));
 				String line; String[] elements;
 				while((line = br.readLine()) != null) {
-					elements = line.split(",");
+					elements = line.split(";");
 					users_weights.put(elements[0],Double.parseDouble(elements[1]));
 				}
 				br.close();
@@ -77,10 +81,22 @@ public class Constraints {
 	public String getFileSuffix() {
 		String suffix = "";
 		if(constraints != null) {
-			for(String key: constraints.keySet())
-				suffix += "_"+key+"_"+constraints.get(key);
+			for(String key: constraints.keySet()) {
+				String val = constraints.get(key);
+				if(key.equals("users_event_probscores")) {
+					val = new File(val).getName();
+					val = val.substring(0,val.indexOf("."));
+				}
+				suffix += "_"+key+"_"+val;
+			}
 		}
 		return suffix;
+	}
+	
+	
+	public static void main(String[] args) {
+		Constraints c = new Constraints(";users_event_probscores=C:/BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/ProbScores/Stadio_San_Siro_(MI)-11_04_2012_19_00-11_04_2012_23_00.txt");
+		System.out.println(c.getFileSuffix());
 	}
 	
 }

@@ -89,9 +89,11 @@ public class PopulationDensity {
 			UserEventCounterCellacXHour.process(p); // file name is called as the placemark
 			PLSSpaceDensity.process(rm, Config.getInstance().base_folder+"/UserEventCounter/"+p.getName()+"_cellXHour.csv", null, null);
 			File pls_space_density_file = new File(Config.getInstance().base_folder+"/PLSSpaceDensity/"+p.getName()+"_"+rm.getName()+".csv");
+			
+			
 			Map<String,Double> space_density = pd.computeSpaceDensity(pls_space_density_file,rm,constraints);
 			
-			plotSpaceDensity(p.getName()+constraints.getFileSuffix(), space_density, rm,0);
+			plotSpaceDensity(p.getName(), space_density, rm,0);
 			
 			StringBuffer sb = new StringBuffer();
 			sb.append("var heatMapData = [\n");
@@ -111,14 +113,7 @@ public class PopulationDensity {
 	}
 	
 	
-	private String getFileSuffix(Map<String,String> constraints) {
-		String suffix = "";
-		if(constraints != null) {
-			for(String key: constraints.keySet())
-				suffix += "_"+key+"_"+constraints.get(key);
-		}
-		return suffix;
-	}
+	
 	
 	public void plotSpaceDensity(String city, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
 		File d = new File(Config.getInstance().web_kml_folder);
