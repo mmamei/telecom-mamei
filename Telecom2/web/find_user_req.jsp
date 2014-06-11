@@ -1,7 +1,7 @@
 <html>
 <head>
 <%@include file="includes/head.html" %>
-<%@include file="includes/multiMapTimeSelectJS.html" %>
+<%@include file="includes/multiMapTimeSelect.js" %>
 <script type="text/javascript">
 jspLocation = "find_user_res.jsp";
 longRun = true;
@@ -15,7 +15,7 @@ longRun = true;
 
 <h2>Find User</h2>
 
-<%@include file="includes/multiMapTimeSelectHTML.html" %>
+<%@include file="includes/multiMapTimeSelect.html" %>
 
 
 </div>

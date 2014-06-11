@@ -1,7 +1,7 @@
 <html>
 <head>
 <%@include file="includes/head.html" %>
-<%@include file="includes/mapTimeSelectJS.html" %>
+<%@include file="includes/mapTimeSelect.js" %>
 
 <script type="text/javascript">
 jspLocation = "event_attendance_res.jsp";
@@ -15,7 +15,7 @@ longRun = true;
 <div class="container">
 <h2>Event Attendance Estimate</h2>
 
-<%@include file="includes/mapTimeSelectHTML.html" %>
+<%@include file="includes/mapTimeSelect.html" %>
 
 
 </div>

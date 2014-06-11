@@ -114,7 +114,10 @@ function process() {
 	
 	var constraints = "";
 	var ao = document.getElementById("adv_op");
-	if(ao.style.display=="block") constraints = document.getElementById("constraints").value;
+	if(ao.style.display=="block") {
+		constraints = document.getElementById("constraints").value;
+		constraints = constraints+";users_event_probscores="+ueps;
+	}
 	
 	var p1 = marker1.getPosition();
 	var p2 = marker2.getPosition();
@@ -122,7 +125,7 @@ function process() {
 	var url = jspLocation+"?places_file="+pf+"&kop="+kop+"&exclude_kop="+exclude_kop+
 			  "&lat1="+p1.lat().toFixed(4)+"&lon1="+p1.lng().toFixed(4)+
 			  "&lat2="+p2.lat().toFixed(4)+"&lon2="+p2.lng().toFixed(4)+
-			  "&region_map="+rm+"&constraints="+constraints+";users_event_probscores="+ueps;
+			  "&region_map="+rm+"&constraints="+constraints;
 	if(longRun) longRunF(url)
 	else window.open(url);
 }

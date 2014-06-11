@@ -393,9 +393,10 @@
 		ol.style1
 		{
 		}
-
+	
+	
 	/* Forms */
-
+	
 		form
 		{
 		}
@@ -406,7 +407,6 @@
 			}
 		
 			form input.text,
-			form select,
 			form textarea
 			{
 				-webkit-appearance: none;
@@ -462,7 +462,7 @@
 				{
 					border: 0;
 				}
-			
+	
 	/* Tables */
 	
 		table
