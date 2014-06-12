@@ -78,7 +78,8 @@ public class Constraints {
 		return true;
 	}
 	
-	public String getFileSuffix() {
+	
+	public String toString() {
 		String suffix = "";
 		if(constraints != null) {
 			for(String key: constraints.keySet()) {
@@ -90,13 +91,11 @@ public class Constraints {
 				suffix += "_"+key+"_"+val;
 			}
 		}
-		return suffix;
+		return suffix;	
 	}
-	
 	
 	public static void main(String[] args) {
 		Constraints c = new Constraints(";users_event_probscores=C:/BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/ProbScores/Stadio_San_Siro_(MI)-11_04_2012_19_00-11_04_2012_23_00.txt");
-		System.out.println(c.getFileSuffix());
 	}
 	
 }

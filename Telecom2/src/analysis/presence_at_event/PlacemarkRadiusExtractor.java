@@ -321,7 +321,6 @@ public class PlacemarkRadiusExtractor {
 	}
 	*/
 	
-	public static Constraints constraints = new Constraints(null);
 	
 	public static List<double[][]> computeZXRadius(List<CityEvent> relevantEvents, boolean ring) throws Exception {
 		
@@ -333,12 +332,12 @@ public class PlacemarkRadiusExtractor {
 		PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark(); 
 		File d = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+subdir);
 		d.mkdirs();
-		String file = d.getAbsolutePath()+"/"+p.getName()+"_"+(double)MAX_R+constraints.getFileSuffix()+".txt";
+		String file = d.getAbsolutePath()+"/"+p.getName()+"_"+(double)MAX_R+".txt";
 		File f = new File(file);
 		if(!f.exists()) {
 			Logger.logln(file+" does not exist");
 			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
-			pap.process(p,constraints);
+			pap.process(p,null);
 		}
 		
 		
@@ -352,7 +351,7 @@ public class PlacemarkRadiusExtractor {
 			
 			if(ring) p.changeRadiusRing(max_r);
 			else p.changeRadius(max_r);
-			PLSTimeDensity plsmap = PLSTimeDensity.getPLSTimeCounter(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+constraints.getFileSuffix()+".txt",p);
+			PLSTimeDensity plsmap = PLSTimeDensity.getPLSTimeCounter(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+subdir+"/"+p.getName()+"_"+(double)MAX_R+".txt",p);
 			
 			if(plsmap.startTime == null) {
 				for(int i=0; i<relevantEvents.size();i++) {

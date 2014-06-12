@@ -26,7 +26,11 @@ public class ODMatrixTime {
 	public static void main(String[] args) throws Exception {
 		ODMatrixTime od = new ODMatrixTime();
 		//String js = od.runAll("2014-04-20", "00", "2014-04-21", "00", 7.6203,45.0945,7.6969,45.0774, "FIX_Piemonte.ser", "");
-		String js = od.runAll("2012-04-11", "19", "2012-04-11", "23", 9.0937,45.4896,9.150,45.4655, "grid5", ";users_event_probscores=C:/BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/ProbScores/Stadio_San_Siro_(MI)-11_04_2012_19_00-11_04_2012_23_00.txt");
+		//String js = od.runAll("2012-04-11", "19", "2012-04-11", "23", 9.0937,45.4896,9.150,45.4655, "grid5", ";users_event_probscores=C:/BASE/PresenceCounter/C_DATASET_PLS_file_pls_file_pls_lomb/ProbScores/Stadio_San_Siro_(MI)-11_04_2012_19_00-11_04_2012_23_00.txt");
+		
+		String js = od.runAll("2014-05-01", "08", "2014-05-01", "11", 12.3135,45.4483,12.3611,45.4263, "grid20", "mnt=!22201");
+	
+		
 		System.out.println(js);
 	}
 	

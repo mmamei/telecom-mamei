@@ -77,15 +77,15 @@ class PLSEventsAroundAPlacemark extends BufferAnalyzer implements PLSEventsAroun
 			File fd = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir());
 			fd.mkdirs();
 			
-			System.out.println("Output Dir = "+fd);
+			//System.out.println("Output Dir = "+fd);
 			
 			
 			for(int i=0; i<placemarks.size();i++) {
 				Placemark p = placemarks.get(i);
-				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(fd+"/"+p.getName()+"_"+p.getRadius()+constraints.getFileSuffix()+".txt"))));
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(fd+"/"+p.getName()+"_"+p.getRadius()+".txt"))));
 				
 				for(UserTrace ui: userInfos.get(i).values()) {
-					if(constraints.okConstraints(ui.mnt, ui.getNumDays())) out.println(ui);
+					if(constraints==null || constraints.okConstraints(ui.mnt, ui.getNumDays())) out.println(ui);
 				}
 				
 				out.close();

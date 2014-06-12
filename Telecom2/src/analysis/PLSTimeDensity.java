@@ -170,7 +170,7 @@ public class PLSTimeDensity implements Serializable {
 			
 			PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
 			pap.process(p,constraints);
-			String file = Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+constraints.getFileSuffix()+".txt";
+			String file = Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt";
 			PLSTimeDensity plsmap = getPLSTimeCounter(file,null);
 			//(new File(file)).delete();
 			

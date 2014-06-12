@@ -44,7 +44,7 @@ public class PLSParser {
 		dir = Config.getInstance().pls_folder;
 		sTime = System.currentTimeMillis();
 		
-		analyzeDirectory(new File(dir),ba);
+		analyzeDirectory(new File(dir),ba,null);
 		
 		eTime = System.currentTimeMillis();
 		mins = (int)((eTime - sTime) / 60000);
@@ -58,14 +58,12 @@ public class PLSParser {
 	
 	//private static Map<String,String> allDays = new TreeMap<String,String>();
 	
-	private static void analyzeDirectory(File directory, BufferAnalyzer analyzer) throws Exception{	
+	private static void analyzeDirectory(File directory, BufferAnalyzer analyzer, Set<String> bogus) throws Exception{	
 		
-		Set<String> bogus = new HashSet<String>();
-		
-		
-		if(REMOVE_BOGUS) {
-			System.out.println(directory.getAbsolutePath());
-			System.out.println(Config.getInstance().pls_folder);
+
+		if(REMOVE_BOGUS && bogus == null) {
+			bogus = new HashSet<String>();
+			System.out.println("Loading bogus users ... "+Config.getInstance().pls_folder);
 			String d = directory.getAbsolutePath().substring(Config.getInstance().pls_root_folder.length()+1);
 			if(d.indexOf("\\") > 0) d = d.substring(0,d.indexOf("\\"));
 			File f = new File(Config.getInstance().base_folder+"/UserEventCounter/"+d+"_bogus.txt");
@@ -81,7 +79,6 @@ public class PLSParser {
 			}
 		}
 		
-		System.out.println(directory);
 		File[] items = directory.listFiles();
 		for(int i=0; i<items.length;i++){
 			File item = items[i];
@@ -100,8 +97,7 @@ public class PLSParser {
 				
 				if(end_cal.get(Calendar.HOUR_OF_DAY) < MIN_HOUR || begin_cal.get(Calendar.HOUR_OF_DAY) > MAX_HOUR) continue;
 				
-				
-				System.out.println(n+" ==> "+begin_cal.getTime()+", "+end_cal.getTime());
+				if(!QUIET) System.out.println(n+" ==> "+begin_cal.getTime()+", "+end_cal.getTime());
 				
 				//String key = end_cal.get(Calendar.DAY_OF_MONTH)+"/"+MONTHS[end_cal.get(Calendar.MONTH)]+"/"+end_cal.get(Calendar.YEAR);
 				//String h = allDays.get(key);
@@ -114,7 +110,7 @@ public class PLSParser {
 				}
 			}
 			else if(item.isDirectory())
-				analyzeDirectory(item, analyzer);
+				analyzeDirectory(item, analyzer,bogus);
 		}
 		
 		//Logger.logln("Days in the dataset:");
