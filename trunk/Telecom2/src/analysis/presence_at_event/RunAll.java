@@ -31,10 +31,7 @@ public class RunAll {
 		return radiusAndAttendance(sday,shour,eday, ehour, lon1, lat1, lon1, lat1,new Constraints(sconstraints));
 	}
 	
-	
-	private int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, Constraints constraints) {
-		return radiusAndAttendance(sday,shour,eday, ehour, lon1, lat1, lon1, lat1,constraints);
-	}
+
 	
 	private int[] radiusAndAttendance(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, Constraints constraints) {
 		try {
@@ -42,7 +39,7 @@ public class RunAll {
 			PresenceCounter.PLOT = false;
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
-			System.out.println("---> "+dir);
+			System.out.println("WORKING DIR ---> "+dir);
 			if(dir == null) return new int[]{0,0};
 			
 			SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
@@ -69,8 +66,13 @@ public class RunAll {
 			Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(PresenceCounter.USE_INDIVIDUAL_EVENT,PlacemarkRadiusExtractor.DIFF);	
 			int bestr = (int)Math.round(bestRadius.get(ce.toString()));
 			
-			
+			PresenceCounter.constraints = constraints;
 			PresenceCounter.process(all);
+			
+			ResultEvaluator.PIECEWISE = false;
+			ResultEvaluator.RANGE = false;
+			ResultEvaluator.INTERCEPT = false;
+			
 			int attendance =  ResultEvaluator.run(new File(PresenceCounter.ODIR+"/"+PresenceCounter.OFILE));
 			
 			if(CLEANUP) {
@@ -135,12 +137,20 @@ public class RunAll {
 		//int[] rad_att = ra.radiusAndAttendance("2014-03-02","19","2014-03-03","0",11.28265300110946,43.78066799975202); // partita Fiorentina - Lazio. capienza stadio 47000
 		//int[] rad_att = ra.radiusAndAttendance("2012-04-01","13","2012-04-01","18",9.123845,45.478068,""); // San Siro
 		//int[] rad_att = ra.radiusAndAttendance("2012-03-20","19","2012-03-20","23",7.641453,45.109536); // Juventus Stadium
-		int[] rad_att = ra.radiusAndAttendance("2012-04-06","17","2012-04-06","20",7.6501,45.0418,""); // Stadio Olimpico
 		
-		 
-		
+		int[] rad_att = ra.radiusAndAttendance("2013-05-11","16","2013-05-11","20",12.3801,45.4275,""); 
 		System.out.println("RADIUS = "+rad_att[0]);
 		System.out.println("ATTENDANCE = "+rad_att[1]);
+		
+		rad_att = ra.radiusAndAttendance("2013-05-11","16","2013-05-11","20",12.3801,45.4275,"mnt=!22201"); 
+		System.out.println("RADIUS = "+rad_att[0]);
+		System.out.println("ATTENDANCE = "+rad_att[1]);
+		
+		rad_att = ra.radiusAndAttendance("2013-05-11","16","2013-05-11","20",12.3801,45.4275,"mnt=22201"); 
+		System.out.println("RADIUS = "+rad_att[0]);
+		System.out.println("ATTENDANCE = "+rad_att[1]);
+		
+		
 	} 
 	
 }

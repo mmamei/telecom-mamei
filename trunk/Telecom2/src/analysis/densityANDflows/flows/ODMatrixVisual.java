@@ -26,14 +26,14 @@ import com.graphhopper.util.PointList;
 public class ODMatrixVisual {
 		
 
-	
+	public static final String TRASPORTATION_MODE = EncodingManager.FOOT;
 	
     
     // main for testing purposes
     public static void main(String[] args) throws Exception {
     	String ghLoc = "C:/DATASET/osm/piem";
 	    String testOsm = "C:/DATASET/osm/piem/piem.pbf";
-    	GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager("CAR")).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
+    	GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager(TRASPORTATION_MODE)).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
 		gh.setPreciseIndexResolution(10000); // to be set about the grid size
 		gh.importOrLoad();
 		
@@ -147,7 +147,7 @@ public class ODMatrixVisual {
 		String ghLoc = "C:/DATASET/osm/"+n;
 	    String testOsm = "C:/DATASET/osm/"+n+"/"+n+".pbf";
 		
-		GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager("CAR")).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
+		GraphHopper gh = new GraphHopper().setInMemory(true, true).setEncodingManager(new EncodingManager(TRASPORTATION_MODE)).setGraphHopperLocation(ghLoc).setOSMFile(testOsm);
 		gh.setPreciseIndexResolution(10000); // to be set about the grid size
 		gh.importOrLoad();
 		

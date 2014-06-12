@@ -84,7 +84,7 @@ public class PresenceCounter {
 				double c = count(ce,O_RADIUS,DAYS);
 				
 				//Logger.logln(ce.toString()+" estimated attendance = "+(int)c+" groundtruth = "+ce.head_count);
-				Logger.logln(ce.toString()+","+bestr+","+(int)c+","+ce.head_count);
+				System.err.println(ce.toString()+","+bestr+","+(int)c+","+ce.head_count);
 				
 				result[i][0] = c;
 				result[i][1] = ce.head_count;
@@ -137,9 +137,9 @@ public class PresenceCounter {
 		
 		//Logger.logln("\n"+event.spot.name+", e_r = "+event.spot.radius);
 		
-		Logger.logln("PLSAroundAPlacemark with BEST radius....");
+		//Logger.logln("PLSAroundAPlacemark with BEST radius....");
 		File file_event = getFile(event.spot.clone(),event.spot.getRadius());
-		Logger.logln("PLSAroundAPlacemark with OTHER radius....");
+		//Logger.logln("PLSAroundAPlacemark with OTHER radius....");
 		File file_other = getFile(event.spot.clone(),o_radius);
 		
 		Set<String> userPresentDuringEvent = getUsers(file_event,event.st,event.et,null,null);
@@ -157,7 +157,7 @@ public class PresenceCounter {
 		Map<String,List<PLSEvent>> usr_pls = getUsersPLS(file_event,userPresentDuringEvent);
 		Map<String,List<PLSEvent>> usr_other_pls = getUsersPLS(file_other,userPresentDuringEvent);
 		
-
+		
 		double prob = 0;
 		
 		
@@ -179,17 +179,20 @@ public class PresenceCounter {
 		return prob;
 	}
 	
+	
+	static Constraints constraints;
+	
 	public static File getFile(Placemark p, double radius) throws Exception{
 		p.changeRadius(radius);
 		
 		PLSEventsAroundAPlacemarkI pap = DataFactory.getPLSEventsAroundAPlacemark();
-		Constraints constraints = PlacemarkRadiusExtractor.constraints;
 		
-		File f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+constraints.getFileSuffix()+".txt");
+		
+		File f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt");
 		if(f==null || !f.exists()) {
-			Logger.logln("Executing PLSEventsAroundAPlacemark.process()");
+			Logger.logln("-------------------------------------------------------------->Executing PLSEventsAroundAPlacemark.process()"+constraints);
 			pap.process(p,constraints);
-			f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+constraints.getFileSuffix()+".txt");
+			f = new File(Config.getInstance().base_folder+"/PLSEventsAroundAPlacemark/"+Config.getInstance().get_pls_subdir()+"/"+p.getName()+"_"+p.getRadius()+".txt");
 		}
 		return f;
 	}

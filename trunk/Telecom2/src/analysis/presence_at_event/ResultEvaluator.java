@@ -29,7 +29,7 @@ public class ResultEvaluator {
 	public static boolean DIFF = false;
 
 	public static boolean LEAVE_ONE_OUT = true;
-	public static boolean PIECEWISE = true;
+	public static boolean PIECEWISE = false;
 	public static int PIECE_SIZE = 6;
 	
 	public static boolean RANGE = false;
@@ -51,7 +51,7 @@ public class ResultEvaluator {
 	
 	
 	public static void main(String[] args) throws Exception {
-		
+		PLOT = true;
 		File[] training = new File[]{lomb,piem2012,piem2013};
 		File[] testing = new File[]{lomb,piem2012,piem2013};
 		
@@ -77,8 +77,8 @@ public class ResultEvaluator {
 		Map<String,List<double[]>> testing_map = read(testing_files);
 		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
 		if(RANGE) {
-			Map<String,List<double[]>>[] tra = divide(training_map,RANGE_TH);
-			Map<String,List<double[]>>[] tst = divide(testing_map,RANGE_TH);
+			Map<String,List<double[]>>[] tra = divideTraining(training_map,RANGE_TH);
+			Map<String,List<double[]>>[] tst = divideTesting(testing_map,tra);
 			
 			Logger.logln("RESULTS FOR EVENTS BELOW "+RANGE_TH);
 			INTERCEPT = false;
@@ -124,7 +124,7 @@ public class ResultEvaluator {
 	
 	
 	
-	public static Map<String,List<double[]>>[] divide(Map<String,List<double[]>> x, double threshold) {
+	public static Map<String,List<double[]>>[] divideTraining(Map<String,List<double[]>> x, double threshold) {
 		Map<String,List<double[]>>[] ba = (Map<String,List<double[]>>[])new Map[2]; // ba = bottom - above
 		ba[0] = new HashMap<String,List<double[]>>();
 		ba[1] = new HashMap<String,List<double[]>>();
@@ -148,13 +148,50 @@ public class ResultEvaluator {
 		l.add(v);
 	}
 	
+	
+	public static Map<String,List<double[]>>[] divideTesting(Map<String,List<double[]>> x, Map<String,List<double[]>>[] tra) {
+		
+		double threshold = (getMax(tra[0]) + getMin(tra[1]))/2;
+		
+		
+		Map<String,List<double[]>>[] ba = (Map<String,List<double[]>>[])new Map[2]; // ba = bottom - above
+		ba[0] = new HashMap<String,List<double[]>>();
+		ba[1] = new HashMap<String,List<double[]>>();
+		for(String k: x.keySet()) {
+			List<double[]> l = x.get(k);
+			for(double[] v: l) {
+				if(v[0] <= threshold) add(ba[0],k,v);
+				else add(ba[1],k,v);
+			}
+		}
+		return ba;
+		
+	}
+	
+	private static double getMin(Map<String,List<double[]>> m) {
+		double min = Double.MAX_VALUE;
+		for(List<double[]> l : m.values())
+		for(double[] d: l)
+			min = Math.min(min, d[0]);
+		return min;
+	}
+	
+	private static double getMax(Map<String,List<double[]>> m) {
+		double max = -Double.MAX_VALUE;
+		for(List<double[]> l : m.values())
+		for(double[] d: l)
+			max = Math.max(max, d[0]);
+		return max;
+	}
+	
+	
 
 	
 	
 	public static Map<String,List<double[]>> scale(Map<String,List<double[]>> testing_map, Map<String,List<double[]>> training_map) {
 		SimpleRegression training_sr = getRegression(training_map);
 		
-		printInfo("INFO: ",training_sr);
+		if(PLOT) printInfo("INFO: ",training_sr);
 		
 		Map<String,List<double[]>> scaled = new HashMap<String,List<double[]>>();
 		for(String placemark: testing_map.keySet()) {
@@ -290,6 +327,9 @@ public class ResultEvaluator {
 				//System.out.println("-------------------------------------------------------------leave one out effective!");
 				continue;
 			}
+			
+			System.out.println("............................................add regression piece... "+all.get(i)[0]+","+all.get(i)[1]);
+			
 			r.addData(all.get(i)[0], all.get(i)[1]);
 		}
 
