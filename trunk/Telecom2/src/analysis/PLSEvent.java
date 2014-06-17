@@ -156,9 +156,10 @@ public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 				BufferedReader in = new BufferedReader(new FileReader(fx));
 				while((line = in.readLine()) != null){
 					line = line.trim();
+					//System.out.println(line);
 					if(line.length() < 1) continue; // extra line at the end of file
 					String[] splitted = line.split(",");
-					if(splitted.length == 5) {
+					if(splitted.length >= 4) {
 						if(splitted[3].equals("null")) continue;
 						cal.setTimeInMillis(Long.parseLong(splitted[1]));
 						if(start.before(cal) && end.after(cal)) {

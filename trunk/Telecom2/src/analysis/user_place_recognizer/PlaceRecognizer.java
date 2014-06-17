@@ -147,7 +147,7 @@ public class PlaceRecognizer {
 	public static synchronized void process(Map<String, Object[]> res) {
 		
 		String username = res.keySet().iterator().next().split("_")[0];
-		PlaceRecognizerLogger.openUserFolderKML(username);
+		if(KML_OUTPUT) PlaceRecognizerLogger.openUserFolderKML(username);
 		for(String k: res.keySet()) {
 			String[] user_kop = k.split("_");
 			String user = user_kop[0];
@@ -158,10 +158,10 @@ public class PlaceRecognizer {
 			allResults.put(k, points);
 			if(VERBOSE) PlaceRecognizerLogger.log(user, kind_of_place, clusters);
 			PlaceRecognizerLogger.logcsv(user,kind_of_place,points);
-			PlaceRecognizerLogger.logkml(kind_of_place, clusters, points);
+			if(KML_OUTPUT) PlaceRecognizerLogger.logkml(kind_of_place, clusters, points);
 			
 		}
-		PlaceRecognizerLogger.closeUserFolderKML();
+		if(KML_OUTPUT) PlaceRecognizerLogger.closeUserFolderKML();
 	}
 	
 	
@@ -177,25 +177,27 @@ public class PlaceRecognizer {
 	}
 	
 	
+	public static boolean KML_OUTPUT = false;
+	
 	public static void main(String[] args) throws Exception {
 		
 		/**************************************************************************************************************************/
 		/**************************************   				 BATCH RUN 					***************************************/
 		/**************************************************************************************************************************/
 		
-		String dir = "file_pls_piem_users_200_100";
+		String dir = "file_pls_lomb_users_200_10000";
 		String in_dir = Config.getInstance().base_folder+"/UsersCSVCreator/"+dir;
 		String out_dir = Config.getInstance().base_folder+"/PlaceRecognizer/"+dir;
 		File d = new File(out_dir);
 		if(!d.exists()) d.mkdirs();
 		
 		PlaceRecognizerLogger.openTotalCSVFile(out_dir+"/results.csv");
-		PlaceRecognizerLogger.openKMLFile(out_dir+"/results.kml");
+		if(KML_OUTPUT) PlaceRecognizerLogger.openKMLFile(out_dir+"/results.kml");
 		File[] files = new File(in_dir).listFiles();
 		
 		
-		int total_size = 20; //files.length;
-		int n_thread = 4;
+		int total_size = files.length;
+		int n_thread = 8;
 		int size = total_size / n_thread;
 		Worker[] w = new Worker[n_thread];
 		for(int t = 0; t < n_thread;t++) {
@@ -214,7 +216,7 @@ public class PlaceRecognizer {
 		
 		
 		
-		PlaceRecognizerLogger.closeKMLFile();
+		if(KML_OUTPUT) PlaceRecognizerLogger.closeKMLFile();
 		PlaceRecognizerLogger.closeTotalCSVFile();
 		
 		//PlaceRecognizerEvaluator rs = new PlaceRecognizerEvaluator(2000);

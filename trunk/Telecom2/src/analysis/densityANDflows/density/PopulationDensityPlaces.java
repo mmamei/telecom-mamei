@@ -23,7 +23,7 @@ public class PopulationDensityPlaces {
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
 		
 		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", "SATURDAY_NIGHT","");
-		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", null,"");
+		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_10000/results.csv", "FIX_Piemonte.ser", "HOME", null,"");
 		Logger.logln("Done!");
 	}
 	
@@ -63,6 +63,9 @@ public class PopulationDensityPlaces {
 		
 		Map<String,Double> space_density = computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place,constraints);
 		
+		//for(double x: space_density.values())
+		//	System.out.println(x);
+		
 		
 		String title = rm.getName()+"-"+kind_of_place+"-"+exclude_kind_of_place;	
 		plotSpaceDensity(title, space_density, rm,0);
@@ -94,7 +97,7 @@ public class PopulationDensityPlaces {
 	public void plotSpaceDensity(String title, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
 		File d = new File(Config.getInstance().web_kml_folder);
 		d.mkdirs();
-		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+title+".kml",space_density,rm,title,false);
+		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+title+".kml",space_density,rm,title,true);
 		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+title+".html", title, space_density, rm, threshold);
 	}
 	
@@ -113,10 +116,11 @@ public class PopulationDensityPlaces {
 			if(r != null)
 			for(double[] ll: r) {
 				RegionI reg = rm.get(ll[0], ll[1]);
-				if(reg == null) 
-					Logger.logln(ll[0]+","+ll[1]+" is outside "+rm.getName());
+				if(reg == null) {
+					//Logger.logln(ll[0]+","+ll[1]+" is outside "+rm.getName());
+				}
 				else {
-					Double val = density.get(reg.getName());
+					Double val = density.get(reg.getName().toLowerCase());
 					if(val == null) val = 0.0;
 					val += constraints.weight(p.username);
 					density.put(reg.getName().toLowerCase(), val);

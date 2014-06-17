@@ -16,25 +16,25 @@ import visual.java.GraphPlotter;
 
 public class InterEventDistribution {
 	public static void main(String[] args) throws Exception {
-		//CityEvent ce = CityEvent.getEvent("Stadio Silvio Piola (NO),29/04/2012");
-		CityEvent ce = CityEvent.getEvent("Juventus Stadium (TO),20/03/2012");
-		process(ce);
+		process(Config.getInstance().base_folder+"/UsersCSVCreator/file_pls_piem_users_200_10000",null,null);
 	}
 	
-	public static void process(CityEvent e) throws Exception {
+	public static void process(String dir, Calendar startTime, Calendar endTime) throws Exception {
 		
-		String dir = "BASE/UsersCSVCreator/"+e.toString();
 		File fd = new File(dir);
 		if(!fd.exists()) {
 			Logger.logln(dir+" does not exist");
-			UsersCSVCreator.create(e);
-		}
-		else Logger.logln(dir+" already exists");
+			System.exit(0);
+		}		
 		
-		Calendar startTime = e.st;
-		Calendar endTime = e.et;
-		int startH = startTime.get(Calendar.HOUR_OF_DAY);
-		int endH = endTime.get(Calendar.HOUR_OF_DAY);
+		int startH = 0;
+		int endH = 24;
+		
+		
+		if(startTime != null && endTime !=null) {
+			startH = startTime.get(Calendar.HOUR_OF_DAY);
+			endH = endTime.get(Calendar.HOUR_OF_DAY);
+		}
 		
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		DescriptiveStatistics per_user_first_q = new DescriptiveStatistics();
@@ -62,11 +62,12 @@ public class InterEventDistribution {
 				
 				if(d1 != d2) continue;
 				
-				if(events.get(j).getCalendar().before(e.st) || events.get(j).getCalendar().after(e.et)) continue;
-				if(events.get(j-1).getCalendar().before(e.st) || events.get(j-1).getCalendar().after(e.et)) continue;
-					
+				if(startTime != null && endTime !=null) {
+					if(events.get(j).getCalendar().before(startTime) || events.get(j).getCalendar().after(endTime)) continue;
+					if(events.get(j-1).getCalendar().before(startTime) || events.get(j-1).getCalendar().after(endTime)) continue;
+				}
 				double dt = (1.0 * (events.get(j).getTimeStamp() - events.get(j-1).getTimeStamp())/60000);
-				if(dt == 0) {
+				if(dt <= 0) {
 					System.err.println("Warning:");
 					System.err.println("-- "+events.get(j).getTimeStamp());
 					System.err.println("-- "+events.get(j-1).getTimeStamp());
@@ -103,7 +104,9 @@ public class InterEventDistribution {
 			labels[i] = String.valueOf((int)xaxis[i]);
 		
 		
-		PrintWriter out = new PrintWriter(new FileWriter(new File("BASE/InterEventDistribution/InterEventDistrib"+e.toFileName())));
+		new File(Config.getInstance().base_folder+"/InterEventDistribution").mkdirs();
+		PrintWriter out = new PrintWriter(new FileWriter(new File(Config.getInstance().base_folder+"/InterEventDistribution/InterEventDistrib_"+fd.getName()+".csv")));
+		
 		out.print("xlabels");
 		for(String l: labels)
 			out.print(","+l);
