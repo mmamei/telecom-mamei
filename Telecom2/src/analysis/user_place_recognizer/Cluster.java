@@ -81,8 +81,10 @@ public class Cluster implements Serializable {
 		for(PLSEvent e: events) {
 			if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());
 			RegionI x = NM.getRegion(e.getCellac());
-			double f = tot_w > 0 ? w(e,weights) : 1;
-			r += x.getRadius() * f;
+			if(x!=null) {
+				double f = tot_w > 0 ? w(e,weights) : 1;
+				r += x.getRadius() * f;
+			}
 		}
 		double den = tot_w > 0 ? tot_w : size();
 		return r / den;
@@ -96,9 +98,11 @@ public class Cluster implements Serializable {
 		for(PLSEvent e: events) {
 			if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());
 			RegionI x = NM.getRegion(e.getCellac());
-			double f = tot_w > 0 ? w(e,weights) : 1;
-			aLat += x.getLatLon()[0] * f;
-			aLon += x.getLatLon()[1] * f;
+			if(x!=null) {
+				double f = tot_w > 0 ? w(e,weights) : 1;
+				aLat += x.getLatLon()[0] * f;
+				aLon += x.getLatLon()[1] * f;
+			}
 		}		
 		
 		double den = tot_w > 0 ? tot_w : size();
@@ -115,10 +119,12 @@ public class Cluster implements Serializable {
 		for(PLSEvent e: events){
 			if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());
 			RegionI cell = NM.getRegion(String.valueOf(e.getCellac()));
-			maxLat = Math.max(maxLat, cell.getLatLon()[0]);
-			maxLon = Math.max(maxLon, cell.getLatLon()[1]);
-			minLat = Math.min(minLat, cell.getLatLon()[0]);
-			minLon = Math.min(minLon, cell.getLatLon()[1]);
+			if(cell!=null) {
+				maxLat = Math.max(maxLat, cell.getLatLon()[0]);
+				maxLon = Math.max(maxLon, cell.getLatLon()[1]);
+				minLat = Math.min(minLat, cell.getLatLon()[0]);
+				minLon = Math.min(minLon, cell.getLatLon()[1]);
+			}
 		}
 		LatLonPoint p1 = new LatLonPoint(maxLat, maxLon);
 		LatLonPoint p2 = new LatLonPoint(minLat, minLon);

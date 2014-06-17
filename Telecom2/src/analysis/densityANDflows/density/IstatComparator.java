@@ -16,25 +16,33 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.java.GraphScatterPlotter;
+import analysis.Constraints;
 
 public class IstatComparator {
 	
 	
-	public static boolean LOG = false;
+	public static boolean LOG = true;
 	public static boolean INTERCEPT = true;
 	
 	public static void main(String[] args) throws Exception {
-		
+		/*
 		String regionMap = "FIX_Piemonte.ser";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
+		String dir ="file_pls_piem_users_200_10000";
+		*/
+		
+		String regionMap = "FIX_Lombardia.ser";
+		String kind_of_place = "HOME";
+		String exclude_kind_of_place = "";
+		String dir ="file_pls_lomb_users_200_10000";
 		
 		
 		RegionMap rm = (RegionMap)(RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));
-		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv");
+		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_folder+"/PlaceRecognizer/"+dir+"/results.csv");
 		
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
-		Map<String,Double> density = pdp.computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place,null);
+		Map<String,Double> density = pdp.computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place,new Constraints(""));
 		
 		String region = regionMap.substring("FIX_".length(),regionMap.indexOf("."));
 		Map<String,Integer> istat = ParserDatiISTAT.parse("G:/DATASET/ISTAT/DatiDemografici/"+region);
