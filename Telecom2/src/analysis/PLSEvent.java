@@ -160,7 +160,7 @@ public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 					if(line.length() < 1) continue; // extra line at the end of file
 					String[] splitted = line.split(",");
 					if(splitted.length >= 4) {
-						if(splitted[3].equals("null")) continue;
+						if(splitted[3].equals("null") || splitted[3].equals("-1") ) continue;
 						cal.setTimeInMillis(Long.parseLong(splitted[1]));
 						if(start.before(cal) && end.after(cal)) {
 							PLSEvent e = new PLSEvent(splitted[0], splitted[2], splitted[3], splitted[1]);

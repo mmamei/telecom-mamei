@@ -16,6 +16,7 @@ import utils.Logger;
 public class CreatorRegionMapIvoryCoastSubPref {
 	
 	public static void main(String[] args) throws Exception {
+		Config.getInstance().changeDataset("ivory-set3");
 		String region = "IvoryCoast";
 		String input_kml_file="C:/DATASET/GEO/"+region+".kml";
 		String output_obj_file=Config.getInstance().base_folder+"/RegionMap/FIX_"+region+".ser";

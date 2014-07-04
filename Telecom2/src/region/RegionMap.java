@@ -202,6 +202,7 @@ public class RegionMap implements Serializable {
 		kml.printFooterFolder(out);
 		out.close();
 	}
+
 	
 	public void printKML(String file, double[] ll, double[] tr) throws Exception {
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file)));

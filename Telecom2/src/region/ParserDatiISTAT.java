@@ -15,12 +15,13 @@ import utils.Config;
 
 public class ParserDatiISTAT {
 	public static void main(String[] args) throws Exception {
-		String dir = "G:/DATASET/ISTAT/DatiDemografici/Piemonte";
+		String region = "Lombardia";
+		String dir = "G:/DATASET/CENSUS/ISTAT/DatiDemografici/"+region;
 		Map<String,Integer> data = parse(dir);
 		
-		File out_dir = new File(Config.getInstance().base_folder+"/ParserDatiISTAT");
+		File out_dir = new File(Config.getInstance().base_folder+"/CENSUS");
 		out_dir.mkdirs();
-		PrintWriter out = new PrintWriter(new FileWriter(out_dir+"/Piemonte.csv"));
+		PrintWriter out = new PrintWriter(new FileWriter(out_dir+"/"+region+".csv"));
 		
 		for(String comune: data.keySet()) 
 			out.println(comune.toUpperCase()+","+data.get(comune));

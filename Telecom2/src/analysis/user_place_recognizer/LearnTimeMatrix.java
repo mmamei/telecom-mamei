@@ -3,6 +3,8 @@ package analysis.user_place_recognizer;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -13,18 +15,20 @@ import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
 import region.RegionI;
+import utils.Config;
 import analysis.PLSEvent;
 import dataset.NetworkMapFactoryI;
 import dataset.file.DataFactory;
 
 public class LearnTimeMatrix {
 	
+	public static double dist_threshold = 1000;
 	
 	public static void main(String[] args) throws Exception {
 		
 		Map<String, Map<String, LatLonPoint>> gt = read("G:/DATASET/PLS/volontari/users_info.txt");
 		
-		String kop = "Home";
+		String kop = "Work";
 		File dir = new File("G:/DATASET/PLS/volontari/pls");
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		NetworkMapFactoryI nmf = DataFactory.getNetworkMapFactory();
@@ -36,12 +40,17 @@ public class LearnTimeMatrix {
 				//System.out.println(p);
 				Calendar cal = p.getCalendar();
 				RegionI networkcell = nmf.getNetworkMap(p.getTimeStamp()).getRegion(p.getCellac());
-				if(networkcell!=null && LatLonUtils.getHaversineDistance(latlon, networkcell.getCenterPoint()) < 1000) {
+				if(networkcell!=null && LatLonUtils.getHaversineDistance(latlon, networkcell.getCenterPoint()) < dist_threshold) {
 					stats.addValue(cal.get(Calendar.HOUR_OF_DAY));
 				}
 			}
 		}
-
+		
+		PrintWriter out = new PrintWriter(new FileWriter(Config.getInstance().base_folder+"/time_matrix_"+kop+".csv"));
+		for(double v: stats.getSortedValues())
+			out.println(v);
+		out.close();
+		
 		System.out.println("Mean = "+stats.getMean());
 		System.out.println("SD = "+stats.getStandardDeviation());
 	}

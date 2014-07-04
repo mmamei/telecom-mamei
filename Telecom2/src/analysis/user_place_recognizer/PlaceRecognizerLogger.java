@@ -121,7 +121,7 @@ public class PlaceRecognizerLogger {
 	
 	
 	public static void openUserFolderKML(String username) {
-		kml.printFolder(outKml, username.substring(0,5));
+		kml.printFolder(outKml, username.length() > 5 ? username.substring(0,5) : username);
 	}
 	
 	public static void closeUserFolderKML() {
@@ -183,14 +183,24 @@ public class PlaceRecognizerLogger {
 				} 
 				
 				
+				
+				
 				for(String celllac: clusterByCells.keySet()){
 					String desc = getDescription(clusterEvents, clusterByCells.get(celllac));
 					int cellsize = clusterByCells.get(celllac).size();
+					
 					RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(clusterByCells.get(celllac).get(0).getTimeStamp());
+					
+					
+					
 					RegionI cell = nm.getRegion(celllac);
-					String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
-					cell.setDescription(name+". "+desc);
-					outKml.println(cell.toKml("aa"+COLORS[colorIndex % (COLORS.length)]));
+					
+					
+					if(cell!=null) {
+						String name = "Cluster N. "+k+", cell_lac: "+celllac+", size: "+cellsize+"/"+clusterEvents.size();
+						cell.setDescription(name+". "+desc);
+						outKml.println(cell.toKml("aa"+COLORS[colorIndex % (COLORS.length)]));
+					}
 				}
 				colorIndex++;
 				kml.closeFolder(outKml);
