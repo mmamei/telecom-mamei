@@ -1,10 +1,13 @@
 package analysis.densityANDflows.density;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +24,7 @@ import analysis.Constraints;
 public class IstatComparator {
 	
 	
-	public static boolean LOG = true;
+	public static boolean LOG = false;
 	public static boolean INTERCEPT = true;
 	
 	public static void main(String[] args) throws Exception {
@@ -32,10 +35,18 @@ public class IstatComparator {
 		String dir ="file_pls_piem_users_200_10000";
 		*/
 		
+		/*
 		String regionMap = "FIX_Lombardia.ser";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
 		String dir ="file_pls_lomb_users_200_10000";
+		*/
+		
+		Config.getInstance().changeDataset("ivory-set3");
+		String regionMap = "FIX_IvoryCoast.ser";
+		String kind_of_place = "HOME";
+		String exclude_kind_of_place = "";
+		String dir = "file_pls_ivory_users_2000_10";
 		
 		
 		RegionMap rm = (RegionMap)(RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));
@@ -45,7 +56,20 @@ public class IstatComparator {
 		Map<String,Double> density = pdp.computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place,new Constraints(""));
 		
 		String region = regionMap.substring("FIX_".length(),regionMap.indexOf("."));
-		Map<String,Integer> istat = ParserDatiISTAT.parse("G:/DATASET/ISTAT/DatiDemografici/"+region);
+		
+		// read census data
+		
+		Map<String,Integer> istat = new HashMap<String,Integer>();
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/CENSUS/"+region+".csv")));
+		String line;
+		while((line=br.readLine())!=null) {
+			String[] e = line.split(",");
+			istat.put(e[0].toLowerCase(), (int)Double.parseDouble(e[1]));
+		}
+		br.close();
+		
+		
+		
 		compareWithISTAT(region,density,istat);
 	}
 	
@@ -83,11 +107,8 @@ public class IstatComparator {
 					result[i][1] = LOG? Math.log10(groundtruth): groundtruth;
 					i++;
 				}
-				
-				
 			}
 		}
-		
 		out.close();
 		
 		SimpleRegression sr = new SimpleRegression(INTERCEPT);
@@ -99,7 +120,9 @@ public class IstatComparator {
 		List<String> labels = new ArrayList<String>();
 		labels.add("population density");
 		
-		new GraphScatterPlotter("Result: "+title,"Estimated (log10)","GroundTruth (log10)",ldata,labels);
+		String x = "Estimated"+(LOG?" (log10)":"");
+		String y = "GroundTruth"+(LOG?" (log10)":"");
+		new GraphScatterPlotter("Result: "+title,x,y,ldata,labels);
 	}
 	
 	public static void printInfo(SimpleRegression sr) {

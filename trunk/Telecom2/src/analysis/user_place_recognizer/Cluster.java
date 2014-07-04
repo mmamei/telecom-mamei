@@ -114,7 +114,7 @@ public class Cluster implements Serializable {
 	}
 	
 	public double calcWidth() {
-		double maxLat=0, maxLon=0;
+		double maxLat= -Double.MAX_VALUE, maxLon= -Double.MAX_VALUE;
 		double minLat = Double.MAX_VALUE, minLon = Double.MAX_VALUE;
 		for(PLSEvent e: events){
 			if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());

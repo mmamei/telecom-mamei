@@ -111,13 +111,15 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	
 	
 	public static void main(String[] args) throws Exception {
-		
-		String region = "file_pls_lomb";
+		Config.getInstance().changeDataset("ivory-set3");
+		String region = "file_pls_ivory";
+		//String region = "file_pls_lomb";
 		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+region;
-		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,30);
+		Config.getInstance().pls_start_time = new GregorianCalendar(2012,Calendar.FEBRUARY,1);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2012,Calendar.MARCH,30);
 		
-		String filename = region+"_users_200_10000.txt";
+		
+		String filename = region+"_users_2000_10000.txt";
 		File file = new File(Config.getInstance().base_folder+"/UserEventCounter/"+filename);
 		if(!file.exists()) {
 			Logger.logln(file+" Does not exist!");

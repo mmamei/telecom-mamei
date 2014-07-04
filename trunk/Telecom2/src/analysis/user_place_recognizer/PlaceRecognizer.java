@@ -34,9 +34,9 @@ public class PlaceRecognizer {
 		
 		
 		List<PLSEvent> workingset = CopyAndSerializationUtils.clone(events);
+	
 				
-				
-		Logger.logln("Processing "+username.substring(0,5)+" "+kind_of_place);
+		Logger.logln("Processing "+(username.length() > 5 ? username.substring(0,5) : username)+" "+kind_of_place);
 		
 		double[][] weights = Weights.get(kind_of_place);
 		
@@ -47,6 +47,9 @@ public class PlaceRecognizer {
 		String tperiod = events.get(0).getTimeStamp()+"-"+events.get(events.size()-1).getTimeStamp();
 		
 		Map<Integer, Cluster> clusters = null;
+		
+		
+		//clusters = new AgglomerativeClusterer(3,weights,delta).buildCluster(workingset);
 		
 		File dir = new File(Config.getInstance().base_folder+"/PlaceRecognizer/Clusters");
 		dir.mkdirs();
@@ -68,8 +71,15 @@ public class PlaceRecognizer {
 			}	
 		}
 		if(found != -1) clusters.put(-1, clusters.remove(found));
-		
-		
+		/*
+		System.out.println("Number of clusters --> "+clusters.size());
+		for(int key:  clusters.keySet()) {
+			System.out.println("  "+key+" --> "+clusters.get(key).size());
+			for(PLSEvent pe :clusters.get(key).getEvents()) 
+				System.out.print(pe.getCellac()+", ");
+			System.out.println();
+		}
+		*/
 		WeightFunction[] wfunctions = new WeightFunction[]{
 				new WeightOnTime(1.0,weights),
 				new WeightOnDay(alpha),
@@ -101,7 +111,7 @@ public class PlaceRecognizer {
 	
 	
 	
-	private static final String[] KIND_OF_PLACES = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
+	private static final String[] KIND_OF_PLACES = new String[]{"HOME","WORK"};//,"SATURDAY_NIGHT","SUNDAY"};
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	public Map<String, List<LatLonPoint>> runSingle(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
 		
@@ -185,7 +195,11 @@ public class PlaceRecognizer {
 		/**************************************   				 BATCH RUN 					***************************************/
 		/**************************************************************************************************************************/
 		
-		String dir = "file_pls_lomb_users_200_10000";
+		Config.getInstance().changeDataset("ivory-set3");
+		String dir = "file_pls_ivory_users_2000_10";
+		
+		
+		//String dir = "file_pls_lomb_users_200_10000";
 		String in_dir = Config.getInstance().base_folder+"/UsersCSVCreator/"+dir;
 		String out_dir = Config.getInstance().base_folder+"/PlaceRecognizer/"+dir;
 		File d = new File(out_dir);
@@ -263,8 +277,7 @@ class Worker extends Thread {
 				if(!f.isFile()) continue;
 				String filename = f.getName();
 				String username = filename.substring(0, filename.indexOf(".csv"));
-				List<PLSEvent> events = PLSEvent.readEvents(f);
-				
+				List<PLSEvent> events = PLSEvent.readEvents(f);			
 				Map<String, Object[]> res = new HashMap<String, Object[]>();
 				for(String kind_of_place:KIND_OF_PLACES)
 					res.put(username+"_"+kind_of_place, PlaceRecognizer.analyze(username,kind_of_place,events,0.25,0.25,2000,0.6));

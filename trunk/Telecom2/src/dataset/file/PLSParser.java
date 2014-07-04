@@ -64,6 +64,7 @@ public class PLSParser {
 		if(REMOVE_BOGUS && bogus == null) {
 			bogus = new HashSet<String>();
 			System.out.println("Loading bogus users ... "+Config.getInstance().pls_folder);
+			System.out.println(directory.getAbsolutePath());
 			String d = directory.getAbsolutePath().substring(Config.getInstance().pls_root_folder.length()+1);
 			if(d.indexOf("\\") > 0) d = d.substring(0,d.indexOf("\\"));
 			File f = new File(Config.getInstance().base_folder+"/UserEventCounter/"+d+"_bogus.txt");
