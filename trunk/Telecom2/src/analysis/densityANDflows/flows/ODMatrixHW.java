@@ -22,21 +22,18 @@ public class ODMatrixHW {
 		String regionMap = "grid5";
 		String places_file = Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv";
 		ODMatrixHW od = new ODMatrixHW();
-		String js = od.runAll(places_file, regionMap, "");
+		String js = od.runAll(places_file, regionMap, "",0,0,0,0);
 		System.out.println(js);
 		Logger.log("Done!");
 	}
 	
-	public String runAll(String places_file, String regionMap, String sconstraints) {
-		return runAll(places_file,regionMap,new Constraints(sconstraints));
+	public String runAll(String places_file, String regionMap, String sconstraints,double minlat,double minlon, double maxlat,double maxlon) {
+		return runAll(places_file,regionMap,new Constraints(sconstraints),minlat,minlon,maxlat,maxlon);
 	}
 	
-	public String runAll(String places_file, String regionMap, Constraints constraints) {
+	public String runAll(String places_file, String regionMap, Constraints constraints,double minlat,double minlon, double maxlat,double maxlon) {
 		
-		try {
-			
-			
-			
+		try {			
 			String region = places_file.substring("C:/BASE/PlaceRecognizer/".length(),places_file.indexOf("_users"));
 			
 			Map<String,UserPlaces> up = UserPlaces.readUserPlaces(places_file);
@@ -45,7 +42,7 @@ public class ODMatrixHW {
 			// load the region map
 			RegionMap rm = null;
 			if(regionMap.startsWith("grid")) {
-				
+				/*
 				double minlon = Double.MAX_VALUE;
 				double minlat = Double.MAX_VALUE;
 				double maxlon = -Double.MAX_VALUE;
@@ -58,7 +55,8 @@ public class ODMatrixHW {
 					minlat = Math.min(minlat, lonlat[1]);
 					maxlon = Math.max(maxlon, lonlat[0]);
 					maxlat = Math.max(maxlat, lonlat[1]);
-				}			
+				}	
+				*/		
 				double[][] lonlat_bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
 				int size = Integer.parseInt(regionMap.substring("grid".length()));
 				rm = CreatorRegionMapGrid.process("grid", lonlat_bbox, size);

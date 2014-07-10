@@ -27,7 +27,11 @@ import dataset.file.UsersCSVCreator;
 
 public class PlaceRecognizer {
 	
-	public static boolean VERBOSE = true;
+	
+	public static boolean SAVE_CLUSTERS = false;
+	
+	public static boolean VERBOSE = false;
+	
 	
 	public static Object[] analyze(String username, String kind_of_place, List<PLSEvent> events, 
 			                   double alpha, double beta, double delta, double rwf) {
@@ -48,19 +52,19 @@ public class PlaceRecognizer {
 		
 		Map<Integer, Cluster> clusters = null;
 		
-		
-		//clusters = new AgglomerativeClusterer(3,weights,delta).buildCluster(workingset);
-		
-		File dir = new File(Config.getInstance().base_folder+"/PlaceRecognizer/Clusters");
-		dir.mkdirs();
-		File f = new File(dir+"/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
-		if(f.exists()) 
-			clusters = (Map<Integer, Cluster>)CopyAndSerializationUtils.restore(f);
-		else {
+		if(!SAVE_CLUSTERS)
 			clusters = new AgglomerativeClusterer(3,weights,delta).buildCluster(workingset);
-			CopyAndSerializationUtils.save(f, clusters);
+		else {
+			File dir = new File(Config.getInstance().base_folder+"/PlaceRecognizer/Clusters");
+			dir.mkdirs();
+			File f = new File(dir+"/"+username+"-"+kind_of_place+"-"+tperiod+"-"+delta+".ser");
+			if(f.exists()) 
+				clusters = (Map<Integer, Cluster>)CopyAndSerializationUtils.restore(f);
+			else {
+				clusters = new AgglomerativeClusterer(3,weights,delta).buildCluster(workingset);
+				CopyAndSerializationUtils.save(f, clusters);
+			}
 		}
-		
 		// rename the reference cluster to -1
 		int found = -1;
 		for(int k : clusters.keySet()) {
@@ -71,6 +75,7 @@ public class PlaceRecognizer {
 			}	
 		}
 		if(found != -1) clusters.put(-1, clusters.remove(found));
+		
 		/*
 		System.out.println("Number of clusters --> "+clusters.size());
 		for(int key:  clusters.keySet()) {
@@ -102,8 +107,9 @@ public class PlaceRecognizer {
 			if(k==-1) continue;
 			Cluster c = clusters.get(k);
 			if(c.totWeight() > threshold) {
+							
 				LatLonPoint p = c.getCenter(weights);
-				placemarks.add(p);
+				if(p!=null) placemarks.add(p);
 			}
 		}		
 		return new Object[]{clusters, placemarks};
@@ -111,7 +117,7 @@ public class PlaceRecognizer {
 	
 	
 	
-	private static final String[] KIND_OF_PLACES = new String[]{"HOME","WORK"};//,"SATURDAY_NIGHT","SUNDAY"};
+	private static final String[] KIND_OF_PLACES = new String[]{"HOME","WORK","SATURDAY_NIGHT","SUNDAY"};
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd-hh");
 	public Map<String, List<LatLonPoint>> runSingle(String sday, String eday, String user, double lon1, double lat1, double lon2, double lat2) {
 		
@@ -156,10 +162,10 @@ public class PlaceRecognizer {
 	
 	public static synchronized void process(Map<String, Object[]> res) {
 		
-		String username = res.keySet().iterator().next().split("_")[0];
+		String username = res.keySet().iterator().next().split("*")[0];
 		if(KML_OUTPUT) PlaceRecognizerLogger.openUserFolderKML(username);
 		for(String k: res.keySet()) {
-			String[] user_kop = k.split("_");
+			String[] user_kop = k.split("*");
 			String user = user_kop[0];
 			String kind_of_place = user_kop[1];
 			Object[] clusters_points = res.get(k);
@@ -195,11 +201,11 @@ public class PlaceRecognizer {
 		/**************************************   				 BATCH RUN 					***************************************/
 		/**************************************************************************************************************************/
 		
-		Config.getInstance().changeDataset("ivory-set3");
-		String dir = "file_pls_ivory_users_2000_10000";
+		//Config.getInstance().changeDataset("ivory-set3");
+		//String dir = "file_pls_ivory_users_2000_10000";
 		
 		
-		//String dir = "file_pls_lomb_users_200_10000";
+		String dir = "file_pls_piem_users_200_10000";
 		String in_dir = Config.getInstance().base_folder+"/UsersCSVCreator/"+dir;
 		String out_dir = Config.getInstance().base_folder+"/PlaceRecognizer/"+dir;
 		File d = new File(out_dir);
@@ -277,10 +283,17 @@ class Worker extends Thread {
 				if(!f.isFile()) continue;
 				String filename = f.getName();
 				String username = filename.substring(0, filename.indexOf(".csv"));
+				
+				// if(!username.equals("699b8a4680a419d66791766828669f1a8cfedcd9087a050f994e18c0f2ad51")) continue;
+				
 				List<PLSEvent> events = PLSEvent.readEvents(f);			
 				Map<String, Object[]> res = new HashMap<String, Object[]>();
-				for(String kind_of_place:KIND_OF_PLACES)
-					res.put(username+"_"+kind_of_place, PlaceRecognizer.analyze(username,kind_of_place,events,0.25,0.25,2000,0.6));
+				for(String kind_of_place:KIND_OF_PLACES) {
+					
+					// if(!kind_of_place.equals("HOME")) continue;
+					
+					res.put(username+"*"+kind_of_place, PlaceRecognizer.analyze(username,kind_of_place,events,0.25,0.25,2000,0.6));
+				}
 				PlaceRecognizer.process(res);
 			} catch(Exception e) {
 				e.printStackTrace();

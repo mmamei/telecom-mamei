@@ -23,7 +23,7 @@ double lon1 = Double.parseDouble(request.getParameter("lon1"));
 double lat2 = Double.parseDouble(request.getParameter("lat2"));
 double lon2 = Double.parseDouble(request.getParameter("lon2"));
 
-String jsData = pdp.runAll(placesFile,regionMap,kop,exclude_kop,constraints);
+String jsData = pdp.runAll(placesFile,regionMap,kop,exclude_kop,constraints,lat1,lon1,lat2,lon2);
 out.println(jsData);
 
 

@@ -93,17 +93,21 @@ public class Cluster implements Serializable {
 	public LatLonPoint getCenter(double[][] weights) {
 		double aLat = 0;
 		double aLon = 0;
-		
 		double tot_w = w(weights);
+		
+		boolean ok = false;
 		for(PLSEvent e: events) {
 			if(NM == null) NM = DataFactory.getNetworkMapFactory().getNetworkMap(e.getTimeStamp());
 			RegionI x = NM.getRegion(e.getCellac());
 			if(x!=null) {
+				ok = true;
 				double f = tot_w > 0 ? w(e,weights) : 1;
 				aLat += x.getLatLon()[0] * f;
 				aLon += x.getLatLon()[1] * f;
 			}
 		}		
+		
+		if(!ok) return null;
 		
 		double den = tot_w > 0 ? tot_w : size();
 		
