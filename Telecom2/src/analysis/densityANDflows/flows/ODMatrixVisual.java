@@ -26,7 +26,7 @@ import com.graphhopper.util.PointList;
 public class ODMatrixVisual {
 		
 
-	public static final String TRASPORTATION_MODE = EncodingManager.FOOT;
+	public static final String TRASPORTATION_MODE = EncodingManager.CAR;
 	
     
     // main for testing purposes

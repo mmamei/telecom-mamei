@@ -22,16 +22,16 @@ public class PopulationDensityPlaces {
 	public static void main(String[] args) throws Exception {
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
 		
-		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", "SATURDAY_NIGHT","");
-		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_10000/results.csv", "FIX_Piemonte.ser", "HOME", null,"");
+		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", "SATURDAY_NIGHT","",0,0,0,0);
+		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_10000/results.csv", "FIX_Piemonte.ser", "HOME", null,"",0,0,0,0);
 		Logger.logln("Done!");
 	}
 	
-	public String runAll(String places_file, String regionMap, String kind_of_place, String exclude_kind_of_place, String sconstraints) {
-		return runAll(places_file,regionMap,kind_of_place,exclude_kind_of_place,new Constraints(sconstraints));
+	public String runAll(String places_file, String regionMap, String kind_of_place, String exclude_kind_of_place, String sconstraints,double minlat,double minlon, double maxlat,double maxlon) {
+		return runAll(places_file,regionMap,kind_of_place,exclude_kind_of_place,new Constraints(sconstraints),minlat,minlon,maxlat,maxlon);
 	}
 	
-	public String runAll(String places_file, String regionMap, String kind_of_place, String exclude_kind_of_place, Constraints constraints) {
+	public String runAll(String places_file, String regionMap, String kind_of_place, String exclude_kind_of_place, Constraints constraints, double minlat,double minlon, double maxlat,double maxlon) {
 		try {
 		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(places_file);
 		
@@ -39,7 +39,7 @@ public class PopulationDensityPlaces {
 		// load the region map
 		RegionMap rm = null;
 		if(regionMap.startsWith("grid")) {
-			
+			/*
 			double minlon = Double.MAX_VALUE;
 			double minlat = Double.MAX_VALUE;
 			double maxlon = -Double.MAX_VALUE;
@@ -52,7 +52,10 @@ public class PopulationDensityPlaces {
 				minlat = Math.min(minlat, lonlat[1]);
 				maxlon = Math.max(maxlon, lonlat[0]);
 				maxlat = Math.max(maxlat, lonlat[1]);
-			}			
+			}		
+			
+			System.out.println("---> ("+minlon+","+minlat+") ("+maxlon+","+maxlat+")");
+			*/
 			double[][] lonlat_bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
 			int size = Integer.parseInt(regionMap.substring("grid".length()));
 			rm = CreatorRegionMapGrid.process("grid", lonlat_bbox, size);

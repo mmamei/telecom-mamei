@@ -7,7 +7,7 @@
 // according to Windows-like systems, to avoid errors.
 
 
-web_kml_folder = G:/CODE/Telecom/web/kml
+web_kml_folder = G:/CODE/Telecom/Telecom2/web/kml
 
 
 // File Telecom
