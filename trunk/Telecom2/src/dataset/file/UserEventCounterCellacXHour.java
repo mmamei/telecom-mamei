@@ -54,6 +54,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	}
 	
 	//private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
+	
 	protected void finish() {
 		try {
 			File dir = new File(Config.getInstance().base_folder+"/UserEventCounter");
