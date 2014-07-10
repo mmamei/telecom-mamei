@@ -52,12 +52,12 @@ public class PopulationDensity {
 	}
 	
 	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, Constraints constraints) {
-		
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
 			if(dir == null) return null;
 			System.out.println(dir);
+			PLSSpaceDensity.COMPACT_SPACE=false;
 			Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+dir;
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));

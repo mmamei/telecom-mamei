@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
 
 
 public class Config {
-	private static String CFILE = "G:/CODE/Telecom/config/config.txt"; // nel server all'univ
+	private static String CFILE = "G:/CODE/Telecom/Telecom2/config/config.txt"; // nel server all'univ
 	static {
 		File f = new File(CFILE);
 		if(!f.exists()) CFILE = "C:/Users/Marco/Google Drive/Code/TELECOM/Telecom2/config/config.txt"; // vaio marco

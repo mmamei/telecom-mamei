@@ -62,7 +62,7 @@ public class PLSSpaceDensity implements Serializable {
 	public static transient int[] HP_INT;
 	
 	
-	public static transient final boolean COMPACT_SPACE = true;
+	public static transient boolean COMPACT_SPACE = true;
 	
 	static {
 		if(DP != null) { DP_LABELS = changePeriodLables(DP); DP_INT = toNum(DP);}
