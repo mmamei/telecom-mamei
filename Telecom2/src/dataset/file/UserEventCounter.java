@@ -106,23 +106,19 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		percentAnalysis(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"));
 	}
 	
-	public static void main1(String[] args) throws Exception {
-		
-		String region = "file_pls_lomb";
+	public static void getBogus() throws Exception {
+		String region = "file_pls_fi";
 		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+region;
-		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,30);
-		//PLSParser.MIN_HOUR = 1;
-		//PLSParser.MAX_HOUR = 3;
-		
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,10,23,59,59);
+		PLSParser.MIN_HOUR = 1;
+		PLSParser.MAX_HOUR = 3;
 		//new UserEventCounter(null,null).run();
 		
-		
-		//percentAnalysis(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"));
-		int threshold = 200;
-		int max_users_retrieved = 10000;
-		//String filename = region+"_bogus.txt";
-		String filename = region+"_users_"+threshold+"_"+max_users_retrieved+".txt";
+		percentAnalysis(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"));
+		int threshold = 20;
+		int max_users_retrieved = -1;
+		String filename = region+"_bogus.txt";
 		extractUsersAboveThreshold(new File(Config.getInstance().base_folder+"/UserEventCounter/"+region+"_count_timeframe_"+PLSParser.MIN_HOUR+"_"+PLSParser.MAX_HOUR+".csv"),new File(Config.getInstance().base_folder+"/UserEventCounter"+"/"+filename), threshold,max_users_retrieved);
 	
 		Logger.logln("Done!");
@@ -130,7 +126,7 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 	}
 
 	
-	public static void main(String[] args) throws Exception {
+	public static void main5(String[] args) throws Exception {
 		
 		Config.getInstance().changeDataset("ivory-set3");
 		String region = "file_pls_ivory";
@@ -148,5 +144,10 @@ public class UserEventCounter extends BufferAnalyzerConstrained {
 		Logger.logln("Done!");
 		Mail.send("UserEventCounter completed!");
 	}
+	
+	public static void main(String[] args) throws Exception{
+		getBogus();
+	}
+	
 	
 }

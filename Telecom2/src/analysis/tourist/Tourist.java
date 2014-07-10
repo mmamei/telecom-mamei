@@ -15,7 +15,7 @@ public class Tourist extends Profile {
 		
 		boolean is_italian = super.isItalian(mnt);
 		
-		if(!is_italian && num_days == days_interval && num_days >= 2 && num_days<= 3) return true;
+		if(!is_italian && num_days >= 2 && num_days<= 3) return true;
 		return false;
 		
 	}

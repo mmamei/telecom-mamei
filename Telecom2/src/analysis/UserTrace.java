@@ -35,13 +35,13 @@ public class UserTrace {
 		this.mnt = mnt;
 		
 		cal.setTimeInMillis(Long.parseLong(timestamp));
-		
-		if(!max_one_event_per_hour || (max_one_event_per_hour && isTimeAvailableH(cal))) 
-			events.add(new PLSEvent(username, mnt, cellac, timestamp,max_one_event_per_hour));
+		PLSEvent pe = new PLSEvent(username, mnt, cellac, timestamp,max_one_event_per_hour);
+		if(!max_one_event_per_hour || (max_one_event_per_hour && !events.contains(pe))) 
+			events.add(pe);
 	}
 	
 	
-	protected boolean isTimeAvailableH(Calendar c) {
+	/*protected boolean isTimeAvailableH(Calendar c) {
 		SimpleDateFormat sdh = new SimpleDateFormat("yyyy-MM-dd-HH");
 		String x = sdh.format(c.getTime());
 		for(PLSEvent p: events) {
@@ -51,7 +51,7 @@ public class UserTrace {
 		}
 		return true;
 	} 
-	
+	*/
 	
 	public List<PLSEvent> getEvents(){
 		List<PLSEvent> l = new ArrayList<PLSEvent>();
@@ -100,8 +100,8 @@ public class UserTrace {
 		Calendar c = Calendar.getInstance();
 		for(PLSEvent p:events) {
 			c.setTimeInMillis(p.getTimeStamp());
-			if(min == null || c.before(min)) min = c;
-			if(max == null || c.after(max)) max = c;
+			if(min == null || c.before(min)) {min = Calendar.getInstance(); min.setTimeInMillis(c.getTimeInMillis());}
+			if(max == null || c.after(max)) {max = Calendar.getInstance(); max.setTimeInMillis(c.getTimeInMillis());}
 		}
 		return new Calendar[]{min,max};
 	}
@@ -120,13 +120,13 @@ public class UserTrace {
 	public String getInfoCellXHour() {		
 		SimpleDateFormat sdh = new SimpleDateFormat("yyyy-MM-dd:EEE:HH",Locale.US);
 		StringBuffer sb = new StringBuffer();
-		for(PLSEvent p:events) {
-			
-			cal.setTimeInMillis(p.getTimeStamp());
-			
-			
+		
+		
+		for(PLSEvent p:events) {	
+			cal.setTimeInMillis(p.getTimeStamp());			
 			sb.append(sdh.format(cal.getTime())+":"+p.getCellac()+",");
 		}
+		
 		return mnt+","+events.size()+","+getNumDays()+","+getDaysInterval()+","+sb.toString();
 	}
 	
