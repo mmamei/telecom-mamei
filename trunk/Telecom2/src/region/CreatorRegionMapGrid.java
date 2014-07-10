@@ -13,10 +13,13 @@ public class CreatorRegionMapGrid {
 	
 	public static void main(String[] args) throws Exception {
 	
-		
-		Placemark p = Placemark.getPlacemark("Torino");
+		String name = "Firenze";
+		Placemark p = Placemark.getPlacemark(name);
 		p.changeRadius(p.getRadius()+1000);
-		process(p.getName(),p.getBboxLonLat(),4);
+		RegionMap rm = process(p.getName(),p.getBboxLonLat(),4);
+		rm.printKML();
+		String output_obj_file=new File(Config.getInstance().base_folder+"/RegionMap").getAbsolutePath()+"/"+name+".ser";
+		CopyAndSerializationUtils.save(new File(output_obj_file), rm);
 		
 		/*
 		CityEvent ce = CityEvent.getEvent("Juventus Stadium (TO),20/03/2012");
@@ -25,26 +28,21 @@ public class CreatorRegionMapGrid {
 		double[][] bbox = ce.spot.getBBox();
 		process(name,bbox,5);
 		*/
+		
+		Logger.logln("Done!");
 	}
 		
 		
 	public static RegionMap process(String name, double[][] lonlat_bbox, int size) throws Exception {
 		
-		String output_obj_file=new File(Config.getInstance().base_folder+"/RegionMap").getAbsolutePath()+"/"+name+".ser";
-		
 		SpaceGrid sg = new SpaceGrid(lonlat_bbox[0][0],lonlat_bbox[0][1],lonlat_bbox[1][0],lonlat_bbox[1][1],size,size);
-		
 		
 		RegionMap rm = new RegionMap(name);
 		
 		for(int i=0; i<size;i++)
 		for(int j=0; j<size;j++) {
 			rm.add(new Region(i+","+j,sg.getBorderLonLat(i, j)));
-		}
-		
-		//rm.printKML();
-		//CopyAndSerializationUtils.save(new File(output_obj_file), rm);
-		Logger.logln("Done!");
+		}	
 		return rm;
 	}
 	

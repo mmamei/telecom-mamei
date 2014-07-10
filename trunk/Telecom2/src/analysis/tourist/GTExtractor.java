@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -24,12 +25,13 @@ public class GTExtractor {
 	
 	public static final String CLASSES = "Resident,Tourist,Commuter,Transit";
 	
-	//static final String FILE = "UserEventCounter/file_pls_fi_Firenze_cellXHour_cellXHour.csv";
-	//static final String PLACEMARK = "Firenze";
 	
-	
-	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour.csv";
-	static final String PLACEMARK = "Venezia";
+	static final String PLACEMARK = "Firenze";
+	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/"+PLACEMARK+"_cellXHour.csv";
+	static {
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+	}
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -82,7 +84,7 @@ public class GTExtractor {
 				for(int i=5;i<p.length;i++) {
 					String[] x = p[i].split(":|-");
 					int y = Integer.parseInt(x[0]);
-					int m = Integer.parseInt(x[1]);
+					int m = Integer.parseInt(x[1]) - 1; // beware! important calendar correction
 					int d = Integer.parseInt(x[2]);
 					int h = Integer.parseInt(x[4]);
 					RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(new GregorianCalendar(y,m,d));
@@ -99,6 +101,9 @@ public class GTExtractor {
 				}
 								
 				n_total ++;
+				
+				if(n_total % 10000 == 0) System.out.println("Processed "+n_total+" users..."); 
+				
 			} catch(Exception e) {
 				System.err.println(line);
 			}
@@ -109,7 +114,7 @@ public class GTExtractor {
 			Logger.logln(prof+" = "+mcont.get(prof)+"/"+n_total);
 		
 		
-		File dir = new File(Config.getInstance().base_folder+"/ourist");
+		File dir = new File(Config.getInstance().base_folder+"/Tourist");
 		dir.mkdirs();
 		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/"+PLACEMARK+"_gt_profiles.csv"));
 		for(String user: mu.keySet())

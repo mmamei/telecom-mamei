@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,7 +42,10 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	
 	
 	public static void main(String[] args) {
-		Placemark placemark= Placemark.getPlacemark("Firenze");
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_ve"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		Placemark placemark= Placemark.getPlacemark("Venezia");
 		BufferAnalyzerConstrained ba = new UserSetCreator(placemark,null);
 		ba.run();
 		Logger.logln("Done!");

@@ -15,11 +15,10 @@ import java.util.Set;
 import region.Placemark;
 import utils.Config;
 import utils.Logger;
+import utils.Mail;
 import analysis.UserTrace;
 
 public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
-	
-	
 	
 	
 	private Map<String,UserTrace> users_info;
@@ -76,17 +75,34 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		ba.run();
 	}
 	
+	public static void process(String userListF) {
+		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,userListF);
+		ba.run();
+	}
 	
 	
 	public static void main(String[] args) throws Exception {
-		//BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,FileUtils.getFileS("UserSetCreator/Firenze.csv"));
+		
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
 		
 		
-		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem"; 
-		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.FEBRUARY,16,18,0,0);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.FEBRUARY,16,23,0,0);
-		Placemark placemark= Placemark.getPlacemark("Torino");
-		process(placemark);
+		/*
+		 * Questo mi serve per le operazioni density and flows perchè vedo le tracce degli utenti e quindi la loro density/flow
+		 * all'interno della città.
+		 */
+	
+		//process(Placemark.getPlacemark("Firenze"));
+		
+		/*
+		 * Questo serve per l'analisi dei turisti. In questo modo trovo i dati di tutti i turisti che sono passati almeno una volta per la città.
+		 * Ma estraggo anche i dati relativi a quando erano fuori dalla città. In questo modo, ad esempio, riesco ad estrarre anche informazioni sugli utenti in
+		 * transito perchè veod dov'erano prima e dopo la città e quindi quanto tempo ci sono stati.
+		 */
+		
+		process(Config.getInstance().base_folder+"/UserSetCreator/Firenze.csv");
+		Mail.send("UserEventCounterCellacXHour completed!");
 		Logger.logln("Done!");
 	}	
 	

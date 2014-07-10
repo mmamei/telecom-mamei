@@ -22,8 +22,6 @@ public abstract class Profile {
 		this.placemark = placemark;
 	}
 	
-	
-	
 	public boolean isItalian(String mnt) {
 		return mnt.startsWith("222");
 	}

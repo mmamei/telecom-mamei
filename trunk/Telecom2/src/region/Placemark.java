@@ -159,7 +159,7 @@ public class Placemark extends RegionI {
 		double bbox = 1;
 		double[] ll = new double[]{getLatLon()[0]-bbox,getLatLon()[1]-bbox};
 		double[] tr = new double[]{getLatLon()[0]+bbox,getLatLon()[1]+bbox};
-		Set<RegionI> ncells = nm.getRegionsIn(ll, tr);
+		//Set<RegionI> ncells = nm.getRegionsIn(ll, tr);
 		LatLonPoint center_point = getCenterPoint();
 		for(RegionI nc: nm.getRegions()) {
 			//Polygon c = GeomUtils.getCircle(nc.getBarycentreLongitude(), nc.getBarycentreLatitude(), nc.getRadius());
@@ -221,7 +221,7 @@ public class Placemark extends RegionI {
 		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
 		//initPlacemaks();
 		//NetworkMap nm = NetworkMapFactory.getNetworkMap();
-		Placemark p = getPlacemark("Venezia");
+		Placemark p = getPlacemark("Firenze");
 		//System.out.println(p.getNumCells());
 		//System.out.println(p.contains("4018584023"));
 		//System.out.println(nm.get(Long.parseLong("4018584023")));

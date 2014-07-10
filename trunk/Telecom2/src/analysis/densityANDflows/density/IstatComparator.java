@@ -24,7 +24,7 @@ import analysis.Constraints;
 public class IstatComparator {
 	
 	
-	public static boolean LOG = false;
+	public static boolean LOG = true;
 	public static boolean INTERCEPT = true;
 	
 	public static void main(String[] args) throws Exception {
@@ -46,7 +46,7 @@ public class IstatComparator {
 		String regionMap = "FIX_IvoryCoast.ser";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
-		String dir = "file_pls_ivory_users_2000_10";
+		String dir = "file_pls_ivory_users_2000_10000";
 		
 		
 		RegionMap rm = (RegionMap)(RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));

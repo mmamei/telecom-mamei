@@ -196,7 +196,7 @@ public class PlaceRecognizer {
 		/**************************************************************************************************************************/
 		
 		Config.getInstance().changeDataset("ivory-set3");
-		String dir = "file_pls_ivory_users_2000_10";
+		String dir = "file_pls_ivory_users_2000_10000";
 		
 		
 		//String dir = "file_pls_lomb_users_200_10000";

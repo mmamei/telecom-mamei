@@ -62,7 +62,7 @@ public class PLSSpaceDensity implements Serializable {
 	public static transient int[] HP_INT;
 	
 	
-	public static transient final boolean COMPACT_SPACE = false;
+	public static transient final boolean COMPACT_SPACE = true;
 	
 	static {
 		if(DP != null) { DP_LABELS = changePeriodLables(DP); DP_INT = toNum(DP);}
@@ -312,16 +312,16 @@ public class PLSSpaceDensity implements Serializable {
 		
 	
 	public static void main(String[] args) throws Exception {
-		
+		/*
 		String city = "Torino";
 		String cellXHourFile = Config.getInstance().base_folder+"/UserEventCounter/Torino_cellXHour.csv";
 		String gt_ser_file = "Firenze_gt_profiles.ser";
-		
-		/*
-		String city = "Venezia";
-		String cellXHourFile = "file_pls_ve_Venezia_cellXHour.csv";
-		String gt_ser_file = "Venezia_gt_profiles.ser";
 		*/
+		
+		String city = "Firenze";
+		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+ city+"_cellXHour.csv";
+		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles.ser";
+		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
 		process(rm,cellXHourFile,gt_ser_file,null);
 		Logger.logln("Done");
@@ -333,17 +333,17 @@ public class PLSSpaceDensity implements Serializable {
 		
 		String placemark_name = cellXHourFile.substring(cellXHourFile.lastIndexOf("/")+1,cellXHourFile.lastIndexOf("_cellXHour.csv"));
 		
-		/*
+		
 		Map<String,String> user_gt_prof = null;
 		if(gt_ser_file != null)
-			user_gt_prof = (Map<String,String>)CopyAndSerializationUtils.restore(FileUtils.getFile("Tourist/"+gt_ser_file));
-		*/
+			user_gt_prof = (Map<String,String>)CopyAndSerializationUtils.restore(new File(gt_ser_file));
+		
 		String s = max == null ? "" : "_"+max;
 	
 		File dir = new File(Config.getInstance().base_folder+"/PLSSpaceDensity");
 		dir.mkdirs();
 		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+placemark_name+"_"+rm.getName()+s+".csv"))));
-		//PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(FileUtils.createDir("BASE/Tourist")+"/"+city+s+".arff"))));
+		PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(Config.getInstance().base_folder+"/Tourist")+"/"+rm.getName()+s+".arff")));
 		
 		int i=0;
 		String line;
@@ -353,26 +353,36 @@ public class PLSSpaceDensity implements Serializable {
 			if(max != null && i > max) break;
 			
 			try {
-			td = new PLSSpaceDensity(line,rm);
+				td = new PLSSpaceDensity(line,rm);
 			} catch(Exception e) {
 				System.err.println(line);
 				continue;
 			}
 			
-			//if(i==0) weka_out.println(td.wekaHeader(city));
+			if(i==0) weka_out.println(td.wekaHeader(rm.getName()));
 			
 			out.println(td);
-			//String clazz = user_gt_prof == null ? null : user_gt_prof.get(td.user_id);
-			//weka_out.println(td.toWEKAString(clazz));
+			String clazz = user_gt_prof == null ? null : user_gt_prof.get(td.user_id);
+			weka_out.println(td.toWEKAString(clazz));
+			
+			/*
+			if(line.startsWith("60c8e54db1761e8617deaa4d5515c56bb97bf5699e8395c0f3f1437f59eea")) {
+				System.out.println(line);
+				System.out.println(td.wekaHeader(rm.getName()));
+				System.out.println(td.toWEKAString(clazz));
+				return;
+			}
+			*/
+			
 			
 			i++;
 			if(i % 10000 == 0) {
-				Logger.logln("Processed "+i+" users...");
+				Logger.logln("Processed "+i+"th users...");
 			}
 		}
 		br.close();
 		out.close();
-		//weka_out.close();
+		weka_out.close();
 	}
 	
 }
