@@ -27,7 +27,7 @@ public abstract class Profile {
 	}
 	
 	
-	public int countDays(List<CalCell> list, int cal_field, int[] interval) {
+	protected int countDays(List<CalCell> list, int cal_field, int[] interval) {
 		Set<String> days = new HashSet<String>();
 		for(CalCell cc: list) {
 			Calendar c = cc.cal;
@@ -39,6 +39,7 @@ public abstract class Profile {
 	}
 	
 	private boolean contains(int[] x, int y) {
+		if(x == null) return true;
 		for(int i: x)
 			if(i == y)
 				return true;

@@ -63,7 +63,7 @@ for(String rm: regionMaps) {
 <span onclick="showAdvOp()" style="color:gray;font-size:70%">Adv. Opts</span>
 
 <div id="adv_op" style="display:none">
-Constraints: <input id="constraints" type="text" name="constraints" value="es. mnt=!22201;maxdays=4"> 
+Constraints: <input id="constraints" type="text" name="constraints" value="es. mnt=!222;maxdays=4"> 
 Weight By Event Attendance
 <select id="users_event_probscores">
 <option value="null"><span>null</option>

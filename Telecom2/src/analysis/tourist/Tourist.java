@@ -2,6 +2,7 @@ package analysis.tourist;
 
 
 
+import java.util.Calendar;
 import java.util.List;
 
 import region.Placemark;
@@ -15,7 +16,12 @@ public class Tourist extends Profile {
 		
 		boolean is_italian = super.isItalian(mnt);
 		
-		if(!is_italian && num_days >= 2 && num_days<= 3) return true;
+		int days_in_area = countDays(list,Calendar.DAY_OF_MONTH,null);
+		
+		if(!is_italian && days_in_area >= 2 && days_in_area<= 3 && 
+		   Math.abs(days_interval-days_in_area) < 4 && 
+		   Math.abs(num_days-days_in_area) < 4 &&
+		   Math.abs(num_days-days_interval) < 4) return true;
 		return false;
 		
 	}

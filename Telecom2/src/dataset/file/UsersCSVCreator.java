@@ -110,7 +110,7 @@ public class UsersCSVCreator extends BufferAnalyzer {
 	}
 	
 	
-	public static void main(String[] args) throws Exception {
+	public static void main2(String[] args) throws Exception {
 		Config.getInstance().changeDataset("ivory-set3");
 		String region = "file_pls_ivory";
 		//String region = "file_pls_lomb";
@@ -126,6 +126,34 @@ public class UsersCSVCreator extends BufferAnalyzer {
 			System.exit(0);
 		}
 		UsersCSVCreator ba = new UsersCSVCreator(getUserListFromFile(file),filename.substring(0,filename.indexOf(".")));
+		if(ba.traces.size() > 0) {
+			PLSParser.parse(ba);
+			ba.finish();
+		}
+		Mail.send("UsersCSVCreator completed!");
+		Logger.logln("Done");
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		
+		String region = "file_pls_pu";
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+region;
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,2);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,30);
+		
+		Set<String> users = new HashSet<String>();
+		CityEvent target_event = CityEvent.getEvent("Melpignano,22/08/2014");	
+		BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().base_folder+"/UsersAroundAnEvent/"+target_event.toFileName()));
+		String line;
+		while((line = br.readLine()) != null) {
+			String[] usrmnt = line.split(",");
+			if(!usrmnt[1].startsWith("222"))
+				users.add(usrmnt[0]);
+		}
+		br.close();
+		
+		UsersCSVCreator ba = new UsersCSVCreator(users,target_event.toFileName()+"_STR");
 		if(ba.traces.size() > 0) {
 			PLSParser.parse(ba);
 			ba.finish();

@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import region.CityEvent;
+import utils.Config;
 import dataset.UsersAroundAnEventI;
 
 public class UsersAroundAnEvent extends BufferAnalyzer implements UsersAroundAnEventI {
@@ -30,7 +31,7 @@ public class UsersAroundAnEvent extends BufferAnalyzer implements UsersAroundAnE
 	UsersAroundAnEvent(CityEvent c) {
 		event = c;
 		usersAround = new HashSet<String>();
-		String dir = "BASE/"+this.getClass().getSimpleName();
+		String dir = Config.getInstance().base_folder+"/UsersAroundAnEvent";
 		File fd = new File(dir);
 		if(!fd.exists()) fd.mkdirs();
 		
@@ -57,18 +58,20 @@ public class UsersAroundAnEvent extends BufferAnalyzer implements UsersAroundAnE
 	
 	String[] fields;
 	String username;
+	String mnt;
 	String celllac;
 	Calendar cal = new GregorianCalendar();
 	
 	protected void analyze(String line) {
 		fields = line.split("\t");
 		username = fields[0];
+		mnt = fields[1];
 		celllac = fields[2];
 		cal.setTimeInMillis(Long.parseLong(fields[3]));
 		
 		if(cal.before(startTime) || cal.after(endTime) || !event.spot.contains(celllac)) return;
 				
-		usersAround.add(username);
+		usersAround.add(username+","+mnt);
 	}
 	
 	protected void finish() {

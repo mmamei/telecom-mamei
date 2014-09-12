@@ -8,13 +8,12 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeMap;
 
+import region.RegionI;
 import region.RegionMap;
 import utils.Colors;
 import utils.Config;
@@ -61,8 +60,11 @@ public class KMLPath {
 		kml.printFolder(out, "cells");
 		for(String day: evPerDay.keySet()) {
 			kml.printFolder(out, day);
-			for(PLSEvent pe: evPerDay.get(day))
-				out.println(nm.getRegion(String.valueOf(pe.getCellac())).toKml("#7f770077"));
+			for(PLSEvent pe: evPerDay.get(day)) {
+				RegionI r = nm.getRegion(pe.getCellac());
+				if(r!=null)
+					out.println(r.toKml("#7f770077"));
+			}
 			kml.closeFolder(out);
 		}
 		kml.closeFolder(out);
@@ -78,12 +80,18 @@ public class KMLPath {
 				PLSEvent pe1 = evPerDay.get(day).get(i+1);
 				int dmin =  (int)((pe1.getTimeStamp() - pe.getTimeStamp()) / 60000);
 				if(dmin < 180) {
-					double lon1 = nm.getRegion(String.valueOf(pe.getCellac())).getLatLon()[1] + jitter(pe);
-					double lat1 = nm.getRegion(String.valueOf(pe.getCellac())).getLatLon()[0] + jitter(pe);
-					double lon2 = nm.getRegion(String.valueOf(pe1.getCellac())).getLatLon()[1] + jitter(pe1);
-					double lat2 = nm.getRegion(String.valueOf(pe1.getCellac())).getLatLon()[0] + jitter(pe1);
-					//out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
-					out.println(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
+					
+					RegionI r = nm.getRegion(pe.getCellac());
+					RegionI r1 = nm.getRegion(pe.getCellac());
+					
+					if(r!=null && r1!=null) {
+					double lon1 = r.getLatLon()[1] + jitter(pe);
+						double lat1 = r.getLatLon()[0] + jitter(pe);
+						double lon2 = r1.getLatLon()[1] + jitter(pe1);
+						double lat2 = r1.getLatLon()[0] + jitter(pe1);
+						//out.println(KMLArrow.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
+						out.println(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, 2, Colors.RANDOM_COLORS[color_index],true));
+					}
 				}
 				else {
 					color_index ++;
@@ -113,16 +121,19 @@ public class KMLPath {
 		for(String day: evPerDay.keySet()) {
 			kml.printFolder(out, day);
 			for(PLSEvent pe: evPerDay.get(day)) {
-				double lon1 = nm.getRegion(pe.getCellac()).getLatLon()[1] + jitter(pe);
-				double lat1 = nm.getRegion(pe.getCellac()).getLatLon()[0] + jitter(pe);
-				out.println("<Placemark>" +
-						    "<name>"+pe.getTime().split(" ")[1]+"</name>" +
-						    "<description>"+pe.getTime()+"</description>" +
-						    "<styleUrl>#ff0000ff</styleUrl>" +
-						    "<Point>" +	
-						    "<coordinates>"+lon1+","+lat1+",0</coordinates>" +
-						    "</Point>" +
-						    "</Placemark>");
+				RegionI r = nm.getRegion(pe.getCellac());
+				if(r!=null) {
+					double lon1 = r.getLatLon()[1] + jitter(pe);
+					double lat1 = r.getLatLon()[0] + jitter(pe);
+					out.println("<Placemark>" +
+							    "<name>"+pe.getTime().split(" ")[1]+"</name>" +
+							    "<description>"+pe.getTime()+"</description>" +
+							    "<styleUrl>#ff0000ff</styleUrl>" +
+							    "<Point>" +	
+							    "<coordinates>"+lon1+","+lat1+",0</coordinates>" +
+							    "</Point>" +
+							    "</Placemark>");
+				}
 			}
 			kml.closeFolder(out);
 		}
@@ -217,8 +228,8 @@ public class KMLPath {
 		return l;
 	}
 	
-	
-	public static void main(String[] args) throws Exception {
+	// single user
+	public static void main2(String[] args) throws Exception {
 		openFile(new File(Config.getInstance().base_folder+"/TouristData").getAbsolutePath()+"/test.kml");
 		
 		String user = "feaf164623aa5fcac0512b3b4a62496c34458ac017141a808dfe306b62759f";
@@ -235,5 +246,22 @@ public class KMLPath {
 		closeFile();
 		Logger.logln("Done!");
 	}
+	
+	
+	// multiple users
+	public static void main(String[] args) throws Exception {
+		openFile(new File(Config.getInstance().base_folder+"/Tourist").getAbsolutePath()+"/melpignano.kml");
+		
+		
+		File dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/Melpignano-22_08_2014_00_00-25_08_2014_00_00.txt_STR");
+		for(File f: dir.listFiles()) {
+			System.out.println("Processing "+f.getName());
+			print(f.getName(),PLSEvent.readEvents(f));
+		}
+		
+		closeFile();
+		Logger.logln("Done!");
+	}
+	
 	
 }

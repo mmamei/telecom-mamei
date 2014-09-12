@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -98,6 +99,11 @@ public class RegionMap implements Serializable {
 		if(area_intersection != null) return area_intersection;
 		area_intersection = new float[this.getNumRegions()];
 		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(time);
+		
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(time);
+		//System.out.println("********** "+c.getTime());
+		
 		RegionI nc = nm.getRegion(""+celllac);
 		
 		//System.out.println(nc);
@@ -118,6 +124,9 @@ public class RegionMap implements Serializable {
 		float sum = 0;
 		for(float f: area_intersection)
 			sum += f;
+		
+		
+		
 		for(i=0; i<area_intersection.length;i++) {
 			area_intersection[i] = area_intersection[i] / sum;
 			//if(area_intersection[i] > 0) System.out.println(area_intersection[i]);

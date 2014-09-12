@@ -27,7 +27,7 @@ public class GTExtractor {
 	
 	
 	static final String PLACEMARK = "Firenze";
-	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/"+PLACEMARK+"_cellXHour.csv";
+	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_"+PLACEMARK+"_cellXHour.csv";
 	static {
 		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
@@ -64,7 +64,9 @@ public class GTExtractor {
 			mcont.put(p, 0);
 		
 		Map<String,String> mu = new HashMap<String,String>(); // user profile
-			
+		
+		int[][] gtConfMatrix = new int[mp.size()][mp.size()];
+		int users_with_multiple_classes = 0;
 		int n_total = 0;
 		
 		// read header
@@ -92,17 +94,32 @@ public class GTExtractor {
 					list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
 				}
 				
-				
+				List<Integer> uprofiles = new ArrayList<Integer>();
+				int how_many_classes = 0;
+				int i = 0;
 				for(String prof: mp.keySet()) {
 					if(mp.get(prof).check(user_id,mnt,num_pls,num_days,days_interval,list,tot_days)) {
+						how_many_classes++;
 						mu.put(user_id, prof);
 						mcont.put(prof,mcont.get(prof)+1);
+						uprofiles.add(i);
 					}
+					i++;
 				}
-								
+				
+				if(how_many_classes > 1) {
+					users_with_multiple_classes++;
+					for(int ii: uprofiles) {
+					for(int jj: uprofiles)
+						if(ii!=jj) gtConfMatrix[ii][jj]++;
+					}
+				}	
 				n_total ++;
 				
-				if(n_total % 10000 == 0) System.out.println("Processed "+n_total+" users..."); 
+				if(n_total % 10000 == 0) {
+					System.out.println("Processed "+n_total+" users..."); 
+					Logger.logln("USERS WITH MULTIPLE CLASSES "+users_with_multiple_classes+"/"+n_total);
+				}
 				
 			} catch(Exception e) {
 				System.err.println(line);
@@ -112,7 +129,13 @@ public class GTExtractor {
 		
 		for(String prof: mcont.keySet())
 			Logger.logln(prof+" = "+mcont.get(prof)+"/"+n_total);
-		
+		Logger.logln("USERS WITH MULTIPLE CLASSES "+users_with_multiple_classes+"/"+n_total);
+		Logger.logln("GT CONFUSION MATRIX");
+		for(int i=0; i< gtConfMatrix.length;i++) {
+			for(int j=0; j<gtConfMatrix.length;j++)
+				System.out.print(gtConfMatrix[i][j]+"\t");
+			System.out.println();
+		}
 		
 		File dir = new File(Config.getInstance().base_folder+"/Tourist");
 		dir.mkdirs();

@@ -23,7 +23,7 @@ public class PLSParser {
 	
 	public static boolean REMOVE_BOGUS = true;
 	
-	private static boolean QUIET = true;
+	private static boolean QUIET = false;
 	
 	//private static Config conf = null;
 	//private static final int BUFFER_SIZE = 1048576;
@@ -105,10 +105,8 @@ public class PLSParser {
 				//allDays.put(key, h==null? end_cal.get(Calendar.HOUR_OF_DAY)+"-" : h+end_cal.get(Calendar.HOUR_OF_DAY)+"-");
 				
 				analyzeFile(item, analyzer,bogus);
-				if((i+1) % 10 == 0) {
-					if(!QUIET) Logger.logln(i+"/"+items.length+" done!");
-					System.gc();
-				}
+				if((i+1) % 10 == 0) 
+					Thread.sleep(1000);
 			}
 			else if(item.isDirectory())
 				analyzeDirectory(item, analyzer,bogus);

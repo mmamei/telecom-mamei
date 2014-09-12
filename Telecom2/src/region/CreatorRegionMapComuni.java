@@ -30,7 +30,7 @@ public class CreatorRegionMapComuni {
 	
 	
 	public static void main(String[] args) throws Exception {
-		String region = "Lombardia";
+		String region = "Puglia";
 		String input_kml_file="C:/DATASET/GEO/"+region+".kml";
 		String output_obj_file=Config.getInstance().base_folder+"/RegionMap/FIX_"+region+".ser";
 		process(region, input_kml_file,output_obj_file);
