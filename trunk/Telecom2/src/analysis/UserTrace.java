@@ -3,6 +3,7 @@ package analysis;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,7 +16,7 @@ import java.util.TreeSet;
 
 import utils.Logger;
 
-public class UserTrace {
+public class UserTrace implements Serializable {
 	
 	static final SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
 	static Calendar cal = Calendar.getInstance();

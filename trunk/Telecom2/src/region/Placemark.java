@@ -39,6 +39,28 @@ public class Placemark extends RegionI {
 		this.cellsAround = getCellsAround();
 	}
 	
+	public Placemark(String name, Set<String> celllacs) {
+		this.name = name;
+		this.nm = DataFactory.getNetworkMapFactory().getNetworkMap(Config.getInstance().pls_start_time);
+		this.cellsAround = celllacs;
+		centerLatLon = new double[2];
+		int cont = 0;
+		for(String celllac: celllacs) {
+			RegionI r = nm.getRegion(celllac);
+			if(r!=null) {
+				centerLatLon[0] += r.centerLatLon[0];
+				centerLatLon[1] += r.centerLatLon[1];
+				cont++;
+			}
+			else {
+				Logger.logln(celllac+" not found!");
+			}
+		}
+		centerLatLon[0] = centerLatLon[0] / cont;
+		centerLatLon[1] = centerLatLon[1] / cont;
+		radius = this.getMaxDist();
+	}
+	
 	
 	public double[][] getBboxLonLat() {
 		LatLonPoint c = this.getCenterPoint();
@@ -142,16 +164,38 @@ public class Placemark extends RegionI {
 				String[] el = line.split(",");
 				String name = el[0].trim();
 				if(name.equals(pname)) {
-					p = new Placemark(pname,new double[]{Double.parseDouble(el[1].trim()), Double.parseDouble(el[2].trim())},Double.parseDouble(el[3].trim()));
+					
+					if(el[1].equals("coord"))
+						p = new Placemark(pname,new double[]{Double.parseDouble(el[2].trim()), Double.parseDouble(el[3].trim())},Double.parseDouble(el[4].trim()));
+					else if(el[1].equals("lac-cid")) {
+						Set<String> celllacs = new HashSet<String>();
+						int cont = 0;
+						for(int i=2; i<el.length;i=i+2) {
+							long lac = Long.parseLong(el[i]);
+							long cell_id = Long.parseLong(el[i+1]);
+							String celllac = String.valueOf(lac*65536+cell_id);
+							celllacs.add(celllac);
+							cont ++;
+						}
+						System.out.println(cont+" cells in "+pname);
+						p = new Placemark(pname,celllacs);
+					}
+					else {
+						Logger.logln("Format not supported! Check placemarks.csv file!");
+						System.exit(0);
+					}
 					break;
 				}
 			}
-		br.close();
+			br.close();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		return p;
 	}
+	
+	
+	
 	
 	
 	private Set<String> getCellsAround() { 
@@ -221,7 +265,7 @@ public class Placemark extends RegionI {
 		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
 		//initPlacemaks();
 		//NetworkMap nm = NetworkMapFactory.getNetworkMap();
-		Placemark p = getPlacemark("Firenze");
+		Placemark p = getPlacemark("Lecce");
 		//System.out.println(p.getNumCells());
 		//System.out.println(p.contains("4018584023"));
 		//System.out.println(nm.get(Long.parseLong("4018584023")));

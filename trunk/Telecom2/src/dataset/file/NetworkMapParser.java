@@ -19,7 +19,7 @@ import utils.Logger;
 public class NetworkMapParser {
     public static void main(String[] args) throws Exception {
     		
-    		Config.getInstance().changeDataset("ivory-set3");
+    		//Config.getInstance().changeDataset("ivory-set3");
             
     		new File(Config.getInstance().base_folder+"/NetworkMapParser").mkdirs();
             

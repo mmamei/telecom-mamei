@@ -14,6 +14,7 @@ import java.util.Set;
 
 import region.Placemark;
 import utils.Config;
+import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import utils.Mail;
 import analysis.UserTrace;
@@ -27,6 +28,16 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	UserEventCounterCellacXHour(Placemark placemark, String user_list_name) {
 		super(placemark,user_list_name);
 		users_info = new HashMap<String,UserTrace>();
+	}
+	
+	// resume mode
+	UserEventCounterCellacXHour(Placemark placemark, String user_list_name, boolean resume) {
+		super(placemark,user_list_name);
+		if(!resume) users_info = new HashMap<String,UserTrace>();
+		else {
+			String resume_file = Config.getInstance().base_folder+"/UserEventCounter/"+this.getString()+"_cellXHour.ser";
+			users_info = (Map<String,UserTrace>)CopyAndSerializationUtils.restore(new File(resume_file));
+		}
 	}
 	
 	
@@ -59,6 +70,9 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		try {
 			File dir = new File(Config.getInstance().base_folder+"/UserEventCounter");
 			dir.mkdirs();
+			
+			CopyAndSerializationUtils.save(new File(dir+"/"+this.getString()+"_cellXHour.ser"), users_info);
+			
 			PrintWriter out = new PrintWriter(new FileWriter(dir+"/"+this.getString()+"_cellXHour.csv"));
 			out.println("// TOT. DAYS = "+getTotDays());
 			for(String user: users_info.keySet())
@@ -71,30 +85,30 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	}
 	
 
-	public static void process(Placemark placemark) {
-		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(placemark,null);
+	public static void process(Placemark placemark, boolean resume) {
+		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(placemark,null,resume);
 		ba.run();
 	}
 	
-	public static void process(String userListF) {
-		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,userListF);
+	public static void process(String userListF, boolean resume) {
+		BufferAnalyzerConstrained ba = new UserEventCounterCellacXHour(null,userListF,resume);
 		ba.run();
 	}
 	
 	
 	public static void main(String[] args) throws Exception {
 		
-		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
-		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
-		
-		
 		/*
 		 * Questo mi serve per le operazioni density and flows perchè vedo le tracce degli utenti e quindi la loro density/flow
 		 * all'interno della città.
 		 */
-	
+		//Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,11,23,59,59);
 		//process(Placemark.getPlacemark("Firenze"));
+		
+		
+		/*********************************************************************************************************************************/
 		
 		/*
 		 * Questo serve per l'analisi dei turisti. In questo modo trovo i dati di tutti i turisti che sono passati almeno una volta per la città.
@@ -102,7 +116,16 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		 * transito perchè veod dov'erano prima e dopo la città e quindi quanto tempo ci sono stati.
 		 */
 		
-		process(Config.getInstance().base_folder+"/UserSetCreator/Firenze.csv");
+		//Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_ve"; 
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,15,23,59,59);
+		//process(Config.getInstance().base_folder+"/UserSetCreator/Venezia.csv",false);
+		
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_ve"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,16,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		process(Config.getInstance().base_folder+"/UserSetCreator/Venezia.csv",true);
+		
 		Mail.send("UserEventCounterCellacXHour completed!");
 		Logger.logln("Done!");
 	}	

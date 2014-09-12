@@ -11,6 +11,7 @@ import java.util.Map;
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
 
+import region.CityEvent;
 import region.CreatorRegionMapGrid;
 import region.Placemark;
 import region.RegionI;
@@ -39,9 +40,40 @@ public class PopulationDensity {
 		Map<String,Double> space_density = pd.computeSpaceDensity(pls_space_density_file,rm,constraints);
 		pd.plotSpaceDensity(city+pd.getFileSuffix(constraints), space_density, rm,0);
 		*/
+		/*
 		PopulationDensity pd = new PopulationDensity();
 		String js = pd.runAll("2014-04-20", "00", "2014-04-20", "03", 7.6203,45.0945,7.6969,45.0774, "FIX_Piemonte.ser","");
 		System.out.println(js);
+		
+		*/
+		
+		PopulationDensity pd = new PopulationDensity();
+		
+		CityEvent target_event = CityEvent.getEvent("Melpignano,22/08/2014");	
+		tmp_file = target_event.toString()+"_STR";
+		pd.runAll("2014-08-21", "00", "2014-08-22", "00", 16.7514,41.1621,18.6795,39.7368, "FIX_Puglia.ser","mnt=!222;users_event_probscores=C:/BASE/UsersAroundAnEvent/"+target_event.toFileName());
+		tmp_file = target_event.toString()+"_ITA";
+		pd.runAll("2014-08-21", "00", "2014-08-22", "00", 16.7514,41.1621,18.6795,39.7368, "FIX_Puglia.ser","mnt=222;users_event_probscores=C:/BASE/UsersAroundAnEvent/"+target_event.toFileName());
+		
+		
+		target_event = CityEvent.getEvent("Lecce,14/08/2014");	
+		tmp_file = target_event.toString()+"_STR";
+		pd.runAll("2014-08-13", "00", "2014-08-14", "00", 16.7514,41.1621,18.6795,39.7368, "FIX_Puglia.ser","mnt=!222;users_event_probscores=C:/BASE/UsersAroundAnEvent/"+target_event.toFileName());
+		tmp_file = target_event.toString()+"_ITA";
+		pd.runAll("2014-08-13", "00", "2014-08-14", "00", 16.7514,41.1621,18.6795,39.7368, "FIX_Puglia.ser","mnt=222;users_event_probscores=C:/BASE/UsersAroundAnEvent/"+target_event.toFileName());
+		
+		
+		target_event = CityEvent.getEvent("Lecce,24/08/2014");	
+		tmp_file = target_event.toString()+"_STR";
+		pd.runAll("2014-08-23", "00", "2014-08-24", "00", 16.7514,41.1621,18.6795,39.7368, "FIX_Puglia.ser","mnt=!222;users_event_probscores=C:/BASE/UsersAroundAnEvent/"+target_event.toFileName());
+		tmp_file = target_event.toString()+"_ITA";
+		pd.runAll("2014-08-23", "00", "2014-08-24", "00", 16.7514,41.1621,18.6795,39.7368, "FIX_Puglia.ser","mnt=222;users_event_probscores=C:/BASE/UsersAroundAnEvent/"+target_event.toFileName());
+		
+		
+		
+		
+		//String js = pd.runAll("2014-08-21", "00", "2014-08-22", "00", 16.7514,41.1621,18.6795,39.7368, "FIX_Puglia.ser","mnt=!222;users_event_probscores=C:/BASE/UsersAroundAnEvent/"+target_event.toFileName());
+		
 		Logger.logln("Done!");
 	}
 	
@@ -51,6 +83,7 @@ public class PopulationDensity {
 		return runAll(sday,shour,eday,ehour,lon1,lat1,lon2,lat2,regionMap,new Constraints(sconstraints));
 	}
 	
+	public static String tmp_file = "tmp";
 	public String runAll(String sday,String shour,String eday, String ehour, double lon1, double lat1, double lon2, double lat2, String regionMap, Constraints constraints) {
 		try {
 			EventFilesFinderI eff = DataFactory.getEventFilesFinder();
@@ -67,7 +100,7 @@ public class PopulationDensity {
 			LatLonPoint p1 = new LatLonPoint(lat1,lon1);
 			LatLonPoint p2 = new LatLonPoint(lat2,lon2);
 			int r = (int)LatLonUtils.getHaversineDistance(p1, p2) / 2;
-			Placemark p = new Placemark("tmp",new double[]{lat,lon},r);
+			Placemark p = new Placemark(tmp_file,new double[]{lat,lon},r);
 			
 			PopulationDensity pd = new PopulationDensity();
 			
@@ -86,12 +119,21 @@ public class PopulationDensity {
 			// Create UserEventCounterCellacXHour and PLSSpaceDenstiy files
 			// Then compute the population density.
 			
-			UserEventCounterCellacXHour.process(p); // file name is called as the placemark
+			UserEventCounterCellacXHour.process(p,false); // file name is called as the placemark
 			PLSSpaceDensity.process(rm, Config.getInstance().base_folder+"/UserEventCounter/"+p.getName()+"_cellXHour.csv", null, null);
 			File pls_space_density_file = new File(Config.getInstance().base_folder+"/PLSSpaceDensity/"+p.getName()+"_"+rm.getName()+".csv");
 			
 			
 			Map<String,Double> space_density = pd.computeSpaceDensity(pls_space_density_file,rm,constraints);
+			
+			
+			// percent
+			double tot = 0;
+			for(double x: space_density.values())
+				tot += x;
+			for(String k: space_density.keySet())
+				space_density.put(k, 100*space_density.get(k)/tot);
+			
 			
 			plotSpaceDensity(p.getName(), space_density, rm,0);
 			
@@ -118,7 +160,7 @@ public class PopulationDensity {
 	public void plotSpaceDensity(String city, Map<String,Double> space_density, RegionMap rm, double threshold) throws Exception {
 		File d = new File(Config.getInstance().web_kml_folder);
 		d.mkdirs();
-		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+city+"_"+rm.getName()+".kml",space_density,rm,city,false);
+		KMLHeatMap.drawHeatMap(d.getAbsolutePath()+"/"+city+"_"+rm.getName()+".kml",space_density,rm,"",true);
 		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+city+"_"+rm.getName()+".html", city, space_density, rm, threshold);
 	}
 	
@@ -153,13 +195,13 @@ public class PopulationDensity {
 			}
 		}
 		br.close();
-		
+		/*
 		for(String k : sd.keySet()) {
 			double val = sd.get(k);
 			double area = rm.getRegion(k).getGeom().getArea();
 			sd.put(k, val/area);
 		}
-		
+		*/
 		
 		
 		return sd;

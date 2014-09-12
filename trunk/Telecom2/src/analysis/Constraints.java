@@ -35,8 +35,10 @@ public class Constraints {
 				BufferedReader br = new BufferedReader(new FileReader(f));
 				String line; String[] elements;
 				while((line = br.readLine()) != null) {
-					elements = line.split(";");
-					users_weights.put(elements[0],Double.parseDouble(elements[1]));
+					elements = line.split(";|,");
+					double prob = Double.parseDouble(elements[1]);
+					if(prob > 1) prob = 1;
+					users_weights.put(elements[0],prob);
 				}
 				br.close();
 			}
@@ -61,10 +63,10 @@ public class Constraints {
 			if(mnt!=null) {
 				if(mnt.startsWith("!")) { 
 					//System.err.println(ui.mnt+"VS"+mnt.substring(1));
-					if(ui_mnt.equals(mnt.substring(1))) return false;
+					if(ui_mnt.substring(0,3).equals(mnt.substring(1))) return false;
 				}
 				else
-					if(!ui_mnt.equals(mnt)) return false;
+					if(!ui_mnt.substring(0,3).equals(mnt)) return false;
 			}
 			String mindays = constraints.get("mindays");
 			if(mindays!=null && ui_num_days>0) 

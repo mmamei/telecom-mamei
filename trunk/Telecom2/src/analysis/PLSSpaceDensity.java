@@ -10,8 +10,10 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import region.RegionI;
 import region.RegionMap;
@@ -29,7 +31,6 @@ import analysis.tourist.GTExtractor;
 
 public class PLSSpaceDensity implements Serializable {
 	
-	public static transient final String TIM_MNT = "22201";
 
 	// d_periods = {0,0,0,0,0,1,1}
 	// mapping weekdays in 0
@@ -42,14 +43,14 @@ public class PLSSpaceDensity implements Serializable {
 															  "M","M","M","M","M","M","A","A", 
 															  "A","A","A","E","E","E","E","N"};
 	
-	public static transient final String[] HP2 = new String[]{"H","H","H","H","H","H","H","H", 
-															  "H","W","W","W","W","W","W","W", 
+	public static transient final String[] HP2 = new String[]{"H","H","H","H","H","H","H","W", 
+															  "W","W","W","W","W","W","W","W", 
 															  "W","W","W","W","W","H","H","H"};
 	
 	public static transient final String[] HP3 = new String[]{"H","H","H","H","H","H","H","H", 
 		  													  "H","H","H","H","H","H","H","H", 
 		  													  "H","H","H","H","H","H","H","H"};
-	public static transient final String[] HP = HP3;
+	public static transient final String[] HP = HP2;
 	
 	// these will be overwritten in case of a compact operation
 	public static transient String[] DP_LABELS = new String[]{"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
@@ -111,6 +112,7 @@ public class PLSSpaceDensity implements Serializable {
 	public String mnt;
 	public int num_pls;
 	public int num_days;
+	public int num_days_in_area;
 	public int days_interval;
 	public float[][][] plsMatrix;
 	
@@ -120,7 +122,7 @@ public class PLSSpaceDensity implements Serializable {
 	 * 1b44888ff4f,22201,3,1,2013-5-23:Sun:13:4018542484,2013-5-23:Sun:17:4018542495,2013-5-23:Sun:13:4018542391,
 	*/
 	
-	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-mm-HH");
+	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd");
 	public PLSSpaceDensity(String events, RegionMap map) throws Exception {
 		
 		//if(events == null) return; // need for a null construcutor for testing
@@ -141,22 +143,31 @@ public class PLSSpaceDensity implements Serializable {
 		num_days = Integer.parseInt(p[3]);
 		days_interval = Integer.parseInt(p[4]);
 		plsMatrix = new float[7][24][map.getNumRegions()];
+		Set<String> days_in_area = new HashSet<String>();
 		float[] ai;
 		for(int i=5;i<p.length;i++) {
 			try {
 				// 2013-5-23:Sun:13:4018542484
+				
 				String[] x = p[i].split(":");
+				
+				//System.out.println("---> "+x[0]+" --> "+F.parse(x[0]));
+				
 				int day = DM.get(x[1]);
 				int h = Integer.parseInt(x[2]);
 				long celllac =Long.parseLong(x[3].trim());
 				ai = map.computeAreaIntersection(celllac,F.parse(x[0]).getTime());
-				for(int k=0; k<ai.length;k++) 
-					plsMatrix[day][h][k] += ai[k];
+				if(!Double.isNaN(ai[0])) {
+					for(int k=0; k<ai.length;k++) 
+						plsMatrix[day][h][k] += ai[k];
+					days_in_area.add(x[0]);
+				}
 			} catch(Exception e) {
 				System.out.println("Problems with "+p[i]);
 				e.printStackTrace();
 			}
 		}
+		num_days_in_area = days_in_area.size();
 		
 		compactTime();
 		if(COMPACT_SPACE) compactSpace();
@@ -166,8 +177,8 @@ public class PLSSpaceDensity implements Serializable {
 	
 	
 	
-	public boolean roaming() {
-		return !mnt.equals(TIM_MNT);
+	public boolean isItalian() {
+		return mnt.startsWith("222");
 	}
 	
 	public String toString() {
@@ -177,7 +188,7 @@ public class PLSSpaceDensity implements Serializable {
 	    for(int k=0; k<plsMatrix[0][0].length;k++)
 	    	if(plsMatrix[i][j][k] > 0)
 	    		sb.append(","+i+":"+j+":"+k+":"+plsMatrix[i][j][k]);		
-		return user_id+","+mnt+","+num_pls+","+num_days+","+days_interval+sb.toString();
+		return user_id+","+mnt+","+num_pls+","+num_days+","+days_interval+sb.toString();		
 	}
 	
 	
@@ -194,6 +205,7 @@ public class PLSSpaceDensity implements Serializable {
 		sb.append("@ATTRIBUTE roaming {TIM,ROAMING}\n");
 		sb.append("@ATTRIBUTE num_pls NUMERIC\n");
 		sb.append("@ATTRIBUTE num_days NUMERIC\n");
+		sb.append("@ATTRIBUTE num_days_in_area NUMERIC\n");
 		sb.append("@ATTRIBUTE days_interval NUMERIC\n");
 		for(int i=0; i<plsMatrix.length;i++)
 		for(int j=0; j<plsMatrix[0].length;j++)
@@ -218,7 +230,7 @@ public class PLSSpaceDensity implements Serializable {
 	 */
 	public String toWEKAString(String clazz) {
 		StringBuffer sb = new StringBuffer();
-		int fcont = 4;
+		int fcont = 5;
 		for(int i=0; i<plsMatrix.length;i++)
 		for(int j=0; j<plsMatrix[0].length;j++)
 	    for(int k=0; k<plsMatrix[0][0].length;k++) {
@@ -226,9 +238,13 @@ public class PLSSpaceDensity implements Serializable {
 	    		sb.append(","+fcont+" "+plsMatrix[i][j][k]);
 	    	fcont++;
 	    }
-		String roaming = roaming()? "ROAMING" : "TIM";
+		String roaming = isItalian()? "TIM" : "ROAMING";
 		String class_attribute = clazz == null ? ", "+fcont+" ?"  : ", "+fcont+" "+clazz;
-		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+days_interval+sb.toString()+class_attribute+"}";
+		
+		
+		//if(num_pls==66 && num_days_in_area==14 && clazz!=null && clazz.equals("Transit")) System.out.println(user_id);
+		
+		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+num_days_in_area+", 4 "+days_interval+sb.toString()+class_attribute+"}";
 	}
 	
 	
@@ -312,18 +328,23 @@ public class PLSSpaceDensity implements Serializable {
 		
 	
 	public static void main(String[] args) throws Exception {
+	
 		/*
 		String city = "Torino";
 		String cellXHourFile = Config.getInstance().base_folder+"/UserEventCounter/Torino_cellXHour.csv";
 		String gt_ser_file = "Firenze_gt_profiles.ser";
 		*/
 		
-		String city = "Firenze";
-		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+ city+"_cellXHour.csv";
+		String city = "Venezia";
+		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_"+ city+"_cellXHour.csv";
 		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles.ser";
-		
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
 		process(rm,cellXHourFile,gt_ser_file,null);
+		
+		
+		
+		
+		
 		Logger.logln("Done");
 	}
 	
