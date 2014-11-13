@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,51 +23,41 @@ public class ZZZ_TouristCounterByMNC {
 	
 	public static void main(String[] args) throws Exception {
 		
-		for(int i=0; i<MONTHS.length;i++)
-			process("Venezia",i);
+		String pre = "file_pls_ve_";
+		String city = "Venezia";
 		
-	}
-	
-	private static void process(String city, int month) throws Exception {
-		
-		
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/UserEventCounter/"+city+"_cellacXhour.csv")));
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
+		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/UserEventCounter/"+pre+city+"_cellXHour.csv")));
 		
 		Map<String,String> mncT = mncT();
 		
 		Map<String,Integer> count = new HashMap<String,Integer>();
 		
-		PLSSpaceDensity td;
+		
 		String line;
 		while((line=br.readLine())!=null) {
-			
-			if(!line.contains("2013-"+month)) continue;
-			
-			td = new PLSSpaceDensity(line,rm);
-			
-			if(td.num_days < 4 && td.days_interval < 3 * td.num_days) {
-				String country = mncT.get(td.mnt.substring(0,3));
-				
-				if(country == null) System.out.println(td.mnt.substring(0,3));
-				
-				Integer c = count.get(country);
-				if(c == null) c = 0;
-				count.put(country, c+1);
-			}
+			if(!line.contains(",")) continue;
+			String[] split = line.split(",");
+			 String mnt = split[1];
+			int numdays = Integer.parseInt(split[3]);
+			if(numdays > 4) continue;
+			String country = mncT.get(mnt.substring(0,3));
+			if(country == null) System.out.println(mnt.substring(0,3));
+			Integer c = count.get(country);
+			if(c == null) c = 0;
+			count.put(country, c+1);
 		}
 		br.close();
 		
-		File f = new File(Config.getInstance().base_folder+"/TouristData");
-		PrintWriter out = new PrintWriter(new FileWriter(f+"/"+city+"_"+MONTHS[month]+"_count.csv"));
-	
-		LinkedHashMap<String, Integer> ordered = Sort.sortHashMapByValuesD(count,null);
-		for(String country : ordered.keySet()) {
-			Logger.logln(country+" = "+ordered.get(country));
-			out.println(country+","+ordered.get(country));
-		}
-		out.close();
+		int tot =0;
+		for(int c: count.values())
+			tot+=c;
 		
+		System.out.println(tot);
+		
+		LinkedHashMap<String, Integer> ordered = Sort.sortHashMapByValuesD(count,Collections.reverseOrder());
+		for(String country : ordered.keySet()) {
+			Logger.logln(country+" = "+1.0*ordered.get(country)/tot);
+		}
 	}
 	
 	
