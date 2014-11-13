@@ -18,16 +18,17 @@ import region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
+import analysis.PLSEvent;
 import dataset.file.DataFactory;
 
 public class GTExtractor {
 	
 	
-	public static final String CLASSES = "Resident,Tourist,Commuter,Transit";
+	public static final String CLASSES = "Resident,Tourist,Commuter,Transit,Excursionist";
 	
 	
-	static final String PLACEMARK = "Firenze";
-	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_"+PLACEMARK+"_cellXHour.csv";
+	static final String PLACEMARK = "Venezia";
+	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_"+PLACEMARK+"_cellXHour.csv";
 	static {
 		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
@@ -48,7 +49,7 @@ public class GTExtractor {
 		//NetworkMap nm = NetworkMapFactory.getNetworkMap(Config.getInstance().pls_start_time);
 		String user_id,mnt;
 		int num_pls,num_days,days_interval;
-		List<CalCell> list;
+		List<PLSEvent> list;
 		
 		Placemark placemark = Placemark.getPlacemark(PLACEMARK);
 		
@@ -57,7 +58,7 @@ public class GTExtractor {
 		mp.put("Tourist", new Tourist(placemark));
 		mp.put("Commuter", new Commuter(placemark));
 		mp.put("Transit", new Transit(placemark));
-		
+		mp.put("Excursionist", new Excursionist(placemark));
 		
 		Map<String,Integer> mcont = new HashMap<String,Integer>(); // map profiles
 		for(String p : mp.keySet())
@@ -81,7 +82,9 @@ public class GTExtractor {
 				num_pls = Integer.parseInt(p[2]);
 				num_days = Integer.parseInt(p[3]);
 				days_interval = Integer.parseInt(p[4]);
-				list = new ArrayList<CalCell>();
+				list = PLSEvent.getDataFormUserEventCounterCellacXHourLine(line);
+				/*
+				list = new ArrayList<PLSEvent>();
 				// 2013-5-23:Sun:13:4018542484
 				for(int i=5;i<p.length;i++) {
 					String[] x = p[i].split(":|-");
@@ -89,11 +92,10 @@ public class GTExtractor {
 					int m = Integer.parseInt(x[1]) - 1; // beware! important calendar correction
 					int d = Integer.parseInt(x[2]);
 					int h = Integer.parseInt(x[4]);
-					RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(new GregorianCalendar(y,m,d));
-					RegionI nc = nm.getRegion(x[5]);
-					list.add(new CalCell(new GregorianCalendar(y,m,d,h,0),nc));
+					String time = String.valueOf(new GregorianCalendar(y,m,d,h,0).getTimeInMillis());
+					list.add(new PLSEvent(user_id,mnt,x[5],time));
 				}
-				
+				*/
 				List<Integer> uprofiles = new ArrayList<Integer>();
 				int how_many_classes = 0;
 				int i = 0;

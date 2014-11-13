@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import region.Placemark;
+import analysis.PLSEvent;
 
 
 
@@ -15,7 +16,7 @@ public class Resident extends Profile {
 
 	private static final double FR = 0.3;
 	
-	boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<CalCell> list, int tot_days) {
+	boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<PLSEvent> list, int tot_days) {
 		
 		boolean is_italian = super.isItalian(mnt);
 		boolean has_enough_days = (1.0 * num_days / tot_days) > FR;
