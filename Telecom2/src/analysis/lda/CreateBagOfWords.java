@@ -13,6 +13,7 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import visual.kml.KMLPath;
+import analysis.PLSEvent;
 import analysis.lda.bow.Bow;
 import analysis.lda.bow.OneDocXDayMov;
 
@@ -79,7 +80,7 @@ public class CreateBagOfWords {
 		
 		KMLPath.addKml("<Folder><name>RegionMap</name>"+rm.getKMLBorders()+"</Folder>");
 		
-		KMLPath.print(user_id,KMLPath.getDataFormUserEventCounterCellacXHourLine(line));	
+		KMLPath.print(user_id,PLSEvent.getDataFormUserEventCounterCellacXHourLine(line));	
 		KMLPath.closeFile();	
 		
 		try {

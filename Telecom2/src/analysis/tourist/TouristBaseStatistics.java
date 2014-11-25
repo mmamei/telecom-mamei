@@ -115,7 +115,7 @@ public class TouristBaseStatistics {
 		
 		
 		stat_pls_per_day.addValue(num_pls/num_days);
-		//stat_radius_of_gyration.addValue(RadiusOfGyration.computeGyrationRadius(pe));
+		stat_radius_of_gyration.addValue(RadiusOfGyration.computeGyrationRadius(pe));
 		stat_num_days_in_area.addValue(num_days_in_area);
 		mnt = mnt.substring(0,3);
 		Integer c = stat_mnt.get(mnt);
@@ -140,9 +140,10 @@ public class TouristBaseStatistics {
 		String gt_ser_file = "Firenze_gt_profiles.ser";
 		*/
 		
+		String pre = "file_pls_ve_";
 		String city = "Venezia";
 		placemark = Placemark.getPlacemark(city);
-		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_"+ city+"_cellXHour.csv";
+		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+ city+"_cellXHour.csv";
 		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles.ser";
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
 		process(rm,cellXHourFile,gt_ser_file,null);

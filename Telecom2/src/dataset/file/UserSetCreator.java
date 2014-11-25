@@ -24,10 +24,14 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 
 	
 	protected void analyze(String username, String imsi, String celllac,long timestamp, Calendar cal,String header) {
+		if(username.equals("33a8b88a4ed464bcea3c9514d683f8456b573811a31de923d62e5def88889")) {		
+			System.out.println(celllac+" --> "+cal.getTime());
+		}
 		users.add(username);
 	}
 
 	protected void finish() {
+		
 		try {
 			File dir = new File(Config.getInstance().base_folder+"/UserSetCreator");
 			dir.mkdirs();
@@ -38,14 +42,15 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	
 	public static void main(String[] args) {
-		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_ve"; 
-		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
-		Placemark placemark= Placemark.getPlacemark("Venezia");
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,20,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,20,23,59,59);
+		Placemark placemark= Placemark.getPlacemark("Firenze");
 		BufferAnalyzerConstrained ba = new UserSetCreator(placemark,null);
 		ba.run();
 		Logger.logln("Done!");

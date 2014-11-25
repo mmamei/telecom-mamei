@@ -95,6 +95,8 @@ public abstract class BufferAnalyzerConstrained extends BufferAnalyzer {
 			check_users = user_list == null || user_list.contains(username);
 			check_placemark = placemark == null || placemark.contains(celllac);
 			
+			
+			
 			if(check_users && check_placemark)
 				analyze(username,imsi,celllac,timestamp,cal,header);
 		} catch(Exception e) {

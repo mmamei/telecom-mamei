@@ -18,7 +18,7 @@ import visual.kml.KMLPath;
 public class ProfilesPlotter {
 	
 	static final String PLACEMARK = "Venezia";
-	static int HOW_MANY = 10; 
+	static int HOW_MANY = 5; 
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -32,9 +32,10 @@ public class ProfilesPlotter {
 		pusers.put("Tourist", new ArrayList<String>());
 		pusers.put("Commuter", new ArrayList<String>());
 		pusers.put("Transit", new ArrayList<String>());
+		pusers.put("Excursionist", new ArrayList<String>());
 		
 		// username --> profile
-		Map<String,String> mu =  (Map<String,String>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/Tourist/"+PLACEMARK+"_gt_profiles.ser"));
+		Map<String,String> mu =  (Map<String,String>)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/Tourist/"+PLACEMARK+"_gt_profiles_July2013.ser"));
 		
 		for(String user: mu.keySet()) {
 			String profile = mu.get(user);
@@ -46,7 +47,7 @@ public class ProfilesPlotter {
 			for(String u : users)
 				traces.put(u, new ArrayList<PLSEvent>());
 		
-		BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_"+PLACEMARK+"_cellXHour.csv"));
+		BufferedReader br = new BufferedReader(new FileReader(Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_"+PLACEMARK+"_cellXHour_July2013.csv"));
 		String line;
 		while((line = br.readLine())!=null) {	
 			String[] p = line.split(",");

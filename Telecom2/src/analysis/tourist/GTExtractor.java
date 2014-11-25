@@ -25,13 +25,27 @@ public class GTExtractor {
 	
 	
 	public static final String CLASSES = "Resident,Tourist,Commuter,Transit,Excursionist";
-	
-	
+	static final String POST = "_July2013";
+	static final String PRE = "file_pls_ve_";
 	static final String PLACEMARK = "Venezia";
-	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_"+PLACEMARK+"_cellXHour.csv";
+	
+	//static final String PRE = "file_pls_fi_";
+	//static final String PLACEMARK = "Firenze";
+	
+	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/"+PRE+PLACEMARK+"_cellXHour"+POST+".csv";
 	static {
-		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		if(POST.equals("_July2013")) {
+			Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+			Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		}
+		else if(POST.equals("_March2014")) {
+			Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
+			Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
+		}
+		else {
+			System.out.println("ERROR IN SETTING pls_start_time AND pls_end_time");
+			System.exit(0);
+		}
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -141,12 +155,12 @@ public class GTExtractor {
 		
 		File dir = new File(Config.getInstance().base_folder+"/Tourist");
 		dir.mkdirs();
-		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/"+PLACEMARK+"_gt_profiles.csv"));
+		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/"+PLACEMARK+"_gt_profiles"+POST+".csv"));
 		for(String user: mu.keySet())
 			pw.println(user+","+mu.get(user));
 		pw.close();
 		
-		CopyAndSerializationUtils.save(new File(Config.getInstance().base_folder+"/Tourist/"+PLACEMARK+"_gt_profiles.ser"), mu);
+		CopyAndSerializationUtils.save(new File(Config.getInstance().base_folder+"/Tourist/"+PLACEMARK+"_gt_profiles"+POST+".ser"), mu);
 		
 		Logger.logln("Done!");
 	}	

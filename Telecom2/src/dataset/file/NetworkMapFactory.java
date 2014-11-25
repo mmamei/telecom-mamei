@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,10 +113,17 @@ class NetworkMapFactory implements NetworkMapFactoryI  {
             return nm;
     }
     
-    
+   
     public static void main(String[] args) {
+    	
+    		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,31,0,0,0);
+    		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+    		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
+    		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
+    	
     		NetworkMapFactory nmf = getInstance();
             RegionMap nm = nmf.getNetworkMap(Config.getInstance().pls_start_time);
             System.out.println(nm.getName());
+            System.out.println(nm.getRegion("2939749220"));
     }
 }
