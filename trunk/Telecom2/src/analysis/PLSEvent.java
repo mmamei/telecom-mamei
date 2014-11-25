@@ -182,6 +182,30 @@ public class PLSEvent implements Comparable<PLSEvent>, Cloneable, Serializable {
 	}
 	
 	
+	public static List<PLSEvent> getDataFormUserEventCounterCellacXHourLine(String line) {
+		List<PLSEvent> l = null;
+		String[] el = line.split(",");
+		String username = el[0];
+		String imsi = el[1];
+		l = new ArrayList<PLSEvent>();
+		for(int i=5;i<el.length;i++) {
+			String[] pls = el[i].split(":"); // 2013-3-27:Sat:19:1972908327
+			String[] ymd = pls[0].split("-");
+			int y = Integer.parseInt(ymd[0]);
+			int m = Integer.parseInt(ymd[1]) -1;
+			int d = Integer.parseInt(ymd[2]);
+			int h = Integer.parseInt(pls[2]);
+			Calendar cal = new GregorianCalendar(y,m,d,h,0,0);
+			String timestamp = ""+cal.getTimeInMillis();
+			String celllac = pls[3];
+			PLSEvent pe = new PLSEvent(username,imsi,celllac,timestamp);
+			l.add(pe);
+			//Logger.logln(pe.toString());
+		}
+		return l;
+	}
+	
+	
 	public static int countDays(List<PLSEvent> pe) {
 		Set<String> days = new HashSet<String>();
 		for(PLSEvent e: pe) {

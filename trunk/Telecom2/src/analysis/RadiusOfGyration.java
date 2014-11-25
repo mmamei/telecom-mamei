@@ -15,9 +15,9 @@ import dataset.file.DataFactory;
 public class RadiusOfGyration {
 	
 	public static void main(String[] args) throws Exception {
-		//Config.getInstance().changeDataset("ivory-set3");
-		//String dir = "file_pls_ivory_users_2000_10000";
-		String dir = "file_pls_lomb_users_200_10000";
+		Config.getInstance().changeDataset("ivory-set3");
+		String dir = "file_pls_ivory_users_2000_10000";
+		//String dir = "file_pls_lomb_users_200_10000";
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		File in_dir = new File(Config.getInstance().base_folder+"/UsersCSVCreator/"+dir);
 		int cont = 0;
@@ -39,6 +39,8 @@ public class RadiusOfGyration {
 		double clon = 0;
 		double clat = 0;
 		double cont = 0;
+		
+		
 		NetworkMapFactoryI nmf = DataFactory.getNetworkMapFactory();
 		for(PLSEvent e: events) {
 			RegionI r = nmf.getNetworkMap(e.getTimeStamp()).getRegion(e.getCellac());
@@ -64,5 +66,7 @@ public class RadiusOfGyration {
 		}
 		return Math.sqrt(sum_sq_d / cont);
 	}
+	
+	
 	
 }

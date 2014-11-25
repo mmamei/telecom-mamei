@@ -9,12 +9,16 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import region.Placemark;
 import region.RegionI;
 import region.RegionMap;
 import utils.Config;
@@ -109,18 +113,30 @@ public class PLSSpaceDensity implements Serializable {
 	public static transient String[] MAP_LABELS = null;	
 	
 	public String user_id;
+	
+	// feature vector
 	public String mnt;
 	public int num_pls;
 	public int num_days;
-	public int num_days_in_area;
 	public int days_interval;
+	
+	public int num_days_in_area;
+	public int num_nights_in_area;
+	public int num_weekends_in_area;
+	public int max_h_interval;
+	private final int NUM_FEATURES_BEFORE_PLS_MATRIX = 8;
+	
 	public float[][][] plsMatrix;
 	
+
 	/* String events is in the form:
 	 * user_id, mnt, num_pls, num,_days, 2013-5-23:Sun:cellac,....
 	 * EXAMPLE:
 	 * 1b44888ff4f,22201,3,1,2013-5-23:Sun:13:4018542484,2013-5-23:Sun:17:4018542495,2013-5-23:Sun:13:4018542391,
 	*/
+	
+	
+	
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd");
 	public PLSSpaceDensity(String events, RegionMap map) throws Exception {
@@ -142,13 +158,23 @@ public class PLSSpaceDensity implements Serializable {
 		num_pls = Integer.parseInt(p[2]);
 		num_days = Integer.parseInt(p[3]);
 		days_interval = Integer.parseInt(p[4]);
+		
 		plsMatrix = new float[7][24][map.getNumRegions()];
 		Set<String> days_in_area = new HashSet<String>();
+		Set<String> nights_in_area = new HashSet<String>();
 		float[] ai;
+		
+		
+		// the following three variables are used to compute the maximum time interval in which the user is inside the city 
+		// this is useful to classify user in transit (their maximum time interval must be small)
+		boolean inarea = false; // boolean variable to see if the user is currently in the city
+		long prevTime = -1; // the last time the user entered the city
+		int max_dh = -1; // the maximum time interval (in hours) in which the user has been in the city
+		
+		
 		for(int i=5;i<p.length;i++) {
 			try {
 				// 2013-5-23:Sun:13:4018542484
-				
 				String[] x = p[i].split(":");
 				
 				//System.out.println("---> "+x[0]+" --> "+F.parse(x[0]));
@@ -157,17 +183,56 @@ public class PLSSpaceDensity implements Serializable {
 				int h = Integer.parseInt(x[2]);
 				long celllac =Long.parseLong(x[3].trim());
 				ai = map.computeAreaIntersection(celllac,F.parse(x[0]).getTime());
-				if(!Double.isNaN(ai[0])) {
+				
+				Calendar cal = new GregorianCalendar();
+				cal.setTime(F.parse(x[0]));
+				cal.set(Calendar.HOUR_OF_DAY, h);
+				long time = cal.getTimeInMillis();
+				
+				if(placemark.contains(celllac)) {
+				//if(!Double.isNaN(ai[0])) {
+					// event inside the city area
 					for(int k=0; k<ai.length;k++) 
 						plsMatrix[day][h][k] += ai[k];
-					days_in_area.add(x[0]);
+					
+					days_in_area.add(x[0]+":"+x[1]);
+					
+					if(h >= 21 || h <= 6) nights_in_area.add(x[0]+":"+x[1]);
+						
+
+					
+					if(!inarea) { // before I was out
+						prevTime = time;		
+					}
+					else { // before I was in
+						int dh = (int)((time - prevTime)/(3600 * 1000));
+						if(max_dh == -1 || dh > max_dh) max_dh = dh;
+					}
+					inarea = true;
+				}
+				else {
+					
+					
+					
+					// event outside the city area
+					inarea = false;
+					prevTime = time;
 				}
 			} catch(Exception e) {
 				System.out.println("Problems with "+p[i]);
 				e.printStackTrace();
 			}
 		}
+		max_h_interval = max_dh;
 		num_days_in_area = days_in_area.size();
+		num_nights_in_area = nights_in_area.size();
+		num_weekends_in_area  = 0;
+		for(String d: days_in_area)
+			if(d.endsWith("Sat") || d.endsWith("Sun"))
+				num_weekends_in_area ++;
+		
+		
+		
 		
 		compactTime();
 		if(COMPACT_SPACE) compactSpace();
@@ -181,16 +246,6 @@ public class PLSSpaceDensity implements Serializable {
 		return mnt.startsWith("222");
 	}
 	
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		for(int i=0; i<plsMatrix.length;i++)
-		for(int j=0; j<plsMatrix[0].length;j++)
-	    for(int k=0; k<plsMatrix[0][0].length;k++)
-	    	if(plsMatrix[i][j][k] > 0)
-	    		sb.append(","+i+":"+j+":"+k+":"+plsMatrix[i][j][k]);		
-		return user_id+","+mnt+","+num_pls+","+num_days+","+days_interval+sb.toString();		
-	}
-	
 	
 	/*
 	 * @RELATION iris
@@ -202,11 +257,20 @@ public class PLSSpaceDensity implements Serializable {
 	public String wekaHeader(String title) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("@RELATION "+title+"\n");
-		sb.append("@ATTRIBUTE roaming {TIM,ROAMING}\n");
+		
+		//sb.append("@ATTRIBUTE roaming {TIM,ROAMING}\n");
+		sb.append("@ATTRIBUTE mnt NUMERIC\n");
+		
 		sb.append("@ATTRIBUTE num_pls NUMERIC\n");
 		sb.append("@ATTRIBUTE num_days NUMERIC\n");
-		sb.append("@ATTRIBUTE num_days_in_area NUMERIC\n");
 		sb.append("@ATTRIBUTE days_interval NUMERIC\n");
+		
+		sb.append("@ATTRIBUTE num_days_in_area NUMERIC\n");
+		sb.append("@ATTRIBUTE num_nights_in_area NUMERIC\n");
+		sb.append("@ATTRIBUTE num_weekends_in_area NUMERIC\n");
+		
+		sb.append("@ATTRIBUTE max_h_interval NUMERIC\n");
+		
 		for(int i=0; i<plsMatrix.length;i++)
 		for(int j=0; j<plsMatrix[0].length;j++)
 		if(COMPACT_SPACE)
@@ -230,7 +294,7 @@ public class PLSSpaceDensity implements Serializable {
 	 */
 	public String toWEKAString(String clazz) {
 		StringBuffer sb = new StringBuffer();
-		int fcont = 5;
+		int fcont = NUM_FEATURES_BEFORE_PLS_MATRIX;
 		for(int i=0; i<plsMatrix.length;i++)
 		for(int j=0; j<plsMatrix[0].length;j++)
 	    for(int k=0; k<plsMatrix[0][0].length;k++) {
@@ -238,13 +302,17 @@ public class PLSSpaceDensity implements Serializable {
 	    		sb.append(","+fcont+" "+plsMatrix[i][j][k]);
 	    	fcont++;
 	    }
-		String roaming = isItalian()? "TIM" : "ROAMING";
+		String roaming = mnt.substring(0,3);//isItalian()? "TIM" : "ROAMING";
 		String class_attribute = clazz == null ? ", "+fcont+" ?"  : ", "+fcont+" "+clazz;
 		
 		
-		//if(num_pls==66 && num_days_in_area==14 && clazz!=null && clazz.equals("Transit")) System.out.println(user_id);
+		//if(max_h_interval > 10 && max_h_interval!=1000 && num_pls < 10  && clazz!=null && clazz.equals("Transit")) System.out.println(user_id);
 		
-		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+num_days_in_area+", 4 "+days_interval+sb.toString()+class_attribute+"}";
+		String max_h_attribute = max_h_interval > 0 ? String.valueOf(max_h_interval) : "?";
+		
+		
+		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+days_interval+", 4 "+num_days_in_area+", 5 "+num_nights_in_area+", 6 "+num_weekends_in_area+", 7 "+max_h_attribute+
+				sb.toString()+class_attribute+"}";
 	}
 	
 	
@@ -325,7 +393,25 @@ public class PLSSpaceDensity implements Serializable {
 	// mapping weekends in 1
 	// h_periods = {3,3,3,3,3,3,3,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3}
 	// mapping [7-13] in 0 (morning), [14,18] in 1 (afternoon), [19-22] in 2 (evening), [23-6] in 3 (night)
-		
+	
+	private static Placemark placemark;
+	
+	static String POST = "_July2013";
+	static {
+		if(POST.equals("_July2013")) {
+			Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+			Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		}
+		else if(POST.equals("_March2014")) {
+			Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
+			Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
+		}
+		else {
+			System.out.println("ERROR IN SETTING pls_start_time AND pls_end_time");
+			System.exit(0);
+		}
+	}
+	
 	
 	public static void main(String[] args) throws Exception {
 	
@@ -335,12 +421,13 @@ public class PLSSpaceDensity implements Serializable {
 		String gt_ser_file = "Firenze_gt_profiles.ser";
 		*/
 		
+		String pre = "file_pls_ve_";
 		String city = "Venezia";
-		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_"+ city+"_cellXHour.csv";
-		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles.ser";
+		placemark = Placemark.getPlacemark(city);
+		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+city+"_cellXHour"+POST+".csv";
+		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles"+POST+".ser";
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
 		process(rm,cellXHourFile,gt_ser_file,null);
-		
 		
 		
 		
@@ -348,11 +435,13 @@ public class PLSSpaceDensity implements Serializable {
 		Logger.logln("Done");
 	}
 	
+
+	
 	public static void process(RegionMap rm, String cellXHourFile, String gt_ser_file, Integer max) throws Exception {
 	
 		BufferedReader br = new BufferedReader(new FileReader(new File(cellXHourFile)));
 		
-		String placemark_name = cellXHourFile.substring(cellXHourFile.lastIndexOf("/")+1,cellXHourFile.lastIndexOf("_cellXHour.csv"));
+		//String placemark_name = cellXHourFile.substring(cellXHourFile.lastIndexOf("/")+1,cellXHourFile.lastIndexOf("_cellXHour.csv"));
 		
 		
 		Map<String,String> user_gt_prof = null;
@@ -363,8 +452,7 @@ public class PLSSpaceDensity implements Serializable {
 	
 		File dir = new File(Config.getInstance().base_folder+"/PLSSpaceDensity");
 		dir.mkdirs();
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(new File(dir+"/"+placemark_name+"_"+rm.getName()+s+".csv"))));
-		PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(Config.getInstance().base_folder+"/Tourist")+"/"+rm.getName()+s+".arff")));
+		PrintWriter weka_out = new PrintWriter(new BufferedWriter(new FileWriter(new File(Config.getInstance().base_folder+"/Tourist")+"/"+rm.getName()+s+POST+".arff")));
 		
 		int i=0;
 		String line;
@@ -380,9 +468,8 @@ public class PLSSpaceDensity implements Serializable {
 				continue;
 			}
 			
-			if(i==0) weka_out.println(td.wekaHeader(rm.getName()));
+			if(i==0) weka_out.println(td.wekaHeader(rm.getName()+POST));
 			
-			out.println(td);
 			String clazz = user_gt_prof == null ? null : user_gt_prof.get(td.user_id);
 			weka_out.println(td.toWEKAString(clazz));
 			
@@ -402,7 +489,6 @@ public class PLSSpaceDensity implements Serializable {
 			}
 		}
 		br.close();
-		out.close();
 		weka_out.close();
 	}
 	

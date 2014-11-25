@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import region.Placemark;
 import utils.Config;
@@ -44,6 +45,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	UserTrace info;
 	String day,dayw;
 	void analyze(String username, String imsi, String celllac, long timestamp, Calendar cal,String header) {
+		
 		info = users_info.get(username);
 		if(info == null) {
 			info = new UserTrace(username,true);
@@ -67,6 +69,7 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 	//private static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
 	
 	protected void finish() {
+		System.out.println("Start Writing File");
 		try {
 			File dir = new File(Config.getInstance().base_folder+"/UserEventCounter");
 			dir.mkdirs();
@@ -116,16 +119,18 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		 * transito perchè veod dov'erano prima e dopo la città e quindi quanto tempo ci sono stati.
 		 */
 		
-		//Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_ve"; 
-		//Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
-		//Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,15,23,59,59);
-		//process(Config.getInstance().base_folder+"/UserSetCreator/Venezia.csv",false);
 		
-		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_ve"; 
-		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,16,0,0,0);
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
-		process(Config.getInstance().base_folder+"/UserSetCreator/Venezia.csv",true);
+		process(Config.getInstance().base_folder+"/UserSetCreator/Firenze.csv",false);
 		
+		/*
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,25,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
+		process(Config.getInstance().base_folder+"/UserSetCreator/Firenze.csv",true);
+		*/
 		Mail.send("UserEventCounterCellacXHour completed!");
 		Logger.logln("Done!");
 	}	

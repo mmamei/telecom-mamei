@@ -42,6 +42,7 @@ public class WekaClassifier {
 		Instances fdata = Filter.useFilter(data, filter);
 		
 		
+		
 		System.out.println("***** Num instances after filtering missing values: "+fdata.numInstances());
 		
 		//printClasses(fdata);

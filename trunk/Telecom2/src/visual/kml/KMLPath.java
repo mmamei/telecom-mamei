@@ -7,7 +7,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -108,9 +108,22 @@ public class KMLPath {
 
 		kml.printFolder(out, "points");
 		
-		out.println("<Style id=\"ff0000ff\">" +
+		
+		Map<String,String> hour_time = new HashMap<String,String>();
+		hour_time.put("00:00", "night"); hour_time.put("01:00", "night"); hour_time.put("02:00", "night"); hour_time.put("03:00", "night"); 
+		hour_time.put("04:00", "night"); hour_time.put("05:00", "night"); hour_time.put("06:00", "night"); hour_time.put("07:00", "night"); 
+		hour_time.put("08:00", "day"); hour_time.put("09:00", "day"); hour_time.put("10:00", "day"); hour_time.put("11:00", "day"); 
+		hour_time.put("12:00", "day"); hour_time.put("13:00", "day"); hour_time.put("14:00", "day"); hour_time.put("15:00", "day"); 
+		hour_time.put("16:00", "day"); hour_time.put("17:00", "day"); hour_time.put("18:00", "day"); hour_time.put("19:00", "day"); 
+		hour_time.put("20:00", "night"); hour_time.put("21:00", "night"); hour_time.put("22:00", "night"); hour_time.put("23:00", "night"); 
+		
+							// weekday-night, // weekend-night, weekday-day, weekend-day
+		String[] pcolors = new String[]{"ff000000","ffaa0000","ff0000ff","ff00ff00"};
+		
+		for(String color : pcolors)
+		out.println("<Style id=\""+color+"\">" +
 	        	"<IconStyle>" +
-	        	"<color>ff0000ff</color>" +
+	        	"<color>"+color+"</color>" +
 	        	"<scale>1.2</scale>" +
 	        	"<Icon>" +
 	        	"<href>https://maps.google.com/mapfiles/kml/shapes/shaded_dot.png</href>" +
@@ -120,15 +133,27 @@ public class KMLPath {
 		
 		for(String day: evPerDay.keySet()) {
 			kml.printFolder(out, day);
+			
+			boolean weekend = day.endsWith("Sat") || day.endsWith("Sun");
+			boolean weekday = !weekend;
+			
 			for(PLSEvent pe: evPerDay.get(day)) {
 				RegionI r = nm.getRegion(pe.getCellac());
 				if(r!=null) {
+					
+					String hour = pe.getTime().split(" ")[1];
+					String color = "";
+					if(weekday && hour_time.get(hour).equals("day")) color = "ff0000ff";
+					if(weekday && hour_time.get(hour).equals("night")) color = "ff000000";
+					if(weekend && hour_time.get(hour).equals("day")) color = "ff00ff00";
+					if(weekend && hour_time.get(hour).equals("night")) color = "ffaa0000";
+					
 					double lon1 = r.getLatLon()[1] + jitter(pe);
 					double lat1 = r.getLatLon()[0] + jitter(pe);
 					out.println("<Placemark>" +
-							    "<name>"+pe.getTime().split(" ")[1]+"</name>" +
+							    "<name>"+hour+"</name>" +
 							    "<description>"+pe.getTime()+"</description>" +
-							    "<styleUrl>#ff0000ff</styleUrl>" +
+							    "<styleUrl>#"+color+"</styleUrl>" +
 							    "<Point>" +	
 							    "<coordinates>"+lon1+","+lat1+",0</coordinates>" +
 							    "</Point>" +
@@ -198,35 +223,14 @@ public class KMLPath {
 		String line;
 		while((line=br.readLine())!=null) 
 			if(line.startsWith(username)) {
-				l = getDataFormUserEventCounterCellacXHourLine(line);
+				l = PLSEvent.getDataFormUserEventCounterCellacXHourLine(line);
 				break;
 			}
 		br.close();
 		return l;
 	}
 	
-	public static List<PLSEvent> getDataFormUserEventCounterCellacXHourLine(String line) {
-		List<PLSEvent> l = null;
-		String[] el = line.split(",");
-		String username = el[0];
-		String imsi = el[1];
-		l = new ArrayList<PLSEvent>();
-		for(int i=5;i<el.length;i++) {
-			String[] pls = el[i].split(":"); // 2013-3-27:Sat:19:1972908327
-			String[] ymd = pls[0].split("-");
-			int y = Integer.parseInt(ymd[0]);
-			int m = Integer.parseInt(ymd[1]);
-			int d = Integer.parseInt(ymd[2]);
-			int h = Integer.parseInt(pls[2]);
-			Calendar cal = new GregorianCalendar(y,m,d,h,0,0);
-			String timestamp = ""+cal.getTimeInMillis();
-			String celllac = pls[3];
-			PLSEvent pe = new PLSEvent(username,imsi,celllac,timestamp);
-			l.add(pe);
-			//Logger.logln(pe.toString());
-		}
-		return l;
-	}
+	
 	
 	// single user
 	public static void main2(String[] args) throws Exception {
