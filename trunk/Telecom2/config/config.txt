@@ -26,7 +26,7 @@ base_folder = C:/BASE
 //base_folder = C:/BASE_D4D2
 
 // Filter events on the basis of time
-pls_start_time = 1/08/2014 00:00
+pls_start_time = 1/08/2011 00:00
 pls_end_time = 31/07/2015 00:00
 
 
