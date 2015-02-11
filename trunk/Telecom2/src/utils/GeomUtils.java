@@ -120,7 +120,8 @@ public class GeomUtils {
 	public static Geometry openGis2Geom(String opengis) {
 		Geometry g = null;
 		try {
-			g = new WKTReader().read("POLYGON (("+opengis+"))");
+			if(opengis.startsWith("POLYGON")) g = new WKTReader().read(opengis);
+			else g = new WKTReader().read("POLYGON (("+opengis+"))");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

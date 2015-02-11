@@ -12,11 +12,13 @@ import utils.Logger;
 public class CreatorRegionMapGrid {
 	
 	public static void main(String[] args) throws Exception {
-	
-		String name = "Firenze";
-		Placemark p = Placemark.getPlacemark(name);
-		p.changeRadius(p.getRadius()+1000);
-		RegionMap rm = process(p.getName(),p.getBboxLonLat(),4);
+		String placemark = "Torino";
+		String name = "TorinoArea";
+		int dr = 50000;
+		int size = 80;
+		Placemark p = Placemark.getPlacemark(placemark);
+		p.changeRadius(p.getRadius()+dr);
+		RegionMap rm = process(name,p.getBboxLonLat(),size);
 		rm.printKML();
 		String output_obj_file=new File(Config.getInstance().base_folder+"/RegionMap").getAbsolutePath()+"/"+name+".ser";
 		CopyAndSerializationUtils.save(new File(output_obj_file), rm);

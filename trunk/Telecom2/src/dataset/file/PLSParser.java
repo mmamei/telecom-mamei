@@ -132,10 +132,10 @@ public class PLSParser {
 			String u;
 			while((line=br.readLine())!=null) { 
 				u = line.substring(0,line.indexOf("\t"));
-				if(!bogus.contains(u)) analyzer.analyze(line);
+				if(bogus==null || !bogus.contains(u)) analyzer.analyze(line);
 			}
 		}catch(Exception e) {
-			System.err.println("Problems wirh file: "+plsFile.getAbsolutePath());
+			System.err.println("Problems with file: "+plsFile.getAbsolutePath());
 			e.printStackTrace();
 		}
 		try {

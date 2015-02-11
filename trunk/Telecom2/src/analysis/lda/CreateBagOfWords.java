@@ -15,26 +15,32 @@ import utils.Logger;
 import visual.kml.KMLPath;
 import analysis.PLSEvent;
 import analysis.lda.bow.Bow;
+import analysis.lda.bow.OneDocXDay;
 import analysis.lda.bow.OneDocXDayMov;
 
 public class CreateBagOfWords {
 	
-	public static final int REPETITIONS = 100;
-	public static final int MAX_NUM = 1;//1000; // negative value for infinite
-	public static int MIN_DAYS = 30;
-	public static int MIN_PLS = 200;
+	public static final int REPETITIONS = 5;
+	public static final int MAX_NUM = 10; // negative value for infinite
+	public static int MIN_DAYS = 1;
+	public static int MIN_PLS = 1;
+	
+	public static final String BOW_KIND = "OneDocXDay";
 	
 	public static void main(String[] args) throws Exception {
-		process("Torino",new OneDocXDayMov());
+		String cellXHourCSV = Config.getInstance().base_folder+"/UserEventCounter/file_pls_piem_LDAPOP_cellXHour.csv";
+		String regionMapSER =  Config.getInstance().base_folder+"/RegionMap/TorinoArea.ser";
+		//process(cellXHourCSV,regionMapSER,new OneDocXDayMov());
+		process(cellXHourCSV,regionMapSER,Bow.getInstance(BOW_KIND));
 	}
 	
 	
-	public static void process(String city, Bow bow) throws Exception {
+	public static void process(String cellXHourCSV, String regionMapSER, Bow bow) throws Exception {
 		String user_id;
 		int num_pls;
 		int num_days;
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/UserEventCounter/"+city+"_cellXHour.csv")));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(regionMapSER));
+		BufferedReader br = new BufferedReader(new FileReader(new File(cellXHourCSV)));
 		
 		int n_users_processed = 0;
 		
@@ -44,6 +50,7 @@ public class CreateBagOfWords {
 			
 			String[] p = line.split(",");
 			user_id = p[0];
+			System.out.println(user_id);
 			//String mnt = p[1];
 			num_pls = Integer.parseInt(p[2]);
 			num_days = Integer.parseInt(p[3]);
@@ -85,7 +92,7 @@ public class CreateBagOfWords {
 		
 		try {
 			// create bag of words file
-			PrintWriter pw = new PrintWriter(new FileWriter(dir+user_id+".txt"));
+			PrintWriter pw = new PrintWriter(new FileWriter(dir+"/"+user_id+".txt"));
 			for(int r=0; r<REPETITIONS;r++)
 			for(String day : docs.keySet())
 				pw.println(day+"\tX\t"+toString(docs.get(day),REPETITIONS));

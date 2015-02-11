@@ -119,11 +119,21 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		 * transito perchè veod dov'erano prima e dopo la città e quindi quanto tempo ci sono stati.
 		 */
 		
-		
+		/*
 		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
 		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
 		process(Config.getInstance().base_folder+"/UserSetCreator/Firenze.csv",false);
+		*/
+		
+		
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem"; 
+		
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JUNE,21,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		PLSParser.REMOVE_BOGUS = false;
+	
+		process(Config.getInstance().base_folder+"/UserSetCreator/LDAPOP.csv",false);
 		
 		/*
 		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 

@@ -24,43 +24,66 @@ import analysis.Constraints;
 public class IstatComparator {
 	
 	
-	public static boolean LOG = true;
+	public static boolean LOG = false;
 	public static boolean INTERCEPT = true;
 	
 	public static void main(String[] args) throws Exception {
+		
 		/*
 		String regionMap = "FIX_Piemonte.ser";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
-		String dir ="file_pls_piem_users_200_10000";
+		String places_file =Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_10000/results_piem.csv";
+		String census_file = Config.getInstance().base_folder+"/CENSUS/Piemonte.csv";
+		String title = "Piemonte";
 		*/
 		
 		/*
-		String regionMap = "FIX_Lombardia.ser";
+		String regionMap = "torino_circoscrizioni_geo.ser";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
-		String dir ="file_pls_lomb_users_200_10000";
+		String places_file =Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_10000/results_piem.csv";
+		String census_file = Config.getInstance().base_folder+"/CENSUS/torino_residenti.csv";
+		String title = "Torino";
 		*/
 		
-		Config.getInstance().changeDataset("ivory-set3");
-		String regionMap = "FIX_IvoryCoast.ser";
+		/*
+		String regionMap = "torino_circoscrizioni_geo.ser";
 		String kind_of_place = "HOME";
 		String exclude_kind_of_place = "";
-		String dir = "file_pls_ivory_users_2000_10000";
+		String places_file =Config.getInstance().base_folder+"/PlaceRecognizer/fast_home_torino.csv";
+		String census_file = Config.getInstance().base_folder+"/CENSUS/torino_residenti.csv";
+		String title = "Torino";
+		*/
 		
+		String regionMap = "milano_circoscrizioni_geo.ser";
+		String kind_of_place = "HOME";
+		String exclude_kind_of_place = "";
+		String places_file =Config.getInstance().base_folder+"/PlaceRecognizer/fast_home_milano.csv";
+		String census_file = Config.getInstance().base_folder+"/CENSUS/milano_residenti.csv";
+		String title = "Milano";
+		
+		
+		/*
+		String regionMap = "milano_circoscrizioni_geo.ser";
+		String kind_of_place = "HOME";
+		String exclude_kind_of_place = "";
+		String places_file =Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_lomb_users_200_10000/results_lomb.csv";
+		String census_file = Config.getInstance().base_folder+"/CENSUS/milano_residenti.csv";
+		String title = "Milano";
+		*/
 		
 		RegionMap rm = (RegionMap)(RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+regionMap));
-		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(Config.getInstance().base_folder+"/PlaceRecognizer/"+dir+"/results.csv");
+		Map<String,UserPlaces> up = UserPlaces.readUserPlaces(places_file);
 		
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
 		Map<String,Double> density = pdp.computeSpaceDensity(rm,up,kind_of_place,exclude_kind_of_place,new Constraints(""));
 		
-		String region = regionMap.substring("FIX_".length(),regionMap.indexOf("."));
 		
 		// read census data
 		
 		Map<String,Integer> istat = new HashMap<String,Integer>();
-		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/CENSUS/"+region+".csv")));
+		BufferedReader br = new BufferedReader(new FileReader(new File(census_file)));
 		String line;
 		while((line=br.readLine())!=null) {
 			String[] e = line.split(",");
@@ -70,11 +93,11 @@ public class IstatComparator {
 		
 		
 		
-		compareWithISTAT(region,density,istat);
+		compareWithISTAT(title,density,istat);
 	}
 	
 	
-	public static int THRESHOLD = 10;
+	public static int THRESHOLD = 1;
 	public static void compareWithISTAT(String title, Map<String,Double> density, Map<String,Integer> istat) throws Exception {
 				
 		int size = 0;

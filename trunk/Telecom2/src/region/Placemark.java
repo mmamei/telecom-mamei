@@ -265,7 +265,7 @@ public class Placemark extends RegionI {
 		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
 		//initPlacemaks();
 		//NetworkMap nm = NetworkMapFactory.getNetworkMap();
-		Placemark p = getPlacemark("Lecce");
+		Placemark p = getPlacemark("Milano");
 		//System.out.println(p.getNumCells());
 		//System.out.println(p.contains("4018584023"));
 		//System.out.println(nm.get(Long.parseLong("4018584023")));

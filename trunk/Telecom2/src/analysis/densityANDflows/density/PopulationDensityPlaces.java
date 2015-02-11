@@ -23,7 +23,14 @@ public class PopulationDensityPlaces {
 		PopulationDensityPlaces pdp = new PopulationDensityPlaces();
 		
 		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_100/results.csv", "FIX_Piemonte.ser", "HOME", "SATURDAY_NIGHT","",0,0,0,0);
-		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_10000/results.csv", "FIX_Piemonte.ser", "HOME", null,"",0,0,0,0);
+		
+		
+		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_piem_users_200_10000/results_piem.csv", "torino_circoscrizioni_geo.ser", "SATURDAY_NIGHT", "HOME","",0,0,0,0);
+		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/file_pls_lomb_users_200_10000/results_lomb.csv", "milano_circoscrizioni_geo.ser", "SUNDAY", "HOME","",0,0,0,0);
+		
+		//pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/fast_home_Torino.csv", "torino_circoscrizioni_geo.ser", "HOME", null,"",0,0,0,0);
+		pdp.runAll(Config.getInstance().base_folder+"/PlaceRecognizer/fast_home_Milano.csv", "milano_circoscrizioni_geo.ser", "HOME", null,"",0,0,0,0);
+		
 		Logger.logln("Done!");
 	}
 	
