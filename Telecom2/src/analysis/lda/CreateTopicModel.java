@@ -43,18 +43,19 @@ public class CreateTopicModel {
 	
 	public static final boolean VERBOSE = false;
 	
-	public static final int numTopics = 4;
+	public static final int numTopics = 6;
 	public static final int burnin = 10000;
 	public static final int numIterations = 500;
-	public static final double alpha = 1; // the higher the more topic per document
-	public static final double beta = 1; // the higher the more word per topic
+	public static final double alpha = 100; // the higher the more topic per document (1 unifrom distrib)
+	public static final double beta = 0.01; // the higher the more word per topic (1 uniform distrib)
 	
 	
-	static RegionMap RM = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/Torino.ser"));
+	static RegionMap RM = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/TorinoArea.ser"));
 	
 	static final DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
     
-	
+	// single thread main
+	/*
     public static void main(String[] args) throws Exception {
     	
     	//String user = "1d8b3e9f864579645d3d7e165f956681fc5c4deb345d1145a2e93cee387d91f5";
@@ -67,16 +68,43 @@ public class CreateTopicModel {
     	
     	System.out.println("Done!");
     }
+    */
+    
+    // multi-thread main
+    public static void main(String[] args) throws Exception {
+    	File maind = new File(Config.getInstance().base_folder+"/Topic");
+    	File[] files = maind.listFiles();
+    	
+    	int total_size = files.length;
+		int n_thread = 8;
+		int size = total_size / n_thread;
+		Worker[] w = new Worker[n_thread];
+		for(int t = 0; t < n_thread;t++) {
+			int start = t*size;
+			int end = t == (n_thread-1) ? total_size : (t+1)*size;
+			w[t] = new Worker(files,start,end);		
+		}
+		
+		for(int t = 0; t < n_thread;t++) 
+			w[t].start();
+
+		for(int t = 0; t < n_thread;t++) 
+			w[t].join();
+		
+		System.out.println("All thread completed!");
+    }
     
     
     public static void processUser(String user) {
+    	System.out.println("Processing "+user);
     	try {
-    		File file = new File(Config.getInstance().base_folder+"/Topic/"+user+"/p_w_z.txt");
-    		if(file.exists()) return;
+    		File file = new File(Config.getInstance().base_folder+"/Topic/"+user+"/"+user+".txt");
+    		//if(file.exists()) return;
 	    	String[] stop = new String[1]; //getStopWords(file);
 	    	run(file,stop);
     	}catch(Exception e) {
     		System.out.println("ERROR in user: "+user);
+    		e.printStackTrace();
     	}
     }
     
@@ -123,7 +151,6 @@ public class CreateTopicModel {
     
     
     public static void run(File file,String[] stop) throws Exception {
-
         // Begin by importing documents from text to feature sequences
         ArrayList<Pipe> pipeList = new ArrayList<Pipe>();
         // Pipes: lowercase, tokenize, remove stopwords, map to features
@@ -193,7 +220,6 @@ public class CreateTopicModel {
         }
         
         out = new PrintWriter(new FileWriter(new File(file.getParent()+"/p_w_z.txt")));
-        
         ArrayList<TreeSet<IDSorter>> topicSortedWords = model.getSortedWords();
         for(int i=0; i<model.numTopics;i++) {
         	if(VERBOSE) System.out.print("Topic"+i);
@@ -216,4 +242,31 @@ public class CreateTopicModel {
         
         out.close();
     }
+}
+
+
+class Worker extends Thread {
+	File[] files;
+	int start;
+	int end;
+	
+	Worker(File[] files, int start, int end) {
+		this.files = files;
+		this.start = start;
+		this.end = end;
+	}
+	
+	public void run() {
+		System.out.println("Thread "+start+"-"+end+" starting!");
+		for(int i=start;i<end;i++) {
+			try {
+				File d = files[i];
+				CreateTopicModel.processUser(d.getName());
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Thread "+start+"-"+end+" completed!");
+	}
+	
 }

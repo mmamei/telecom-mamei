@@ -8,22 +8,26 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import utils.Config;
 import visual.kml.KML;
-import visual.kml.KMLArrowCurved;
+import analysis.lda.bow.Bow;
+import analysis.lda.bow.OneDocXDay;
 
 public class DrawTopicKML {
 	 public static void main(String[] args) {
-		File maind = new File(Config.getInstance().base_folder+"/Topic");
-		for(File d: maind.listFiles()) {
-			System.out.println("Processing user "+d.getName()+" ...");
+		 Bow bow = Bow.getInstance(CreateBagOfWords.BOW_KIND);
+		 File maind = new File(Config.getInstance().base_folder+"/Topic");
+		 for(File d: maind.listFiles()) {
 			try {
-				processUser(d.getName());
+				processUser(d.getName(),bow);
 			}catch(Exception e) {
 				System.out.println("Problems with user "+d.getName());
+				e.printStackTrace();
 			}
 		}
 	    	
@@ -31,8 +35,8 @@ public class DrawTopicKML {
 	 }
 	 
 	 
-	 static final double PROB = 0.2;
-	 public static void processUser(String user) throws Exception {
+	 static final double PROB = 0.1;
+	 public static void processUser(String user,Bow bow) throws Exception {
 		 
 		 File dir = new File(Config.getInstance().base_folder+"/Topic/"+user);
 		 
@@ -81,85 +85,26 @@ public class DrawTopicKML {
 		 while((line=br.readLine()) != null) {
 			 String[] e = line.split(",|-");
 			 
-			 if(e.length < 7 || Double.parseDouble(e[7]) < PROB) continue;
-			 
 			 kml.printFolder(out, e[0]);
 			 
 			 out.println("<description>");
 			 out.println(getGraph(e[0],map.get(e[0])));
 			 out.println("</description>");
 			 
-			 for(int i=1; i<e.length;i=i+7) {
-				 
-				 String h1 = e[i];
-				 double lon1 = Double.parseDouble(e[i+1]);
-				 double lat1 = Double.parseDouble(e[i+2]);
-				 
-				 String h2 = e[i+3]; 
-				 double lon2 = Double.parseDouble(e[i+4]);
-				 double lat2 = Double.parseDouble(e[i+5]);
-				 
-				 double prob = Double.parseDouble(e[i+6]);
-				 
-				 if(prob < PROB) break;
-				 
-				 out.println(getKml(h1,lon1,lat1,h2,lon2,lat2,prob));
-			 }
+			 
+			 List<Entry<String,Double>> l = bow.parsePWZ(line);
+			 for(Entry<String,Double> wp: l)
+				 out.println(bow.word2KML(wp));
+			 
 			 kml.closeFolder(out);
 		 }
-		 br.close();
-		 
-		 
+		 br.close(); 
 		 kml.printFooterDocument(out);
+		 out.flush();
 		 out.close();
 	 }
 	 
-	 private static String getKml(String h1, double lon1, double lat1, String h2, double lon2, double lat2, double prob) {
-		 
-		 StringBuffer sb = new StringBuffer();
-		 
-		  
-		 sb.append("<Style id=\""+h1+prob+"\">");
-		 sb.append("<IconStyle>");
-		 sb.append("<scale>"+10*prob+"</scale>");
-		 sb.append("<Icon><href>http://maps.google.com/mapfiles/kml/paddle/"+h1.toUpperCase()+".png</href></Icon>");
-		 sb.append("</IconStyle>");
-		 sb.append("</Style>");
-		 
-		 sb.append("<Style id=\""+h2+prob+"\">");
-		 sb.append("<IconStyle>");
-		 sb.append("<scale>"+10*prob+"</scale>");
-		 sb.append("<Icon><href>http://maps.google.com/mapfiles/kml/paddle/"+h2.toUpperCase()+".png</href></Icon>");
-		 sb.append("</IconStyle>");
-		 sb.append("</Style>");
-		 
-		 double jitter = 0.001 - 0.0005 * Math.random();
-		 
-		 lon1 = lon1 + jitter;
-		 lat1 = lat1 + jitter;
-		 lon2 = lon2 + jitter;
-		 lat2 = lat2 + jitter;
-		 
-		 sb.append("<Placemark>");
-		 sb.append("<styleUrl>#"+h1+prob+"</styleUrl>");
-		 sb.append("<Point>");
-		 sb.append("<coordinates>"+lon1+","+lat1+",0</coordinates>");
-		 sb.append("</Point>");
-		 sb.append("</Placemark>");
-		 
-		 
-		 sb.append("<Placemark>");
-		 sb.append("<styleUrl>#"+h2+prob+"</styleUrl>");
-		 sb.append("<Point>");
-		 sb.append("<coordinates>"+lon2+","+lat2+",0</coordinates>");
-		 sb.append("</Point>");
-		 sb.append("</Placemark>");
-		 
-		 sb.append(KMLArrowCurved.printArrow(lon1, lat1, lon2, lat2, 6 , "ff000000", true));
-		 
-		 
-		 return sb.toString();
-	 }
+	 
 	 
 	 
 	 private static final DecimalFormat DF = new DecimalFormat("0.00",new DecimalFormatSymbols(Locale.US));

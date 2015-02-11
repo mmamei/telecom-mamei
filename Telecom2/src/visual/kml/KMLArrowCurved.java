@@ -33,24 +33,24 @@ public class KMLArrowCurved {
 		
 		StringBuffer sb = new StringBuffer();
 	
-		sb.append("<Style id=\""+color+size+"\">");
-		sb.append("<LineStyle>");
-		sb.append("<color>"+color+"</color>");
-		sb.append("<width>"+size+"</width>");
-		sb.append("</LineStyle>");
-		sb.append("<PolyStyle>");
-		sb.append("<color>"+color+"</color>");
-		sb.append("<width>"+size+"</width>");
-		sb.append("</PolyStyle>");
-		sb.append("</Style>");
+		sb.append("<Style id=\""+color+size+"\">\n");
+		sb.append("<LineStyle>\n");
+		sb.append("<color>"+color+"</color>\n");
+		sb.append("<width>"+size+"</width>\n");
+		sb.append("</LineStyle>\n");
+		sb.append("<PolyStyle>\n");
+		sb.append("<color>"+color+"</color>\n");
+		sb.append("<width>"+size+"</width>\n");
+		sb.append("</PolyStyle>\n");
+		sb.append("</Style>\n");
 		
-		sb.append("<Placemark>");
-		sb.append("<name></name>");
-		sb.append("<styleUrl>#"+color+size+"</styleUrl>");
-		sb.append("<LineString>");
-		sb.append("<extrude>1</extrude>");
-		sb.append("<tessellate>1</tessellate>");
-		sb.append("<coordinates>");
+		sb.append("<Placemark>\n");
+		sb.append("<name></name>\n");
+		sb.append("<styleUrl>#"+color+size+"</styleUrl>\n");
+		sb.append("<LineString>\n");
+		sb.append("<extrude>1</extrude>\n");
+		sb.append("<tessellate>1</tessellate>\n");
+		sb.append("<coordinates>\n");
 		double x = 0;
 		double y = 0;
 		double l1,l2,l3,l4;
@@ -73,11 +73,11 @@ public class KMLArrowCurved {
 		    y = l2+(a*i*i+b*i)*Math.cos(Math.toRadians(teta))+i*Math.sin(Math.toRadians(teta));
 		    sb.append(x+","+y+",0 ");
 		}
-		sb.append(l3+","+l4+",0 ");
+		sb.append(l3+","+l4+",0\n");
 		
-		sb.append("</coordinates>");
-		sb.append("</LineString>");
-		sb.append("</Placemark>");
+		sb.append("</coordinates>\n");
+		sb.append("</LineString>\n");
+		sb.append("</Placemark>\n");
 		
 		// print arrow tip
 		if(directed) {
@@ -88,18 +88,18 @@ public class KMLArrowCurved {
 			LatLonPoint tip1 = LatLonUtils.getPointAtDistance(p2, slope+10, dist);
 			LatLonPoint tip2 = LatLonUtils.getPointAtDistance(p2, slope-10, dist);
 			
-			sb.append("<Placemark>");
-			sb.append("<styleUrl>#"+color+size+"</styleUrl>");
-			sb.append("<Polygon>");
-			sb.append("<outerBoundaryIs>");
-			sb.append("<LinearRing>");
-			sb.append("<coordinates>");
-			sb.append(tip1.getLongitude()+","+tip1.getLatitude()+",0 "+lon2+","+lat2+",0 "+tip2.getLongitude()+","+tip2.getLatitude()+",0 "+tip1.getLongitude()+","+tip1.getLatitude()+",0");
-			sb.append("</coordinates>");
-			sb.append("</LinearRing>");
-			sb.append("</outerBoundaryIs>");
-			sb.append("</Polygon>");
-			sb.append("</Placemark>");
+			sb.append("<Placemark>\n");
+			sb.append("<styleUrl>#"+color+size+"</styleUrl>\n");
+			sb.append("<Polygon>\n");
+			sb.append("<outerBoundaryIs>\n");
+			sb.append("<LinearRing>\n");
+			sb.append("<coordinates>\n");
+			sb.append(tip1.getLongitude()+","+tip1.getLatitude()+",0 "+lon2+","+lat2+",0 "+tip2.getLongitude()+","+tip2.getLatitude()+",0 "+tip1.getLongitude()+","+tip1.getLatitude()+",0\n");
+			sb.append("</coordinates>\n");
+			sb.append("</LinearRing>\n");
+			sb.append("</outerBoundaryIs>\n");
+			sb.append("</Polygon>\n");
+			sb.append("</Placemark>\n");
 		}
 		
 		return sb.toString();
