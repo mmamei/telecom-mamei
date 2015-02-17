@@ -2,8 +2,11 @@ package visual.r;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.rosuda.REngine.Rserve.RConnection;
 
@@ -139,6 +142,13 @@ public class RPlotter {
         }      
 	}
 	
+	static final DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
+	public static void drawLine(double[] x, List<double []> y, List<String> names, String kind, String xlab, String ylab, String file, String opts) {
+		String[] sx = new String[x.length];
+		for(int i=0; i<sx.length;i++)
+			sx[i] = F.format(x[i]);
+		drawLine(sx,y,names,kind,xlab,ylab,file,opts);
+	}
 	
 	public static void drawLine(String[] x, List<double []> y, List<String> names, String kind, String xlab, String ylab, String file, String opts) {
 		try {
@@ -282,7 +292,7 @@ public class RPlotter {
 		//drawLine(new double[]{1,2,3},new double[]{5,6,7},"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
 		//drawScatter(new double[]{1,2,9},new double[]{5,6,7},"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
 		
-		/*
+		
 		List<double[]> l = new ArrayList<double[]>();
 		l.add(new double[]{5,6,7});
 		l.add(new double[]{1,2,7});
@@ -293,11 +303,11 @@ public class RPlotter {
 		names.add("ok2");
 		names.add("ok3");
 		
-		//drawBar(new String[]{"a","b","c"},l,names,"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
+		drawBar(new String[]{"a","b","c"},l,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
 		//drawLine(new String[]{"a","b","c"},l,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
-		*/
 		
 		
+		/*
 		List<double[]> lx = new ArrayList<double[]>();
 		lx.add(new double[]{5,6,7});
 		lx.add(new double[]{1,2,7});
@@ -315,5 +325,6 @@ public class RPlotter {
 		names.add("stadium3");
 		
 		drawScatter(lx,ly,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
+		*/
 	}
 }

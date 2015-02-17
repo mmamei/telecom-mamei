@@ -21,7 +21,7 @@ import analysis.lda.bow.OneDocXDayMov;
 public class CreateBagOfWords {
 	
 	public static final int REPETITIONS = 5;
-	public static final int MAX_NUM = 10; // negative value for infinite
+	public static final int MAX_NUM = -1; // negative value for infinite
 	public static int MIN_DAYS = 1;
 	public static int MIN_PLS = 1;
 	

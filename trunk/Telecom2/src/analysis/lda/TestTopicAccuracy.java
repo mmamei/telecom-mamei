@@ -14,67 +14,107 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+import analysis.lda.bow.Bow;
 import utils.Config;
+import visual.r.RPlotter;
 
+
+	
 public class TestTopicAccuracy {
 	
 	
 	public static final boolean VERBOSE = false;
-	static final DecimalFormat F = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
 	
 	public static void main(String[] args) throws Exception  {
-		
+		Bow bow = Bow.getInstance(CreateBagOfWords.BOW_KIND);
 		File dir = new File(Config.getInstance().base_folder+"/Topic");
 		dir.mkdirs();
-		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/accuracy.csv"));
+	
+		DescriptiveStatistics stat1 = new DescriptiveStatistics();
+		DescriptiveStatistics stat2 = new DescriptiveStatistics();
 		
 		int cont = 0;
 		File maind = new File(Config.getInstance().base_folder+"/Topic");
 		File[] dirs = maind.listFiles();
 		for(File d: dirs) {
 			try {
-				double[] x = process(d.getName());
-				pw.println(F.format(x[0])+","+F.format(x[1]));
+				double[] x = process(d.getName(),bow);
+				if(VERBOSE) System.exit(0);
+				
+				stat1.addValue(x[0]);
+				stat2.addValue(x[1]);
+
 			} catch(Exception e) {
 			}
 			cont ++;
 			if(cont % 100 == 0) System.out.println(cont +" out of "+dirs.length);
 		}
-		pw.close();
+		
+		
+	   double[] p = new double[100];
+	   double[] cdf1 = new double[100];
+	   double[] cdf2 = new double[100];
+	   
+	   List<double[]> ps = new ArrayList<double[]>();
+	   ps.add(p);
+	   ps.add(p);
+	   
+	   List<double[]> cdf = new ArrayList<double[]>();
+	   cdf.add(cdf1);
+	   cdf.add(cdf2);
+	   
+	   List<String> names = new ArrayList<String>();
+	   names.add("cdf1");
+	   names.add("cdf2");
+	   
+	   for(int i=1;i<=100;i++) {
+		   p[i-1] = (double)i/100;
+		   cdf1[i-1] = stat1.getPercentile(i);
+		   cdf2[i-1] = stat2.getPercentile(i);
+	   }
+	   
+	   RPlotter.drawScatter(cdf, ps, names, "cdf", "error", "cdf", Config.getInstance().base_folder+"/Images/TopicAccuracy.pdf", "geom_line()");	
+	   
+		
 		System.out.println("Done!");
 	}
 	
 	
-	public static double[] process(String user) throws Exception  {
+	public static double[] process(String user,Bow bow) throws Exception  {
+		
+		if(VERBOSE)
+			System.out.println(user);
 		
 		// read p_w_z ****************************************************************************************************
 		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/Topic/"+user+"/p_w_z.txt")));
 		String line;
 		// Topic_0,n,7.666,45.0713-n,7.6529,45.055,0.27,n,7.6529,45.055-n,7.666,45.0713,0.2,m,7.6529,45.055-e,7.6587,45.0707,0.13,m,7.666,45.0713-a,7.6529,45.055,0.07
-		Map<Integer,List<WordProb>> topics = new TreeMap<Integer,List<WordProb>>();
+		Map<Integer,List<Entry<String,Double>>> topics = new TreeMap<Integer,List<Entry<String,Double>>>();
 		while((line = br.readLine()) != null) {
-			List<WordProb> topic = new ArrayList<WordProb>();
+			List<Map.Entry<String,Double>> topic = bow.parsePWZ(line);
 			String[] e = line.split(",|-");
-			for(int i=1; i<e.length;i=i+7) {
-				String time1 = e[i];
-				double lon1 = Double.parseDouble(e[i+1]);
-				double lat1 = Double.parseDouble(e[i+2]);
-				String time2 = e[i+3];
-				double lon2 = Double.parseDouble(e[i+4]);
-				double lat2 = Double.parseDouble(e[i+5]);
-				double p = Double.parseDouble(e[i+6]);
-				topic.add(new WordProb(time1,lon1,lat1,time2,lon2,lat2,p));
-			}
-			int index = Integer.parseInt(e[0].substring(e[0].indexOf("_")+1));
-			topics.put(index, topic);
+			int topic_index = Integer.parseInt(e[0].split("_")[1]);
+			topics.put(topic_index, topic);
 		}
 		br.close();
 		
 		if(VERBOSE) {
-			for(int t: topics.keySet()) 
-				System.out.println(WordProb.print(topics.get(t)));
+			System.out.println("\npwz");
+			for(int k: topics.keySet()) {
+				System.out.print("topic"+k);
+				List<Map.Entry<String,Double>> topic = topics.get(k);
+				for(int i=0; i<topic.size() && i<5;i++) {
+					Entry<String,Double> wp = topic.get(i);
+					System.out.print(" ("+wp.getKey()+","+wp.getValue()+")");
+				}
+				System.out.println();
+			}
 		}
+	
 		
 		// read p_z_d *******************************************************************************************************
 		Map<String,double[]> pzd = new TreeMap<String,double[]>();
@@ -90,6 +130,7 @@ public class TestTopicAccuracy {
 		br.close();
 		
 		if(VERBOSE) {
+			System.out.println("\npzd");
 			for(String day: pzd.keySet()) {
 				System.out.print(day);
 				for(double p: pzd.get(day))
@@ -113,7 +154,7 @@ public class TestTopicAccuracy {
 			}
 		
 			for(int i=2; i<e.length;i++) {
-				t.add(e[i].toLowerCase());
+				t.add(e[i].replaceAll("-", ","));
 			}
 			
 		}
@@ -124,7 +165,7 @@ public class TestTopicAccuracy {
 			for(String k: trace.keySet()) {
 				System.out.print(k);
 				for(String w: trace.get(k)) {
-					System.out.print(","+w);
+					System.out.print(" "+w);
 				}
 				System.out.println();
 			}
@@ -137,7 +178,7 @@ public class TestTopicAccuracy {
 	
 	
 	
-	public static double[] computeAccuracy(Map<Integer,List<WordProb>> topics,Map<String,double[]> pzd,Map<String,Set<String>> trace) {
+	public static double[] computeAccuracy(Map<Integer,List<Entry<String,Double>>> topics,Map<String,double[]> pzd,Map<String,Set<String>> trace) {
 		double cont1 = 0, cont2 = 0;
 		double size1 = 0; int size2 = 0;
 		
@@ -149,14 +190,14 @@ public class TestTopicAccuracy {
 			int maxi = 0;
 			for(int i=1; i<p.length;i++)
 				if(p[maxi] < p[i]) maxi = i;
-			List<WordProb> topic = topics.get(maxi);
+			List<Entry<String,Double>> topic = topics.get(maxi);
 			
 			
 			Set<String> mov = trace.get(day);
 			
 			Set<String> topWords = new HashSet<String>();
-			for(WordProb wp : topic) {
-				if(wp.p > 0.1) topWords.add(wp.toString());
+			for(Entry<String,Double> wp : topic) {
+				if(wp.getValue() > 0.1) topWords.add(wp.getKey());
 			}
 			
 			
@@ -169,40 +210,10 @@ public class TestTopicAccuracy {
 			size2 += topWords.size();
 		}
 		
-		//System.out.println(cont1+"/"+size1);
-		//System.out.println(cont2+"/"+size2);
-		return new double[]{cont1/size1,cont2/size2};
-	}
-}
-
-
-class WordProb {
-	String time1;
-	double lon1, lat1;
-	String time2;
-	double lon2,lat2;
-	double p;
-	
-	public WordProb(String time1, double lon1, double lat1, String time2, double lon2, double lat2, double p) {
-		this.time1 = time1;
-		this.lon1= lon1;
-		this.lat1 = lat1;
-		this.time2 = time2;
-		this.lon2= lon2;
-		this.lat2 = lat2;
-		this.p = p;
-	}
-	
-	public String toString() {
-		return time1+","+lon1+","+lat1+"-"+time2+","+lon2+","+lat2;
-	}
-	
-	
-	public static String print(List<WordProb> topic) {
-		StringBuffer sb = new StringBuffer();
-		for(WordProb wp : topic) {
-			sb.append(wp+" ");
+		if(VERBOSE) {
+			System.out.println(cont1+"/"+size1);
+			System.out.println(cont2+"/"+size2);
 		}
-		return sb.toString();
+		return new double[]{cont1/size1,cont2/size2};
 	}
 }
