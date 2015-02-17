@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import utils.Config;
 import utils.Logger;
 
-public class TestPopulationStats {
+public class NumPLSDaysStats {
 	public static void main(String[] args) throws Exception {
 		
 		
