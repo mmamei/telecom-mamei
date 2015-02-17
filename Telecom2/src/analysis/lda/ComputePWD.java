@@ -70,7 +70,7 @@ public class ComputePWD {
 			 br.close();
 			 
 			 //Map<String,Double> o = Sort.sortHashMapByValuesD(pwd, Collections.reverseOrder());
-			 dir = new File(Config.getInstance().base_folder+"/TopicMov/"+user);
+			 dir = new File(Config.getInstance().base_folder+"/TopicPWD/"+user);
 			 dir.mkdirs();
 			 PrintWriter out = new PrintWriter(new FileWriter(dir+"/p_w_d.txt"));
 			 for(String wd: pwd.keySet())

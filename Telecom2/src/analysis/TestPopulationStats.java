@@ -1,4 +1,4 @@
-package analysis.lda;
+package analysis;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,6 +33,7 @@ public class TestPopulationStats {
 			h_num_pls[f]++;
 			h_num_days[num_days]++;
 		}
+		br.close();
 		
 		File dir = new File(Config.getInstance().base_folder+"/Topic");
 		dir.mkdirs();
