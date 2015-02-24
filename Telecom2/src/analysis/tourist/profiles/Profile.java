@@ -1,4 +1,4 @@
-package analysis.tourist;
+package analysis.tourist.profiles;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -13,7 +13,7 @@ public abstract class Profile {
 	static final SimpleDateFormat F = new SimpleDateFormat("dd/MM/yyyy");
 	static final String[] DAY_WEEK = new String[]{"0","Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 	
-	abstract boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<PLSEvent> list, int tot_days);
+	public abstract boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<PLSEvent> list, int tot_days);
 	
 	Placemark placemark;
 	

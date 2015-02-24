@@ -23,6 +23,7 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import utils.Sort;
+import visual.r.RPlotter;
 import analysis.PLSEvent;
 import analysis.RadiusOfGyration;
 
@@ -115,7 +116,7 @@ public class TouristBaseStatistics {
 		
 		
 		stat_pls_per_day.addValue(num_pls/num_days);
-		stat_radius_of_gyration.addValue(RadiusOfGyration.computeGyrationRadius(pe));
+		//stat_radius_of_gyration.addValue(RadiusOfGyration.computeGyrationRadius(pe));
 		stat_num_days_in_area.addValue(num_days_in_area);
 		mnt = mnt.substring(0,3);
 		Integer c = stat_mnt.get(mnt);
@@ -142,13 +143,37 @@ public class TouristBaseStatistics {
 		
 		String pre = "file_pls_ve_";
 		String city = "Venezia";
+		String time = "July2013";
 		placemark = Placemark.getPlacemark(city);
-		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+ city+"_cellXHour.csv";
-		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles.ser";
+		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+ city+"_cellXHour_"+time+".csv";
+		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles_"+time+".ser";
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
 		process(rm,cellXHourFile,gt_ser_file,null);
 		
 		
+		
+		
+		double[] p = new double[100];
+		double[] pls_cdf = new double[100];
+		double[] days_cdf = new double[100];
+		double[] plsxday_cdf = new double[100];
+		
+		for(int i=1;i<=100;i++) {
+			p[i-1] = (double)i/100;
+			//pls_cdf[i-1] = pls_stat.getPercentile(i);
+			days_cdf[i-1] = stat_num_days_in_area.getPercentile(i);
+			plsxday_cdf[i-1] = stat_pls_per_day.getPercentile(i);
+		}
+		
+		RPlotter.drawScatter(pls_cdf, p, "num_pls", "cdf", Config.getInstance().base_folder+"/Images/pls.pdf", "geom_line()");	
+		RPlotter.drawScatter(days_cdf, p, "num_days", "cdf", Config.getInstance().base_folder+"/Images/days.pdf", "geom_line()");	   
+		RPlotter.drawScatter(plsxday_cdf, p, "plsXday", "cdf", Config.getInstance().base_folder+"/Images/plsXday.pdf", "geom_line()");	   
+		System.out.println("Done!");
+		
+		
+		
+		
+		/*
 		// print statistics
 		
 		int tot = 0;
@@ -181,9 +206,9 @@ public class TouristBaseStatistics {
 			if(p > 0.01)
 				System.out.println(mncT.get(mnt)+","+p);
 		}
-
+		 */
 		
-		Logger.logln("Done");
+	
 	}
 	
 
@@ -192,7 +217,7 @@ public class TouristBaseStatistics {
 	
 		BufferedReader br = new BufferedReader(new FileReader(new File(cellXHourFile)));
 		
-		String placemark_name = cellXHourFile.substring(cellXHourFile.lastIndexOf("/")+1,cellXHourFile.lastIndexOf("_cellXHour.csv"));
+		String placemark_name = cellXHourFile.substring(cellXHourFile.lastIndexOf("/")+1,cellXHourFile.lastIndexOf("_cellXHour"));
 		
 		
 		Map<String,String> user_gt_prof = null;
