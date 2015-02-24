@@ -1,4 +1,4 @@
-package analysis.tourist;
+package analysis.tourist.profiles;
 
 
 
@@ -17,7 +17,7 @@ public class Excursionist extends Profile {
 		transit = new Transit(placemark);
 	}
 
-	boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<PLSEvent> list, int tot_days) {
+	public boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<PLSEvent> list, int tot_days) {
 		
 		boolean is_italian = super.isItalian(mnt);
 		

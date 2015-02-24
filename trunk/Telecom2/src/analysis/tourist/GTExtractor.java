@@ -19,6 +19,12 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import analysis.PLSEvent;
+import analysis.tourist.profiles.Commuter;
+import analysis.tourist.profiles.Excursionist;
+import analysis.tourist.profiles.Profile;
+import analysis.tourist.profiles.Resident;
+import analysis.tourist.profiles.Tourist;
+import analysis.tourist.profiles.Transit;
 import dataset.file.DataFactory;
 
 public class GTExtractor {

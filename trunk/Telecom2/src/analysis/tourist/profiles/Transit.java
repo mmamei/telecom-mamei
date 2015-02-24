@@ -1,4 +1,4 @@
-package analysis.tourist;
+package analysis.tourist.profiles;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -14,7 +14,7 @@ public class Transit extends Profile {
 		super(placemark);
 	}
 
-	boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<PLSEvent> list, int tot_days) {
+	public boolean check(String user_id, String mnt, int num_pls, int num_days, int days_interval, List<PLSEvent> list, int tot_days) {
 		/*
 		// check
 		String user = "5b1728db7737cbaa4a14feaf1e8ba2bb6a8f68972f8ae4938603c6571f4364f";
