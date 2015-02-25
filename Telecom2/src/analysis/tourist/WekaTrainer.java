@@ -17,7 +17,7 @@ import weka.filters.unsupervised.instance.RemoveWithValues;
 import weka.gui.treevisualizer.PlaceNode2;
 import weka.gui.treevisualizer.TreeVisualizer;
 
-public class WekaClassifier {
+public class WekaTrainer {
 	
 	public static void main(String[] args) throws Exception {
 		String city = "Venezia";

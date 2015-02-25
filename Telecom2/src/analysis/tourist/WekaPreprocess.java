@@ -14,7 +14,6 @@ import weka.filters.unsupervised.instance.Resample;
 public class WekaPreprocess {
 	
 	public static void main(String[] args) throws Exception {
-		new File(Config.getInstance().base_folder+"/Tourist/resample").mkdirs();
 		preprocess("Venezia","_July2013");
 		preprocess("Venezia","_March2014");
 		preprocess("Firenze","_July2013");
@@ -35,7 +34,7 @@ public class WekaPreprocess {
 		rwv.setInputFormat(data);
 		data = Filter.useFilter(data, rwv);
 		
-		// resample 1-2% of the instances
+		// resample 2-4% of the instances
 		Resample res = new Resample();
 		res.setSampleSizePercent(resample);
 		res.setNoReplacement(true);
