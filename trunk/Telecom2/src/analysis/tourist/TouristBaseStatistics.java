@@ -115,8 +115,8 @@ public class TouristBaseStatistics {
 		num_days_in_area = days_in_area.size();
 		
 		
-		stat_pls_per_day.addValue(num_pls/num_days);
-		//stat_radius_of_gyration.addValue(RadiusOfGyration.computeGyrationRadius(pe));
+		stat_pls_per_day.addValue(1.0*num_pls/num_days);
+		stat_radius_of_gyration.addValue(COMPUTE_RADIUS_OF_GYRATION ? RadiusOfGyration.computeGyrationRadius(pe) : 0.0);
 		stat_num_days_in_area.addValue(num_days_in_area);
 		mnt = mnt.substring(0,3);
 		Integer c = stat_mnt.get(mnt);
@@ -126,121 +126,129 @@ public class TouristBaseStatistics {
 	
 
 	
+	
+	private static Placemark placemark;
 	static DescriptiveStatistics stat_pls_per_day = new DescriptiveStatistics();
 	static DescriptiveStatistics stat_radius_of_gyration = new DescriptiveStatistics();
 	static DescriptiveStatistics stat_num_days_in_area = new DescriptiveStatistics();
 	static Map<String,Integer> stat_mnt = new HashMap<String,Integer>();
-	
-	
-	private static Placemark placemark;
-	public static void main(String[] args) throws Exception {
-	
+	static final boolean COMPUTE_RADIUS_OF_GYRATION = false;
+	static final boolean GT_TOURISTS_ONLY = true;
+	public static void runProcess() throws Exception {
 		/*
 		String city = "Torino";
 		String cellXHourFile = Config.getInstance().base_folder+"/UserEventCounter/Torino_cellXHour.csv";
 		String gt_ser_file = "Firenze_gt_profiles.ser";
 		*/
 		
-		String pre = "file_pls_ve_";
-		String city = "Venezia";
+		String pre = "file_pls_fi_";
+		String city = "Firenze";
 		String time = "July2013";
 		placemark = Placemark.getPlacemark(city);
 		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+ city+"_cellXHour_"+time+".csv";
 		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles_"+time+".ser";
 		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
-		process(rm,cellXHourFile,gt_ser_file,null);
-		
-		
+		process(rm,cellXHourFile,GT_TOURISTS_ONLY ? gt_ser_file : null,null);
 		
 		
 		double[] p = new double[100];
-		double[] pls_cdf = new double[100];
-		double[] days_cdf = new double[100];
-		double[] plsxday_cdf = new double[100];
+		double[] pls_per_day = new double[100];
+		double[] radius_of_gyration = new double[100];
+		double[] num_days_in_area = new double[100];
 		
 		for(int i=1;i<=100;i++) {
 			p[i-1] = (double)i/100;
-			//pls_cdf[i-1] = pls_stat.getPercentile(i);
-			days_cdf[i-1] = stat_num_days_in_area.getPercentile(i);
-			plsxday_cdf[i-1] = stat_pls_per_day.getPercentile(i);
+			pls_per_day[i-1] = stat_pls_per_day.getPercentile(i);
+			radius_of_gyration[i-1] = stat_radius_of_gyration.getPercentile(i);
+			num_days_in_area[i-1] = stat_num_days_in_area.getPercentile(i);
 		}
-		
-		RPlotter.drawScatter(pls_cdf, p, "num_pls", "cdf", Config.getInstance().base_folder+"/Images/pls.pdf", "geom_line()");	
-		RPlotter.drawScatter(days_cdf, p, "num_days", "cdf", Config.getInstance().base_folder+"/Images/days.pdf", "geom_line()");	   
-		RPlotter.drawScatter(plsxday_cdf, p, "plsXday", "cdf", Config.getInstance().base_folder+"/Images/plsXday.pdf", "geom_line()");	   
-		System.out.println("Done!");
-		
-		
-		
-		
-		/*
-		// print statistics
 		
 		int tot = 0;
 		for(int c: stat_mnt.values())
 			tot+=c;
 		
-		System.out.println("tot users = "+tot);
-		
-		System.out.print("stat_pls_per_day");
-		for(int i=1;i<=100;i++) 
-			System.out.print(","+stat_pls_per_day.getPercentile(i));
-		System.out.println();
-		
-		System.out.print("stat_radius_of_gyration");
-		for(int i=1;i<=100;i++) 
-			System.out.print(","+stat_radius_of_gyration.getPercentile(i));
-		System.out.println();
-		
-		System.out.print("stat_num_days_in_area");
-		for(int i=1;i<=100;i++) 
-			System.out.print(","+stat_num_days_in_area.getPercentile(i));
-		System.out.println();
-		
-			
 		Map<String,String> mncT = mncT();
 		LinkedHashMap<String, Integer> o_stat_mnt = Sort.sortHashMapByValuesD(stat_mnt,Collections.reverseOrder());
-		System.out.println("stat_mnt");
-		for(String mnt: o_stat_mnt.keySet()) {
-			double p = 1.0 * o_stat_mnt.get(mnt) / tot;
-			if(p > 0.01)
-				System.out.println(mncT.get(mnt)+","+p);
-		}
-		 */
 		
+		String[] countries = new String[11];
+		double[] prob = new double[countries.length];
+		double otherp = 100;
+		int i=0;
+		for(String mnt: o_stat_mnt.keySet()) {
+			countries[i] = mncT.get(mnt);
+			prob[i] = (int)(100.0 * o_stat_mnt.get(mnt) / tot);
+			otherp -= prob[i];
+			i++;
+			if(i>= countries.length-1) break;
+		}
+		countries[countries.length-1] = "Other";
+		prob[prob.length-1] = otherp;
+		
+		String suffix = "_"+city+"_"+time;
+		suffix = GT_TOURISTS_ONLY ? suffix+"_tourists" : suffix;
+		RPlotter.drawScatter(pls_per_day, p, "pls per day", "cdf", Config.getInstance().base_folder+"/Images/pls_per_day"+suffix+".pdf", "geom_line()");	
+		RPlotter.drawScatter(radius_of_gyration, p, "radius of gyration", "cdf", Config.getInstance().base_folder+"/Images/radius_of_gyration"+suffix+".pdf", "geom_line()");	   
+		RPlotter.drawScatter(num_days_in_area, p, "num days in area", "cdf", Config.getInstance().base_folder+"/Images/num_days_in_area"+suffix+".pdf", "geom_line()");	
+		RPlotter.drawBar(countries, prob, "countries", "%", Config.getInstance().base_folder+"/Images/stat_mnt"+suffix+".pdf", null);
+		
+	}
 	
+	
+	public static void runCorssMonthAnalysis() throws Exception {
+		
+		String[] gtInfo = new String[]{"file_pls_fi_","Firenze","July2013"};
+		String[] cellXHourInfo = new String[]{"file_pls_fi_","Firenze","March2014"};
+		
+		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+cellXHourInfo[0]+ cellXHourInfo[1]+"_cellXHour_"+cellXHourInfo[2]+".csv";
+		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+gtInfo[1]+"_gt_profiles_"+gtInfo[2]+".ser";
+		
+		Map<String,Double> profilesCrossProb = corssMonthAnalysis(gt_ser_file,cellXHourFile);
+		String[] profiles = new String[profilesCrossProb.size()];
+		double[] corssProb = new double[profiles.length];
+		int i=0;
+		for(String profile: profilesCrossProb.keySet()) {
+			profiles[i] = profile;
+			corssProb[i] = profilesCrossProb.get(profile);
+			i++;
+		}
+		
+
+		RPlotter.drawBar(profiles, corssProb, "profiles", "cross %", Config.getInstance().base_folder+"/Images/cross_month"+"_"+gtInfo[1]+"_"+gtInfo[2]+"_"+cellXHourInfo[1]+"_"+cellXHourInfo[2]+".pdf", null);
 	}
 	
 
+	
+	
 	
 	public static void process(RegionMap rm, String cellXHourFile, String gt_ser_file, Integer max) throws Exception {
 	
 		BufferedReader br = new BufferedReader(new FileReader(new File(cellXHourFile)));
 		
-		String placemark_name = cellXHourFile.substring(cellXHourFile.lastIndexOf("/")+1,cellXHourFile.lastIndexOf("_cellXHour"));
-		
-		
 		Map<String,String> user_gt_prof = null;
 		if(gt_ser_file != null)
 			user_gt_prof = (Map<String,String>)CopyAndSerializationUtils.restore(new File(gt_ser_file));
 		
-		String s = max == null ? "" : "_"+max;
-	
-		
 		int i=0;
 		String line;
-		TouristBaseStatistics td;
 		while((line=br.readLine())!=null) {
 			if(line.startsWith("//")) continue;
 			if(max != null && i > max) break;
 			
+			boolean ok = true;
+			if(user_gt_prof != null) {
+				String profile = user_gt_prof.get(line.split(",")[0]);
+				if(profile == null) ok = false;
+				else ok = profile.equals("Tourist") || profile.equals("Excursionist");
+			}
+			
+			if(ok) {
 			try {
-				td = new TouristBaseStatistics(line,rm);
+				new TouristBaseStatistics(line,rm);
 			} catch(Exception e) {
 				System.err.println(line);
 				continue;
 			}
-			
+			}
 			
 			
 			i++;
@@ -266,4 +274,51 @@ public class TouristBaseStatistics {
 		return mncT;
 	}
 	
+	/*
+	 * This method counts how many users of the gt_ser_file can be found in the cellXHourFile.
+	 * It is useful as a cross month measure. Tourists in the GT file of one month should not appear in the cellXHourFile of another month.
+	 * Vice versa Residents in the GT file of one month should appear in the cellXHourFile of another month.
+	 * 
+	 * The method returns a map associating for each profile the fraction of users in cellXHourFile that are also in gt_ser_file
+	 */
+	
+	public static Map<String,Double> corssMonthAnalysis(String gt_ser_file, String cellXHourFile) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(new File(cellXHourFile)));
+		
+		Map<String,String> user_gt_prof = (Map<String,String>)CopyAndSerializationUtils.restore(new File(gt_ser_file));
+		
+		Map<String,Double> denominator = new HashMap<String,Double>();
+		for(String profile: user_gt_prof.values()) {
+			Double d = denominator.get(profile);
+			if (d == null) d = 0.0;
+			denominator.put(profile, d+1);
+		}
+		
+		Map<String,Double> numerator = new HashMap<String,Double>();
+		for(String profile: denominator.keySet()) 
+			numerator.put(profile, 0.0);
+		
+		
+		String line;
+		while((line=br.readLine())!=null) {
+			if(line.startsWith("//")) continue;
+			String user = line.split(",")[0];
+			String profile = user_gt_prof.get(user);
+			if(profile!=null) numerator.put(profile, numerator.get(profile)+1);
+		}
+		br.close();
+		
+		
+		for(String profile: denominator.keySet())
+			numerator.put(profile, numerator.get(profile) / denominator.get(profile));
+		
+		return numerator;
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		//runProcess();
+		runCorssMonthAnalysis();
+		System.out.println("Done!");	
+	}
 }

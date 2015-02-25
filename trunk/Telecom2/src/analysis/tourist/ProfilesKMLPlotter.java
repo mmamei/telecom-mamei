@@ -15,7 +15,7 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import visual.kml.KMLPath;
 
-public class ProfilesPlotter {
+public class ProfilesKMLPlotter {
 	
 	static final String PLACEMARK = "Venezia";
 	static int HOW_MANY = 5; 
