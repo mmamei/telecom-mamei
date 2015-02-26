@@ -67,7 +67,7 @@ public class PLSSpaceDensity implements Serializable {
 	public static transient int[] HP_INT;
 	
 	
-	public static transient boolean COMPACT_SPACE = true;
+	public static transient boolean COMPACT_SPACE = false;
 	
 	static {
 		if(DP != null) { DP_LABELS = changePeriodLables(DP); DP_INT = toNum(DP);}
@@ -124,7 +124,7 @@ public class PLSSpaceDensity implements Serializable {
 	public int num_nights_in_area;
 	public int num_weekends_in_area;
 	public int max_h_interval;
-	private final int NUM_FEATURES_BEFORE_PLS_MATRIX = 8;
+	
 	
 	public float[][][] plsMatrix;
 	
@@ -134,7 +134,6 @@ public class PLSSpaceDensity implements Serializable {
 	 * EXAMPLE:
 	 * 1b44888ff4f,22201,3,1,2013-5-23:Sun:13:4018542484,2013-5-23:Sun:17:4018542495,2013-5-23:Sun:13:4018542391,
 	*/
-	
 	
 	
 	
@@ -231,9 +230,6 @@ public class PLSSpaceDensity implements Serializable {
 			if(d.endsWith("Sat") || d.endsWith("Sun"))
 				num_weekends_in_area ++;
 		
-		
-		
-		
 		compactTime();
 		if(COMPACT_SPACE) compactSpace();
 		normalize();
@@ -253,12 +249,13 @@ public class PLSSpaceDensity implements Serializable {
 	 * @ATTRIBUTE sepalwidth   NUMERIC
 	 * @ATTRIBUTE class        {Iris-setosa,Iris-versicolor,Iris-virginica}
 	 */
-	
+	private final int NUM_FEATURES_BEFORE_PLS_MATRIX = 9;
 	public String wekaHeader(String title) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("@RELATION "+title+"\n");
 		
 		//sb.append("@ATTRIBUTE roaming {TIM,ROAMING}\n");
+		sb.append("@ATTRIBUTE user STRING\n");
 		sb.append("@ATTRIBUTE mnt NUMERIC\n");
 		
 		sb.append("@ATTRIBUTE num_pls NUMERIC\n");
@@ -311,8 +308,8 @@ public class PLSSpaceDensity implements Serializable {
 		String max_h_attribute = max_h_interval > 0 ? String.valueOf(max_h_interval) : "?";
 		
 		
-		return "{0 "+roaming+", 1 "+num_pls+", 2 "+num_days+", 3 "+days_interval+", 4 "+num_days_in_area+", 5 "+num_nights_in_area+", 6 "+num_weekends_in_area+", 7 "+max_h_attribute+
-				sb.toString()+class_attribute+"}";
+		return "{0 "+user_id+", 1 "+roaming+", 2 "+num_pls+", 3 "+num_days+", 4 "+days_interval+", 5 "+num_days_in_area+", 6 "+num_nights_in_area+", "
+				+ "7 "+num_weekends_in_area+", 8 "+max_h_attribute+sb.toString()+class_attribute+"}";
 	}
 	
 	
@@ -423,10 +420,11 @@ public class PLSSpaceDensity implements Serializable {
 		
 		String pre = "file_pls_ve_";
 		String city = "Venezia";
+		String mapfile = "venezia_area.ser"; 
 		placemark = Placemark.getPlacemark(city);
 		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+city+"_cellXHour"+POST+".csv";
 		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles"+POST+".ser";
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
+		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+mapfile));
 		process(rm,cellXHourFile,gt_ser_file,null);
 		
 		
