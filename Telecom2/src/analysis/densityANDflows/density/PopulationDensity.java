@@ -90,7 +90,6 @@ public class PopulationDensity {
 			String dir = eff.find(sday,shour,eday,ehour,lon1,lat1,lon2,lat2);
 			if(dir == null) return null;
 			System.out.println(dir);
-			PLSSpaceDensity.COMPACT_SPACE=false;
 			Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/"+dir;
 			Config.getInstance().pls_start_time.setTime(F.parse(sday+"-"+shour));
 			Config.getInstance().pls_end_time.setTime(F.parse(eday+"-"+ehour));
@@ -120,11 +119,7 @@ public class PopulationDensity {
 			// Then compute the population density.
 			
 			UserEventCounterCellacXHour.process(p,false); // file name is called as the placemark
-			PLSSpaceDensity.process(rm, Config.getInstance().base_folder+"/UserEventCounter/"+p.getName()+"_cellXHour.csv", null, null);
-			File pls_space_density_file = new File(Config.getInstance().base_folder+"/PLSSpaceDensity/"+p.getName()+"_"+rm.getName()+".csv");
-			
-			
-			Map<String,Double> space_density = pd.computeSpaceDensity(pls_space_density_file,rm,constraints);
+			Map<String,Double> space_density = pd.computeSpaceDensity(new File(Config.getInstance().base_folder+"/UserEventCounter/"+p.getName()+"_cellXHour.csv"),rm,constraints);
 			
 			
 			// percent
@@ -164,11 +159,10 @@ public class PopulationDensity {
 		HeatMapGoogleMaps.draw(d.getAbsolutePath()+"/"+city+"_"+rm.getName()+".html", city, space_density, rm, threshold);
 	}
 	
-	
-	public Map<String,Double> computeSpaceDensity(File pls_space_density_file, RegionMap rm, Constraints constraints) throws Exception {
-		String city = rm.getName();
-		
-		BufferedReader br = new BufferedReader(new FileReader(pls_space_density_file));
+	private static final SimpleDateFormat F2 = new SimpleDateFormat("yyyy-MM-dd");
+	public Map<String,Double> computeSpaceDensity(File cellXHourFile, RegionMap rm, Constraints constraints) throws Exception {
+				
+		BufferedReader br = new BufferedReader(new FileReader(cellXHourFile));
 		
 		Map<String,Double> sd = new HashMap<String,Double>();
 		for(RegionI r: rm.getRegions())
@@ -176,33 +170,37 @@ public class PopulationDensity {
 		
 		String line;
 		while((line=br.readLine())!=null) {
+			if(line.startsWith("//")) continue;
+			
 			String[] p = line.split(",");
-			
-			String username = p[0];
+			String user_id = p[0];
 			String mnt = p[1];
-			int num_pls = Integer.parseInt(p[2]);
-			int num_days = Integer.parseInt(p[3]);
-			int days_interval = Integer.parseInt(p[4]);
-			
-			
-			if(constraints.okConstraints(mnt,num_days)) {
-				for(int i=5;i<p.length;i++) {
-					String[] x = p[i].split(":");
-					String rname = rm.getRegion(Integer.parseInt(x[2])).getName();
-					double v = constraints.weight(username) * Double.parseDouble(x[3]);	
-					sd.put(rname,sd.get(rname)+v);
+			int num_pls = 0, num_days = 0, days_interval = 0;
+			try {
+				num_pls = Integer.parseInt(p[2]);
+				num_days = Integer.parseInt(p[3]);
+				days_interval = Integer.parseInt(p[4]);
+	
+				if(constraints.okConstraints(mnt,num_days)) {			
+					for(int i=5;i<p.length;i++) {
+						String[] x = p[i].split(":");
+						if(x.length!=4) continue;
+						long celllac =Long.parseLong(x[3].trim());
+						float[] ai = rm.computeAreaIntersection(celllac,F2.parse(x[0]).getTime());
+						if(!Double.isNaN(ai[0]))
+						for(int j=0; j<ai.length;j++) {
+							String rname = rm.getRegion(j).getName();
+							double v = constraints.weight(user_id) * ai[j];	
+							sd.put(rname,sd.get(rname)+v);
+						}
+					}
 				}
-			}
+			}catch(Exception e) {
+				System.out.println("BAD LINE: "+line);
+				continue;
+			}		
 		}
 		br.close();
-		/*
-		for(String k : sd.keySet()) {
-			double val = sd.get(k);
-			double area = rm.getRegion(k).getGeom().getArea();
-			sd.put(k, val/area);
-		}
-		*/
-		
 		
 		return sd;
 	}

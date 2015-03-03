@@ -11,6 +11,13 @@ public class Constraints {
 	private Map<String,String> constraints = null;
 	private Map<String, Double> users_weights = null;
 	
+	
+	public Constraints(Map<String,String> constraints, Map<String, Double> users_weights) {
+		this.constraints = constraints;
+		if(constraints == null) constraints = new HashMap<String,String>();
+		this.users_weights = users_weights;
+	}
+	
 	public Constraints(String sconstraints) {
 		
 		System.out.println("**** CONSTRAINTS = "+sconstraints);

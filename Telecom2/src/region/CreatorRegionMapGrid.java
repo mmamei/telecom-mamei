@@ -1,6 +1,8 @@
 package region;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.gps.utils.LatLonPoint;
 import org.gps.utils.LatLonUtils;
@@ -12,10 +14,12 @@ import utils.Logger;
 public class CreatorRegionMapGrid {
 	
 	public static void main(String[] args) throws Exception {
-		String placemark = "Torino";
-		String name = "TorinoArea";
-		int dr = 50000;
-		int size = 80;
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,31,23,59,59);
+		String placemark = "Lecce";
+		String name = placemark+"Center";
+		int dr = 5000;
+		int size = 10;
 		Placemark p = Placemark.getPlacemark(placemark);
 		p.changeRadius(p.getRadius()+dr);
 		RegionMap rm = process(name,p.getBboxLonLat(),size);

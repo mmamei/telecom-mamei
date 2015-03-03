@@ -25,6 +25,7 @@ public abstract class Bow {
 	public static Bow getInstance(String bow_kind) {
 		if(bow_kind.equals("OneDocXDay")) return new OneDocXDay();
 		else if(bow_kind.equals("OneDocXDayMov")) return new OneDocXDayMov();
+		else if(bow_kind.equals("OneDocXDayMultiPoint")) return new OneDocXDayMultiPoint();
 		return null;
 	}
 	
@@ -142,7 +143,7 @@ public abstract class Bow {
 	 * 
 	 */
 	
-	private Map<String,Integer> computeHourRef(String[] events, int startIndex, RegionMap rm) {
+	protected Map<String,Integer> computeHourRef(String[] events, int startIndex, RegionMap rm) {
 		Map<String,Integer> hmap = new HashMap<String,Integer>();
 		for(int h=0;h<24;h++) {
 			if(0 <= h && h <= 5) hmap.put(String.valueOf(h), 3);

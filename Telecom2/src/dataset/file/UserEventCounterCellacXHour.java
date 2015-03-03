@@ -105,10 +105,10 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		 * Questo mi serve per le operazioni density and flows perchè vedo le tracce degli utenti e quindi la loro density/flow
 		 * all'interno della città.
 		 */
-		//Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
-		//Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
-		//Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,11,23,59,59);
-		//process(Placemark.getPlacemark("Firenze"));
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.APRIL,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.APRIL,30,23,59,59);
+		process(Placemark.getPlacemark("Torino"),false);
 		
 		
 		/*********************************************************************************************************************************/
@@ -119,21 +119,27 @@ public class UserEventCounterCellacXHour extends BufferAnalyzerConstrained {
 		 * transito perchè veod dov'erano prima e dopo la città e quindi quanto tempo ci sono stati.
 		 */
 		
+		
+		
+		//Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_pu"; 
+		
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,31,23,59,59);
+		
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,31,23,59,59);
+		
+		//process(Config.getInstance().base_folder+"/UserSetCreator/Lecce.csv",false);
+		
+		
 		/*
-		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
-		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
-		process(Config.getInstance().base_folder+"/UserSetCreator/Firenze.csv",false);
-		*/
-		
-		
-		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem"; 
-		
+		// TOPIC
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem";
 		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JUNE,21,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
 		PLSParser.REMOVE_BOGUS = false;
-	
 		process(Config.getInstance().base_folder+"/UserSetCreator/LDAPOP.csv",false);
+		*/
 		
 		/*
 		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 

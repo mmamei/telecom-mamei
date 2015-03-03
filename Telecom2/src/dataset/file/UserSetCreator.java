@@ -47,10 +47,19 @@ public class UserSetCreator extends BufferAnalyzerConstrained {
 	
 	
 	public static void main(String[] args) {
-		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_fi"; 
-		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,20,0,0,0);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,20,23,59,59);
-		Placemark placemark= Placemark.getPlacemark("Firenze");
+		/*
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_piem"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.OCTOBER,20,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.NOVEMBER,14,23,59,59);
+		Placemark placemark= Placemark.getPlacemark("Torino");
+		*/
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_pu"; 
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,31,23,59,59);
+		Placemark placemark= Placemark.getPlacemark("Lecce");
+		
+		
+		
 		BufferAnalyzerConstrained ba = new UserSetCreator(placemark,null);
 		ba.run();
 		Logger.logln("Done!");

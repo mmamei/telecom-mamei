@@ -66,7 +66,6 @@ public class GroundtruthInfo {
 		int cont = 0;
 		
 		DescriptiveStatistics stat = new DescriptiveStatistics();
-		DescriptiveStatistics stath = new DescriptiveStatistics();
 		
 		for(Info info: gt) {
 			File dir = new File(bdir+"/"+info.user);
@@ -108,20 +107,10 @@ public class GroundtruthInfo {
 						 double d2 = (LatLonUtils.getHaversineDistance(p1, info.p2) + LatLonUtils.getHaversineDistance(p2, info.p1)) / 2; 
 						 if(d1 < mind) mind = d1;
 						 if(d2 < mind) mind = d2;
-						 
-						 int gth1 = (int)(info.time1 / 3600000);
-						 int gth2 = (int)(info.time2 / 3600000);
-						 
-						 double dh1 = ((double)(Math.abs(h1-gth1) +  Math.abs(h2-gth2))) / 2;
-						 double dh2 = ((double)(Math.abs(h1-gth2) +  Math.abs(h2-gth1))) / 2;
-						 
-						 if(dh1 < mindh) mindh = dh1;
-						 if(dh2 < mindh) mindh = dh2;
 					 }
 				}
 				br.close();
 				stat.addValue(mind);
-				stath.addValue(mindh);
 				cont ++;
 				}catch(Exception exc) {
 					System.err.println("Problems with user = "+info.user+" *********************************************************************************************");
@@ -137,14 +126,11 @@ public class GroundtruthInfo {
 		
 		double[] prob = new double[100];
 		double[] val = new double[prob.length];
-		double[] valh = new double[prob.length];
 		for(int i=1; i<100;i++) {
 			prob[i] = (double)i/100;
 			val[i] = stat.getPercentile(i);
-			valh[i] = stath.getPercentile(i);
 		}
 		RPlotter.drawLine(val, prob, "distance (m)", "CDF", Config.getInstance().base_folder+"/Images/gt.pdf","scale_x_log10(limits = c(10,10000))");
-		RPlotter.drawLine(valh, prob, "time (h)", "CDF", Config.getInstance().base_folder+"/Images/gth.pdf",null);
 	}
 	
 	
@@ -160,44 +146,47 @@ public class GroundtruthInfo {
 			int i = 0;
 			if(dir.exists()) {
 				try {
-				BufferedReader br = new BufferedReader(new FileReader(dir+"/p_w_d.txt"));
+					BufferedReader br = new BufferedReader(new FileReader(dir+"/p_w_d.txt"));
 				
-				Map<String,Double> pw = new HashMap<String,Double>(); 
-				//Fri-2013-07-05;13,45.0346,7.6738,13,45.0399,7.6848;0.16219999999999998
-				while((line=br.readLine()) != null) {
-					String[] elements = line.split(";");
-					if(elements[0].startsWith("Sat") || elements[0].startsWith("Sun")) continue;
-					Double p = pw.get(elements[1]);
-					if(p == null) p = 0.0;
-					pw.put(elements[1], p + Double.parseDouble(elements[2]));
-				}
-				double top_prob = 0;
-				double min_dist = Double.MAX_VALUE;
-				pw = Sort.sortHashMapByValuesD(pw, Collections.reverseOrder());
-				int nt = 0;
-				for(String w: pw.keySet()) {
-					//System.out.print(pw.get(w)+" * ");
-					String[] letters = w.split(",");
-					double lon1 = Double.parseDouble(letters[1]);
-					double lat1 = Double.parseDouble(letters[2]);
-					double lon2 = Double.parseDouble(letters[4]);
-					double lat2 = Double.parseDouble(letters[5]);
-					if(lat1==lat2 && lon1==lon2) continue;
 					
-					if(top_prob == 0) top_prob = pw.get(w);
-					//if(pw.get(w) < top_prob * 80 / 100) continue;
-					if(nt > 5) break;
-					nt++;
-					LatLonPoint p1 = new LatLonPoint(lat1,lon1);
-					LatLonPoint p2 = new LatLonPoint(lat2,lon2);
-					double d1 = (LatLonUtils.getHaversineDistance(p1, info.p1) + LatLonUtils.getHaversineDistance(p2, info.p2)) / 2; 
-					double d2 = (LatLonUtils.getHaversineDistance(p1, info.p2) + LatLonUtils.getHaversineDistance(p2, info.p1)) / 2; 
-					min_dist = Math.min(min_dist, Math.min(d1, d2));					
-				}	
-				System.out.println();
-				stat.addValue(min_dist);
-				cont ++;
-				br.close();
+				
+					//Fri-2013-06-21;0,7.6296,45.0941;0.005200000000000001
+					Map<String,Double> lp = new HashMap<String,Double>();
+					while((line=br.readLine()) != null) {
+						String[] elements = line.split(";");
+						if(elements[0].startsWith("Sat") || elements[0].startsWith("Sun")) continue;
+						double p = Double.parseDouble(elements[2]);
+						String[] f = elements[1].split(",");
+						String key = f[2]+","+f[1];
+						Double prob = lp.get(key);
+						if(prob == null) prob = 0.0;
+						lp.put(key, prob+p);
+					}
+					br.close();
+					
+					
+					double homedist = 0;
+					double workdist = 0;
+					LatLonPoint homep = null;
+					LatLonPoint workp = null;
+					
+					Map<String,Double> olp = Sort.sortHashMapByValuesD(lp, Collections.reverseOrder());
+					int num = 0;
+					for(String k: olp.keySet()) {
+						String[] latlon = k.split(",");
+						LatLonPoint x = new LatLonPoint(Double.parseDouble(latlon[0]), Double.parseDouble(latlon[1]));
+						if(homep == null || LatLonUtils.getHaversineDistance(x, info.p1) < homedist) {
+							homep = x;
+							homedist = LatLonUtils.getHaversineDistance(x, info.p1);
+						}
+						else if(workp == null || LatLonUtils.getHaversineDistance(x, info.p2) < workdist)  {
+							workp = x;
+							workdist = LatLonUtils.getHaversineDistance(x, info.p2);
+						}
+						if(num>10) break;
+					}
+					stat.addValue(homedist+workdist);
+					cont ++;
 				}catch(Exception exc) {
 					System.err.println("Problems with user = "+info.user+" *********************************************************************************************");
 					System.err.println(line); 
@@ -222,8 +211,8 @@ public class GroundtruthInfo {
 	public static void main(String[] args) {
 		List<Info> gt = run("C:/DATASET/lda-groundtruth/dailyroutes.csv");
 		//userSetCreator(gt,Config.getInstance().base_folder+"/UserSetCreator/LDAPOP.csv");
-		check(gt,Config.getInstance().base_folder+"/Topic");
-		//checkPWD(gt,Config.getInstance().base_folder+"/TopicMov");
+		//check(gt,Config.getInstance().base_folder+"/Topic");
+		checkPWD(gt,Config.getInstance().base_folder+"/TopicPWD-multi");
 	}
 }
 

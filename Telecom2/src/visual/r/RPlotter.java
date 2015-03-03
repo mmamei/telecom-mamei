@@ -14,6 +14,9 @@ import utils.Config;
 
 public class RPlotter {
 	
+	public static boolean VIEW = true;
+	private static int FONT_SIZE = 20;
+	
 	private static RConnection c = null;
 	
 	
@@ -35,23 +38,26 @@ public class RPlotter {
             String end = opts==null || opts.length()==0 ? ";" : " + "+opts+";";
             String code = 
             		   "library(ggplot2);"
+            		 + "x <- ordered(x,levels=c(x));"
             	     + "z <- data.frame(x,y);"
-            	     + "ggplot(z,aes(x=x,y=y)) + geom_bar(stat='identity') + theme_bw() +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
+            	     + "ggplot(z,aes(x=factor(x),y=y)) + geom_bar(stat='identity') + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
             	     + "ggsave('"+file+"');"
             	     + "dev.off();";
             
             //System.out.println(code);
             c.eval(code);
             c.close();
-            Desktop.getDesktop().open(new File(file));
+            if(VIEW) Desktop.getDesktop().open(new File(file));
         } catch (Exception e) {
-        	c.close();
         	if(e.getMessage().startsWith("Cannot connect")) {
              	System.err.println("You must launch the following code in R");
              	System.err.println("library(Rserve)");
              	System.err.println("Rserve()");
             }
-            else e.printStackTrace();
+            else {
+            	c.close();
+            	e.printStackTrace();
+            }
         }      
 	}
 	
@@ -84,14 +90,14 @@ public class RPlotter {
             	     + "names(z) <- c("+sbn+");"
             	     + "z <- melt(z,id.vars=c('x'));"
             	     + "names(z) <- c('x','"+kind+"','value');"
-            	     + "ggplot(z,aes(x=x, y=value, fill="+kind+")) + geom_bar(stat='identity', position='dodge') + theme_bw() +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
+            	     + "ggplot(z,aes(x=x, y=value, fill="+kind+")) + geom_bar(stat='identity', position='dodge') + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
             	     + "ggsave('"+file+"');"
             	     + "dev.off();";
             
             //System.out.println(code);
             c.eval(code);
             c.close();
-            Desktop.getDesktop().open(new File(file));
+            if(VIEW) Desktop.getDesktop().open(new File(file));
         } catch (Exception e) {
         	c.close();
         	if(e.getMessage().startsWith("Cannot connect")) {
@@ -124,13 +130,13 @@ public class RPlotter {
             String code = 
             		   "library(ggplot2);"
             	     + "z <- data.frame(x,y);"
-            	     + "ggplot(z,aes(x=x,y=y)) + geom_line() + geom_point() + theme_bw() +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
+            	     + "ggplot(z,aes(x=x,y=y)) + geom_line() + geom_point() + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
             	     + "ggsave('"+file+"');"
             	     + "dev.off();";
             //System.out.println(code);
             c.eval(code);
             c.close();
-            Desktop.getDesktop().open(new File(file));
+            if(VIEW) Desktop.getDesktop().open(new File(file));
         } catch (Exception e) {
         	c.close();
         	if(e.getMessage().startsWith("Cannot connect")) {
@@ -178,14 +184,14 @@ public class RPlotter {
             	     + "names(z) <- c("+sbn+");"
             	     + "z <- melt(z,id.vars=c('x'));"
             	     + "names(z) <- c('x','"+kind+"','value');"
-            	     + "ggplot(z,aes(x=x, y=value, linetype="+kind+", group="+kind+", shape="+kind+")) + geom_line() + geom_point() + theme_bw() +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
+            	     + "ggplot(z,aes(x=x, y=value, linetype="+kind+", group="+kind+", shape="+kind+")) + geom_line() + geom_point() + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
             	     + "ggsave('"+file+"');"
             	     + "dev.off();";
             
             //System.out.println(code);
             c.eval(code);
             c.close();
-            Desktop.getDesktop().open(new File(file));
+            if(VIEW) Desktop.getDesktop().open(new File(file));
         } catch (Exception e) {
         	c.close();
         	if(e.getMessage().startsWith("Cannot connect")) {
@@ -218,21 +224,23 @@ public class RPlotter {
             String code = 
             		   "library(ggplot2);"
             	     + "z <- data.frame(x,y);"
-            	     + "ggplot(z,aes(x=x,y=y)) + geom_point() + theme_bw() +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
+            	     + "ggplot(z,aes(x=x,y=y)) + geom_point() + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
             	     + "ggsave('"+file+"');"
             	     + "dev.off();";
             //System.out.println(code);
             c.eval(code);
             c.close();
-            Desktop.getDesktop().open(new File(file));
+            if(VIEW) Desktop.getDesktop().open(new File(file));
         } catch (Exception e) {
-        	c.close();
         	if(e.getMessage().startsWith("Cannot connect")) {
              	System.err.println("You must launch the following code in R");
              	System.err.println("library(Rserve)");
              	System.err.println("Rserve()");
             }
-            else e.printStackTrace();
+            else{
+            	c.close();
+            	e.printStackTrace();
+            }
         }      
 	}
 	
@@ -267,14 +275,14 @@ public class RPlotter {
             
             code +=  "z <- rbind("+zl+");\n"
             		 + "names(z) <- c('x','"+kind+"','value');"
-            	     + "ggplot(z,aes(x=x, y=value, linetype="+kind+", group="+kind+", shape="+kind+")) + geom_point() + theme_bw() +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
+            	     + "ggplot(z,aes(x=x, y=value, linetype="+kind+", group="+kind+", shape="+kind+")) + geom_point() + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
             	     + "ggsave('"+file+"');\n"
             	     + "dev.off();\n";
             
             System.out.println(code);
             c.eval(code);
             c.close();
-            Desktop.getDesktop().open(new File(file));
+            if(VIEW) Desktop.getDesktop().open(new File(file));
         } catch (Exception e) {
         	c.close();
         	if(e.getMessage().startsWith("Cannot connect")) {
