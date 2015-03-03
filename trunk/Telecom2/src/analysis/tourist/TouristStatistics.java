@@ -14,11 +14,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import region.Placemark;
-import region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
@@ -28,7 +28,7 @@ import analysis.PLSEvent;
 import analysis.RadiusOfGyration;
 
 
-public class TouristBaseStatistics {
+public class TouristStatistics {
 	
 	private String user_id;
 	
@@ -50,7 +50,7 @@ public class TouristBaseStatistics {
 	
 	private static final SimpleDateFormat F = new SimpleDateFormat("yyyy-MM-dd");
 	
-	private TouristBaseStatistics(String events, RegionMap map, Placemark placemark, boolean COMPUTE_RADIUS_OF_GYRATION) throws Exception {
+	private TouristStatistics(String events, Placemark placemark, boolean COMPUTE_RADIUS_OF_GYRATION) throws Exception {
 		
 		
 		String[] p = events.split(",");
@@ -127,28 +127,24 @@ public class TouristBaseStatistics {
 
 	
 	
-	private static DescriptiveStatistics stat_pls_per_day = new DescriptiveStatistics();
-	private static DescriptiveStatistics stat_radius_of_gyration = new DescriptiveStatistics();
-	private static DescriptiveStatistics stat_num_days_in_area = new DescriptiveStatistics();
-	private static Map<String,Integer> stat_mnt = new HashMap<String,Integer>();
+	private static DescriptiveStatistics stat_pls_per_day = null;
+	private static DescriptiveStatistics stat_radius_of_gyration = null;
+	private static DescriptiveStatistics stat_num_days_in_area = null;
+	private static Map<String,Integer> stat_mnt = null;
 	
 	
 	public static void runProcess(String pre, String city, String month, String classes_ser_file, boolean COMPUTE_RADIUS_OF_GYRATION) throws Exception {
-		/*
-		String city = "Torino";
-		String cellXHourFile = Config.getInstance().base_folder+"/UserEventCounter/Torino_cellXHour.csv";
-		String gt_ser_file = "Firenze_gt_profiles.ser";
-		*/
 		
+		stat_pls_per_day = new DescriptiveStatistics();
+		stat_radius_of_gyration = new DescriptiveStatistics();
+		stat_num_days_in_area = new DescriptiveStatistics();
+		stat_mnt = new HashMap<String,Integer>();
 		
 		Placemark placemark = Placemark.getPlacemark(city);
-		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+ city+"_cellXHour_"+month+".csv";
+		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+ city+"_cellXHour"+month+".csv";
 		
 		
-		
-		
-		RegionMap rm = (RegionMap)CopyAndSerializationUtils.restore(new File(Config.getInstance().base_folder+"/RegionMap/"+city+".ser"));
-		process(rm,cellXHourFile,classes_ser_file,null,placemark,COMPUTE_RADIUS_OF_GYRATION);
+		process(cellXHourFile,classes_ser_file,null,placemark,COMPUTE_RADIUS_OF_GYRATION);
 		
 		
 		double[] p = new double[100];
@@ -197,12 +193,13 @@ public class TouristBaseStatistics {
 	public static void runCorssMonthAnalysis(String cellXHourFile, String gt_ser_file) throws Exception {
 		
 		Map<String,Double> profilesCrossProb = corssMonthAnalysis(gt_ser_file,cellXHourFile);
+		profilesCrossProb = new TreeMap<String, Double>(profilesCrossProb); 
 		String[] profiles = new String[profilesCrossProb.size()];
 		double[] corssProb = new double[profiles.length];
 		int i=0;
 		for(String profile: profilesCrossProb.keySet()) {
 			profiles[i] = profile;
-			corssProb[i] = profilesCrossProb.get(profile);
+			corssProb[i] = 100*profilesCrossProb.get(profile);
 			i++;
 		}
 		
@@ -215,7 +212,7 @@ public class TouristBaseStatistics {
 	
 	
 	
-	public static void process(RegionMap rm, String cellXHourFile, String classes_ser_file, Integer max,Placemark placemark,boolean COMPUTE_RADIUS_OF_GYRATION) throws Exception {
+	public static void process(String cellXHourFile, String classes_ser_file, Integer max,Placemark placemark,boolean COMPUTE_RADIUS_OF_GYRATION) throws Exception {
 	
 		BufferedReader br = new BufferedReader(new FileReader(new File(cellXHourFile)));
 		
@@ -238,7 +235,7 @@ public class TouristBaseStatistics {
 			
 			if(ok) {
 			try {
-				new TouristBaseStatistics(line,rm,placemark,COMPUTE_RADIUS_OF_GYRATION);
+				new TouristStatistics(line,placemark,COMPUTE_RADIUS_OF_GYRATION);
 			} catch(Exception e) {
 				System.err.println(line);
 				continue;
@@ -314,8 +311,53 @@ public class TouristBaseStatistics {
 	
 	
 	public static void main(String[] args) throws Exception {		
-		//runProcess("file_pls_ve_","Venezia","July2013",Config.getInstance().base_folder+"/Tourist/Venezia_July2013_classes.ser",false);
-		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_July2013.csv", Config.getInstance().base_folder+"/Tourist/Venezia_July2013_classes.ser");
+		
+		RPlotter.VIEW = false;
+		
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.OCTOBER,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.OCTOBER,31,23,59,59);
+		//runProcess("file_pls_piem_","Torino","_Oct2014",null,true);
+		//runProcess("file_pls_piem_","Torino","_Oct2014",Config.getInstance().base_folder+"/Tourist/Torino_Oct2014_noregion_classes.ser",true);
+		
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,31,23,59,59);
+		//runProcess("file_pls_pu_","Lecce","_Aug2014",null,true);
+		//runProcess("file_pls_pu_","Lecce","_Aug2014",Config.getInstance().base_folder+"/Tourist/Lecce_Aug2014_noregion_classes.ser",true);
+		
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,31,23,59,59);
+		//runProcess("file_pls_pu_","Lecce","_Sep2014",null,false);
+		//runProcess("file_pls_pu_","Lecce","_Sep2014",Config.getInstance().base_folder+"/Tourist/Lecce_Sep2014_noregion_classes.ser",false);
+		
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		//runProcess("file_pls_ve_","Venezia","_July2013",null,true);
+		//runProcess("file_pls_fi_","Firenze","_July2013",null,true);
+		//runProcess("file_pls_ve_","Venezia","_July2013",Config.getInstance().base_folder+"/Tourist/Venezia_July2013_noregion_classes.ser",true);
+		//runProcess("file_pls_fi_","Firenze","_July2013",Config.getInstance().base_folder+"/Tourist/Firenze_July2013_noregion_classes.ser",true);
+		
+		
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
+		//runProcess("file_pls_ve_","Venezia","_March2014",null,true);
+		//runProcess("file_pls_fi_","Firenze","_March2014",null,true);
+		//runProcess("file_pls_ve_","Venezia","_March2014",Config.getInstance().base_folder+"/Tourist/Venezia_March2014_noregion_classes.ser",true);
+		//runProcess("file_pls_fi_","Firenze","_March2014",Config.getInstance().base_folder+"/Tourist/Firenze_March2014_noregion_classes.ser",false);
+		
+		
+		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/Torino_cellXHour_April2014.csv", Config.getInstance().base_folder+"/Tourist/Torino_Oct2014_noregion_classes.ser");
+		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/file_pls_pu_Lecce_cellXHour_Sep2014.csv", Config.getInstance().base_folder+"/Tourist/Lecce_Aug2014_noregion_classes.ser");
+		
+		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_July2013.csv", Config.getInstance().base_folder+"/Tourist/Venezia_March2014_noregion_classes.ser");
+		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_March2014.csv", Config.getInstance().base_folder+"/Tourist/Venezia_July2013_noregion_classes.ser");
+		
+		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_July2013.csv", Config.getInstance().base_folder+"/Tourist/Firenze_March2014_noregion_classes.ser");
+		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_March2014.csv", Config.getInstance().base_folder+"/Tourist/Firenze_July2013_noregion_classes.ser");
+		
+		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_July2013.csv", Config.getInstance().base_folder+"/Tourist/Firenze_July2013_noregion_classes.ser");
+		runCorssMonthAnalysis(Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_March2014.csv", Config.getInstance().base_folder+"/Tourist/Firenze_March2014_noregion_classes.ser");
+		
+
 		System.out.println("Done!");	
 	}
 }

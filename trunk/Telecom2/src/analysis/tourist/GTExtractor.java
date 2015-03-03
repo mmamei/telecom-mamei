@@ -31,30 +31,34 @@ public class GTExtractor {
 	
 	
 	public static final String CLASSES = "Resident,Tourist,Commuter,Transit,Excursionist";
-	static final String POST = "_July2013";
-	static final String PRE = "file_pls_ve_";
-	static final String PLACEMARK = "Venezia";
 	
-	//static final String PRE = "file_pls_fi_";
-	//static final String PLACEMARK = "Firenze";
-	
-	static final String FILE = Config.getInstance().base_folder+"/UserEventCounter/"+PRE+PLACEMARK+"_cellXHour"+POST+".csv";
-	static {
-		if(POST.equals("_July2013")) {
-			Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
-			Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
-		}
-		else if(POST.equals("_March2014")) {
-			Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
-			Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
-		}
-		else {
-			System.out.println("ERROR IN SETTING pls_start_time AND pls_end_time");
-			System.exit(0);
-		}
-	}
 	
 	public static void main(String[] args) throws Exception {
+		/*
+		final String POST = "_July2013";
+		final String PRE = "file_pls_ve_";
+		final String PLACEMARK = "Venezia";
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		*/
+		
+		final String POST = "_Oct2014";
+		final String PRE = "file_pls_piem_";
+		final String PLACEMARK = "Torino";
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.OCTOBER,20,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.NOVEMBER,14,23,59,59);
+		
+		/*
+		final String POST = "_Sep2014";
+		final String PRE = "file_pls_pu_";
+		final String PLACEMARK = "Lecce";
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,31,23,59,59);
+		*/
+		
+		
+		
+		final String FILE = Config.getInstance().base_folder+"/UserEventCounter/"+PRE+PLACEMARK+"_cellXHour"+POST+".csv";
 		
 		String line;
 		

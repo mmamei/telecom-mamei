@@ -21,10 +21,21 @@ import weka.filters.unsupervised.instance.RemoveWithValues;
 public class WekaUseClassifier {
 	
 	public static void main(String[] args) throws Exception {
-		classify(Config.getInstance().base_folder+"/Tourist/Venezia_July2013.arff",Config.getInstance().base_folder+"/Tourist/resample/Venezia_July2013_resampled.model");
-		classify(Config.getInstance().base_folder+"/Tourist/Venezia_March2014.arff",Config.getInstance().base_folder+"/Tourist/resample/Venezia_March2014_resampled.model");
-		classify(Config.getInstance().base_folder+"/Tourist/Firenze_July2013.arff",Config.getInstance().base_folder+"/Tourist/resample/Firenze_July2013_resampled.model");
-		classify(Config.getInstance().base_folder+"/Tourist/Firenze_March2014.arff",Config.getInstance().base_folder+"/Tourist/resample/Firenze_March2014_resampled.model");
+		
+		File dir = new File(Config.getInstance().base_folder+"/Tourist");
+		for(File f: dir.listFiles()) {
+			if(f.getAbsolutePath().endsWith(".arff")) {
+				File classifier = new File(Config.getInstance().base_folder+"/Tourist/Resampled/"+f.getName().replaceAll(".arff", "_resampled.model"));
+				//System.out.println(classifier);
+				if(classifier.exists())
+					classify(f.getAbsolutePath(),classifier.getAbsolutePath());
+				else
+					System.out.println("Classifier for "+f.getName()+" not found!");
+			}
+		} 
+		
+		
+		//classify(Config.getInstance().base_folder+"/Tourist/Firenze_March2014.arff",Config.getInstance().base_folder+"/Tourist/resample/Firenze_March2014_resampled.model");
 	}
 	
 	

@@ -1,5 +1,6 @@
 package analysis.tourist;
 
+import java.io.File;
 import java.util.Random;
 
 import utils.Config;
@@ -12,14 +13,21 @@ import weka.core.converters.ConverterUtils.DataSource;
 public class WekaTrainer {
 	
 	public static void main(String[] args) throws Exception {
-		train(Config.getInstance().base_folder+"/Tourist/resample/Venezia_July2013_resampled.arff");
-		train(Config.getInstance().base_folder+"/Tourist/resample/Venezia_March2014_resampled.arff");
-		train(Config.getInstance().base_folder+"/Tourist/resample/Firenze_July2013_resampled.arff");
-		train(Config.getInstance().base_folder+"/Tourist/resample/Firenze_March2014_resampled.arff");
+		File resampledDir = new File(Config.getInstance().base_folder+"/Tourist/Resampled");
+		for(File file: resampledDir.listFiles()) {
+			if(file.getAbsolutePath().endsWith(".arff"))
+				train(file.getAbsolutePath());
+		}
+		
+		//train(Config.getInstance().base_folder+"/Tourist/resample/Firenze_March2014_resampled.arff");
+		System.out.println("Done!");
 	}
 	
 	
 	public static void train(String arff) throws Exception {
+		
+		System.out.println("\n************************************************************************************************************");
+		System.out.println(arff+"\n");
 		
 		DataSource source = new DataSource(arff);
 		Instances data = source.getDataSet();
