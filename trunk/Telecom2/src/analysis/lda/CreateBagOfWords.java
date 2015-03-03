@@ -20,17 +20,16 @@ import analysis.lda.bow.OneDocXDayMov;
 
 public class CreateBagOfWords {
 	
-	public static final int REPETITIONS = 5;
+	public static final int REPETITIONS = 1;
 	public static final int MAX_NUM = -1; // negative value for infinite
 	public static int MIN_DAYS = 1;
 	public static int MIN_PLS = 1;
 	
-	public static final String BOW_KIND = "OneDocXDay";
+	public static final String BOW_KIND = "OneDocXDayMultiPoint";
 	
 	public static void main(String[] args) throws Exception {
 		String cellXHourCSV = Config.getInstance().base_folder+"/UserEventCounter/file_pls_piem_LDAPOP_cellXHour.csv";
 		String regionMapSER =  Config.getInstance().base_folder+"/RegionMap/TorinoArea.ser";
-		//process(cellXHourCSV,regionMapSER,new OneDocXDayMov());
 		process(cellXHourCSV,regionMapSER,Bow.getInstance(BOW_KIND));
 	}
 	

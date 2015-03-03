@@ -12,10 +12,10 @@ import visual.kml.KMLArrowCurved;
 
 public class OneDocXDay extends Bow {
 	
-	OneDocXDay() {
-		
+	OneDocXDay() {	
 	}
-
+	
+	@Override
 	public  Map<String,List<String>> process(List<TimePlace> tps) {
 		Map<String,List<String>> dailyPatterns = new TreeMap<String,List<String>>();
 		for(TimePlace tp : tps) {

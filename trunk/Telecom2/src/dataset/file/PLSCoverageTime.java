@@ -22,13 +22,14 @@ import dataset.PLSCoverageTimeI;
 
 	public static void main(String[] args) {
 		PLSCoverageTime apc = new PLSCoverageTime();
-		/*
-		Map<String,String> allDays = apc.compute();
+		
+		Config.getInstance().pls_folder = Config.getInstance().pls_root_folder+"/file_pls_pu"; 
+		List<String> allDays = apc.compute();
 		Logger.logln("Days in the dataset:");
-		for(String d:allDays.keySet()) 
-			Logger.logln(d+" = "+allDays.get(d));
+		for(String d:allDays) 
+			Logger.logln(d);
 		System.out.println("TOT = "+allDays.size());
-		*/
+		
 		/*
 		Map<String,Map<String,String>> all =  apc.computeAll();
 		for(String file: all.keySet()) {
@@ -39,6 +40,9 @@ import dataset.PLSCoverageTimeI;
 			System.out.println("TOT = "+allDays.size());
 		}
 		*/
+		
+		
+		/*
 		Map<String,List<String>> all =  apc.computeAll();
 		for(String key: all.keySet()) 
 			System.out.println(key+" -> "+apc.getNumYears(all.get(key)));
@@ -52,6 +56,8 @@ import dataset.PLSCoverageTimeI;
 		
 		String js = apc.getJSMap(all);
 		//System.out.println(js);
+		 * 
+		 */
 	}
 	
 	

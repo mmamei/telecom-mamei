@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import utils.Config;
 import analysis.lda.bow.Bow;
@@ -51,14 +52,34 @@ public class ComputePWD {
 			 br.close();
 			 
 			 
-			 Map<String,Double> pwd = new TreeMap<String,Double>();
-			 
+			 Map<Integer,List<Entry<String,Double>>> pwz = new HashMap<Integer,List<Entry<String,Double>>>();
 			 br = new BufferedReader(new FileReader(dir+"/p_w_z.txt"));
 			 while((line=br.readLine()) != null) {
 				 String[] e = line.split(",|-");
 				 int topic_index = Integer.parseInt(e[0].split("_")[1]);
 				 List<Map.Entry<String,Double>> l = bow.parsePWZ(line);
 				 if(l==null) continue;
+				 pwz.put(topic_index, l);
+			 }
+			 br.close();
+			 
+			 Map<String,Double> pwd = pwd(pzd,pwz);
+			 
+			 
+			 //Map<String,Double> o = Sort.sortHashMapByValuesD(pwd, Collections.reverseOrder());
+			 dir = new File(Config.getInstance().base_folder+"/TopicPWD/"+user);
+			 dir.mkdirs();
+			 PrintWriter out = new PrintWriter(new FileWriter(dir+"/p_w_d.txt"));
+			 for(String wd: pwd.keySet())
+				 out.println(wd+";"+pwd.get(wd));
+			 out.close();			 
+		 }
+		 
+		 public static  Map<String,Double> pwd(Map<String,double[]> pzd, Map<Integer,List<Entry<String,Double>>> pwz) {
+			 Map<String,Double> pwd = new TreeMap<String,Double>();
+			 
+			 for(int topic_index: pwz.keySet()) {
+				 List<Map.Entry<String,Double>> l = pwz.get(topic_index);
 				 for(Map.Entry<String,Double> wp: l)
 					 for(String d: pzd.keySet()) {
 						 String wd = d+";"+wp.getKey();
@@ -67,16 +88,6 @@ public class ComputePWD {
 						 pwd.put(wd, p + pzd.get(d)[topic_index] * wp.getValue());
 					 }
 				 }
-			 br.close();
-			 
-			 //Map<String,Double> o = Sort.sortHashMapByValuesD(pwd, Collections.reverseOrder());
-			 dir = new File(Config.getInstance().base_folder+"/TopicPWD/"+user);
-			 dir.mkdirs();
-			 PrintWriter out = new PrintWriter(new FileWriter(dir+"/p_w_d.txt"));
-			 for(String wd: pwd.keySet())
-				 out.println(wd+";"+pwd.get(wd));
-			 out.close();
-
-			 
+			 return pwd;
 		 }
 }

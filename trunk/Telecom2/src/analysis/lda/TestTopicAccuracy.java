@@ -3,24 +3,21 @@ package analysis.lda;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import analysis.lda.bow.Bow;
 import utils.Config;
 import visual.r.RPlotter;
+import analysis.lda.bow.Bow;
 
 
 	
@@ -29,7 +26,7 @@ public class TestTopicAccuracy {
 	
 	public static final boolean VERBOSE = false;
 	
-	public static void main(String[] args) throws Exception  {
+	public static void main(String[] args) {
 		Bow bow = Bow.getInstance(CreateBagOfWords.BOW_KIND);
 		File dir = new File(Config.getInstance().base_folder+"/Topic");
 		dir.mkdirs();
@@ -49,6 +46,8 @@ public class TestTopicAccuracy {
 				stat2.addValue(x[1]);
 
 			} catch(Exception e) {
+				e.printStackTrace();
+				if(VERBOSE) System.exit(0);
 			}
 			cont ++;
 			if(cont % 100 == 0) System.out.println(cont +" out of "+dirs.length);
@@ -59,17 +58,6 @@ public class TestTopicAccuracy {
 	   double[] cdf1 = new double[100];
 	   double[] cdf2 = new double[100];
 	   
-	   List<double[]> ps = new ArrayList<double[]>();
-	   ps.add(p);
-	   ps.add(p);
-	   
-	   List<double[]> cdf = new ArrayList<double[]>();
-	   cdf.add(cdf1);
-	   cdf.add(cdf2);
-	   
-	   List<String> names = new ArrayList<String>();
-	   names.add("cdf1");
-	   names.add("cdf2");
 	   
 	   for(int i=1;i<=100;i++) {
 		   p[i-1] = (double)i/100;
@@ -77,10 +65,8 @@ public class TestTopicAccuracy {
 		   cdf2[i-1] = stat2.getPercentile(i);
 	   }
 	   
-	   RPlotter.drawScatter(cdf, ps, names, "cdf", "error", "cdf", Config.getInstance().base_folder+"/Images/TopicAccuracy.pdf", "geom_line()");	
-	   
-		
-		System.out.println("Done!");
+	   RPlotter.drawScatter(cdf1, p, "w in trace and topic / w in trace", "cdf", Config.getInstance().base_folder+"/Images/TopicAccuracy.pdf", "geom_line()");	
+	   System.out.println("Done!");
 	}
 	
 	
@@ -93,20 +79,20 @@ public class TestTopicAccuracy {
 		BufferedReader br = new BufferedReader(new FileReader(new File(Config.getInstance().base_folder+"/Topic/"+user+"/p_w_z.txt")));
 		String line;
 		// Topic_0,n,7.666,45.0713-n,7.6529,45.055,0.27,n,7.6529,45.055-n,7.666,45.0713,0.2,m,7.6529,45.055-e,7.6587,45.0707,0.13,m,7.666,45.0713-a,7.6529,45.055,0.07
-		Map<Integer,List<Entry<String,Double>>> topics = new TreeMap<Integer,List<Entry<String,Double>>>();
+		Map<Integer,List<Entry<String,Double>>> pwz = new TreeMap<Integer,List<Entry<String,Double>>>();
 		while((line = br.readLine()) != null) {
 			List<Map.Entry<String,Double>> topic = bow.parsePWZ(line);
 			String[] e = line.split(",|-");
 			int topic_index = Integer.parseInt(e[0].split("_")[1]);
-			topics.put(topic_index, topic);
+			pwz.put(topic_index, topic);
 		}
 		br.close();
 		
 		if(VERBOSE) {
 			System.out.println("\npwz");
-			for(int k: topics.keySet()) {
+			for(int k: pwz.keySet()) {
 				System.out.print("topic"+k);
-				List<Map.Entry<String,Double>> topic = topics.get(k);
+				List<Map.Entry<String,Double>> topic = pwz.get(k);
 				for(int i=0; i<topic.size() && i<5;i++) {
 					Entry<String,Double> wp = topic.get(i);
 					System.out.print(" ("+wp.getKey()+","+wp.getValue()+")");
@@ -172,48 +158,109 @@ public class TestTopicAccuracy {
 		}
 		
 		
-		return computeAccuracy(topics,pzd,trace);
+		return computeAccuracy(pwz,pzd,trace);
 		
 	}
 	
 	
 	
-	public static double[] computeAccuracy(Map<Integer,List<Entry<String,Double>>> topics,Map<String,double[]> pzd,Map<String,Set<String>> trace) {
-		double cont1 = 0, cont2 = 0;
+	public static double[] computeAccuracy(Map<Integer,List<Entry<String,Double>>> pwz,Map<String,double[]> pzd,Map<String,Set<String>> trace) {
+		double w_in_trace_and_topic = 0;
 		double size1 = 0; int size2 = 0;
 		
 		for(String day: trace.keySet()) {
 			double[] p = pzd.get(day);
 			if(p == null) continue;
 			
-			// get maximum topic
-			int maxi = 0;
-			for(int i=1; i<p.length;i++)
-				if(p[maxi] < p[i]) maxi = i;
-			List<Entry<String,Double>> topic = topics.get(maxi);
 			
 			
-			Set<String> mov = trace.get(day);
 			
-			Set<String> topWords = new HashSet<String>();
-			for(Entry<String,Double> wp : topic) {
-				if(wp.getValue() > 0.1) topWords.add(wp.getKey());
+			// hour --> word --> number of repetitions
+			Map<String,Map<String,Integer>> mapx = new HashMap<String,Map<String,Integer>>();
+			for(String w: trace.get(day)) {
+				String h = w.split(",")[0];
+				Map<String,Integer> x = mapx.get(h);
+				if(x==null) {
+					x = new HashMap<String,Integer>();
+					mapx.put(h, x);
+				}
+				Integer cont = x.get(w);
+				if(cont == null) cont = 0;
+				x.put(w, cont + 1);
+			}
+			
+			/*
+			// map associating for each hour the most frequent word in the user trace for that hour.
+			Map<String,List<String>> mov = new HashMap<String,List<String>>();
+			for(String h: mapx.keySet()) {
+				Map<String,Integer> x = mapx.get(h);
+				String mfw = null; // most frequent word
+				for(String w:  x.keySet())
+					if(mfw == null || x.get(mfw) < x.get(w)) mfw = w;
+				List<String> words = new ArrayList<String>();
+				words.add(mfw);
+				mov.put(h, words);
+			}
+			*/
+			
+			// map associating for each hour all the words generated by the user in that hour
+			Map<String,List<String>> mov = new HashMap<String,List<String>>();
+			for(String h: mapx.keySet()) {
+				Map<String,Integer> x = mapx.get(h);
+				List<String> words = new ArrayList<String>();
+				for(String w:  x.keySet())
+					words.add(w);
+				mov.put(h, words);
 			}
 			
 			
-			for(String m: mov)
-				if(topWords.contains(m)) cont1++;
-			for(String m: topWords)
-				if(mov.contains(m)) cont2++;
+			
+			// map associating for each hour the top word in the topics (pwd) for that hour
+			Map<String,Entry<String,Double>> topw = new HashMap<String,Entry<String,Double>>();
+			Map<String,Double> pwd = ComputePWD.pwd(pzd,pwz);
+			for(String word: pwd.keySet()) {
+				double prob = pwd.get(word);
+				String tword = word.split(";")[1];
+				String h = tword.split(",")[0];
+				Entry<String,Double> wp = topw.get(h);
+				if(wp == null || wp.getValue() < prob) topw.put(h, new SimpleEntry<String,Double>(tword,prob));
+			}
+			
+			
+			
+			
+			
+			if(VERBOSE) {
+				System.out.print("TRACE = ");
+				for(List<String> w: mov.values())
+					System.out.print(w+" ");
+				System.out.println();
+				System.out.print("TOPIC = ");
+				for(Entry<String,Double> wp : topw.values())
+					System.out.print(wp.getKey()+" ");
+				System.out.println();
+			}
+			
+			
+			
+			for(String h: mov.keySet()) {
+				List<String> trace_w = mov.get(h);
+				Entry<String,Double> topic_wp = topw.get(h);
+				if(topic_wp !=null) {
+					String topic_w = topic_wp.getKey();
+					if(trace_w.contains(topic_w)) w_in_trace_and_topic++;
+				}
+			}
+			
 			
 			size1 += mov.size();
-			size2 += topWords.size();
+			size2 += topw.size();
 		}
 		
 		if(VERBOSE) {
-			System.out.println(cont1+"/"+size1);
-			System.out.println(cont2+"/"+size2);
+			System.out.println(w_in_trace_and_topic+"/"+size1);
+			System.out.println(w_in_trace_and_topic+"/"+size2);
 		}
-		return new double[]{cont1/size1,cont2/size2};
+		return new double[]{w_in_trace_and_topic/size1,w_in_trace_and_topic/size2};
 	}
 }

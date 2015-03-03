@@ -27,15 +27,24 @@ public class CreatorRegionMapCircoscrizioni {
 
 	
 	public static void main(String[] args) throws Exception {
+		/*
 		String name = "torino_circoscrizioni_geo";
 		String input_file = "G:/DATASET/GEO/"+name+".csv";
 		String output_obj_file=Config.getInstance().base_folder+"/RegionMap/"+name+".ser";
-		process(name,input_file,output_obj_file);
+		processWTK(name,input_file,output_obj_file);
+		*/
+		
+		String name = "firenze_tourist_area";
+		String input_file = "G:/DATASET/GEO/"+name+".csv";
+		String output_obj_file=Config.getInstance().base_folder+"/RegionMap/"+name+".ser";
+		processKML(name,input_file,output_obj_file);
+		
+		
 		Logger.logln("Done!");
 	}
 	
 	
-	public static RegionMap process(String name, String input_file, String output_obj_file) throws Exception {
+	public static RegionMap processWTK(String name, String input_file, String output_obj_file) throws Exception {
 		
 		RegionMap rm = new RegionMap(name);
 		
@@ -50,9 +59,34 @@ public class CreatorRegionMapCircoscrizioni {
 			String n = e[1];
 			rm.add(new Region(n,GeomUtils.openGis2Geom(wtk_shape)));
 		}
+		
+		br.close();
+		
 		rm.printKML();
 		CopyAndSerializationUtils.save(new File(output_obj_file), rm);
 		
 		return rm;
 	}
+	
+	
+	public static RegionMap processKML(String name, String input_file, String output_obj_file) throws Exception {
+		
+		RegionMap rm = new RegionMap(name);
+		
+		BufferedReader br = new BufferedReader(new FileReader(input_file));
+		String line;
+		while((line=br.readLine())!=null) {
+			String[] e = line.split(";");
+			String n = e[0];
+			rm.add(new Region(n,e[1]));
+		}
+		
+		br.close();
+		
+		rm.printKML();
+		CopyAndSerializationUtils.save(new File(output_obj_file), rm);
+		
+		return rm;
+	}
+	
 }
