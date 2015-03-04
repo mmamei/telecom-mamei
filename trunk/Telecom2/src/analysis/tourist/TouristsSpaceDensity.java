@@ -4,15 +4,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import region.RegionI;
 import region.RegionMap;
 import utils.Config;
 import utils.CopyAndSerializationUtils;
+import visual.r.RPlotter;
 import analysis.densityANDflows.density.PopulationDensity;
 
 
@@ -24,29 +27,30 @@ import analysis.densityANDflows.density.PopulationDensity;
 public class TouristsSpaceDensity {
 	
 	public static void main(String[] args) throws Exception {
+		/*
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
-		//process(Config.getInstance().base_folder+"/Tourist/Venezia_March2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_March2014.csv",Config.getInstance().base_folder+"/RegionMap/VeneziaCenter.ser", false);
+		process(Config.getInstance().base_folder+"/Tourist/Venezia_March2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_March2014.csv",Config.getInstance().base_folder+"/RegionMap/VeneziaCenter.ser", false);
 		process(Config.getInstance().base_folder+"/Tourist/Venezia_March2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_March2014.csv",Config.getInstance().base_folder+"/RegionMap/VeneziaProv.ser", true);
 		
-		//process(Config.getInstance().base_folder+"/Tourist/Firenze_March2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_March2014.csv",Config.getInstance().base_folder+"/RegionMap/FirenzeCenter.ser", false);
+		process(Config.getInstance().base_folder+"/Tourist/Firenze_March2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_March2014.csv",Config.getInstance().base_folder+"/RegionMap/FirenzeCenter.ser", false);
 		process(Config.getInstance().base_folder+"/Tourist/Firenze_March2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_March2014.csv",Config.getInstance().base_folder+"/RegionMap/FirenzeProv.ser", true);
 		
 		
 		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
-		//process(Config.getInstance().base_folder+"/Tourist/Venezia_July2013_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_July2013.csv",Config.getInstance().base_folder+"/RegionMap/VeneziaCenter.ser", false);
+		process(Config.getInstance().base_folder+"/Tourist/Venezia_July2013_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_July2013.csv",Config.getInstance().base_folder+"/RegionMap/VeneziaCenter.ser", false);
 		process(Config.getInstance().base_folder+"/Tourist/Venezia_July2013_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_ve_Venezia_cellXHour_July2013.csv",Config.getInstance().base_folder+"/RegionMap/VeneziaProv.ser", true);
 		
-		//process(Config.getInstance().base_folder+"/Tourist/Firenze_July2013_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_July2013.csv",Config.getInstance().base_folder+"/RegionMap/FirenzeCenter.ser", false);
+		process(Config.getInstance().base_folder+"/Tourist/Firenze_July2013_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_July2013.csv",Config.getInstance().base_folder+"/RegionMap/FirenzeCenter.ser", false);
 		process(Config.getInstance().base_folder+"/Tourist/Firenze_July2013_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_fi_Firenze_cellXHour_July2013.csv",Config.getInstance().base_folder+"/RegionMap/FirenzeProv.ser", true);
 		
 		
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.OCTOBER,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.OCTOBER,31,23,59,59);
-		//process(Config.getInstance().base_folder+"/Tourist/Torino_Oct2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_piem_Torino_cellXHour_Oct2014.csv",Config.getInstance().base_folder+"/RegionMap/TorinoCenter.ser", false);
+		process(Config.getInstance().base_folder+"/Tourist/Torino_Oct2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_piem_Torino_cellXHour_Oct2014.csv",Config.getInstance().base_folder+"/RegionMap/TorinoCenter.ser", false);
 		process(Config.getInstance().base_folder+"/Tourist/Torino_Oct2014_noregion_classes.ser",Config.getInstance().base_folder+"/UserEventCounter/file_pls_piem_Torino_cellXHour_Oct2014.csv",Config.getInstance().base_folder+"/RegionMap/TorinoProv.ser", true);
-		
+		*/
 				
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,31,23,59,59);
@@ -65,8 +69,46 @@ public class TouristsSpaceDensity {
 		PopulationDensity pd = new PopulationDensity();
 		Map<String,Map<String,Double>> profile_space_density = computeSpaceDensity(new File(cellXHourFile), rm, user_prof, in_out_only);
 		String name = new File(cellXHourFile).getName().replace(".csv", "");
-		for(String profile: profile_space_density.keySet()) 
-			pd.plotSpaceDensity(name+"_"+profile+(in_out_only ? "_inout" : ""), profile_space_density.get(profile), rm, 0);
+		for(String profile: profile_space_density.keySet()) {
+			Map<String,Double> density = profile_space_density.get(profile);
+			pd.plotSpaceDensity(name+"_"+profile+(in_out_only ? "_inout" : ""), density, rm, 0);
+			
+			List<Double> llat = new ArrayList<Double>();
+			List<Double> llon = new ArrayList<Double>();
+			List<Double> lw = new ArrayList<Double>();
+			double max = 0;
+			for(RegionI r: rm.getRegions()) {
+				Double val = density.get(r.getName());
+				if(val != null) max = Math.max(max, val);
+			}
+			for(RegionI r: rm.getRegions()) {
+				Double val = density.get(r.getName());
+				//System.out.println(r.getName()+" = "+val);
+				if(val != null) {
+					
+					if(10*val/max > 0) {
+					
+						llat.add(r.getLatLon()[0]);
+						llon.add(r.getLatLon()[1]);
+						lw.add(val);
+					}
+					
+				}
+			}
+			
+			double[] lat = new double[llat.size()];
+			double[] lon = new double[llon.size()];
+			double[] w = new double[lw.size()];
+			for(int i=0; i<lat.length;i++) {
+				lat[i] = llat.get(i);
+				lon[i] = llon.get(i);
+				w[i] = 1;//lw.get(i);
+				//System.out.println(w[i]);
+			}
+			
+			RPlotter.drawHeatMap(lat, lon, w, Config.getInstance().base_folder+"/Images/map"+name+".pdf");
+			
+		}
 	}
 	
 	
@@ -77,19 +119,25 @@ public class TouristsSpaceDensity {
 		BufferedReader br = new BufferedReader(new FileReader(cellXHourFile));
 		
 		Map<String,Map<String,Double>> profile_space_density = new HashMap<String,Map<String,Double>>();
-		for(String profile: GTExtractor.CLASSES.split(",")) {
+		/*
+		for(String profile: GTExtractor.PROFILES.split(",")) {
 			Map<String,Double> sd = new HashMap<String,Double>();
 			for(RegionI r: rm.getRegions())
 				sd.put(r.getName(), 0.0);
 			profile_space_density.put(profile, sd);
 		}
+		*/
 		
-		int cont = 0;
+		Map<String,Double> xsd = new HashMap<String,Double>();
+		for(RegionI r: rm.getRegions())
+			xsd.put(r.getName(), 0.0);
+		profile_space_density.put("Tourist", xsd);
+		
+		
+	
 		String line;
 		while((line=br.readLine())!=null) {
 			if(line.startsWith("//")) continue;
-			
-			cont++;
 			
 			String[] p = line.split(",");
 			String user_id = p[0];
@@ -116,7 +164,11 @@ public class TouristsSpaceDensity {
 						System.out.println(prof);
 						continue;
 					}
+					
 					Map<String,Double> sd = profile_space_density.get(prof);
+					
+					if(sd == null) continue;
+					
 					float[] ai = rm.computeAreaIntersection(celllac,F.parse(x[0]).getTime());
 					if(!Double.isNaN(ai[0]))
 					for(int j=0; j<ai.length;j++) {
@@ -126,6 +178,8 @@ public class TouristsSpaceDensity {
 				}	
 			}catch(Exception e) {
 				System.out.println("BAD LINE: "+line);
+				e.printStackTrace();
+				//System.exit(0);
 				continue;
 			}		
 		}
