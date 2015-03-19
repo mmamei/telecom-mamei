@@ -22,8 +22,8 @@ public class Excursionist extends Profile {
 		boolean is_italian = super.isItalian(mnt);
 		
 		int days_in_area = countDays(list,Calendar.DAY_OF_MONTH,null);
-		boolean in_transit = transit.check(user_id, mnt, num_pls, num_days, days_interval, list, tot_days);
-		if(is_italian && days_in_area == 1 && !in_transit) return true;
+		int maxdh = transit.maxTimeInPlacemark(list);
+		if(is_italian && days_in_area == 1 && maxdh >= 4) return true;
 		return false;
 		
 	}

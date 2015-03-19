@@ -9,6 +9,7 @@ import java.util.Random;
 
 import utils.Config;
 import utils.CopyAndSerializationUtils;
+import utils.LatexUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instance;
@@ -25,7 +26,7 @@ public class WekaUseClassifier {
 		File dir = new File(Config.getInstance().base_folder+"/Tourist");
 		for(File f: dir.listFiles()) {
 			if(f.getAbsolutePath().endsWith(".arff")) {
-				File classifier = new File(Config.getInstance().base_folder+"/Tourist/Resampled/"+f.getName().replaceAll(".arff", "_resampled.model"));
+				File classifier = new File(Config.getInstance().base_folder+"/Tourist/Resampled/"+f.getName().replaceAll(".arff", "_resampled_j48.model"));
 				//System.out.println(classifier);
 				if(classifier.exists())
 					classify(f.getAbsolutePath(),classifier.getAbsolutePath());
@@ -86,9 +87,9 @@ public class WekaUseClassifier {
 		
 		CopyAndSerializationUtils.save(new File(arff.replace(".arff", "_classes.ser")), mu);
 		
-		
-		
-		
+		String texfile = new File(arff).getName().replace(".arff", ".tex");
+		LatexUtils.printTable(Config.getInstance().paper_folder+"/img/tables/"+texfile,"classified as --$>$", classes, classes, cm);
+		/*
 		for(int j=0; j<classes.length;j++)
 			System.out.print(classes[j].substring(0,3)+"\t");
 		System.out.println("<-- classified as");
@@ -97,7 +98,7 @@ public class WekaUseClassifier {
 				System.out.print(cm[i][j]+"\t");
 			System.out.println(classes[i]);
 		}
-		
+		*/
 		
 		
 	   

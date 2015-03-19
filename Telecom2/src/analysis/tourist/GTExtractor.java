@@ -30,39 +30,48 @@ import dataset.file.DataFactory;
 public class GTExtractor {
 	
 	
-	public static final String CLASSES = "Resident,Tourist,Commuter,Transit,Excursionist";
-	
+	public static final String[] PROFILES = {"Resident","Tourist","Commuter","Transit","Excursionist"};
 	
 	public static void main(String[] args) throws Exception {
-		/*
-		final String POST = "_July2013";
-		final String PRE = "file_pls_ve_";
-		final String PLACEMARK = "Venezia";
-		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
-		*/
 		
-		final String POST = "_Oct2014";
-		final String PRE = "file_pls_piem_";
-		final String PLACEMARK = "Torino";
-		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.OCTOBER,20,0,0,0);
-		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.NOVEMBER,14,23,59,59);
+		
+		
+			
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,31,23,59,59);
+		runProcess("file_pls_pu_","Lecce","_Aug2014");
 		
 		/*
-		final String POST = "_Sep2014";
-		final String PRE = "file_pls_pu_";
-		final String PLACEMARK = "Lecce";
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,31,23,59,59);
+		runProcess("file_pls_pu_","Lecce","_Sep2014");
+		
+		
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.OCTOBER,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.OCTOBER,31,23,59,59);
+		runProcess("file_pls_piem_","Torino","_Oct2014");
+		
+		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
+		runProcess("file_pls_ve_","Venezia","_July2013");
+		runProcess("file_pls_fi_","Firenze","_July2013");
+			
+				
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
+		runProcess("file_pls_ve_","Venezia","_March2014");
+		runProcess("file_pls_fi_","Firenze","_March2014");
 		*/
+	}
+	
+	
+	public static void runProcess(String pre, String placemarkName,String post) throws Exception {
 		
-		
-		
-		final String FILE = Config.getInstance().base_folder+"/UserEventCounter/"+PRE+PLACEMARK+"_cellXHour"+POST+".csv";
+		String file = Config.getInstance().base_folder+"/UserEventCounter/"+pre+placemarkName+"_cellXHour"+post+".csv";
 		
 		String line;
 		
-		File f = new File(FILE);
+		File f = new File(file);
 		if(f == null) {
 			Logger.logln("Run UserEventCounterCellacXHour first!");
 			System.exit(0);
@@ -75,7 +84,7 @@ public class GTExtractor {
 		int num_pls,num_days,days_interval;
 		List<PLSEvent> list;
 		
-		Placemark placemark = Placemark.getPlacemark(PLACEMARK);
+		Placemark placemark = Placemark.getPlacemark(placemarkName);
 		
 		Map<String,Profile> mp = new HashMap<String,Profile>(); // map profiles
 		mp.put("Resident", new Resident(placemark));
@@ -101,6 +110,8 @@ public class GTExtractor {
 		while((line = br.readLine())!=null) {	
 			try {
 				String[] p = line.split(",");
+				
+					
 				user_id = p[0];
 				mnt = p[1];
 				num_pls = Integer.parseInt(p[2]);
@@ -165,12 +176,12 @@ public class GTExtractor {
 		
 		File dir = new File(Config.getInstance().base_folder+"/Tourist");
 		dir.mkdirs();
-		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/"+PLACEMARK+"_gt_profiles"+POST+".csv"));
+		PrintWriter pw = new PrintWriter(new FileWriter(dir+"/"+placemarkName+"_gt_profiles"+post+".csv"));
 		for(String user: mu.keySet())
 			pw.println(user+","+mu.get(user));
 		pw.close();
 		
-		CopyAndSerializationUtils.save(new File(Config.getInstance().base_folder+"/Tourist/"+PLACEMARK+"_gt_profiles"+POST+".ser"), mu);
+		CopyAndSerializationUtils.save(new File(Config.getInstance().base_folder+"/Tourist/"+placemarkName+"_gt_profiles"+post+".ser"), mu);
 		
 		Logger.logln("Done!");
 	}	

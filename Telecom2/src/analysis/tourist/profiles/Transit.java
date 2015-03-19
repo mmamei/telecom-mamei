@@ -40,15 +40,12 @@ public class Transit extends Profile {
 		}
 		*/
 		
-		
-		if(user_id.equals("c447d5e96e77ecdca7271e65d16c2dc1cf94162c15a1aa7dce3532e5a9f"))
-			System.out.println("========> "+isTransit(list));
-		
-		
-		return isTransit(list);
+		int maxdh = maxTimeInPlacemark(list);
+		//System.out.println(maxdh);
+		return maxdh != -1 && maxdh < 4;
 	}	
 	
-	
+	/*
 	private boolean isTransit(List<PLSEvent> list) {
 		PLSEvent spotted = list.get(0);
 		if(placemark.contains(spotted.getCellac())) return false; 
@@ -73,5 +70,33 @@ public class Transit extends Profile {
 		}
 		return num_entry > 0;
 	}
+	*/
 	
+	
+	public int maxTimeInPlacemark(List<PLSEvent> list) {
+		PLSEvent spotted = list.get(0);
+		if(placemark.contains(spotted.getCellac())) return -1; 
+		if(placemark.contains(list.get(list.size()-1).getCellac())) return -1;
+		
+		int num_entry = 0;
+		boolean outside_placemark = true;		
+		int maxdh = -1;
+		for(int i=1; i<list.size();i++) {
+			PLSEvent cc = list.get(i);
+			if(outside_placemark && !placemark.contains(cc.getCellac())) // we are still out
+				spotted = cc;
+			if(!outside_placemark && !placemark.contains(cc.getCellac())) { // we exit
+				int dh = (int)((cc.getCalendar().getTimeInMillis() - spotted.getCalendar().getTimeInMillis()) / (1000 * 3600));
+				if(dh > maxdh) maxdh = dh;
+				spotted = cc;
+				outside_placemark = true;
+			}
+			if(outside_placemark && placemark.contains(cc.getCellac())) {
+				outside_placemark = false;
+				num_entry ++;
+			}
+		}
+		if(num_entry > 0) return maxdh;
+		else return -1;
+	}
 }

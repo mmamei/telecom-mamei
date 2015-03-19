@@ -34,10 +34,9 @@ public class CreatorRegionMapCircoscrizioni {
 		processWTK(name,input_file,output_obj_file);
 		*/
 		
-		String name = "firenze_tourist_area";
-		String input_file = "G:/DATASET/GEO/"+name+".csv";
-		String output_obj_file=Config.getInstance().base_folder+"/RegionMap/"+name+".ser";
-		processKML(name,input_file,output_obj_file);
+		String input_file = "G:/DATASET/GEO/venezia/circoscrizioni.txt";
+		String output_obj_file=Config.getInstance().base_folder+"/RegionMap/VeniceDistricts.ser";
+		processKML("VeniceDistricts",input_file,output_obj_file);
 		
 		
 		Logger.logln("Done!");
