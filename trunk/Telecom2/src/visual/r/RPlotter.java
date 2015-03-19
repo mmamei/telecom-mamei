@@ -34,7 +34,7 @@ public class RPlotter {
 	
 	public static void drawBar(String[] x, double [] y, String xlab, String ylab, String file, String opts) {
 		try {
-            	
+            file = file.replaceAll("_", "-");
             c = new RConnection();// make a new local connection on default port (6311)
             
             c.assign("x", x);
@@ -69,7 +69,7 @@ public class RPlotter {
 	
 	public static void drawBar(String[] x, List<double []> y, List<String> names, String kind, String xlab, String ylab, String file, String opts) {
 		try {
-            	
+			file = file.replaceAll("_", "-");
             c = new RConnection();// make a new local connection on default port (6311)
             
             c.assign("x", x);
@@ -91,15 +91,16 @@ public class RPlotter {
             String code = 
             		   "library(ggplot2);"
             		 + "library(reshape2);"
+            		 + "x <- ordered(x,levels=c(x));"
             	     + "z <- data.frame(x"+sby+");"
             	     + "names(z) <- c("+sbn+");"
             	     + "z <- melt(z,id.vars=c('x'));"
             	     + "names(z) <- c('x','"+kind+"','value');"
-            	     + "ggplot(z,aes(x=x, y=value, fill="+kind+")) + geom_bar(stat='identity', position='dodge') + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
-            	     + "ggsave('"+file+"');"
+            	     + "ggplot(z,aes(x=x, y=value, fill="+kind+")) + geom_bar(stat='identity', position='dodge') + scale_fill_grey() + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
+            	     + "ggsave('"+file+"',width=10);"
             	     + "dev.off();";
             
-            //System.out.println(code);
+            System.out.println(code);
             c.eval(code);
             c.close();
             if(VIEW) Desktop.getDesktop().open(new File(file));
@@ -125,7 +126,7 @@ public class RPlotter {
 	
 	public static void drawLine(double[] x, double [] y, String xlab, String ylab, String file, String opts) {
 		try {
-            	
+			file = file.replaceAll("_", "-");
             c = new RConnection();// make a new local connection on default port (6311)
             
             c.assign("x", x);
@@ -163,7 +164,7 @@ public class RPlotter {
 	
 	public static void drawLine(String[] x, List<double []> y, List<String> names, String kind, String xlab, String ylab, String file, String opts) {
 		try {
-            	
+			file = file.replaceAll("_", "-");
             c = new RConnection();// make a new local connection on default port (6311)
             
             c.assign("x", x);
@@ -185,15 +186,16 @@ public class RPlotter {
             String code = 
             		   "library(ggplot2);"
             		 + "library(reshape2);"
+            		 + "x <- ordered(x,levels=c(x));"
             	     + "z <- data.frame(x"+sby+");"
             	     + "names(z) <- c("+sbn+");"
             	     + "z <- melt(z,id.vars=c('x'));"
             	     + "names(z) <- c('x','"+kind+"','value');"
             	     + "ggplot(z,aes(x=x, y=value, linetype="+kind+", group="+kind+", shape="+kind+")) + geom_line() + geom_point() + theme_bw(base_size = "+FONT_SIZE+") +xlab('"+xlab+"') + ylab('"+ylab+"')"+end
-            	     + "ggsave('"+file+"');"
+            	     + "ggsave('"+file+"',width=10);"
             	     + "dev.off();";
             
-            //System.out.println(code);
+            System.out.println(code);
             c.eval(code);
             c.close();
             if(VIEW) Desktop.getDesktop().open(new File(file));
@@ -219,7 +221,7 @@ public class RPlotter {
 	
 	public static void drawScatter(double[] x, double [] y, String xlab, String ylab, String file, String opts) {
 		try {
-            	
+			file = file.replaceAll("_", "-");
             c = new RConnection();// make a new local connection on default port (6311)
             
             c.assign("x", x);
@@ -252,7 +254,7 @@ public class RPlotter {
 	
 	public static void drawScatter(List<double[]> x, List<double []> y, List<String> names, String kind, String xlab, String ylab, String file, String opts) {
 		try {
-            	
+			file = file.replaceAll("_", "-");
             c = new RConnection();// make a new local connection on default port (6311)
             
             for(int i=0; i<x.size();i++)
@@ -307,7 +309,7 @@ public class RPlotter {
 	/************************************************************************************************************/
 	
 	
-	public static void dawHeatMap(String name, Map<String,Double> density, RegionMap rm, double threshold, boolean log) {
+	public static void dawHeatMap(String file, Map<String,Double> density, RegionMap rm, boolean log, String text) {
 		List<double[]> points = new ArrayList<double[]>();
 		
 		double max = 0;
@@ -320,10 +322,10 @@ public class RPlotter {
 		for(RegionI r: rm.getRegions()) {
 			Double val = density.get(r.getName());
 			if(log) val = Math.log10(val);
-			if(val != null && val > threshold) {
+			if(val != null) {
 				double[][] lonlatbbox = r.getBboxLonLat(); // {{minlon,minlat},{maxlon,maxlat}}
 				
-				System.out.println(lonlatbbox[0][0]+","+lonlatbbox[0][1]+","+lonlatbbox[1][0]+","+lonlatbbox[1][1]);
+				//System.out.println(lonlatbbox[0][0]+","+lonlatbbox[0][1]+","+lonlatbbox[1][0]+","+lonlatbbox[1][1]);
 				int npoint = (int)(1000.0 * val / max);
 				for(int i=0; i<npoint;i++) {
 				// generate a random point within the bounding box
@@ -342,7 +344,7 @@ public class RPlotter {
 			lon[i] = points.get(i)[0];
 			lat[i] = points.get(i)[1];
 		}
-		System.out.println(points.size());
+		//System.out.println(points.size());
 		
 		Envelope e = rm.getEnvelope();
 		double[] lonlatBbox = new double[4];
@@ -351,32 +353,36 @@ public class RPlotter {
 		lonlatBbox[2] = e.getMaxX();
 		lonlatBbox[3] = e.getMaxY();
 		
-		drawHeatMap(lat,lon,lonlatBbox,Config.getInstance().base_folder+"/Images/"+name+".pdf");
+		drawHeatMap(lat,lon,lonlatBbox,file,text);
 		
 	}
 	
-	private static void drawHeatMap(double[] lat, double [] lon, double[] lonlatBbox, String file) {
+	private static void drawHeatMap(double[] lat, double [] lon, double[] lonlatBbox, String file, String text) {
+		String code = null;
 		try {
-            	
+			file = file.replaceAll("_", "-");
+			System.out.println(file);
             c = new RConnection();// make a new local connection on default port (6311)
             
           
             c.assign("lat", lat);
             c.assign("lon", lon);
             c.assign("bbox",lonlatBbox);
-
             
-            String code = "library(ggmap);"+
+           
+            
+            // install.packages('ggmap');
+            	   code = "library(ggmap);"+
          				  "W <- data.frame(lat,lon);"+
          				  "amap <- c(bbox);"+
-         				  "amap.map = get_map(location = amap, maptype='terrain');"+
+         				  "amap.map = get_map(location = amap, maptype='terrain', color='bw');"+
          				  "ggmap(amap.map, extent = 'device', legend='bottomright')+"+
          				  "geom_density2d(data = W, aes(x = lon, y = lat), colour='black') +"+
-         				  "stat_density2d(data = W, aes(x = lon, y = lat, fill = ..level.., alpha = ..level..),size = 0.01, bins = 16, geom = 'polygon') + scale_fill_gradient(low = 'yellow', high = 'red') + scale_alpha(range = c(0.00, 0.25), guide = FALSE)+"+
-         				  "theme(legend.title=element_blank(), axis.title = element_blank(), text = element_text(size = 18));"+
+         				  "stat_density2d(data = W, aes(x = lon, y = lat, fill = ..level.., alpha = ..level..),size = 0.01, bins = 16, geom = 'polygon') + scale_fill_gradient(name='"+text+"',low = 'yellow', high = 'red') + scale_alpha(range = c(0.00, 0.25), guide = FALSE)+"+
+         				  "theme(axis.title = element_blank(), text = element_text(size = 18));"+
          				  "ggsave('"+file+"',width=10, height=10);";
             
-            System.out.println(code);
+            //System.out.println(code);
             c.eval(code);
             c.close();
             if(VIEW) Desktop.getDesktop().open(new File(file));
@@ -389,6 +395,7 @@ public class RPlotter {
             else {
             	c.close();
             	e.printStackTrace();
+            	System.err.println(code);
             }
         }      
 	}
@@ -396,48 +403,48 @@ public class RPlotter {
 	
 	public static void main(String[] args) {
 		
-		//drawBar(new String[]{"a","b","c"},new double[]{5,6,7},"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
-		//drawLine(new double[]{1,2,3},new double[]{5,6,7},"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
-		//drawScatter(new double[]{1,2,9},new double[]{5,6,7},"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
+//		drawBar(new String[]{"a","b","c"},new double[]{5,6,7},"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
+//		drawLine(new double[]{1,2,3},new double[]{5,6,7},"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
+//		drawScatter(new double[]{1,2,9},new double[]{5,6,7},"x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
+
 		
-		/*
-		List<double[]> l = new ArrayList<double[]>();
-		l.add(new double[]{5,6,7});
-		l.add(new double[]{1,2,7});
-		l.add(new double[]{5,-1,4});
-		
-		List<String> names = new ArrayList<String>();
-		names.add("ok1");
-		names.add("ok2");
-		names.add("ok3");
-		
-		drawBar(new String[]{"a","b","c"},l,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
-		//drawLine(new String[]{"a","b","c"},l,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
-		*/
-		
-		/*
-		List<double[]> lx = new ArrayList<double[]>();
-		lx.add(new double[]{5,6,7});
-		lx.add(new double[]{1,2,7});
-		lx.add(new double[]{5,-1,4});
+//		List<double[]> l = new ArrayList<double[]>();
+//		l.add(new double[]{5,6,7,8});
+//		l.add(new double[]{1,2,7,9});
+//		l.add(new double[]{5,-1,4,10});
+//		
+//		List<String> names = new ArrayList<String>();
+//		names.add("ok1");
+//		names.add("ok2");
+//		names.add("ok3");
+//		
+//		drawBar(new String[]{"a","b","c","d"},l,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
+//		drawLine(new String[]{"3","2","1","0"},l,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
 		
 		
-		List<double[]> ly = new ArrayList<double[]>();
-		ly.add(new double[]{5,6,7});
-		ly.add(new double[]{1,2,7});
-		ly.add(new double[]{5,-1,4});
 		
-		List<String> names = new ArrayList<String>();
-		names.add("stadium1");
-		names.add("stadium2");
-		names.add("stadium3");
-		
-		drawScatter(lx,ly,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
-		*/
+//		List<double[]> lx = new ArrayList<double[]>();
+//		lx.add(new double[]{5,6,7});
+//		lx.add(new double[]{1,2,7});
+//		lx.add(new double[]{5,-1,4});
+//		
+//		
+//		List<double[]> ly = new ArrayList<double[]>();
+//		ly.add(new double[]{5,6,7});
+//		ly.add(new double[]{1,2,7});
+//		ly.add(new double[]{5,-1,4});
+//		
+//		List<String> names = new ArrayList<String>();
+//		names.add("stadium1");
+//		names.add("stadium2");
+//		names.add("stadium3");
+//		
+//		drawScatter(lx,ly,names,"types","x","y",Config.getInstance().base_folder+"/Images/test.pdf",null);
+//		
 		
 		double[] lat = new double[]{29.775,30.240,29.803};
 		double[] lon = new double[]{-93.649,-94.270,-94.418};
-		double[] lonlatBBox = new double[]{-94.5,29.7,-93.6,30.3};
+		double[] lonlatBBox = new double[]{-96.5,28.7,-93.6,32.9};
 		
 		System.out.print("lat<-c(");
 		for(double l: lat)
@@ -454,7 +461,7 @@ public class RPlotter {
 		 System.out.print(l+",");
 		System.out.println(");");
 		
-		drawHeatMap(lat,lon,lonlatBBox,Config.getInstance().base_folder+"/Images/map.pdf");
+		drawHeatMap(lat,lon,lonlatBBox,Config.getInstance().base_folder+"/Images/map.pdf","Excursionist (in/out)");
 		
 		
 	}

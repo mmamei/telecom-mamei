@@ -34,19 +34,18 @@ public class Region extends RegionI {
 			if(x.equals("")) return;
 			String[] coord = x.split(",");
 			for(String c: coord) {
-				double lat = Double.parseDouble(c.substring(0,c.indexOf(" ")));
-				double lon = Double.parseDouble(c.substring(c.indexOf(" ")+1));
-				
+				double lon = Double.parseDouble(c.substring(0,c.indexOf(" ")));
+				double lat = Double.parseDouble(c.substring(c.indexOf(" ")+1));
 				minlon = Math.min(minlon, lon);
 				minlat = Math.min(minlat, lat);
 				maxlon = Math.max(maxlon, lon);
 				maxlat = Math.max(maxlat, lat);
 			}
 			
-			// questo codice si puù sostituire con get envelope! test
+			// questo codice si può sostituire con get envelope! test
 			
 			bbox = new double[][]{{minlon,minlat},{maxlon,maxlat}};
-			centerLatLon = new double[]{(minlon+maxlon)/2,(minlat+maxlat)/2};
+			centerLatLon = new double[]{(minlat+maxlat)/2,(minlon+maxlon)/2};
 		}
 	}
 	

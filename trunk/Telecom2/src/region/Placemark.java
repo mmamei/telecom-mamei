@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -265,7 +267,11 @@ public class Placemark extends RegionI {
 		//Map<String,Double> bestRadius = PlacemarkRadiusExtractor.readBestR(true);	
 		//initPlacemaks();
 		//NetworkMap nm = NetworkMapFactory.getNetworkMap();
-		Placemark p = getPlacemark("Milano");
+		
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,31,23,59,59);
+		Placemark p = getPlacemark("LecceBigBig");
+		
 		//System.out.println(p.getNumCells());
 		//System.out.println(p.contains("4018584023"));
 		//System.out.println(nm.get(Long.parseLong("4018584023")));

@@ -14,15 +14,38 @@ import utils.Logger;
 public class CreatorRegionMapGrid {
 	
 	public static void main(String[] args) throws Exception {
+		
+		
+		
+		// since Lecce placemrk is defined as a list of celllcs it is important to set the time proprely	
 		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,31,23,59,59);
-		String placemark = "Lecce";
-		String name = placemark+"Center";
-		int dr = 5000;
-		int size = 10;
+		
+		/*
+		String[] placemarks = new String[]{"Venezia","Firenze","Torino","Lecce"};
+		for(String p: placemarks) {
+			run(p,1000,10,p+"RealCenter");
+			run(p,5000,10,p+"Center");
+			run(p,20000,20,p+"Prov");
+		}
+		*/
+		
+		run("Puglia",0,50,"Puglia");
+		
+	
+		
+	}
+
+	
+	private static void run(String placemark, int dr, int size, String name) throws Exception {
 		Placemark p = Placemark.getPlacemark(placemark);
 		p.changeRadius(p.getRadius()+dr);
-		RegionMap rm = process(name,p.getBboxLonLat(),size);
+		double[][] bbox = p.getBboxLonLat();
+		run(bbox,size,name);
+	}
+	
+	private static void run(double[][] lonlatbbox, int size, String name) throws Exception {
+		RegionMap rm = process(name,lonlatbbox,size);
 		rm.printKML();
 		String output_obj_file=new File(Config.getInstance().base_folder+"/RegionMap").getAbsolutePath()+"/"+name+".ser";
 		CopyAndSerializationUtils.save(new File(output_obj_file), rm);

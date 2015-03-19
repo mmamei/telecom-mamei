@@ -27,42 +27,59 @@ public class WekaPreprocess {
 	
 	public static void main(String[] args) throws Exception {
 		
+		
+				
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.AUGUST,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.AUGUST,31,23,59,59);
+		//runProcess("file_pls_pu_","Lecce","_Aug2014",null);
+			
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.SEPTEMBER,31,23,59,59);
+		//runProcess("file_pls_pu_","Lecce","_Sep2014",null);
+		
+		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.OCTOBER,1,0,0,0);
+		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.OCTOBER,31,23,59,59);
+		//runProcess("file_pls_piem_","Torino","_Oct2014",null);
+		//runProcess("file_pls_piem_","Torino","_Oct2014",Config.getInstance().base_folder+"/RegionMap/TorinoArea.ser");
+			
 		//Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
 		//Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
-		//createARFF("file_pls_ve_","Venezia","_July2013",null);
-		//createARFF("file_pls_fi_","Firenze","_July2013",null);
+		//runProcess("file_pls_ve_","Venezia","_July2013",null);
+		//runProcess("file_pls_fi_","Firenze","_July2013",null);
+			
+				
+		Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
+		Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
+		runProcess("file_pls_ve_","Venezia","_March2014",null);
+		runProcess("file_pls_fi_","Firenze","_March2014",null);
 		
-		//Config.getInstance().pls_start_time = new GregorianCalendar(2014,Calendar.MARCH,1,0,0,0);
-		//Config.getInstance().pls_end_time = new GregorianCalendar(2014,Calendar.MARCH,31,23,59,59);
-		//createARFF("file_pls_ve_","Venezia","_March2014",null);
-		//createARFF("file_pls_fi_","Firenze","_March2014",null);
-
+		runProcess("file_pls_ve_","Venezia","_March2014",Config.getInstance().base_folder+"/RegionMap/VeneziaRealCenter.ser");
+		runProcess("file_pls_fi_","Firenze","_March2014",Config.getInstance().base_folder+"/RegionMap/FirenzeRealCenter.ser");
 		
-		//preprocess("Venezia","_July2013",null);
-		//preprocess("Venezia","_March2014",null);
-		//preprocess("Firenze","_July2013",null);
-		//preprocess("Firenze","_March2014",null);
-		
-		preprocess("Torino","_Oct2014","torino_tourist_area.ser");
-		preprocess("Torino","_Oct2014",null);
-		preprocess("Lecce","_Aug2014",null);
-		preprocess("Lecce","_Sep2014",null);
 		
 		System.out.println("Done");
 	}
 	
+	public static void runProcess(String pre, String placemark, String post, String region) throws Exception {
+		createARFF(pre,placemark,post,region);
+		preprocess(placemark,post,region);
+	}
+	
 	
 	public static void createARFF(String pre, String city, String month, String regionSerFile) throws Exception {
+		File f = regionSerFile == null ? null : new File(regionSerFile);
+		//System.out.println(f.getName());
 		String cellXHourFile =Config.getInstance().base_folder+"/UserEventCounter/"+pre+city+"_cellXHour"+month+".csv";
 		String gt_ser_file = Config.getInstance().base_folder+"/Tourist/"+city+"_gt_profiles"+month+".ser";
-		String weka_file = Config.getInstance().base_folder+"/Tourist/"+city+month+(regionSerFile==null ? "_noregion" : "_"+regionSerFile.substring(0,regionSerFile.lastIndexOf(".ser")))+".arff";
+		String weka_file = Config.getInstance().base_folder+"/Tourist/"+city+month+(regionSerFile==null ? "_noregion" : "_"+f.getName().substring(0,f.getName().lastIndexOf(".ser")))+".arff";
 		Placemark placemark = Placemark.getPlacemark(city);
 		RegionMap rm = regionSerFile == null ? null : (RegionMap)CopyAndSerializationUtils.restore(new File(regionSerFile));
 		PLSSpaceDensity.process(rm,cellXHourFile,gt_ser_file,null,weka_file,placemark);
 	}
 	
 	public static void preprocess(String city, String month, String regionSerFile) throws Exception {
-		String inFile = Config.getInstance().base_folder+"/Tourist/"+city+month+(regionSerFile==null ? "_noregion" : "_"+regionSerFile.substring(0,regionSerFile.lastIndexOf(".ser")))+".arff";
+		String inFile = Config.getInstance().base_folder+"/Tourist/"+city+month+(regionSerFile==null ? "_noregion" : "_"+regionSerFile.substring(regionSerFile.lastIndexOf("/")+1,regionSerFile.lastIndexOf(".ser")))+".arff";
+		System.out.println(inFile);
 		DataSource source = new DataSource(inFile);
 		Instances data = source.getDataSet();
 		double resample = data.numInstances() < 200000 ? 4 : 2;
@@ -90,7 +107,7 @@ public class WekaPreprocess {
 		
 		ArffSaver saver = new ArffSaver();
 		saver.setInstances(data);
-		saver.setFile(new File(Config.getInstance().base_folder+"/Tourist/Resampled/"+city+month+(regionSerFile==null ? "_noregion" : "_"+regionSerFile.substring(0,regionSerFile.lastIndexOf(".ser")))+"_resampled.arff"));
+		saver.setFile(new File(Config.getInstance().base_folder+"/Tourist/Resampled/"+city+month+(regionSerFile==null ? "_noregion" : "_"+regionSerFile.substring(regionSerFile.lastIndexOf("/")+1,regionSerFile.lastIndexOf(".ser")))+"_resampled.arff"));
 		saver.writeBatch();
 	}
 	

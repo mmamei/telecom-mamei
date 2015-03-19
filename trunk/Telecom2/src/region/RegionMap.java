@@ -35,10 +35,15 @@ public class RegionMap implements Serializable {
 	
 	protected String name;
 	protected Map<String,RegionI> rm;
+	private transient Map<Long,float[]> cache_intersection;
+	private transient Map<String,RegionI> cache_closest;
+	private transient Map<Integer,RegionI> int2region = null;
 	
 	public RegionMap(String name) {
 		this.name = name;
 		rm = new HashMap<String,RegionI>();
+		cache_intersection = new HashMap<Long,float[]>();
+		cache_closest = new HashMap<String,RegionI>();
 	}
 	
 	
@@ -62,7 +67,6 @@ public class RegionMap implements Serializable {
 		return rm.get(name);
 	}
 	
-	private transient Map<Integer,RegionI> int2region = null;
 	public RegionI getRegion(int i) {
 		if(int2region == null) {
 			int2region = new HashMap<Integer,RegionI>();
@@ -92,11 +96,16 @@ public class RegionMap implements Serializable {
 		return null;		
 	}
 	
-	private static transient Map<Long,float[]> cache_intersection = new HashMap<Long,float[]>();
 	
+	public static final boolean CACHE_INTERSECTION = true;
 	public float[] computeAreaIntersection(long celllac, long time) {
-		float[] area_intersection = cache_intersection.get(celllac);
-		if(area_intersection != null) return area_intersection;
+		
+		float[] area_intersection = null;
+		if(CACHE_INTERSECTION) {
+			if(cache_intersection == null) cache_intersection = new HashMap<Long,float[]>();
+			area_intersection = cache_intersection.get(celllac);
+			if(area_intersection != null) return area_intersection;
+		}
 		area_intersection = new float[this.getNumRegions()];
 		RegionMap nm = DataFactory.getNetworkMapFactory().getNetworkMap(time);
 		
@@ -132,14 +141,13 @@ public class RegionMap implements Serializable {
 			//if(area_intersection[i] > 0) System.out.println(area_intersection[i]);
 		}
 		
-		
-		cache_intersection.put(celllac, area_intersection);
-		
+		if(CACHE_INTERSECTION) cache_intersection.put(celllac, area_intersection);
 		return area_intersection;
 	}
 	
-	private static transient Map<String,RegionI> cache_closest = new HashMap<String,RegionI>();
+	
 	public RegionI getClosest(String celllac, long time) {
+		if(cache_closest == null) cache_closest = new HashMap<String,RegionI>();
 		RegionI reg = cache_closest.get(celllac);
 		if(reg != null) return reg;
 		

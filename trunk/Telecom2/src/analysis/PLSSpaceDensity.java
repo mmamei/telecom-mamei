@@ -25,6 +25,7 @@ import utils.Config;
 import utils.CopyAndSerializationUtils;
 import utils.Logger;
 import analysis.tourist.GTExtractor;
+import analysis.tourist.profiles.Transit;
 
 
 /*
@@ -167,13 +168,6 @@ public class PLSSpaceDensity implements Serializable {
 		float[] ai;
 		
 		
-		// the following three variables are used to compute the maximum time interval in which the user is inside the city 
-		// this is useful to classify user in transit (their maximum time interval must be small)
-		boolean inarea = false; // boolean variable to see if the user is currently in the city
-		long prevTime = -1; // the last time the user entered the city
-		int max_dh = -1; // the maximum time interval (in hours) in which the user has been in the city
-		
-		
 		for(int i=5;i<p.length;i++) {
 			try {
 				// 2013-5-23:Sun:13:4018542484
@@ -200,32 +194,14 @@ public class PLSSpaceDensity implements Serializable {
 					days_in_area.add(x[0]+":"+x[1]);
 					
 					if(h >= 21 || h <= 6) nights_in_area.add(x[0]+":"+x[1]);
-						
-
-					
-					if(!inarea) { // before I was out
-						prevTime = time;		
-					}
-					else { // before I was in
-						int dh = (int)((time - prevTime)/(3600 * 1000));
-						if(max_dh == -1 || dh > max_dh) max_dh = dh;
-					}
-					inarea = true;
-				}
-				else {
-					
-					
-					
-					// event outside the city area
-					inarea = false;
-					prevTime = time;
-				}
+				}		
 			} catch(Exception e) {
 				System.out.println("Problems with "+p[i]);
 				e.printStackTrace();
 			}
 		}
-		max_h_interval = max_dh;
+		
+		max_h_interval = new Transit(placemark).maxTimeInPlacemark(PLSEvent.getDataFormUserEventCounterCellacXHourLine(events));
 		num_days_in_area = days_in_area.size();
 		num_nights_in_area = nights_in_area.size();
 		num_weekends_in_area  = 0;
@@ -278,7 +254,7 @@ public class PLSSpaceDensity implements Serializable {
 				sb.append("@ATTRIBUTE "+DP_LABELS[i]+"_"+HP_LABELS[j]+"_"+MAP_LABELS[k]+" NUMERIC\n");
 			}
 		}
-		sb.append("@ATTRIBUTE class {"+GTExtractor.CLASSES+"}\n");
+		sb.append("@ATTRIBUTE class {"+GTExtractor.PROFILES+"}\n");
 		sb.append("@DATA\n");
 		return sb.toString();
 	}
@@ -380,10 +356,20 @@ public class PLSSpaceDensity implements Serializable {
 	
 	
 	private void normalize() {
+		
+		
+		float sum = 0;
 		for(int i=0; i<plsMatrix.length;i++)
 		for(int j=0; j<plsMatrix[0].length;j++)
 		for(int k=0; k<plsMatrix[0][0].length;k++) 
-			plsMatrix[i][j][k] = plsMatrix[i][j][k] / num_pls;
+		 sum+= plsMatrix[i][j][k];
+		
+		//System.out.println(sum+" VS. "+num_pls);
+		
+		for(int i=0; i<plsMatrix.length;i++)
+		for(int j=0; j<plsMatrix[0].length;j++)
+		for(int k=0; k<plsMatrix[0][0].length;k++) 
+			plsMatrix[i][j][k] = plsMatrix[i][j][k] / sum;
 	}
 
 	// d_periods = {0,0,0,0,0,1,1}
