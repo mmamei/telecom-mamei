@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import utils.Config;
-import visual.text.LatexUtils;
+import visual.text.LatexTable;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
@@ -58,7 +58,7 @@ public static void main(String[] args) throws Exception {
 		
 		
 		
-		LatexUtils.printTable(Config.getInstance().paper_folder+"/img/tables/"+texfile, "", places, WekaTrainer.classifiers, m);
+		LatexTable.printTable(Config.getInstance().paper_folder+"/img/tables/"+texfile, "", places, WekaTrainer.classifiers, m);
 		
 	}
 	
