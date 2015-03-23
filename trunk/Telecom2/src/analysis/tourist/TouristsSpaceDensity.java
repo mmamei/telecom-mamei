@@ -36,12 +36,10 @@ import analysis.densityANDflows.density.PopulationDensity;
 public class TouristsSpaceDensity {
 	
 	public static boolean LOG_PLOT = false;
-	public static final Integer MAX = 1000;
+	public static final Integer MAX = null;
 	public static void main(String[] args) throws Exception {
 		
 		RPlotter.VIEW = false;
-		
-		
 		
 		Config.getInstance().pls_start_time = new GregorianCalendar(2013,Calendar.JULY,1,0,0,0);
 		Config.getInstance().pls_end_time = new GregorianCalendar(2013,Calendar.JULY,31,23,59,59);
@@ -105,7 +103,7 @@ public class TouristsSpaceDensity {
 		for(String profile: profile_space_density.keySet()) {
 			Map<String,Double> density = profile_space_density.get(profile);
 			//pd.plotSpaceDensity(name+"_"+profile+(in_out_only ? "_inout" : ""), density, rm, 0);
-			//RPlotter.dawHeatMap(dir+"/"+name+"_"+profile+(in_out_only ? "_inout" : "")+".pdf", density, rm, LOG_PLOT,profile+(in_out_only ? " (in/out)" : ""));
+			RPlotter.dawHeatMap(dir+"/"+name+"_"+profile+(in_out_only ? "_inout" : "")+".pdf", density, rm, LOG_PLOT,profile+(in_out_only ? " (in/out)" : ""));
 				
 		}
 		
@@ -261,7 +259,7 @@ public class TouristsSpaceDensity {
 			if(line.startsWith("//")) continue;
 			
 			cont ++;
-			if(cont > MAX) break;
+			if(MAX!=null && cont > MAX) break;
 			
 			String[] p = line.split(",");
 			String user_id = p[0];
@@ -288,8 +286,18 @@ public class TouristsSpaceDensity {
 					
 					if(in_out_only && (i>5 && i<p.length-1)) continue; // if in_out_only is true, only first and last events are considered.
 					
-					
 					String[] x = p[i].split(":");
+					
+					
+					//System.out.println("---> "+x[0]+" --> "+F.parse(x[0]));
+					
+					/*
+					int h = Integer.parseInt(x[2]);
+					Calendar cal = new GregorianCalendar();
+					cal.setTime(F.parse(x[0]));
+					cal.set(Calendar.HOUR_OF_DAY, h);
+					*/
+					
 					if(x.length!=4) continue;
 					long celllac =Long.parseLong(x[3].trim());
 					

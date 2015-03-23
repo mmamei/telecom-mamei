@@ -9,7 +9,7 @@ import java.util.Random;
 
 import utils.Config;
 import utils.CopyAndSerializationUtils;
-import utils.LatexUtils;
+import visual.text.LatexUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instance;
