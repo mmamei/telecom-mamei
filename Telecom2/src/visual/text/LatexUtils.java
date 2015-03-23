@@ -1,4 +1,4 @@
-package utils;
+package visual.text;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+
+import utils.Config;
 public class LatexUtils {
 	
 	/*

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import utils.Config;
-import utils.LatexUtils;
+import visual.text.LatexUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
