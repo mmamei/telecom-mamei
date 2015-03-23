@@ -9,7 +9,7 @@ import java.util.Random;
 
 import utils.Config;
 import utils.CopyAndSerializationUtils;
-import visual.text.LatexUtils;
+import visual.text.LatexTable;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instance;
@@ -88,7 +88,7 @@ public class WekaUseClassifier {
 		CopyAndSerializationUtils.save(new File(arff.replace(".arff", "_classes.ser")), mu);
 		
 		String texfile = new File(arff).getName().replace(".arff", ".tex");
-		LatexUtils.printTable(Config.getInstance().paper_folder+"/img/tables/"+texfile,"classified as --$>$", classes, classes, cm);
+		LatexTable.printTable(Config.getInstance().paper_folder+"/img/tables/"+texfile,"classified as --$>$", classes, classes, cm);
 		/*
 		for(int j=0; j<classes.length;j++)
 			System.out.print(classes[j].substring(0,3)+"\t");

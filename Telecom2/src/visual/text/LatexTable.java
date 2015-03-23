@@ -8,7 +8,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import utils.Config;
-public class LatexUtils {
+public class LatexTable {
 	
 	/*
 	
