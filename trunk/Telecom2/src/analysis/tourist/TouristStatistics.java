@@ -246,7 +246,7 @@ public class TouristStatistics {
 		for(String k:tm.keySet())
 			System.out.println(k+" ==> "+tm.get(k));
 		
-		TextPlotter.getInstance().run(tm, "ftl/TouristStatistics.ftl", Config.getInstance().paper_folder+"/img/TouristStatistics/"+city+month+(classes_ser_file != null ? "_tourists":"")+".tex");
+		TextPlotter.getInstance().run(tm, "src/analysis/tourist/TouristStatistics.ftl", Config.getInstance().paper_folder+"/img/TouristStatistics/"+city+month+(classes_ser_file != null ? "_tourists":"")+".tex");
 	}
 	
 	

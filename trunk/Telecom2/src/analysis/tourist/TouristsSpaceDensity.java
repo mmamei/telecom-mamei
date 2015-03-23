@@ -134,7 +134,7 @@ public class TouristsSpaceDensity {
 		for(String profile: profile_descriptions.keySet())
 			tm.put(profile+"Places", profile_descriptions.get(profile));
 		*/
-		TextPlotter.getInstance().run(tm, "ftl/TouristsSpaceDensity.ftl", Config.getInstance().paper_folder+"/img/heatmap/"+city+"-"+month+(in_out_only ? "-inout" : "")+".tex");
+		TextPlotter.getInstance().run(tm, "src/analysis/tourist/TouristsSpaceDensity.ftl", Config.getInstance().paper_folder+"/img/heatmap/"+city+"-"+month+(in_out_only ? "-inout" : "")+".tex");
 		paragraph ++;
 	}
 	
